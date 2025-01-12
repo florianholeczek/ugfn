@@ -5,9 +5,16 @@
   let lr_model_value = 0.001;
   let lr_logz_value = 0.1;
   let visualize_every = 50;
+  let trajectory_length_value = 2;
+  let hidden_layer_value = 2;
+  let hidden_dim_value = 2;
+  let seed_value = 7614;
+  let batch_size_exponent = 6;
+  $: batch_size_value = 2**batch_size_exponent;
+
 
   //polling every n ms
-  const POLLING_INTERVAL = 1000;
+  const POLLING_INTERVAL = 500;
   let isRunning = false;
   let currentImage = null;
   let pollingTimer;
@@ -23,6 +30,12 @@
       n_iterations_value = 2000;
       lr_model_value = 0.001;
       lr_logz_value = 0.1;
+      visualize_every = 50;
+      trajectory_length_value = 2;
+      hidden_layer_value = 2;
+      hidden_dim_value = 2;
+      seed_value = 7614;
+      batch_size_exponent = 6;
   }
 
   async function startVisualization() {
@@ -40,6 +53,11 @@
           lr_model_value,
           lr_logz_value,
           visualize_every,
+          trajectory_length_value,
+          hidden_layer_value,
+          hidden_dim_value,
+          seed_value,
+          batch_size_value,
         })
       });
 
@@ -244,6 +262,71 @@
           disabled={isRunning}
         />
         <span>{lr_logz_value.toFixed(3)}</span>
+      </div>
+      <div class="slider">
+        <label for="trajectory_length">Length of trajectory</label>
+        <input
+          type="range"
+          min="1"
+          max="8"
+          step="1"
+          bind:value="{trajectory_length_value}"
+          id="trajectory_lenght"
+          disabled={isRunning}
+        />
+        <span>{trajectory_length_value}</span>
+      </div>
+      <div class="slider">
+        <label for="hidden_layer">Number of hidden layers</label>
+        <input
+          type="range"
+          min="1"
+          max="8"
+          step="1"
+          bind:value="{hidden_layer_value}"
+          id="hidden_layer"
+          disabled={isRunning}
+        />
+        <span>{hidden_layer_value}</span>
+      </div>
+      <div class="slider">
+        <label for="seed">Seed for the Run</label>
+        <input
+          type="range"
+          min="0"
+          max="9999"
+          step="1"
+          bind:value="{seed_value}"
+          id="seed"
+          disabled={isRunning}
+        />
+        <span>{seed_value}</span>
+      </div>
+      <div class="slider">
+        <label for="batch_size">Training batch size</label>
+        <input
+          type="range"
+          min="3"
+          max="11"
+          step="1"
+          bind:value="{batch_size_exponent}"
+          id="batch_size"
+          disabled={isRunning}
+        />
+        <span>{batch_size_value}</span>
+      </div>
+    <div class="slider">
+        <label for="vis_every">Update visualization every n interations</label>
+        <input
+          type="range"
+          min="10"
+          max="500"
+          step="10"
+          bind:value="{visualize_every}"
+          id="vis_every"
+          disabled={isRunning}
+        />
+        <span>{visualize_every}</span>
       </div>
     </div>
     <div class="visualization">

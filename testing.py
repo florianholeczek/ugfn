@@ -22,7 +22,7 @@ np.random.seed(seed)
 
 env = Env()
 GFlowNet = GFlowNet()
-losses, logzs, true_logz = GFlowNet.train(env)
+losses, logzs, true_logz = GFlowNet.train(env, n_iterations=1000)
 fig = plot.plot_losses(losses, logzs, true_logz)
 plt.show()
 trajectories = GFlowNet.inference(env, batch_size=2000)

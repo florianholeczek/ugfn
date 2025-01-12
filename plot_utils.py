@@ -11,6 +11,8 @@ from sklearn.neighbors import KernelDensity as kd
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib import cm
+import io
+import base64
 
 
 
@@ -219,23 +221,24 @@ def plot_env_2dsns(
     df['density'] = density.numpy()
     sns.jointplot(x='x', y='y', data=df, hue='density', kind='kde', xlim=(-3, 3), ylim=(-3, 3))
 
+
 def plot_states_2d(
         env,
         trajectory,
         title=None,
-        ground_truth="heatmap",
+        ground_truth="contour",
         levels=10,
         alpha=1.0,
         grid_size=100,
-        colormap='cividis'#'cividis'
+        colormap='viridis'  # 'cividis'
 ):
     """
-    Plots the given final states of the trajectories
+    Plots the given final states of the trajectories with consistent layout.
     :param env: the original environment
     :param trajectory: batch of trajectories as torch.tensor of shape (batch_size, trajectory length, 3)
     :param title: title of the plot
     :param ground_truth: heatmap, contour or None
-    :param levels: number of countour lines
+    :param levels: number of contour lines
     :param alpha: transparency of contour lines
     :param grid_size: density of plotting grid
     :param colormap: matplotlib colormap
@@ -245,27 +248,26 @@ def plot_states_2d(
     sec_color = "0.2"
     binwidth = 0.2
 
-    # get sampled states
-    states = trajectory[:,-1,1:]
-    x=states[:,0].numpy()
-    y=states[:,1].numpy()
+    # Get sampled states
+    states = trajectory[:, -1, 1:]
+    x = states[:, 0].numpy()
+    y = states[:, 1].numpy()
 
-    # calculate density of the environment
+    # Calculate density of the environment
     x_grid, y_grid, grid_points = grid(grid_size=grid_size)
     density_env = env.reward(grid_points)
     density_env = density_env.reshape(grid_size, grid_size).numpy()
 
-    # marginal density is: delta x (dependent on grid size) * marginal
-    # normed for n multivariate gaussians
-    density_x = (6/(grid_size-1))*np.sum(density_env, axis=0)/len(env.mus)
-    density_y = (6/(grid_size-1))*np.sum(density_env, axis=1)/len(env.mus)
+    # Marginal densities
+    density_x = (6 / (grid_size - 1)) * np.sum(density_env, axis=0) / len(env.mus)
+    density_y = (6 / (grid_size - 1)) * np.sum(density_env, axis=1) / len(env.mus)
 
-    # plot ground truth
-    fig = plt.figure(layout='constrained', figsize= (8,8))
+    # Plot ground truth
+    fig = plt.figure(layout='constrained', figsize=(8, 8))
     ax = fig.add_gridspec(top=0.75, right=0.75).subplots()
     ax.set(aspect=1)
     if ground_truth == 'contour':
-        ax.contour(x_grid.numpy(), y_grid.numpy(), density_env, levels=levels, cmap=colormap, alpha = 1)
+        ax.contour(x_grid.numpy(), y_grid.numpy(), density_env, levels=levels, cmap=colormap, alpha=1)
     elif ground_truth == 'heatmap':
         ax.contourf(x_grid.numpy(), y_grid.numpy(), density_env, levels=levels, cmap=colormap, alpha=1)
     ax.set_xlim(-3, 3)
@@ -273,53 +275,47 @@ def plot_states_2d(
     ax.set_xlabel("x")
     ax.set_ylabel("y")
 
-    # plot sampled states
-    ax.scatter(x, y, alpha=alpha, color=sec_color, marker='2', linewidths=1, label = 'samples')
+    # Plot sampled states
+    ax.scatter(x, y, alpha=alpha, color=sec_color, marker='2', linewidths=1, label='samples')
 
-    # prepare additional plots on the side
+    # Side plots for marginals
     ax_histx = ax.inset_axes([0, 1.05, 1, 0.25], sharex=ax)
     ax_histy = ax.inset_axes([1.05, 0, 0.25, 1], sharey=ax)
     ax_histx.tick_params(axis="x", labelbottom=False)
     ax_histy.tick_params(axis="y", labelleft=False)
-    ax_histy.text(0.45,0,'marginal of y', rotation=270, ha='left', va='center')
-    ax_histx.set_title('marginal of x')
+    ax_histy.text(0.55, 0, 'Marginal of y', rotation=270, ha='left', va='center')
+    ax_histx.set_title('Marginal of x')
 
-    # histogram of sampled states for sideplots
-    xymax = max(np.max(np.abs(x)), np.max(np.abs(y)))
-    lim = (int(xymax / binwidth) + 1) * binwidth
-    bins = np.arange(-lim, lim + binwidth, binwidth)
-    ax_histx.hist(x, density=True, bins=bins, color=sec_color, label='samples2')
-    ax_histy.hist(y, density=True, bins=bins, color=sec_color, orientation='horizontal', label='samples3')
+    # Fix side plot ranges
+    ax_histx.set_ylim(0, 0.5)
+    ax_histy.set_xlim(0, 0.5)
 
-    # ground truth (pdf of marginals) for sideplots
+    # Histogram of sampled states
+    bins = np.arange(-3, 3 + binwidth, binwidth)
+    ax_histx.hist(x, density=True, bins=bins, color=sec_color)
+    ax_histy.hist(y, density=True, bins=bins, color=sec_color, orientation='horizontal')
+
+    # Ground truth marginals
     r = torch.linspace(-3, 3, grid_size)
 
-    # height coloring x
-    points = np.array([r, density_x]).T.reshape(-1,1,2)
+    # Marginal x
+    points = np.array([r, density_x]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
-    norm = plt.Normalize(density_x.min(), density_x.max())
-    lc = LineCollection(segments, cmap=colormap, norm=norm)
-    lc.set_array(density_x)  # Set the values used for colormap
+    lc = LineCollection(segments, cmap=colormap, norm=plt.Normalize(0, 0.5))
+    lc.set_array(density_x)
     lc.set_linewidth(2)
-
     ax_histx.add_collection(lc)
-    ax_histx.autoscale()
-    #ax_histx.plot(r, density_x, color=colormap)
 
-    # height coloring y
+    # Marginal y
     points = np.array([density_y, r]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
-    norm = plt.Normalize(density_y.min(), density_y.max())
-    lc = LineCollection(segments, cmap=colormap, norm=norm)
-    lc.set_array(density_y)  # Set the values used for colormap
+    lc = LineCollection(segments, cmap=colormap, norm=plt.Normalize(0, 0.5))
+    lc.set_array(density_y)
     lc.set_linewidth(2)
-
     ax_histy.add_collection(lc)
-    ax_histy.autoscale()
 
-    fig.legend()
     if title:
         fig.suptitle(title)
 
+    fig.canvas.draw()
     return fig
-

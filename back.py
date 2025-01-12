@@ -42,10 +42,15 @@ visualization_state = {
 
 class VisualizationRequest(BaseModel):
     off_policy_value: float
-    n_iterations_value: float
+    n_iterations_value: int
     lr_model_value: float
     lr_logz_value: float
     visualize_every: int
+    trajectory_length_value: int
+    hidden_layer_value: int
+    hidden_dim_value: int
+    seed_value: int
+    batch_size_value: int
 
 # Dummy visualize function
 def visualize(off_policy_value: float, n_iterations_value: int):
@@ -86,6 +91,11 @@ def start_visualization(request: VisualizationRequest, background_tasks: Backgro
     lr_model_value = request.lr_model_value
     lr_logz_value = request.lr_logz_value
     visualize_every = int(request.visualize_every)
+    trajectory_length_value = int(request.trajectory_length_value)
+    hidden_layer_value = int(request.hidden_layer_value)
+    hidden_dim_value = int(request.hidden_dim_value)
+    seed_value = int(request.seed_value)
+    batch_size_value = int(request.batch_size_value)
 
     # Check if a process is already running
     if visualization_state["running"]:
@@ -163,23 +173,22 @@ def train_and_sample(
             n_iterations=visualize_every,
             off_policy=off_policy_value,
         )
-        trajectory = model.inference(env, batch_size=1024, trajectory_length=trajectory_length)
+        trajectory = model.inference(env, batch_size=4096, trajectory_length=trajectory_length)
         fig=plot_states_2d(
             env,
             trajectory,
-            title=f"Iteration {(v+1)*visualize_every}/{n_iterations_value}",
-            ground_truth="heatmap",
-            levels=10,
-            alpha=1.0,
-            grid_size=100,
-            colormap='cividis'
+            title=f"Iteration {(v+1)*visualize_every}/{n_iterations_value}"
         )
+
+        fig.canvas.draw()
+        fig.savefig("Test")
         buf= io.BytesIO()
         fig.savefig(buf, format='png')
         buf.seek(0)
         img_base64 = base64.b64encode(buf.read()).decode('utf-8')
         buf.close()
         visualization_state["current_image"] = img_base64
+        plt.close()
     # Mark process as completed or stop requested
     visualization_state["running"] = False
     if visualization_state["stop_requested"]:
