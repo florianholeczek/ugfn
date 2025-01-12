@@ -8,14 +8,7 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi import FastAPI, BackgroundTasks
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-import time
-import threading
-import base64
-import matplotlib.pyplot as plt
-import io
+
 
 app = FastAPI()
 
