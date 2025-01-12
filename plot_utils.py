@@ -230,7 +230,8 @@ def plot_states_2d(
         levels=10,
         alpha=1.0,
         grid_size=100,
-        colormap='viridis'  # 'cividis'
+        colormap='viridis',  # 'cividis',
+        marginals_gradient = True # To plot the true values of the marginals according to the colormap.
 ):
     """
     Plots the given final states of the trajectories with consistent layout.
@@ -298,24 +299,30 @@ def plot_states_2d(
     # Ground truth marginals
     r = torch.linspace(-3, 3, grid_size)
 
-    # Marginal x
-    points = np.array([r, density_x]).T.reshape(-1, 1, 2)
-    segments = np.concatenate([points[:-1], points[1:]], axis=1)
-    lc = LineCollection(segments, cmap=colormap, norm=plt.Normalize(0, 0.5))
-    lc.set_array(density_x)
-    lc.set_linewidth(2)
-    ax_histx.add_collection(lc)
+    if marginals_gradient:
+        # Marginal x
+        points = np.array([r, density_x]).T.reshape(-1, 1, 2)
+        segments = np.concatenate([points[:-1], points[1:]], axis=1)
+        lc = LineCollection(segments, cmap=colormap, norm=plt.Normalize(0, 0.5))
+        lc.set_array(density_x)
+        lc.set_linewidth(2)
+        ax_histx.add_collection(lc)
 
-    # Marginal y
-    points = np.array([density_y, r]).T.reshape(-1, 1, 2)
-    segments = np.concatenate([points[:-1], points[1:]], axis=1)
-    lc = LineCollection(segments, cmap=colormap, norm=plt.Normalize(0, 0.5))
-    lc.set_array(density_y)
-    lc.set_linewidth(2)
-    ax_histy.add_collection(lc)
+        # Marginal y
+        points = np.array([density_y, r]).T.reshape(-1, 1, 2)
+        segments = np.concatenate([points[:-1], points[1:]], axis=1)
+        lc = LineCollection(segments, cmap=colormap, norm=plt.Normalize(0, 0.5))
+        lc.set_array(density_y)
+        lc.set_linewidth(2)
+        ax_histy.add_collection(lc)
+    else:
+        ax_histx.plot(r.numpy(), density_x, color=colormap(0.8), linewidth=2, label='Marginal x', zorder=5)
+        ax_histy.plot(density_y, r.numpy(), color=colormap(0.8), linewidth=2, label='Marginal y', zorder=5)
 
     if title:
         fig.suptitle(title)
 
     fig.canvas.draw()
+    fig.canvas.flush_events()
+    fig.savefig("Test")
     return fig

@@ -290,7 +290,7 @@
         <span>{hidden_layer_value}</span>
       </div>
       <div class="slider">
-        <label for="seed">Seed for the Run</label>
+        <label for="seed">Seed (TODO)</label>
         <input
           type="range"
           min="0"

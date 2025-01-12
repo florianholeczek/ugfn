@@ -86,16 +86,11 @@ def visualize(off_policy_value: float, n_iterations_value: int):
 @app.post("/start_visualization")
 def start_visualization(request: VisualizationRequest, background_tasks: BackgroundTasks):
     global visualization_state
-    off_policy_value = request.off_policy_value
-    n_iterations_value = int(request.n_iterations_value)
-    lr_model_value = request.lr_model_value
-    lr_logz_value = request.lr_logz_value
-    visualize_every = int(request.visualize_every)
-    trajectory_length_value = int(request.trajectory_length_value)
-    hidden_layer_value = int(request.hidden_layer_value)
-    hidden_dim_value = int(request.hidden_dim_value)
-    seed_value = int(request.seed_value)
-    batch_size_value = int(request.batch_size_value)
+    params = {}
+    for k,v in request.dict().items():
+        params[k.replace("_value","")]=v
+
+    print(params)
 
     # Check if a process is already running
     if visualization_state["running"]:
@@ -110,11 +105,7 @@ def start_visualization(request: VisualizationRequest, background_tasks: Backgro
     #background_tasks.add_task(visualize, off_policy_value, n_iterations_value)
     background_tasks.add_task(
         train_and_sample,
-        off_policy_value,
-        n_iterations_value,
-        lr_model_value,
-        lr_logz_value,
-        visualize_every
+        params
     )
     return {"status": "Visualization started."}
 
@@ -144,44 +135,36 @@ def stop_visualization():
         return JSONResponse(status_code=400, content={"error": "No visualization running."})
 
 def train_and_sample(
-        off_policy_value: float,
-        n_iterations_value: int,
-        lr_model_value: float,
-        lr_logz_value: float,
-        visualize_every: int
+        params: dict,
 ):
     global visualization_state
-    n_visualizations = int(np.ceil(n_iterations_value/visualize_every))
-    trajectory_length = 2
-    batch_size = 64
-    n_hidden_layers = 2
+    n_visualizations = int(np.ceil(params['n_iterations']/params['visualize_every']))
 
     env = Env()
     model = GFlowNet(
-        n_hidden_layers=n_hidden_layers,
-        hidden_dim=batch_size,
-        lr_model=lr_model_value,
-        lr_logz=lr_logz_value
+        n_hidden_layers=params['hidden_layer'],
+        hidden_dim=params['hidden_dim'],
+        lr_model=params['lr_model'],
+        lr_logz=params['lr_logz'],
     )
     for v in range(n_visualizations):
         if visualization_state["stop_requested"]:
             break
         losses = model.train(
             env,
-            batch_size=batch_size,
-            trajectory_length=trajectory_length,
-            n_iterations=visualize_every,
-            off_policy=off_policy_value,
+            batch_size=params['batch_size'],
+            trajectory_length=params['trajectory_length'],
+            n_iterations=params['visualize_every'],
+            off_policy=params['off_policy'],
         )
-        trajectory = model.inference(env, batch_size=4096, trajectory_length=trajectory_length)
+        trajectory = model.inference(env, batch_size=4096, trajectory_length=params['trajectory_length'])
         fig=plot_states_2d(
             env,
             trajectory,
-            title=f"Iteration {(v+1)*visualize_every}/{n_iterations_value}"
+            title=f"Iteration {(v+1)*params['visualize_every']}/{params['n_iterations']}",
+            marginals_gradient=False
         )
 
-        fig.canvas.draw()
-        fig.savefig("Test")
         buf= io.BytesIO()
         fig.savefig(buf, format='png')
         buf.seek(0)
