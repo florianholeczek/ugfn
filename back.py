@@ -7,6 +7,10 @@ import plotly.tools as tools
 import plotly.graph_objects as go
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+
+
+from pydantic import BaseModel
+
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -34,6 +38,12 @@ visualization_state = {
     "stop_requested": False
 }
 
+class VisualizationRequest(BaseModel):
+    off_policy_value: float
+    n_iterations_value: float
+    lr_model_value: float
+    lr_logz_value: float
+    visualize_every: int
 
 # Dummy visualize function
 def visualize(off_policy_value: float, n_iterations_value: int):
@@ -60,13 +70,20 @@ def visualize(off_policy_value: float, n_iterations_value: int):
         # Update state
         visualization_state["current_image"] = img_base64
 
-    # Mark process as completed
+    # Mark process as completed or stop requested
     visualization_state["running"] = False
+    if visualization_state["stop_requested"]:
+        print("Visualization stopped by user.")
 
 
 @app.post("/start_visualization")
-def start_visualization(off_policy_value: float, n_iterations_value: int, background_tasks: BackgroundTasks):
+def start_visualization(request: VisualizationRequest, background_tasks: BackgroundTasks):
     global visualization_state
+    off_policy_value = request.off_policy_value
+    n_iterations_value = int(request.n_iterations_value)
+    lr_model_value = request.lr_model_value
+    lr_logz_value = request.lr_logz_value
+    visualize_every = int(request.visualize_every)
 
     # Check if a process is already running
     if visualization_state["running"]:
@@ -86,11 +103,13 @@ def start_visualization(off_policy_value: float, n_iterations_value: int, backgr
 def get_visualization():
     global visualization_state
 
-    # Return the current image if available
-    if visualization_state["current_image"]:
-        return {"image": visualization_state["current_image"]}
-    else:
-        return {"image": None}
+    if not visualization_state["running"] and visualization_state["current_image"] is None:
+        return {"completed": True, "image_data": None}
+
+    return {
+        "completed": not visualization_state["running"],
+        "image": visualization_state["current_image"]
+    }
 
 
 @app.post("/stop_visualization")
@@ -105,35 +124,9 @@ def stop_visualization():
         return JSONResponse(status_code=400, content={"error": "No visualization running."})
 
 
-"""app.mount("/front", StaticFiles(directory="front/public", html=True), name="front")
-app.mount("/build", StaticFiles(directory="front/public/build"), name="build")
 
-# CORS settings to allow requests from the Svelte frontend
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Replace with your frontend's URL in production
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
-@app.get("/plot")
-async def get_plot():
-   # Create a Matplotlib figure
-   fig, ax = plt.subplots()
-   ax.plot([0, 1, 2], [0, 1, 4], label="Line")
-   ax.set_title("Example Plot")
-   ax.set_xlabel("X-axis")
-   ax.set_ylabel("Y-axis")
-   ax.legend()
-
-   # Convert Matplotlib figure to Plotly figure
-   plotly_fig = tools.mpl_to_plotly(fig)
-
-   # Convert the Plotly figure to a JSON-serializable dictionary
-   plotly_json = plotly_fig.to_plotly_json()
-   return JSONResponse(content=plotly_json)
-
+"""
 @app.get("/rand")
 async def hello():
    return random.randint(0, 100)
@@ -141,9 +134,5 @@ async def hello():
 @app.get('/')
 async def front():
    return RedirectResponse(url='front')
-
-@app.post("/train_params")
-async def receive_train_params(train_params):
-    print(f"Received slider values: {train_params}")
-    return "Trulla"
-"""
+app.mount("/front", StaticFiles(directory="front/public", html=True), name="front")
+app.mount("/build", StaticFiles(directory="front/public/build"), name="build")"""
