@@ -99,44 +99,182 @@
     }, POLLING_INTERVAL);
   }
 </script>
+<main class="main-content">
+  <div id="plot-container" style="width: 100%; height: 100%;"></div>
+  <header class="header">
+    <div class="container">
+      <h1 class="title">Understanding GFlowNets</h1>
+      <p class="subtitle">Gaining intuition for Generative Flow Networks and how to train them</p>
+    </div>
+  </header>
 
-<div class="controls">
-  <label>
-    Off Policy Value: {off_policy_value}
-    <input
-      class="slider"
-      type="range"
-      min="0"
-      max="10"
-      step="0.1"
-      bind:value={off_policy_value}
-      disabled={isRunning} />
-  </label>
+  <section class="section">
+    <h2 class="section-title">What is a GFlowNet?</h2>
+    <p class="section-text">
+      Short Description: What can they do, how do they work, advantages
+    </p>
 
-  <label>
-    N Iterations Value: {n_iterations_value}
-    <input
-      class="slider"
-      type="range"
-      min="1"
-      max="10"
-      step="1"
-      bind:value={n_iterations_value}
-      disabled={isRunning} />
-  </label>
+    <h2 class="section-title">Toy Environment</h2>
+    <p class="section-text">
+      A 2-dimensional multivariate Gaussian environment with two modes. GFlowNet
+      takes steps in the x or y direction, and rewards are calculated based on the mixture of
+      Gaussians.
+    </p>
+    <ul class="bullet-list">
+      <li>Variable sequence length is typically supported, but fixed here for simplicity.</li>
+      <li>State does not depend on the order of steps.</li>
+      <li>Added a counter to avoid circular paths in the graph.</li>
+    </ul>
+    <div class="image-container">
+      <img src="/images/env1.png" class="image" alt="Rendering of the environment">
+    </div>
+  </section>
 
-  <button on:click={isRunning ? stopVisualization : startVisualization}>
-    {isRunning ? 'Stop' : 'Start'}
-  </button>
-</div>
+  <section class="section section-light">
+    <h2 class="section-title">Training</h2>
+    <p class="section-text">
+      Visualizing how GFlowNet samples from the underlying distribution.
+      -> Learns full distribution given enough compute
+      TODO: Add slider over training iterations to visualizations to add interactivity and see training progress
+    </p>
+    <div class="image-container">
+      <img src="/images/run1.png" class="image" alt="GFN samples from the underlying distribution">
+    </div>
 
-<div class="visualization">
-  {#if currentImage}
-    <img src={currentImage} alt="Visualization" />
-  {:else if isRunning}
-    <p>Loading visualization...</p>
-  {/if}
-</div>
+    <h2 class="section-title">Mode Collapse</h2>
+    <p class="section-text">
+      If there is little probability mass between modes, we see mode collapse.
+    </p>
+    <div class="image-container">
+      <img src="/images/run2.png" class="image" alt="Low variance leads to sampling from one mode">
+    </div>
+    <p class="section-text">
+      Training off-policy mitigates this issue.
+      We added variance to each step -> more exploring
+    </p>
+    <div class="image-container">
+      <img src="/images/run3.png" class="image" alt="Off-policy training helps">
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Flow</h2>
+    <p class="section-text">
+      Visualize flow between states. Probably interactive:
+      Hovering over env and displaying flow in 8 directions with arrows.
+      Probably need to discretize for this?
+    </p>
+  </section>
+
+  <section class="playground">
+    <div class="container">
+      <h1 class="title">Playground</h1>
+      <p class="subtitle">
+        Change the environment and train your own GFlowNet to get a feeling on how they work.
+      </p>
+    </div>
+  </section>
+
+  <section class="section-light">
+    <p class="section-text">
+      change env (up to 4 gaussians, change their mean and var by dragging and scaling on the image)
+    </p>
+    <div class="image-container">
+      <img src="/images/env1.png" class="image" alt="Rendering of the environment">
+    </div>
+
+    <p class="section-text">
+      change training settings and start training (visualize training by sampling every n steps),
+      all interactivty deactivated while training, add stop button.
+    </p>
+    <div class="buttonscontainer">
+      <button class="reset-button" on:click="{resetSliders}" disabled="{isRunning}">Reset</button>
+      <button class="reset-button" on:click="{isRunning ? stopVisualization : startVisualization}">
+        {isRunning ? 'Stop' : 'Start'}</button>
+    </div>
+    <div class="slider-container">
+      <div class="slider">
+        <label for="off_policy">Off-policy</label>
+        <input
+          type="range"
+          min="0"
+          max="3"
+          step="0.1"
+          bind:value="{off_policy_value}"
+          id="off_policy"
+          disabled={isRunning}
+        />
+        <span>{off_policy_value}</span>
+      </div>
+      <div class="slider">
+        <label for="n_iterations">Iterations to train</label>
+        <input
+          type="range"
+          min="100"
+          max="10000"
+          step="10"
+          bind:value="{n_iterations_value}"
+          id="n_iterations"
+          disabled={isRunning}
+        />
+        <span>{n_iterations_value}</span>
+      </div>
+      <div class="slider">
+        <label for="lr_model">Learning rate of the model</label>
+        <input
+          type="range"
+          min="0.0001"
+          max="0.1"
+          step="0.0001"
+          bind:value="{lr_model_value}"
+          id="lr_model"
+          disabled={isRunning}
+        />
+        <span>{lr_model_value.toFixed(4)}</span>
+      </div>
+      <div class="slider">
+        <label for="lr_logz">Learning rate of LogZ</label>
+        <input
+          type="range"
+          min="0.001"
+          max="0.3"
+          step="0.001"
+          bind:value="{lr_logz_value}"
+          id="lr_logz"
+          disabled={isRunning}
+        />
+        <span>{lr_logz_value.toFixed(3)}</span>
+      </div>
+    </div>
+    <div class="visualization">
+      {#if currentImage}
+        <img src={currentImage} alt="Visualization" />
+      {:else if isRunning}
+        <p>Loading visualization...</p>
+      {/if}
+    </div>
+
+
+    <!--
+    <h1>Hello {rand}!</h1>
+    <button on:click={getRand}>Get a random number</button>
+    <p class="section-text">
+      Testing: {resp}
+    </p>
+    -->
+
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Sources</h2>
+    <p class="section-text">
+      Add sources
+    </p>
+  </section>
+</main>
+
+
+
 
 <style>
   /* General Styles */

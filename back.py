@@ -8,7 +8,9 @@ import plotly.graph_objects as go
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-
+from arch import GFlowNet
+from env import Env
+from plot_utils import plot_states_2d
 from pydantic import BaseModel
 
 from fastapi import FastAPI, BackgroundTasks
@@ -95,7 +97,15 @@ def start_visualization(request: VisualizationRequest, background_tasks: Backgro
     visualization_state["current_image"] = None
 
     # Start the visualization in the background
-    background_tasks.add_task(visualize, off_policy_value, n_iterations_value)
+    #background_tasks.add_task(visualize, off_policy_value, n_iterations_value)
+    background_tasks.add_task(
+        train_and_sample,
+        off_policy_value,
+        n_iterations_value,
+        lr_model_value,
+        lr_logz_value,
+        visualize_every
+    )
     return {"status": "Visualization started."}
 
 
@@ -123,7 +133,57 @@ def stop_visualization():
     else:
         return JSONResponse(status_code=400, content={"error": "No visualization running."})
 
+def train_and_sample(
+        off_policy_value: float,
+        n_iterations_value: int,
+        lr_model_value: float,
+        lr_logz_value: float,
+        visualize_every: int
+):
+    global visualization_state
+    n_visualizations = int(np.ceil(n_iterations_value/visualize_every))
+    trajectory_length = 2
+    batch_size = 64
+    n_hidden_layers = 2
 
+    env = Env()
+    model = GFlowNet(
+        n_hidden_layers=n_hidden_layers,
+        hidden_dim=batch_size,
+        lr_model=lr_model_value,
+        lr_logz=lr_logz_value
+    )
+    for v in range(n_visualizations):
+        if visualization_state["stop_requested"]:
+            break
+        losses = model.train(
+            env,
+            batch_size=batch_size,
+            trajectory_length=trajectory_length,
+            n_iterations=visualize_every,
+            off_policy=off_policy_value,
+        )
+        trajectory = model.inference(env, batch_size=1024, trajectory_length=trajectory_length)
+        fig=plot_states_2d(
+            env,
+            trajectory,
+            title=f"Iteration {(v+1)*visualize_every}/{n_iterations_value}",
+            ground_truth="heatmap",
+            levels=10,
+            alpha=1.0,
+            grid_size=100,
+            colormap='cividis'
+        )
+        buf= io.BytesIO()
+        fig.savefig(buf, format='png')
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+        buf.close()
+        visualization_state["current_image"] = img_base64
+    # Mark process as completed or stop requested
+    visualization_state["running"] = False
+    if visualization_state["stop_requested"]:
+        print("Visualization stopped by user.")
 
 
 """
