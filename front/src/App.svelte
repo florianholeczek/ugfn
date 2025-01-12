@@ -1,7 +1,8 @@
 <script>
+
     let rand = -1;
-    let off_policy_value = 0;
-    let n_iterations_value = 2000;
+    //let off_policy_value = 0;
+    //let n_iterations_value = 2000;
     let lr_model_value = 0.001;
     let lr_logz_value = 0.1;
     let training_running = false
@@ -20,33 +21,88 @@
         lr_logz_value = 0.1;
     }
 
-    async function startTraining(){
-      training_running = true
-      resp = "123"
-      let train_params = 1 //{off_policy_value, n_iterations_value, lr_model_value, lr_logz_value}
-      await fetch("http://0.0.0.0:8000/train_params")
-      .then(d => d.text()).then(d => (resp = d));
+    import { onMount } from 'svelte';
+    import { writable } from 'svelte/store';
+
+    // Slider values
+    let off_policy_value = 0;
+    let n_iterations_value = 1;
+
+    // Button state
+    let isRunning = false;
+
+    // Visualization image
+    let currentImage = null;
+
+    // Polling interval (ms)
+    const POLLING_INTERVAL = 1000;
+
+    // Polling timer
+    let pollingTimer;
+
+    async function startVisualization() {
+      try {
+        // Disable sliders and switch button state
+        isRunning = true;
+
+        // Start visualization on backend
+        const response = await fetch('http://localhost:8000/start_visualization', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            off_policy_value,
+            n_iterations_value
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to start visualization.');
+        }
+
+        // Start polling for visualizations
+        pollVisualization();
+      } catch (error) {
+        console.error(error);
+        isRunning = false;
+      }
     }
 
-    /*
-    import { onMount } from 'svelte'; // Import onMount for lifecycle handling
-    import Plotly from 'plotly.js-dist';
+    async function stopVisualization() {
+      try {
+        // Stop visualization on backend
+        const response = await fetch('http://localhost:8000/stop_visualization', {
+          method: 'POST'
+        });
 
-    let plotData = null;
+        if (!response.ok) {
+          throw new Error('Failed to stop visualization.');
+        }
 
-    // Fetch the Plotly plot data from the backend
-    async function fetchPlot() {
-        const response = await fetch("http://0.0.0.0:8000/plot");
-        plotData = await response.json();
-
-        // Render the Plotly plot
-        Plotly.newPlot("plot-container", plotData.data, plotData.layout);
+        // Stop polling and reset button state
+        clearInterval(pollingTimer);
+        isRunning = false;
+      } catch (error) {
+        console.error(error);
+      }
     }
 
-    onMount(() => {
-        fetchPlot();
-    });
-    */
+    function pollVisualization() {
+      pollingTimer = setInterval(async () => {
+        try {
+          const response = await fetch('http://localhost:8000/get_visualization');
+          if (!response.ok) {
+            throw new Error('Failed to fetch visualization.');
+          }
+
+          const data = await response.json();
+          if (data.image) {
+            currentImage = `data:image/png;base64,${data.image}`;
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }, POLLING_INTERVAL);
+    }
 
 
 </script>
@@ -142,7 +198,7 @@
     </p>
     <div class="buttonscontainer">
       <button class="reset-button" on:click="{resetSliders}">Reset</button>
-      <button class="reset-button" on:click="{startTraining}">Start training</button>
+      <button class="reset-button" on:click="{resetSliders}">Start training</button>
     </div>
     <div class="slider-container">
       <div class="slider">
@@ -194,6 +250,51 @@
         <span>{lr_logz_value.toFixed(3)}</span>
       </div>
     </div>
+
+
+
+
+
+
+
+    <div class="controls">
+  <label>
+    Off Policy Value: {off_policy_value}
+    <input
+      class="slider"
+      type="range"
+      min="0"
+      max="10"
+      step="0.1"
+      bind:value={off_policy_value}
+      disabled={isRunning} />
+  </label>
+
+  <label>
+    N Iterations Value: {n_iterations_value}
+    <input
+      class="slider"
+      type="range"
+      min="1"
+      max="10"
+      step="1"
+      bind:value={n_iterations_value}
+      disabled={isRunning} />
+  </label>
+
+  <button on:click={isRunning ? stopVisualization : startVisualization}>
+    {isRunning ? 'Stop' : 'Start'}
+  </button>
+</div>
+
+<div class="visualization">
+  {#if currentImage}
+    <img src={currentImage} alt="Visualization" />
+  {:else if isRunning}
+    <p>Loading visualization...</p>
+  {/if}
+</div>
+
 
     <!--
     <h1>Hello {rand}!</h1>
@@ -414,4 +515,23 @@ span {
   }
 
 
+
+
+  .controls {
+    margin-bottom: 20px;
+  }
+
+  .slider {
+    margin: 10px 0;
+  }
+
+  .visualization {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
 </style>
