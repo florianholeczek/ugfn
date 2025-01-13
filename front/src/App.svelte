@@ -11,6 +11,7 @@
   let seed_value = 7614;
   let batch_size_exponent = 6;
   $: batch_size_value = 2**batch_size_exponent;
+  let current_env_image = null;
 
 
   //polling every n ms
@@ -116,7 +117,138 @@
       }
     }, POLLING_INTERVAL);
   }
+
+  async function get_env_state() {
+    try{
+      const response = await fetch('http://localhost:8000/get_env_state');
+      const data = await response.json();
+      if (data.image) {
+        current_env_image = `data:image/png;base64,${data.image}`;
+      }
+      }catch (error) {
+        console.error(error);
+      }
+  }
+
+
+  //Start new
+
+  import { onMount } from 'svelte';
+  import { writable } from 'svelte/store';
+
+  // Gaussian data store
+  const gaussians = writable([
+    { mean: { x: -1, y: -1 }, variance: 0.5 },
+    { mean: { x: 1, y: 1 }, variance: 0.5 }
+  ]);
+
+  // Coordinate range constraints
+  const range = { min: -3, max: 3 };
+  const varianceRange = { min: 0.1, max: 1.2 };
+
+  let selectedGaussian = null; // Tracks the currently selected Gaussian
+  let hoveredGaussian = null; // Tracks the Gaussian to be highlighted for deletion
+
+  // Utility functions
+  const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+  // Add a new Gaussian
+  const addGaussian = () => {
+    gaussians.update(gs => {
+      if (gs.length < 4) {
+        gs.push({ mean: { x: 0, y: 0 }, variance: 0.5 });
+      }
+      return gs;
+    });
+  };
+
+  // Remove the last Gaussian
+  const removeGaussian = () => {
+    gaussians.update(gs => {
+      if (gs.length > 1) {
+        gs.pop();
+      }
+      return gs;
+    });
+  };
+
+  // Mouse interaction handlers
+  let isDraggingMean = false;
+  let isDraggingVariance = false;
+  let initialMouse = { x: 0, y: 0 };
+
+  const startDragMean = (event, gaussian) => {
+    if (isRunning) return;
+    isDraggingMean = true;
+    selectedGaussian = gaussian;
+    initialMouse = { x: event.clientX, y: event.clientY };
+  };
+
+  const startDragVariance = (event, gaussian) => {
+    if (isRunning) return;
+    isDraggingVariance = true;
+    selectedGaussian = gaussian;
+    initialMouse = { x: event.clientX, y: event.clientY };
+  };
+
+  const handleMouseMove = (event) => {
+    if (!selectedGaussian || isRunning) return;
+
+    const dx = (event.clientX - initialMouse.x) / 100;
+    const dy = (event.clientY - initialMouse.y) / 100;
+
+    gaussians.update(gs => {
+      const g = gs.find(g => g === selectedGaussian);
+
+      if (isDraggingMean && g) {
+        g.mean.x = clamp(g.mean.x + dx, range.min, range.max);
+        g.mean.y = clamp(g.mean.y - dy, range.min, range.max);
+      } else if (isDraggingVariance && g) {
+        const newVariance = g.variance + dx;
+        g.variance = clamp(newVariance, varianceRange.min, varianceRange.max);
+      }
+
+      return gs;
+    });
+
+    initialMouse = { x: event.clientX, y: event.clientY };
+  };
+
+  const stopDrag = () => {
+    isDraggingMean = false;
+    isDraggingVariance = false;
+    selectedGaussian = null;
+    get_env_state();
+  };
+
+
+
+
+
+  const highlightGaussian = (index) => {
+    hoveredGaussian = index;
+  };
+
+  const clearHighlight = () => {
+    hoveredGaussian = null;
+  };
+
+  onMount(() => {
+    get_env_state()
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', stopDrag);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', stopDrag);
+    };
+  });
+
+
 </script>
+
+
+
+
 <main class="main-content">
   <div id="plot-container" style="width: 100%; height: 100%;"></div>
   <header class="header">
@@ -195,11 +327,72 @@
 
   <section class="section-light">
     <p class="section-text">
-      change env (up to 4 gaussians, change their mean and var by dragging and scaling on the image)
+      Here you can change the environment.
+      Drag the center of the circles to change the mean and the border to change the variance.
+      You can also add more Gaussians if you want.
     </p>
-    <div class="image-container">
-      <img src="/images/env1.png" class="image" alt="Rendering of the environment">
+    <div class="env-container">
+      <img src="/images/env1.png" class="env-image" alt="Rendering of the environment">
+      <div class="canvas-container">
+        {#each $gaussians as g, i}
+          <!-- Variance circle -->
+          <div
+            class="variance-circle"
+            class:highlight={i === hoveredGaussian || isRunning}
+            style="
+              width: {129 * g.variance}px;
+              height: {129 * g.variance}px;
+              left: {193 + 193/3 * g.mean.x}px;
+              top: {193 - 193/3 * g.mean.y}px;
+            "
+            on:mousedown={(e) => startDragVariance(e, g)}
+          ></div>
+
+          <!-- Mean circle -->
+          <div
+            class="mean-circle"
+            class:highlight={i === hoveredGaussian}
+            style="
+              left: {193 + 193/3 * g.mean.x}px;
+              top: {193 - 193/3 * g.mean.y}px;
+            "
+            on:mousedown={(e) => startDragMean(e, g)}
+          ></div>
+        {/each}
+      </div>
     </div>
+
+    <div class="controls">
+      Number of Gaussians:
+      <button
+        on:mouseover={() => highlightGaussian($gaussians.length - 1)}
+        on:mouseout={clearHighlight}
+        on:click={removeGaussian}
+        disabled={isRunning || $gaussians.length === 1}>
+        -
+      </button>
+      <span>{$gaussians.length}</span>
+      <button on:click={addGaussian} disabled={isRunning || $gaussians.length === 4}>+</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Mean X</th>
+          <th>Mean Y</th>
+          <th>Variance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {#each $gaussians as g, i}
+          <tr>
+            <td>{g.mean.x.toFixed(2)}</td>
+            <td>{g.mean.y.toFixed(2)}</td>
+            <td>{g.variance.toFixed(2)}</td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
 
     <p class="section-text">
       change training settings and start training (visualize training by sampling every n steps),
@@ -347,6 +540,12 @@
     -->
 
   </section>
+
+
+
+  <!-- start new -->
+
+
 
   <section class="section">
     <h2 class="section-title">Sources</h2>
@@ -571,6 +770,86 @@ span {
   img {
     max-width: 100%;
     height: auto;
+  }
+
+
+
+  /* start new*/
+
+  .env-container {
+    position: relative;
+    left: 4px;
+    width: 1000px;
+    height: 500px;
+    }
+
+  .env-image {
+    width: 1000px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1; /* Ensure the image is below the canvas */
+  }
+  .canvas-container {
+    position: absolute;
+    top: 66px;
+    left: 38px;
+    width: 386px;
+    height: 386px;
+    z-index: 2; /* Ensure the canvas is above the image */
+    pointer-events: none; /* Prevent accidental interaction with the container itself */
+    border: 1px solid #ccc;
+  }
+
+
+  .mean-circle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #585858;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    cursor: grab;
+    pointer-events: auto;
+  }
+
+  .mean-circle.highlight {
+    background: #5f1616;
+  }
+
+  .variance-circle {
+    position: absolute;
+    border: 4px solid #585858;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    cursor: grab;
+    pointer-events: auto;
+  }
+
+  .variance-circle.highlight {
+    background: #5f1616;
+    opacity: 0.5;
+  }
+
+  .circles_whenrunning {
+    opacity: 1;
+  }
+
+  .controls {
+    margin-top: 10px;
+  }
+
+  button {
+    margin: 5px;
+  }
+
+  button:hover {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
 </style>

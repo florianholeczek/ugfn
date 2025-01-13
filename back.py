@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 
 from arch import GFlowNet
 from env import Env
-from plot_utils import plot_states_2d
+from plot_utils import plot_states_2d, plot_env
 from pydantic import BaseModel
 
 from fastapi import FastAPI, BackgroundTasks
@@ -39,6 +39,9 @@ visualization_state = {
     "current_image": None,
     "stop_requested": False
 }
+
+env_start = Env()
+env_state = plot_env(env_start, title="PDF of the environment")
 
 class VisualizationRequest(BaseModel):
     off_policy_value: float
@@ -133,6 +136,15 @@ def stop_visualization():
         return {"status": "Stop requested."}
     else:
         return JSONResponse(status_code=400, content={"error": "No visualization running."})
+
+@app.get("/get_env_state")
+def get_env_state():
+    global env_state
+    global visualization_state
+    if visualization_state["running"]:
+        return {"env_state": None}
+    else:
+        return {"env_state": env_state}
 
 def train_and_sample(
         params: dict,
