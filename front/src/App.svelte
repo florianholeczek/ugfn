@@ -15,7 +15,7 @@
 
 
   //polling every n ms
-  const POLLING_INTERVAL = 500;
+  const POLLING_INTERVAL = 200;
   let isRunning = false;
   let currentImage = null;
   let pollingTimer;
@@ -77,9 +77,7 @@
   async function stopVisualization() {
     try {
       // Stop visualization on backend
-      const response = await fetch('http://localhost:8000/stop_visualization', {
-        method: 'POST'
-      });
+      const response = await fetch('http://localhost:8000/stop_visualization');
 
       if (!response.ok) {
         throw new Error('Failed to stop visualization.');
@@ -117,24 +115,69 @@
       }
     }, POLLING_INTERVAL);
   }
-
-  async function get_env_state() {
-    try{
-      const response = await fetch('http://localhost:8000/get_env_state');
-      const data = await response.json();
-      if (data.image) {
-        current_env_image = `data:image/png;base64,${data.image}`;
-      }
-      }catch (error) {
+/*
+  async function get_env_state(value) {
+  try {
+    // Access the current value of 'gaussians' using subscribe
+    gaussians.subscribe(value => {
+      // Send the POST request with the current value of 'gaussians'
+      fetch('http://localhost:8000/get_env_state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gaussians: value })  // Use the current value of 'gaussians'
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.image) {
+          current_env_image = `data:image/png;base64,${data.image}`;
+        }
+      })
+      .catch(error => {
         console.error(error);
-      }
+      });
+    });
+  } catch (error) {
+    console.error(error);
+  }
+} */
+  async function get_env_state() {
+    try {
+      // Access the current value of 'gaussians' using subscribe
+      const value = get(gaussians)
+        fetch('http://localhost:8000/get_env_state', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ gaussians: value })  // Use the current value of 'gaussians'
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.image) {
+            current_env_image = `data:image/png;base64,${data.image}`;
+          }
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
 
   //Start new
 
   import { onMount } from 'svelte';
-  import { writable } from 'svelte/store';
+  import {get, writable} from 'svelte/store';
 
   // Gaussian data store
   const gaussians = writable([
@@ -142,9 +185,10 @@
     { mean: { x: 1, y: 1 }, variance: 0.5 }
   ]);
 
+
   // Coordinate range constraints
   const range = { min: -3, max: 3 };
-  const varianceRange = { min: 0.1, max: 1.2 };
+  const varianceRange = { min: 0.1, max: 1.0 };
 
   let selectedGaussian = null; // Tracks the currently selected Gaussian
   let hoveredGaussian = null; // Tracks the Gaussian to be highlighted for deletion
@@ -215,10 +259,11 @@
   };
 
   const stopDrag = () => {
+    console.log("Mouse released, stopping drag...");
+    get_env_state();
     isDraggingMean = false;
     isDraggingVariance = false;
     selectedGaussian = null;
-    get_env_state();
   };
 
 
@@ -244,10 +289,75 @@
   });
 
 
+/*
+  import Plotly from 'plotly.js-dist';
+
+  let chartId = 'line-chart';
+
+  onMount(() => {
+    const data = [
+      {
+        x: [1, 2, 3, 4, 5],
+        y: [10, 14, 19, 24, 30],
+        type: 'scatter', // Line chart
+        mode: 'lines+markers',
+        marker: { color: 'blue' },
+      },
+    ];
+
+    const layout = {
+      title: 'Simple Line Chart',
+      xaxis: { title: 'X-Axis Label' },
+      yaxis: { title: 'Y-Axis Label' },
+    };
+
+    Plotly.newPlot(chartId, data, layout);
+  });
+ */
+  let Plotly;
+  let chartId = 'line-chart';
+
+  // Load Plotly from CDN
+  async function loadPlotly() {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.plot.ly/plotly-latest.min.js';
+    document.head.appendChild(script);
+
+    return new Promise((resolve) => {
+      script.onload = () => {
+        Plotly = window.Plotly;
+        resolve();
+      };
+    });
+  }
+
+  onMount(async () => {
+    await loadPlotly();
+    // Create your plot
+    const data = [
+      {
+        x: [1, 2, 3, 4, 5],
+        y: [10, 14, 19, 24, 30],
+        type: 'scatter', // Line chart
+        mode: 'lines+markers',
+        marker: { color: 'blue' },
+      },
+    ];
+
+    const layout = {
+      title: 'Simple Line Chart',
+      xaxis: { title: 'X-Axis Label' },
+      yaxis: { title: 'Y-Axis Label' },
+    };
+
+    Plotly.newPlot(chartId, data, layout);
+  });
+
+
 </script>
 
 
-
+<div id={chartId}></div>
 
 <main class="main-content">
   <div id="plot-container" style="width: 100%; height: 100%;"></div>
@@ -331,6 +441,9 @@
       Drag the center of the circles to change the mean and the border to change the variance.
       You can also add more Gaussians if you want.
     </p>
+    <div class="visualization">
+      <img src={current_env_image} alt="Rendering of the environment"/>
+    </div>
     <div class="env-container">
       <img src="/images/env1.png" class="env-image" alt="Rendering of the environment">
       <div class="canvas-container">
@@ -852,4 +965,9 @@ span {
     cursor: not-allowed;
   }
 
+
+    #line-chart {
+    width: 100%;
+    height: 100%;
+  }
 </style>

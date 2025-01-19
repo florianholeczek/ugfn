@@ -3,6 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.responses import RedirectResponse
 import random
 import numpy as np
+import torch
 import plotly.tools as tools
 import plotly.graph_objects as go
 from fastapi.middleware.cors import CORSMiddleware
@@ -40,8 +41,10 @@ visualization_state = {
     "stop_requested": False
 }
 
+# start with standard environment
 env_start = Env()
-env_state = plot_env(env_start, title="PDF of the environment")
+_, env_state = plot_env(env_start, title="PDF of the environment")
+plt.close("all")
 
 class VisualizationRequest(BaseModel):
     off_policy_value: float
@@ -54,6 +57,21 @@ class VisualizationRequest(BaseModel):
     hidden_dim_value: int
     seed_value: int
     batch_size_value: int
+
+
+# Define the model for 'mean' inside each gaussian
+class Mean(BaseModel):
+    x: float
+    y: float
+
+# Define the model for a single Gaussian object
+class Gaussian(BaseModel):
+    mean: Mean
+    variance: float
+
+# Define the request model that contains a list of Gaussians
+class RequestData(BaseModel):
+    gaussians: list[Gaussian]
 
 # Dummy visualize function
 def visualize(off_policy_value: float, n_iterations_value: int):
@@ -93,7 +111,7 @@ def start_visualization(request: VisualizationRequest, background_tasks: Backgro
     for k,v in request.dict().items():
         params[k.replace("_value","")]=v
 
-    print(params)
+    print("start_vis")
 
     # Check if a process is already running
     if visualization_state["running"]:
@@ -137,16 +155,95 @@ def stop_visualization():
     else:
         return JSONResponse(status_code=400, content={"error": "No visualization running."})
 
-@app.get("/get_env_state")
-def get_env_state():
+@app.post("/get_env_state")
+def get_env_state(request: RequestData):
     global env_state
-    global visualization_state
-    if visualization_state["running"]:
-        return {"env_state": None}
-    else:
-        return {"env_state": env_state}
+    print("get env")
+    mus, sigmas = reformat_gaussians(request)
+    env_current = Env(mus, sigmas)
+    _, env_state = plot_env(env_current, title="PDF of the environment")
+    plt.close("all")
+    return {"image": env_state}
+
+def reformat_gaussians(request):
+    gaussians = request.dict()["gaussians"]
+    mus = []
+    sigmas = []
+    for g in gaussians:
+        m=[]
+        m.append(g["mean"]["x"])
+        m.append(g["mean"]["y"])
+        mus.append(torch.Tensor(m))
+        sigmas.append(torch.ones(2)*g["variance"])
+    return mus, sigmas
+
 
 def train_and_sample(
+        params: dict,
+):
+    global visualization_state
+    #n_visualizations = int(np.ceil(params['n_iterations']/params['visualize_every']))
+    trajectory_vis_n = 2048
+    n_rounds = int(trajectory_vis_n/params['batch_size'])
+    n_visualizations = params['n_iterations']//n_rounds
+
+    env = Env()
+    model = GFlowNet(
+        n_hidden_layers=params['hidden_layer'],
+        hidden_dim=params['hidden_dim'],
+        lr_model=params['lr_model'],
+        lr_logz=params['lr_logz'],
+    )
+    if params['off_policy']:
+        off_policy = torch.linspace(params['off_policy'], 0, params['n_iterations'])
+    else:
+        off_policy = [None]*params['n_iterations']
+    for v in range(n_visualizations):
+        if visualization_state["stop_requested"]:
+            break
+        losses, trajectory = model.train(
+            env,
+            batch_size=params['batch_size'],
+            trajectory_length=params['trajectory_length'],
+            n_iterations=n_rounds,
+            off_policy=off_policy[v*n_rounds:(v+1)*n_rounds],
+        )
+        fig, img_base64=plot_states_2d(
+            env,
+            trajectory,
+            title=f"Iteration {(v+1)*n_rounds}/{params['n_iterations']}",
+            marginals_gradient=False
+        )
+        visualization_state["current_image"] = img_base64
+        plt.close()
+
+    # train for the remainder of the division
+    if params['n_iterations']/n_rounds != n_visualizations:
+        mod = params['n_iterations']%n_rounds
+        losses, trajectory = model.train(
+            env,
+            batch_size=params['batch_size'],
+            trajectory_length=params['trajectory_length'],
+            n_iterations=mod,
+            off_policy=off_policy[-mod:]
+        )
+        # To ensure enough samples
+        trajectory = model.inference(env, batch_size=trajectory_vis_n, trajectory_length=params['trajectory_length'])
+        fig, img_base64 = plot_states_2d(
+            env,
+            trajectory,
+            title=f"Iteration {params['n_iterations']}/{params['n_iterations']}",
+            marginals_gradient=False
+        )
+        visualization_state["current_image"] = img_base64
+        plt.close()
+
+    # Mark process as completed or stop requested
+    visualization_state["running"] = False
+    if visualization_state["stop_requested"]:
+        print("Visualization stopped by user.")
+
+def train_and_sampleOLD(
         params: dict,
 ):
     global visualization_state
@@ -188,7 +285,6 @@ def train_and_sample(
     visualization_state["running"] = False
     if visualization_state["stop_requested"]:
         print("Visualization stopped by user.")
-
 
 """
 @app.get("/rand")

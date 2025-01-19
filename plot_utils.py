@@ -127,11 +127,17 @@ def plot_env(
     ax2.plot_surface(x_grid, y_grid, density, cmap="viridis", edgecolor='k', alpha=alpha_3d)
     ax2.set_xlabel("x")
     ax2.set_ylabel("y")
+    ax2.set_zlim(0,1)
     ax2.set_zlabel("Density")
 
     fig.suptitle(title)
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png')
+    buf.seek(0)
+    img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    buf.close()
 
-    return fig
+    return fig, img_base64
 
 def plot_states_2dOLD(
         env,
@@ -243,6 +249,8 @@ def plot_states_2d(
     :param alpha: transparency of contour lines
     :param grid_size: density of plotting grid
     :param colormap: matplotlib colormap
+    :param marginals_gradient: plot the true distribution of the marginals with
+    a gradient according to the colormap instead of a fixed color
     :return: matplotlib fig object
     """
     colormap = mpl.colormaps[colormap]
@@ -324,5 +332,11 @@ def plot_states_2d(
 
     fig.canvas.draw()
     fig.canvas.flush_events()
-    fig.savefig("Test")
-    return fig
+
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png')
+    buf.seek(0)
+    img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    buf.close()
+
+    return fig, img_base64

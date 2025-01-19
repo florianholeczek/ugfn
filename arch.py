@@ -2,6 +2,7 @@ import torch.nn as nn
 import torch
 from tqdm import tqdm
 import copy
+import numpy as np
 
 class GFlowNet():
     def __init__(
@@ -122,18 +123,27 @@ class GFlowNet():
         :param batch_size: Batch size
         :param trajectory_length: Fixed length of the trajectory
         :param n_iterations: number of iterations to train
-        :param off_policy: None to train on-policy.
-        Otherwise a constant (int, float) which will be added to the variance and lead to higher exploration.
-        :return: List of losses, list of logZs, True Logz
+        :param off_policy: None, constant or list
+        None or 0 to train on-policy.
+        A constant (int, float) will be added to the variance and lead to higher exploration.
+        A list of int or float will be used as a schedule. The length must be equal to n_iterations.
+        :return: tuple(List of losses, list of logZs, True Logz), last 4096 trajectories for visualization
         """
 
         losses = []
+        trajectory_vis_n = 2048 # keep the last n trajectories for visualization
+        trajectory_vis = torch.zeros((trajectory_vis_n, trajectory_length+1, 3), device=self.device)
         logzs = []
         logz_true = env.log_partition
         self.forward_model.train()
         self.backward_model.train()
-        exploration_schedule = [None]*n_iterations
-        if off_policy:
+        if not off_policy:
+            exploration_schedule = [None] * n_iterations
+        elif isinstance(off_policy, list):
+            assert len(off_policy) == n_iterations, "Length of off_policy must be equal to n_iterations"
+            exploration_schedule = off_policy
+        else:
+            assert isinstance(off_policy, int) or isinstance(off_policy, float), "no valid off_policy given"
             exploration_schedule = torch.linspace(off_policy, 0, n_iterations)
 
         progress_bar = tqdm(range(n_iterations), desc="Training...")
@@ -161,6 +171,9 @@ class GFlowNet():
             self.optimizer.step()
             losses.append(loss.item())
             logzs.append(self.logz.item())
+            trajectory_vis = torch.cat((trajectory_vis, trajectory), dim=0)
+            if len(trajectory_vis)>trajectory_vis_n:
+                trajectory_vis = trajectory_vis[-trajectory_vis_n:]
 
             if i%20 == 0:
                 progress_bar.set_postfix({
@@ -169,9 +182,9 @@ class GFlowNet():
                     "logZ True": f"{logz_true.item():.3f}"
                 })
 
-        return losses, logzs, logz_true.item()
+        return (losses, logzs, logz_true.item()), trajectory_vis
 
-    def inference(self, env, batch_size=10000, trajectory_length=2):
+    def inference(self, env, batch_size=4096, trajectory_length=2):
         """
         Sample from the model
         :param env: Environment to sample from
@@ -193,5 +206,7 @@ class GFlowNet():
                 x=x_prime
 
         return trajectory
+
+
 
 
