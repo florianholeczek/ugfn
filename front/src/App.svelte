@@ -1,5 +1,8 @@
 <script>
-  let rand = -1;
+  import { onMount } from 'svelte';
+  import {writable} from 'svelte/store';
+
+  // default values
   let off_policy_value = 0;
   let n_iterations_value = 2000;
   let lr_model_value = 0.001;
@@ -10,7 +13,6 @@
   let seed_value = 7614;
   let batch_size_exponent = 6;
   $: batch_size_value = 2**batch_size_exponent;
-  let current_env_image = null;
 
 
   //polling every n ms
@@ -19,6 +21,33 @@
   let currentImage = null;
   let pollingTimer;
 
+  // storing gaussians
+  const gaussians = writable([
+    { mean: { x: -1, y: -1 }, variance: 0.5 },
+    { mean: { x: 1, y: 1 }, variance: 0.5 }
+  ]);
+
+  // ranges for means and variances
+  const range = { min: -3, max: 3 };
+  const varianceRange = { min: 0.1, max: 1.0 };
+
+  // Gaussian tracking
+  let selectedGaussian = null; // Tracks the currently selected Gaussian
+  let hoveredGaussian = null; // Tracks the Gaussian to be highlighted for deletion
+  const highlightGaussian = (index) => {
+    hoveredGaussian = index;
+  };
+  const clearHighlight = () => {
+    hoveredGaussian = null;
+  };
+
+  // Mouse interaction handlers
+  let isDraggingMean = false;
+  let isDraggingVariance = false;
+  let initialMouse = { x: 0, y: 0 };
+
+  // Utility functions
+  const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
   function resetSliders() {
       off_policy_value = 0;
@@ -32,6 +61,22 @@
       batch_size_exponent = 6;
   }
 
+  let Plotly; // Load Plotly from CDN
+  async function loadPlotly() {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.plot.ly/plotly-latest.min.js';
+    document.head.appendChild(script);
+
+    return new Promise((resolve) => {
+      script.onload = () => {
+        Plotly = window.Plotly;
+        resolve();
+      };
+    });
+  }
+
+
+  // Functions used to start, stop and update the training process
   async function startVisualization() {
     try {
       // Disable sliders and switch button state
@@ -110,88 +155,8 @@
       }
     }, POLLING_INTERVAL);
   }
-/*
-  async function get_env_state(value) {
-  try {
-    // Access the current value of 'gaussians' using subscribe
-    gaussians.subscribe(value => {
-      // Send the POST request with the current value of 'gaussians'
-      fetch('http://localhost:8000/get_env_state', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ gaussians: value })  // Use the current value of 'gaussians'
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (data.image) {
-          current_env_image = `data:image/png;base64,${data.image}`;
-        }
-      })
-      .catch(error => {
-        console.error(error);
-      });
-    });
-  } catch (error) {
-    console.error(error);
-  }
-} */
-  async function get_env_state() {
-    try {
-      // Access the current value of 'gaussians' using subscribe
-      const value = get(gaussians)
-        fetch('http://localhost:8000/get_env_state', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ gaussians: value })  // Use the current value of 'gaussians'
-        })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then(data => {
-          if (data.image) {
-            current_env_image = `data:image/png;base64,${data.image}`;
-          }
-        })
-        .catch(error => {
-          console.error(error);
-        });
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
-
-  //Start new
-
-  import { onMount } from 'svelte';
-  import {get, writable} from 'svelte/store';
-
-  // Gaussian data store
-  const gaussians = writable([
-    { mean: { x: -1, y: -1 }, variance: 0.5 },
-    { mean: { x: 1, y: 1 }, variance: 0.5 }
-  ]);
-
-
-  // Coordinate range constraints
-  const range = { min: -3, max: 3 };
-  const varianceRange = { min: 0.1, max: 1.0 };
-
-  let selectedGaussian = null; // Tracks the currently selected Gaussian
-  let hoveredGaussian = null; // Tracks the Gaussian to be highlighted for deletion
-
-  // Utility functions
-  const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-
-  // Add a new Gaussian
+  // Functions for setting the environment
   const addGaussian = () => {
     gaussians.update(gs => {
       if (gs.length < 4) {
@@ -207,7 +172,6 @@
       });
   };
 
-  // Remove the last Gaussian
   const removeGaussian = () => {
     gaussians.update(gs => {
       if (gs.length > 1) {
@@ -222,11 +186,6 @@
         levels: 50,
       });
   };
-
-  // Mouse interaction handlers
-  let isDraggingMean = false;
-  let isDraggingVariance = false;
-  let initialMouse = { x: 0, y: 0 };
 
   const startDragMean = (event, gaussian) => {
     if (isRunning) return;
@@ -266,8 +225,6 @@
   };
 
   const stopDrag = () => {
-
-    /*get_env_state();*/
     if(isDraggingMean || isDraggingVariance){
       console.log($gaussians);
       plotEnvironment(plotContainerId, $gaussians, {
@@ -283,87 +240,17 @@
     selectedGaussian = null;
   };
 
+  // functions for computing the reward and visualizing the Environment
 
-
-
-
-  const highlightGaussian = (index) => {
-    hoveredGaussian = index;
-  };
-
-  const clearHighlight = () => {
-    hoveredGaussian = null;
-  };
-
-  onMount(() => {
-    /*get_env_state()*/
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', stopDrag);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', stopDrag);
-    };
-  });
-
-
-/*
-  import Plotly from 'plotly.js-dist';
-
-  let chartId = 'line-chart';
-
-  onMount(() => {
-    const data = [
-      {
-        x: [1, 2, 3, 4, 5],
-        y: [10, 14, 19, 24, 30],
-        type: 'scatter', // Line chart
-        mode: 'lines+markers',
-        marker: { color: 'blue' },
-      },
-    ];
-
-    const layout = {
-      title: 'Simple Line Chart',
-      xaxis: { title: 'X-Axis Label' },
-      yaxis: { title: 'Y-Axis Label' },
-    };
-
-    Plotly.newPlot(chartId, data, layout);
-  });
- */
-  let Plotly;
-
-  // Load Plotly from CDN
-  async function loadPlotly() {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.plot.ly/plotly-latest.min.js';
-    document.head.appendChild(script);
-
-    return new Promise((resolve) => {
-      script.onload = () => {
-        Plotly = window.Plotly;
-        resolve();
-      };
-    });
+  // calculate reward
+  function gaussianPDF(x, y, mean, variance) {
+    const dx = x - mean.x;
+    const dy = y - mean.y;
+    const sigma2 = variance;
+    return Math.exp(-(dx ** 2 + dy ** 2) / (2 * sigma2)) / (2 * Math.PI * Math.sqrt(sigma2));
   }
 
-
-  onMount(async () => {
-    await loadPlotly();
-    plotEnvironment(plotContainerId, $gaussians, {
-        title: null,
-        gridSize: 100,
-        alpha2D: 1.0,
-        alpha3D: 0.8,
-        levels: 50,
-      });
-
-/*
-    gaussians.subscribe((currentGaussians) => {
-
-    });*/
-  });
-
+  // Density (reward for whole grid)
   function computeDensity(grid, gaussians) {
     const { x, y } = grid;
     const density = Array.from({ length: x.length }, () => Array(y.length).fill(0));
@@ -377,12 +264,6 @@
     }
     return density;
   }
-  function gaussianPDF(x, y, mean, variance) {
-    const dx = x - mean.x;
-    const dy = y - mean.y;
-    const sigma2 = variance;
-    return Math.exp(-(dx ** 2 + dy ** 2) / (2 * sigma2)) / (2 * Math.PI * Math.sqrt(sigma2));
-  }
   function plotEnvironment(containerId, gaussians, options = {}) {
     const gridSize = options.gridSize || 100;
     const alpha2D = options.alpha2D || 1.0;
@@ -393,10 +274,9 @@
     const x = Array.from({ length: gridSize }, (_, i) => range[0] + i * (range[1] - range[0]) / (gridSize - 1));
     const y = Array.from({ length: gridSize }, (_, i) => range[0] + i * (range[1] - range[0]) / (gridSize - 1));
 
-    // Compute density
     const density = computeDensity({ x, y }, gaussians);
 
-    // 2D Contour plot data
+    // 2D plot data
     const contourData = {
       x: x,
       y: y,
@@ -408,7 +288,7 @@
       colorbar: { len: 0.8, x: 0.45, thickness: 20 }, // Position shared colorbar in the middle
     };
 
-    // 3D Surface plot data
+    // 3D plot data
     const surfaceData = {
       x: x,
       y: y,
@@ -419,7 +299,6 @@
       showscale: false, // Disable individual colorbar
     };
 
-    // Layout
     const layout = {
       title: options.title || null,
       grid: { rows: 1, columns: 2, pattern: "independent" },
@@ -434,16 +313,36 @@
       displayModeBar: false, // Hide toolbar
     };
 
-    // Render plot
     Plotly.newPlot(containerId, [contourData, surfaceData], layout, config);
-}
-
-
-
+  }
 
   let plotContainerId = "plot-container";
 
+  // Mounting
+  onMount(async () => {
+    //visualize the environment
+    await loadPlotly();
+    plotEnvironment(plotContainerId, $gaussians, {
+        title: null,
+        gridSize: 100,
+        alpha2D: 1.0,
+        alpha3D: 0.8,
+        levels: 50,
+      });
+
+    // add listeners for changing the Environment
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', stopDrag);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', stopDrag);
+    };
+  });
+
 </script>
+
+
+
 
 
 <main class="main-content">
@@ -528,18 +427,6 @@
       You can also add more Gaussians if you want.
     </p>
 
-    <!--<div id={plotContainerId}
-     style="width: 1000px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1; /* Ensure the image is below the canvas */">
-    </div>-->
-
-    <!--
-    <div class="visualization">
-      <img src={current_env_image} alt="Rendering of the environment"/>
-    </div>-->
     <div class="env-container">
       <!--<img src="/images/env1.png" class="env-image" alt="Rendering of the environment">-->
       <div id={plotContainerId}
@@ -601,7 +488,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each $gaussians as g, i}
+        {#each $gaussians as g, _}
           <tr>
             <td>{g.mean.x.toFixed(2)}</td>
             <td>{g.mean.y.toFixed(2)}</td>
@@ -734,22 +621,7 @@
       {/if}
     </div>
 
-
-    <!--
-    <h1>Hello {rand}!</h1>
-    <button on:click={getRand}>Get a random number</button>
-    <p class="section-text">
-      Testing: {resp}
-    </p>
-    -->
-
   </section>
-
-
-
-  <!-- start new -->
-
-
 
   <section class="section">
     <h2 class="section-title">Sources</h2>
@@ -763,7 +635,6 @@
 
 
 <style>
-  /* General Styles */
   * {
     box-sizing: border-box;
     margin: 0;
@@ -782,7 +653,6 @@
     max-width: 1200px;
   }
 
-  /* Header */
   .header {
     background: linear-gradient(90deg, #32263d, #3e412d);
     color: white;
@@ -800,7 +670,6 @@
     margin-top: 1rem;
   }
 
-  /* Section */
   .section {
     padding: 3rem 0;
   }
@@ -842,7 +711,6 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
-  /* Playground Section */
   .playground {
     background: linear-gradient(90deg, #382d48, #582897);
     color: white;
@@ -850,22 +718,7 @@
     text-align: center;
   }
 
-  .cta-button {
-    background-color: #70229d;
-    color: white;
-    padding: 1rem 2rem;
-    font-size: 1.25rem;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
 
-  .cta-button:hover {
-    background-color: #511a74;
-  }
-
-  /* Responsiveness */
   @media (max-width: 768px) {
     .title {
       font-size: 2.5rem;
@@ -881,10 +734,6 @@
 
     .image {
       width: 80%;
-    }
-
-    .cta-button {
-      font-size: 1rem;
     }
   }
 
@@ -976,10 +825,6 @@ span {
     height: auto;
   }
 
-
-
-  /* start new*/
-
   .env-container {
     position: relative;
     left: 4px;
@@ -987,13 +832,6 @@ span {
     height: 600px;
     }
 
-  .env-image {
-    width: 1000px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1; /* Ensure the image is below the canvas */
-  }
   .canvas-container {
     position: absolute;
     top: 50px;
@@ -1035,10 +873,6 @@ span {
     opacity: 0.5;
   }
 
-  .circles_whenrunning {
-    opacity: 1;
-  }
-
   .controls {
     margin-top: 10px;
   }
@@ -1056,9 +890,4 @@ span {
     cursor: not-allowed;
   }
 
-
-    #line-chart {
-    width: 100%;
-    height: 100%;
-  }
 </style>
