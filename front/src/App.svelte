@@ -205,7 +205,6 @@
       return gs;
     });
     plotEnvironment(plotContainerId, $gaussians, {
-        title: "Gaussian Mixture Environment",
         gridSize: 100,
         alpha2D: 1.0,
         alpha3D: 0.8,
@@ -222,7 +221,6 @@
       return gs;
     });
     plotEnvironment(plotContainerId, $gaussians, {
-        title: "Gaussian Mixture Environment",
         gridSize: 100,
         alpha2D: 1.0,
         alpha3D: 0.8,
@@ -274,11 +272,10 @@
 
   const stopDrag = () => {
 
-    get_env_state();
+    /*get_env_state();*/
     if(isDraggingMean || isDraggingVariance){
       console.log($gaussians);
       plotEnvironment(plotContainerId, $gaussians, {
-        title: "Gaussian Mixture Environment",
         gridSize: 100,
         alpha2D: 1.0,
         alpha3D: 0.8,
