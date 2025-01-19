@@ -204,6 +204,13 @@
       }
       return gs;
     });
+    plotEnvironment(plotContainerId, $gaussians, {
+        title: "Gaussian Mixture Environment",
+        gridSize: 100,
+        alpha2D: 1.0,
+        alpha3D: 0.8,
+        levels: 50,
+      });
   };
 
   // Remove the last Gaussian
@@ -214,6 +221,13 @@
       }
       return gs;
     });
+    plotEnvironment(plotContainerId, $gaussians, {
+        title: "Gaussian Mixture Environment",
+        gridSize: 100,
+        alpha2D: 1.0,
+        alpha3D: 0.8,
+        levels: 50,
+      });
   };
 
   // Mouse interaction handlers
@@ -259,8 +273,19 @@
   };
 
   const stopDrag = () => {
-    console.log("Mouse released, stopping drag...");
+
     get_env_state();
+    if(isDraggingMean || isDraggingVariance){
+      console.log($gaussians);
+      plotEnvironment(plotContainerId, $gaussians, {
+        title: "Gaussian Mixture Environment",
+        gridSize: 100,
+        alpha2D: 1.0,
+        alpha3D: 0.8,
+        levels: 50,
+      });
+    }
+
     isDraggingMean = false;
     isDraggingVariance = false;
     selectedGaussian = null;
@@ -315,7 +340,6 @@
   });
  */
   let Plotly;
-  let chartId = 'line-chart';
 
   // Load Plotly from CDN
   async function loadPlotly() {
@@ -331,36 +355,106 @@
     });
   }
 
+
   onMount(async () => {
     await loadPlotly();
-    // Create your plot
-    const data = [
-      {
-        x: [1, 2, 3, 4, 5],
-        y: [10, 14, 19, 24, 30],
-        type: 'scatter', // Line chart
-        mode: 'lines+markers',
-        marker: { color: 'blue' },
-      },
-    ];
+    plotEnvironment(plotContainerId, $gaussians, {
+        title: null,
+        gridSize: 100,
+        alpha2D: 1.0,
+        alpha3D: 0.8,
+        levels: 50,
+      });
 
-    const layout = {
-      title: 'Simple Line Chart',
-      xaxis: { title: 'X-Axis Label' },
-      yaxis: { title: 'Y-Axis Label' },
-    };
+/*
+    gaussians.subscribe((currentGaussians) => {
 
-    Plotly.newPlot(chartId, data, layout);
+    });*/
   });
 
+  function computeDensity(grid, gaussians) {
+    const { x, y } = grid;
+    const density = Array.from({ length: x.length }, () => Array(y.length).fill(0));
+
+    for (const { mean, variance } of gaussians) {
+      for (let i = 0; i < x.length; i++) {
+        for (let j = 0; j < y.length; j++) {
+          density[j][i] += gaussianPDF(x[i], y[j], mean, variance);
+        }
+      }
+    }
+    return density;
+  }
+  function gaussianPDF(x, y, mean, variance) {
+    const dx = x - mean.x;
+    const dy = y - mean.y;
+    const sigma2 = variance;
+    return Math.exp(-(dx ** 2 + dy ** 2) / (2 * sigma2)) / (2 * Math.PI * Math.sqrt(sigma2));
+  }
+  function plotEnvironment(containerId, gaussians, options = {}) {
+    const gridSize = options.gridSize || 100;
+    const alpha2D = options.alpha2D || 1.0;
+    const alpha3D = options.alpha3D || 0.8;
+
+    // Generate grid
+    const range = [-3, 3];
+    const x = Array.from({ length: gridSize }, (_, i) => range[0] + i * (range[1] - range[0]) / (gridSize - 1));
+    const y = Array.from({ length: gridSize }, (_, i) => range[0] + i * (range[1] - range[0]) / (gridSize - 1));
+
+    // Compute density
+    const density = computeDensity({ x, y }, gaussians);
+
+    // 2D Contour plot data
+    const contourData = {
+      x: x,
+      y: y,
+      z: density,
+      type: "contour",
+      colorscale: "Viridis",
+      opacity: alpha2D,
+      contours: { coloring: "fill", showlines: false },
+      colorbar: { len: 0.8, x: 0.45, thickness: 20 }, // Position shared colorbar in the middle
+    };
+
+    // 3D Surface plot data
+    const surfaceData = {
+      x: x,
+      y: y,
+      z: density,
+      type: "surface",
+      colorscale: "Viridis",
+      opacity: alpha3D,
+      showscale: false, // Disable individual colorbar
+    };
+
+    // Layout
+    const layout = {
+      title: options.title || null,
+      grid: { rows: 1, columns: 2, pattern: "independent" },
+      xaxis: { title: "x", domain: [0, 0.45] }, // Left plot domain
+      yaxis: { title: "y", scaleanchor: "x" },
+      scene: { domain: { x: [0.55, 1] } }, // Right plot domain for 3D scene
+      margin: { t: 50, b: 50, l: 50, r: 50 },
+    };
+
+    const config = {
+      staticplot: true,
+      displayModeBar: false, // Hide toolbar
+    };
+
+    // Render plot
+    Plotly.newPlot(containerId, [contourData, surfaceData], layout, config);
+}
+
+
+
+
+  let plotContainerId = "plot-container";
 
 </script>
 
 
-<div id={chartId}></div>
-
 <main class="main-content">
-  <div id="plot-container" style="width: 100%; height: 100%;"></div>
   <header class="header">
     <div class="container">
       <h1 class="title">Understanding GFlowNets</h1>
@@ -441,11 +535,28 @@
       Drag the center of the circles to change the mean and the border to change the variance.
       You can also add more Gaussians if you want.
     </p>
+
+    <!--<div id={plotContainerId}
+     style="width: 1000px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1; /* Ensure the image is below the canvas */">
+    </div>-->
+
+    <!--
     <div class="visualization">
       <img src={current_env_image} alt="Rendering of the environment"/>
-    </div>
+    </div>-->
     <div class="env-container">
-      <img src="/images/env1.png" class="env-image" alt="Rendering of the environment">
+      <!--<img src="/images/env1.png" class="env-image" alt="Rendering of the environment">-->
+      <div id={plotContainerId}
+       style="width: 1000px;
+       position: relative;
+       top: 0;
+       left: 0;
+       z-index: 1; /* Ensure the image is below the canvas */">
+      </div>
       <div class="canvas-container">
         {#each $gaussians as g, i}
           <!-- Variance circle -->
@@ -455,8 +566,8 @@
             style="
               width: {129 * g.variance}px;
               height: {129 * g.variance}px;
-              left: {193 + 193/3 * g.mean.x}px;
-              top: {193 - 193/3 * g.mean.y}px;
+              left: {176 + 176/3 * g.mean.x}px;
+              top: {176 - 176/3 * g.mean.y}px;
             "
             on:mousedown={(e) => startDragVariance(e, g)}
           ></div>
@@ -466,8 +577,8 @@
             class="mean-circle"
             class:highlight={i === hoveredGaussian}
             style="
-              left: {193 + 193/3 * g.mean.x}px;
-              top: {193 - 193/3 * g.mean.y}px;
+              left: {176 + 176/3 * g.mean.x}px;
+              top: {176 - 176/3 * g.mean.y}px;
             "
             on:mousedown={(e) => startDragMean(e, g)}
           ></div>
@@ -481,7 +592,8 @@
         on:mouseover={() => highlightGaussian($gaussians.length - 1)}
         on:mouseout={clearHighlight}
         on:click={removeGaussian}
-        disabled={isRunning || $gaussians.length === 1}>
+        disabled={isRunning || $gaussians.length === 1}
+      >
         -
       </button>
       <span>{$gaussians.length}</span>
@@ -893,7 +1005,7 @@ span {
     position: relative;
     left: 4px;
     width: 1000px;
-    height: 500px;
+    height: 600px;
     }
 
   .env-image {
@@ -905,10 +1017,10 @@ span {
   }
   .canvas-container {
     position: absolute;
-    top: 66px;
-    left: 38px;
-    width: 386px;
-    height: 386px;
+    top: 50px;
+    left: 77px;
+    width: 352px;
+    height: 352px;
     z-index: 2; /* Ensure the canvas is above the image */
     pointer-events: none; /* Prevent accidental interaction with the container itself */
     border: 1px solid #ccc;
