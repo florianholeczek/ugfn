@@ -1,0 +1,7 @@
+jupyter/
+.ipynb_checkpoints/
+front/node_modules/
+old/
+venv/
+testing.py
+.idea/
