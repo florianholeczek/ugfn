@@ -3,3 +3,4 @@ jupyter/
 front/node_modules/
 old/
 venv/
+testing.py
