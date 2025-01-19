@@ -700,7 +700,7 @@
         <span>{hidden_layer_value}</span>
       </div>
       <div class="slider">
-        <label for="seed">Seed (TODO)</label>
+        <label for="seed">Seed</label>
         <input
           type="range"
           min="0"

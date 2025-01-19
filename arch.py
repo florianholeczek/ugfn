@@ -1,10 +1,13 @@
+"""
+Contains the general GFlowNet architecture.
+"""
+
 import torch.nn as nn
 import torch
 from tqdm import tqdm
 import copy
-import numpy as np
 
-class GFlowNet():
+class GFlowNet:
     def __init__(
             self,
             n_hidden_layers=2,
@@ -18,8 +21,8 @@ class GFlowNet():
         :param n_hidden_layers: Number of hidden layers
         :param hidden_dim: Number of hidden units
         :param lr_model: learning rate of the model
-        :param lr_logz: learning rate of  logZ
-        :param device: device for model and images
+        :param lr_logz: learning rate of logZ
+        :param device: device to train on
         """
         hidden_layers = nn.ModuleList()
         for i in range(n_hidden_layers):
@@ -75,15 +78,15 @@ class GFlowNet():
         :param off_policy: None to train on-policy. Otherwise a constant to add to sigma.
         :return: torch.dist.MultivariateNormal object
         """
-        mus, vars = torch.tensor_split(policy, [2], dim=1)
-        vars = nn.functional.sigmoid(vars)*0.9+0.1 # for mapping in valid [0.1-1] range
-        policy_dist = torch.distributions.MultivariateNormal(mus, torch.diag_embed(vars))
+        mus, sigmas = torch.tensor_split(policy, [2], dim=1)
+        sigmas = torch.sigmoid(sigmas)*0.9+0.1 # for mapping in valid [0.1-1] range
+        policy_dist = torch.distributions.MultivariateNormal(mus, torch.diag_embed(sigmas))
 
         if not off_policy:
             return policy_dist, None
 
 
-        exploration_dist = torch.distributions.MultivariateNormal(mus, torch.diag_embed(vars+off_policy))
+        exploration_dist = torch.distributions.MultivariateNormal(mus, torch.diag_embed(sigmas+off_policy))
         return policy_dist, exploration_dist
 
     def get_action(self, x, off_policy):
@@ -127,7 +130,7 @@ class GFlowNet():
         None or 0 to train on-policy.
         A constant (int, float) will be added to the variance and lead to higher exploration.
         A list of int or float will be used as a schedule. The length must be equal to n_iterations.
-        :return: tuple(List of losses, list of logZs, True Logz), last 4096 trajectories for visualization
+        :return: tuple(List of losses, list of logZs, True Logz), tensor with last trajectories for visualization
         """
 
         losses = []
@@ -137,6 +140,8 @@ class GFlowNet():
         logz_true = env.log_partition
         self.forward_model.train()
         self.backward_model.train()
+
+        # set off policy schedule
         if not off_policy:
             exploration_schedule = [None] * n_iterations
         elif isinstance(off_policy, list):
@@ -146,6 +151,7 @@ class GFlowNet():
             assert isinstance(off_policy, int) or isinstance(off_policy, float), "no valid off_policy given"
             exploration_schedule = torch.linspace(off_policy, 0, n_iterations)
 
+        # start training
         progress_bar = tqdm(range(n_iterations), desc="Training...")
         for i in progress_bar:
             self.optimizer.zero_grad()
@@ -154,6 +160,7 @@ class GFlowNet():
             log_probs_forward = torch.zeros((batch_size,), device=self.device)
             log_probs_backward = torch.zeros((batch_size,), device=self.device)
 
+            # get actions and take steps
             for t in range(trajectory_length):
                 actions, log_probs = self.get_action(x, exploration_schedule[i])
                 log_probs_forward += log_probs
@@ -161,10 +168,12 @@ class GFlowNet():
                 trajectory[:,t+1,:] += x_prime
                 x = x_prime
 
+            # backward log probabilities
             for t in range(trajectory_length,1,-1):
                 log_probs = self.get_backward_log_probs(trajectory[:,t,:], trajectory[:,t,1:]-trajectory[:,t-1,1:])
                 log_probs_backward += log_probs
 
+            # reward and backward passes
             log_reward = env.log_reward(trajectory[:,-1,1:])
             loss = torch.mean((self.logz+log_probs_forward-log_probs_backward-log_reward)**2)
             loss.backward()
@@ -172,6 +181,8 @@ class GFlowNet():
             losses.append(loss.item())
             logzs.append(self.logz.item())
             trajectory_vis = torch.cat((trajectory_vis, trajectory), dim=0)
+
+            # keep last n trajectories for visualization
             if len(trajectory_vis)>trajectory_vis_n:
                 trajectory_vis = trajectory_vis[-trajectory_vis_n:]
 
@@ -189,7 +200,8 @@ class GFlowNet():
         Sample from the model
         :param env: Environment to sample from
         :param batch_size: Number of trajectories to sample
-        :param trajectory_length: Fixed length of the trajectory
+        :param trajectory_length: Fixed length of the trajectory,
+        will only sample correctly if it is the same as in training
         :return: Tensor of shape (batch_size, trajectory_length+1, 2) with the trajectorys of all samples
         """
         self.forward_model.eval()

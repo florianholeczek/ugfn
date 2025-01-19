@@ -1,7 +1,8 @@
 from arch import GFlowNet
 from env import Env
-import torch
 import plot_utils as plot
+
+import torch
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -20,10 +21,15 @@ batch_size=1024
 n_iterations=1000
 trajectory_length = 3
 
+# environment
+env = Env(
+    mus=[torch.tensor([1,1]), torch.tensor([-1.5,-1.5])],
+    sigmas = [torch.ones(2)*0.2]*2,
+)
 
-
-env = Env(mus=[torch.tensor([1,1]), torch.tensor([-1.5,-1.5])], sigmas = [torch.ones(2)*0.2]*2,)
 gflownet = GFlowNet(device=device)
+
+# train
 losses_, _ = gflownet.train(
     env,
     n_iterations=n_iterations,
@@ -31,6 +37,8 @@ losses_, _ = gflownet.train(
     trajectory_length=trajectory_length,
     off_policy=2.5
 )
+
+# plot
 losses, logzs, true_logz = losses_
 fig = plot.plot_losses(losses, logzs, true_logz)
 plt.show()

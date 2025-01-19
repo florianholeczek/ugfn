@@ -1,16 +1,12 @@
+"""
+Contains all the plotting functions.
+"""
+
 import torch
 import numpy as np
-from env import Env
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
 import matplotlib as mpl
-import scipy.stats as stats
-from scipy.stats import multivariate_normal
-from sklearn.neighbors import KernelDensity as kd
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
-from matplotlib import cm
 import io
 import base64
 
@@ -99,7 +95,7 @@ def plot_env(
         grid_size=100
 ):
     """
-
+    Plot the environment as a 2d and 3d plot next to each other
     :param env: the given enviroment to plot.
     :param title: title of the plot
     :param levels: number of countour lines
@@ -139,47 +135,6 @@ def plot_env(
 
     return fig, img_base64
 
-def plot_states_2dOLD(
-        env,
-        trajectory,
-        title=None,
-        levels=50,
-        alpha=1.0,
-        grid_size=100
-):
-    """
-    Plots the given final states of the trajectories
-    :param env: the original environment
-    :param trajectory: batch of trajectories as torch.tensor of shape (batch_size, trajectory length, 3)
-    :param title: title of the plot
-    :param levels: number of countour lines
-    :param alpha: transparency of contour lines
-    :param grid_size: density of plotting grid
-    :return: matplotlib fig object
-    """
-
-    x_grid, y_grid, grid_points = grid(grid_size=grid_size)
-    density_env = env.reward(grid_points)
-    density_env = density_env.reshape(grid_size, grid_size).numpy()
-    print(x_grid.shape, y_grid.shape, density_env.shape)
-
-
-    states = trajectory[:,-1,1:]
-    print(states)
-    x=states[:,0]
-    y=states[:,1]
-    z=env.reward(states)
-
-
-    fig, ax = plt.subplots(figsize=(8, 6))
-    ax.scatter(x, y, c=z, alpha=alpha)
-    #contour = ax.contourf(x_grid, y_grid, density_states, levels=levels, cmap="viridis", alpha = alpha)
-    #fig.colorbar(contour, ax=ax, label="Density")
-    ax.set_title(title)
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
-
-    return fig
 
 def plot_losses(loss, logzs, true_logz):
     """
@@ -202,32 +157,6 @@ def plot_losses(loss, logzs, true_logz):
     ax.legend()
     return fig
 
-def plot_env_2dsns(
-        env,
-        title=None,
-        levels=50,
-        alpha=1.0,
-        grid_size=100
-):
-    """
-    Plots the distributions as contour plots
-    :param env: the given enviroment to plot.
-    :param title: title of the plot
-    :param levels: number of countour lines
-    :param alpha: transparency of contour lines
-    :param grid_size: density of plotting grid
-    :return: matplotlib fig object
-    """
-
-    x_grid, y_grid, grid_points = grid(grid_size=grid_size)
-    density = env.reward(grid_points)
-    #density = density.reshape(grid_size, grid_size).numpy()
-    print(x_grid.shape, y_grid.shape, density.shape, grid_points.shape)
-    df = pd.DataFrame(grid_points.numpy(), columns=["x", "y"])
-    df['density'] = density.numpy()
-    sns.jointplot(x='x', y='y', data=df, hue='density', kind='kde', xlim=(-3, 3), ylim=(-3, 3))
-
-
 def plot_states_2d(
         env,
         trajectory,
@@ -237,7 +166,7 @@ def plot_states_2d(
         alpha=1.0,
         grid_size=100,
         colormap='viridis',  # 'cividis',
-        marginals_gradient = True # To plot the true values of the marginals according to the colormap.
+        marginals_gradient = True
 ):
     """
     Plots the given final states of the trajectories with consistent layout.

@@ -1,8 +1,12 @@
+"""
+The 2d Mixture of gaussians environment
+"""
+
 import torch
 from torch.distributions import MultivariateNormal
 
 
-class Env():
+class Env:
     def __init__(
             self,
             mus=[torch.tensor([1,1]), torch.tensor([-1,-1])],
