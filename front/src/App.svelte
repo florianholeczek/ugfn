@@ -4,7 +4,6 @@
   let n_iterations_value = 2000;
   let lr_model_value = 0.001;
   let lr_logz_value = 0.1;
-  let visualize_every = 50;
   let trajectory_length_value = 2;
   let hidden_layer_value = 2;
   let hidden_dim_value = 2;
@@ -20,18 +19,12 @@
   let currentImage = null;
   let pollingTimer;
 
-  function getRand() {
-      fetch("http://0.0.0.0:8000/rand")
-      .then(d => d.text())
-      .then(d => (rand = d));
-      }
 
   function resetSliders() {
       off_policy_value = 0;
       n_iterations_value = 2000;
       lr_model_value = 0.001;
       lr_logz_value = 0.1;
-      visualize_every = 50;
       trajectory_length_value = 2;
       hidden_layer_value = 2;
       hidden_dim_value = 2;
@@ -43,7 +36,7 @@
     try {
       // Disable sliders and switch button state
       isRunning = true;
-
+      const curr_gaussians = $gaussians;
       // Start visualization on backend
       const response = await fetch('http://localhost:8000/start_visualization', {
         method: 'POST',
@@ -53,12 +46,12 @@
           n_iterations_value,
           lr_model_value,
           lr_logz_value,
-          visualize_every,
           trajectory_length_value,
           hidden_layer_value,
           hidden_dim_value,
           seed_value,
           batch_size_value,
+          curr_gaussians,
         })
       });
 
@@ -77,7 +70,9 @@
   async function stopVisualization() {
     try {
       // Stop visualization on backend
-      const response = await fetch('http://localhost:8000/stop_visualization');
+      const response = await fetch('http://localhost:8000/stop_visualization',{
+        method: 'POST',
+      });
 
       if (!response.ok) {
         throw new Error('Failed to stop visualization.');
@@ -301,7 +296,7 @@
   };
 
   onMount(() => {
-    get_env_state()
+    /*get_env_state()*/
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', stopDrag);
     return () => {
@@ -729,19 +724,6 @@
           disabled={isRunning}
         />
         <span>{batch_size_value}</span>
-      </div>
-    <div class="slider">
-        <label for="vis_every">Update visualization every n interations</label>
-        <input
-          type="range"
-          min="10"
-          max="500"
-          step="10"
-          bind:value="{visualize_every}"
-          id="vis_every"
-          disabled={isRunning}
-        />
-        <span>{visualize_every}</span>
       </div>
     </div>
     <div class="visualization">
