@@ -3,6 +3,6 @@ jupyter/
 front/node_modules/
 old/
 venv/
-testing.py
+python/testing.py
 .idea/
 __pycache__/
