@@ -6,3 +6,4 @@ venv/
 python/testing.py
 .idea/
 __pycache__/
+front/README.md
