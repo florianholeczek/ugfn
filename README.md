@@ -10,5 +10,8 @@ When the training is successfull we can see that the GFN learned the true underl
 
 ![](https://github.com/florianholeczek/ugfn/blob/master/front/public/images/run3.png)
 
-This is still work in progress, next ToDos are:
-integrating the Texts in the 
+This is still work in progress, ToDos are:
+* integrating the Texts in the website
+* webpage design
+* Visualization for Flow
+* Sources
