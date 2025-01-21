@@ -25,6 +25,8 @@ git clone https://github.com/florianholeczek/ugfn
 ```
 
 Set up the environment
+You will need a python version >3.8 and <3.11.
+It is tested with version [3.10.11](https://www.python.org/downloads/release/python-31011/).
 
 Windows
 ```shell
