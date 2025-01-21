@@ -18,32 +18,32 @@ https://hub.docker.com/repositories/florianholeczek
 
 To work locally with everything clone the repository first.
 
-''' shell
+```shell
 cd your/working/directory
 git clone https://github.com/florianholeczek/ugfn
-'''
+```
 
 Set up the environment
 
 Windows
-''' shell
+```shell
 python -m venv venv
 
-#In cmd.exe
+# In cmd.exe
 venv\Scripts\activate.bat
-#In PowerShell
+# In PowerShell
 venv\Scripts\Activate.ps1
 
 pip install -r python\requirements.txt
-'''
+```
 
 
 Linux:
-'''shell
+```shell
 python3 -m venv venv
 source venv/bin/activate
 pip install -r python/requirements.txt
-'''
+```
 
 
 #### Plain python
@@ -52,12 +52,12 @@ the python/main.py file to change the model and the environment.
 
 Then start training with:
 
-'''shell
-#windows
+```shell
+# windows
 python python\main.py
-#linux
+# linux
 python3 python/main.py
-'''
+```
 
 #### Running the webpage locally
 To run the webpage locally you will need 
@@ -69,20 +69,20 @@ uvicorn
 https://www.uvicorn.org/
 
 you can start the backend with 
-''shell
+```shell
 uvicorn back:app --host 0.0.0.0 --port 8000
-'''
+```
 
 in a new terminal you can then build the page and run the frontend via
-'''shell
-#windows
+```shell
+# windows
 cd workingdirectory\front
-#linux
+# linux
 cd workingdirectory/front
 
 npm run build
 npm run dev
-'''
+```
 Your frontend should run on port 8080:
 http://localhost:8080
 
