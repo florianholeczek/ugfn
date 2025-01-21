@@ -29,9 +29,9 @@ Windows
 ''' shell
 python -m venv venv
 
-# In cmd.exe
+#In cmd.exe
 venv\Scripts\activate.bat
-# In PowerShell
+#In PowerShell
 venv\Scripts\Activate.ps1
 
 pip install -r python\requirements.txt
@@ -53,9 +53,9 @@ the python/main.py file to change the model and the environment.
 Then start training with:
 
 '''shell
-# windows
+#windows
 python python\main.py
-# linux
+#linux
 python3 python/main.py
 '''
 
@@ -75,7 +75,7 @@ uvicorn back:app --host 0.0.0.0 --port 8000
 
 in a new terminal you can then build the page and run the frontend via
 '''shell
-# windows
+#windows
 cd workingdirectory\front
 #linux
 cd workingdirectory/front
