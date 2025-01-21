@@ -16,10 +16,11 @@ The folder "front" has the data for building the website with svelte.
 Dockerimages for the website are here:
 https://hub.docker.com/repositories/florianholeczek
 
-To work locally with everything clone the repository first.
+To work locally with everything clone the repository first or download and extract the .zip manually
 
 ```shell
-cd your/working/directory
+cd yourworkingdirectory
+
 git clone https://github.com/florianholeczek/ugfn
 ```
 
@@ -27,11 +28,11 @@ Set up the environment
 
 Windows
 ```shell
-python -m venv venv
+py -m venv venv
 
 # In cmd.exe
 venv\Scripts\activate.bat
-# In PowerShell
+# Or In PowerShell
 venv\Scripts\Activate.ps1
 
 pip install -r python\requirements.txt
@@ -65,20 +66,18 @@ To run the webpage locally you will need
 npm
 https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
 
-uvicorn 
-https://www.uvicorn.org/
 
 you can start the backend with 
 ```shell
+cd front
 uvicorn back:app --host 0.0.0.0 --port 8000
 ```
 
 in a new terminal you can then build the page and run the frontend via
 ```shell
 # windows
-cd workingdirectory\front
-# linux
-cd workingdirectory/front
+cd yourworkingdirectory
+cd front
 
 npm run build
 npm run dev
