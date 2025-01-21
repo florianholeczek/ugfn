@@ -10,7 +10,7 @@ When the training is successfull we can see that the GFN learned the true underl
 
 ![](https://github.com/florianholeczek/ugfn/blob/master/front/public/images/run3.png)
 
-### How to run
+## How to run
 The "python" folder contains all python files which are used for training gflownets.
 The folder "front" has the data for building the website with svelte.
 Dockerimages for the website are here:
@@ -24,9 +24,11 @@ cd yourworkingdirectory
 git clone https://github.com/florianholeczek/ugfn
 ```
 
-Set up the environment
-You will need a python version >3.8 and <3.11.
+To set up the environment you will need a python version >3.8 and <3.11.
+
 It is tested with version [3.10.11](https://www.python.org/downloads/release/python-31011/).
+
+The following creates a virtual environment:
 
 Windows
 ```shell
@@ -49,7 +51,7 @@ pip install -r python/requirements.txt
 ```
 
 
-#### Plain python
+### Plain python
 If you want to simply train models you can change the hyperparameters at the beginning of 
 the python/main.py file to change the model and the environment. 
 
@@ -62,7 +64,7 @@ python python\main.py
 python3 python/main.py
 ```
 
-#### Running the webpage locally
+### Running the webpage locally
 To run the webpage locally you will need 
 
 npm
@@ -88,7 +90,7 @@ Your frontend should run on port 8080:
 http://localhost:8080
 
 
-### TODOs
+## TODOs
 This is still work in progress, ToDos are:
 * integrating the Texts in the website
 * webpage design
