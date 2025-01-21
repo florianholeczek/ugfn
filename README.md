@@ -64,29 +64,48 @@ python python\main.py
 python3 python/main.py
 ```
 
-### Running the webpage locally
-To run the webpage locally you will need 
+#### Running the webpage locally
+To run the webpage locally you will need [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+and nodejs. 
+Node Version 22.12.0 is tested.
 
-npm
-https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
-
-
-you can start the backend with 
+To get it, install nvm via this [link](https://github.com/coreybutler/nvm-windows/releases/download/1.2.2/nvm-setup.exe)
+or by executing
 ```shell
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+source ~/.nvm/nvm.sh
+```
+
+Then execute
+```shell
+# install nodejs
+nvm install 22.12.0
+nvm use 22.12.0
+
+# change to the front folder
 cd front
+
+# install dependecies
+npm install
+```
+
+
+
+
+assuming you are already in the front folder, you can start the backend with 
+```shell
 uvicorn back:app --host 0.0.0.0 --port 8000
 ```
 
 in a new terminal you can then build the page and run the frontend via
 ```shell
-# windows
 cd yourworkingdirectory
 cd front
 
 npm run build
 npm run dev
 ```
-Your frontend should run on port 8080:
+Your frontend should now run on port 8080:
 http://localhost:8080
 
 

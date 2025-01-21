@@ -142,13 +142,13 @@ class GFlowNet:
         self.backward_model.train()
 
         # set off policy schedule
-        if not off_policy:
-            exploration_schedule = [None] * n_iterations
-        elif isinstance(off_policy, list):
-            assert len(off_policy) == n_iterations, "Length of off_policy must be equal to n_iterations"
+        if isinstance(off_policy, list) or isinstance(off_policy, torch.Tensor):
+            #assert len(off_policy) == n_iterations, "Length of off_policy must be equal to n_iterations"
             exploration_schedule = off_policy
+        elif not off_policy:
+            exploration_schedule = [None] * n_iterations
         else:
-            assert isinstance(off_policy, int) or isinstance(off_policy, float), "no valid off_policy given"
+            #assert isinstance(off_policy, int) or isinstance(off_policy, float), "no valid off_policy given"
             exploration_schedule = torch.linspace(off_policy, 0, n_iterations)
 
         # start training
