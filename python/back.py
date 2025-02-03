@@ -156,6 +156,7 @@ def train_and_sample(
             title=f"Iteration {(v+1)*n_rounds}/{params['n_iterations']}",
             marginals_gradient=False
         )
+        plt.savefig(f"ims/run3_{(v+1)*n_rounds}.png")
         visualization_state["current_image"] = img_base64
         plt.close()
 
@@ -178,6 +179,7 @@ def train_and_sample(
             marginals_gradient=False
         )
         visualization_state["current_image"] = img_base64
+        plt.savefig(f"ims/run3_{params['n_iterations']}.png")
         plt.close()
 
     # Mark process as completed or stop requested

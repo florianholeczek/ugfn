@@ -33,7 +33,7 @@ class GFlowNet:
             nn.Linear(3, hidden_dim),
             nn.ELU(),
             *hidden_layers,
-            nn.Linear(hidden_dim, 4)
+            nn.Linear(hidden_dim, 3)
         ).to(device)
         self.backward_model = copy.deepcopy(self.forward_model)
         self.logz = nn.Parameter(torch.tensor(0.0, device=device))
@@ -80,6 +80,9 @@ class GFlowNet:
         """
         mus, sigmas = torch.tensor_split(policy, [2], dim=1)
         sigmas = torch.sigmoid(sigmas)*0.9+0.1 # for mapping in valid [0.1-1] range
+        #print(mus.shape, sigmas.shape)
+        sigmas = torch.cat((sigmas, sigmas), dim=1)
+        #print(mus.shape, sigmas.shape)
         policy_dist = torch.distributions.MultivariateNormal(mus, torch.diag_embed(sigmas))
 
         if not off_policy:

@@ -1,17 +1,20 @@
 <script>
   import { onMount } from 'svelte';
   import {writable} from 'svelte/store';
+  import Katex from 'svelte-katex'
+  import 'katex/dist/katex.min.css';
+  import { CollapsibleCard } from 'svelte-collapsible'
 
   // default values
   let off_policy_value = 0;
   let n_iterations_value = 2000;
-  let lr_model_value = 0.001;
+  let lr_model_value = 0.005;
   let lr_logz_value = 0.1;
   let trajectory_length_value = 2;
   let hidden_layer_value = 2;
   let hidden_dim_value = 2;
-  let seed_value = 7614;
-  let batch_size_exponent = 6;
+  let seed_value = 42;
+  let batch_size_exponent = 5;
   $: batch_size_value = 2**batch_size_exponent;
 
 
@@ -23,8 +26,8 @@
 
   // storing gaussians
   const gaussians = writable([
-    { mean: { x: -1, y: -1 }, variance: 0.5 },
-    { mean: { x: 1, y: 1 }, variance: 0.5 }
+    { mean: { x: -1, y: -1 }, variance: 0.2 },
+    { mean: { x: 1, y: 1 }, variance: 0.2 }
   ]);
 
   // ranges for means and variances
@@ -170,6 +173,12 @@
         alpha3D: 0.8,
         levels: 50,
       });
+    plotEnvironment(plotContainerId2, $gaussians, {
+        gridSize: 100,
+        alpha2D: 1.0,
+        alpha3D: 0.8,
+        levels: 50,
+      });
   };
 
   const removeGaussian = () => {
@@ -180,6 +189,12 @@
       return gs;
     });
     plotEnvironment(plotContainerId, $gaussians, {
+        gridSize: 100,
+        alpha2D: 1.0,
+        alpha3D: 0.8,
+        levels: 50,
+      });
+    plotEnvironment(plotContainerId2, $gaussians, {
         gridSize: 100,
         alpha2D: 1.0,
         alpha3D: 0.8,
@@ -228,6 +243,12 @@
     if(isDraggingMean || isDraggingVariance){
       console.log($gaussians);
       plotEnvironment(plotContainerId, $gaussians, {
+        gridSize: 100,
+        alpha2D: 1.0,
+        alpha3D: 0.8,
+        levels: 50,
+      });
+      plotEnvironment(plotContainerId2, $gaussians, {
         gridSize: 100,
         alpha2D: 1.0,
         alpha3D: 0.8,
@@ -317,12 +338,20 @@
   }
 
   let plotContainerId = "plot-container";
+  let plotContainerId2 = "plot-container2";
 
   // Mounting
   onMount(async () => {
     //visualize the environment
     await loadPlotly();
     plotEnvironment(plotContainerId, $gaussians, {
+        title: null,
+        gridSize: 100,
+        alpha2D: 1.0,
+        alpha3D: 0.8,
+        levels: 50,
+      });
+    plotEnvironment(plotContainerId2, $gaussians, {
         title: null,
         gridSize: 100,
         alpha2D: 1.0,
@@ -338,15 +367,18 @@
       window.removeEventListener('mouseup', stopDrag);
     };
   });
+  let open = false
+
+
 
 </script>
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
 
 
 
 
 <main class="main-content">
-  <header class="header">
+  <header class="header-top">
     <div class="container">
       <h1 class="title">Understanding GFlowNets</h1>
       <p class="subtitle">Gaining intuition for Generative Flow Networks and how to train them</p>
@@ -356,50 +388,269 @@
   <section class="section">
     <h2 class="section-title">What is a GFlowNet?</h2>
     <p class="section-text">
-      Short Description: What can they do, how do they work, advantages
+
+      In short, a generative flow network is a model class which allows sampling from an arbitrary probability distribution (similar to MCMC). GFlowNets allow for generating objects with sequentially built compositional structure like trees or graphs.
+
+      <br>We train a model to learn a distribution <Katex>\pi(x)</Katex> (our policy), so we can sample from it. For this, we need a reward function R(x) which assigns value to each final object x and we want <Katex>\pi(x)</Katex> to sample proportional to it:  <Katex>\pi(x) \propto R(x)</Katex>. This allows us later on to sample a diversity of solutions instead of just the reward-maximizing one.
+
+      <br>As we do not rely on a external dataset but only on our internal reward function we are only limited by compute - we can generate objects and query the reward function as often as we like.
+
+      <CollapsibleCard {open}>
+        <h2 slot='header' class='collapsible-header'>
+          Example (And more introduction)
+        </h2>
+        <p slot='body' class='collapsible-body'>
+        Imagine building a Lego Pyramid. There are different blocks, and you can place them rotated and at different places.
+        <br>You might start with an empty plane and add a 2x4 block and so on. After some steps you might end up with an object which is more or less pyramid-shaped.
+        <br>
+        <br>The different possibilities of states of the object form a graph: While in the beginning (state 0) you can only place something in the first level, later on you might have different options, and they depend on your first choices. One option is always to choose to be finished instead of continuing building.
+        <br>
+        <br>If you want to use a GFlowNet for your task, it is important that the resulting graph is acyclic, i.e. it is not possible to reach a previous state.
+        <br>If we built a pyramid, in the end we have a trajectory (a sequence of states <Katex>s_0 \to s_1 \to ... \to s_{"final"}</Katex>). As we can choose to stop anytime, our trajectories can have different lengts, e.g. we can build a pyramid from 1 piece or from 100.
+        <br>
+        <br>As you might have guessed from the vocabulary, GFlowNets are very similar to Reinforcement learning methods, we sample trajectories and assign a reward R(x) to them (or to the states). The main difference is that usual RL methods try to find solutions which maximize the reward, whereas GFlowNets learn the underlying distribution p(x). So we want to train a model such that p(x) is proportional to the reward function R(x). This allows us to sample not only from the mode which has the highest reward, but also all other modes which might be almost as good. Imagine a pyramid from two 2x4 blocks next to each other and a 2x2 block centered on top or we could just use 2x2 blocks. Both are valid and we might be interested in finding many possible ways to build pyramids.
+        <br>
+        <br>Building Lego Pyramids is maybe not usecase number one for GFlowNets, but they are used for is drug discovery (Nica et al., 2022), where sampling from multiple modes is really what you want in order to discover not only the most promising molecule.
+        </p>
+      </CollapsibleCard>
+
+      When sequentially generating an object, we need to take actions which give us the next state:
+      We could add one of the possible components or decide we are done.
+      For this we use a neural net which represents our forward policy
+      <Katex>
+        P_F(s_{"{t+1}"}|s_t)
+      </Katex>, it gives us the action which leads to the next state.
+      <br>
+      <br>So far, everything sounds very nice, but how do we achieve this?
+      <br>Thats where the Flows come into play.
+      <br>
+      <br>If you connect all possible states from the start state to the terminal states you get a directed graph.
+      If you want to use a GFlowNet for your task it is important that the graph is acyclic, i.e. it is not possible to reach a previous state.
+      We can now interpret this directed acyclic graph (DAG) as a flow network.
+      <br>Imagine water flowing from the start space through the intermediate states to the final states, following the edges of the DAG like pipes.
+      <br>
     </p>
+      <div class="image-container">
+        <img src="/images/gflownet_anim.gif" class="image" alt="A visualization of the flow through the DAG">
+      </div>
+    <p class="section-text">
+      <span class="mathexpl">Visualization from the GFlowNet Tutorial by MILA showing the flow from the start state to the terminal states as particles</span>
+
+      <br>This places an important constraint on our model: Preservation of Flow.
+      The pipes (edges) and states (nodes) must not be leaky, all of the water has to be preserved.
+      <br>This means:
+      <br>
+
+      <span class="li">The flow going into the DAG (Flow of the start state) is the same as the Flow going out of it (Sum of the flow of all terminal states).</span>
+      <span class="li">Same for the nodes: The sum of the flow going into a state is the same as the sum of the flow going out of it.</span>
+      <br>
+      We now can set the flow going out of a terminal state equal to it's reward.
+      Assuming all flow is stricly positivy, we can express the Flow from one state s to its children s' as:
+
+
+      <Katex displayMode>
+        \sum_{"{s'}"} F(s,s') = \sum_{"{s'}"} R(s') + F(s')
+      </Katex>
+      <span class="mathexpl">The total Flow of a state is the Reward of its terminal children plus the Flow of its non-terminal children</span>
+
+
+      We now define our forward policy as the proportion of the Flow s -> s' to the total Flow of s:
+      <Katex displayMode>
+      P_F(s'|s) = \frac{"{F(s,s')}{F(s)}"}
+      </Katex>
+      <span class="mathexpl"> The probability to sample an action to get to the next state s' is the flow going from s to s' divided by the total flow through s</span>
+      By using this policy we will sample finished objects x proportional to its reward.
+
+      <br>The only thing we miss for training is the loss. The easiest way would be to turn our flow matching constraint into a MSE:
+
+      <Katex displayMode>
+        \mathcal{"{L}"}_{"{FM}"} = \left( \log \frac{"{\\sum_{(s''\\to s)}F(s'',s)}"}{"{\\sum_{(s\\to s')}F(s,s')}"} \right)^2
+      </Katex>
+      <span class="mathexpl"> If the flow going into a state is equal to the flow going out of a state the loss goes to 0.</span>
+
+      This is actually what the authors did in the first paper (Benigo et al., 2021), however it does not perform so well as there are problems with credit assignment.
+      We will later use the Trajectory Balance Loss (Malkin et al., 2022) to calculate the loss for a whole trajectory instead of single states.
+      It converges better but is a bit more complicated, so let's ignore it for now and look at our environment.
+
+    </p>
+
 
     <h2 class="section-title">Toy Environment</h2>
     <p class="section-text">
-      A 2-dimensional multivariate Gaussian environment with two modes. GFlowNet
-      takes steps in the x or y direction, and rewards are calculated based on the mixture of
-      Gaussians.
-    </p>
-    <ul class="bullet-list">
-      <li>Variable sequence length is typically supported, but fixed here for simplicity.</li>
-      <li>State does not depend on the order of steps.</li>
-      <li>Added a counter to avoid circular paths in the graph.</li>
-    </ul>
-    <div class="image-container">
-      <img src="/images/env1.png" class="image" alt="Rendering of the environment">
-    </div>
-  </section>
+      As we want to train GFlowNets quickly to explore how they behave, we need a simple environment which allows for exploring without needing a lot of compute during training. Here we use a simple 2D grid with each variable in the range [-3,3]. We then calculate the reward according to the Mixture of Multivariate Gaussians (for now two of them).
+      <br>
+      <br>For each action, the GFlowNet takes a step along both the x and y direction, this is repeated until the defined length of a trajectory is reached. Note that this is unusual: GFlowNets allow for variable trajectory lengths, so the action space usually contains an additional end of sequence action, where the current state becomes the final state.
+      <br>
+      <br>Above we stated that GFlowNets build an Acyclic Graph, so each state can only be visited once. We currently violate this assumption: While it is unlikely that a state gets visited twice in our continuous environment, it is still possible. To mitigate this we simply include a counter in our state which represents the current step.
+
+    </section>
+    <div class="env-container">
+        <!--<img src="/images/env1.png" class="env-image" alt="Rendering of the environment">-->
+        <div id={plotContainerId2}
+         style="width: 1000px;
+         position: relative;
+         top: 0;
+         left: 0;
+         z-index: 1; /* Ensure the image is below the canvas */">
+        </div>
+        <div class="canvas-container">
+          {#each $gaussians as g, i}
+            <!-- Variance circle -->
+            <div
+              class="variance-circle"
+              class:highlight={i === hoveredGaussian || isRunning}
+              style="
+                width: {129 * g.variance}px;
+                height: {129 * g.variance}px;
+                left: {176 + 176/3 * g.mean.x}px;
+                top: {176 - 176/3 * g.mean.y}px;
+              "
+              on:mousedown={(e) => startDragVariance(e, g)}
+            ></div>
+
+            <!-- Mean circle -->
+            <div
+              class="mean-circle"
+              class:highlight={i === hoveredGaussian}
+              style="
+                left: {176 + 176/3 * g.mean.x}px;
+                top: {176 - 176/3 * g.mean.y}px;
+              "
+              on:mousedown={(e) => startDragMean(e, g)}
+            ></div>
+          {/each}
+        </div>
+      </div>
+
+      <div class="controls">
+        Number of Gaussians:
+        <button
+          on:mouseover={() => highlightGaussian($gaussians.length - 1)}
+          on:mouseout={clearHighlight}
+          on:click={removeGaussian}
+          disabled={isRunning || $gaussians.length === 1}
+        >
+          -
+        </button>
+        <span>{$gaussians.length}</span>
+        <button on:click={addGaussian} disabled={isRunning || $gaussians.length === 4}>+</button>
+      </div>
 
   <section class="section section-light">
     <h2 class="section-title">Training</h2>
     <p class="section-text">
-      Visualizing how GFlowNet samples from the underlying distribution.
-      -> Learns full distribution given enough compute
-      TODO: Add slider over training iterations to visualizations to add interactivity and see training progress
+      Now, how do we train a GFlowNet?
+      <br>First we need our GFN to be able to act in the environment.
+      To do this we let it predict the parameters of a distribution from which we then sample the actions.
+      To move, we simply add the actio to the current state to get the next state.
+      <br>That was the easy part.
+      We now want to train our GFN using Trajectory Balance loss. Here it is again:
+      <Katex displayMode>
+      L(\tau) = \log\left(\frac{"{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t;\\theta)}"}{"{R(x)\\prod_t P_B(s_t|s_{t+1}; \\theta)}"} \right)^2
+      </Katex>
+      <span class="mathexpl">The trajectory balance loss. <br> If both parts of the fraction are equal our loss goes to 0.</span>
+      We want the two parts of the fraction to be equal again.
+      Simply put, the upper part tells us what fraction of the total flow goes through this trajectory and the lower part tells us what fraction of the reward of the final object x goes through this trajectory.
+      <br>Here <Katex>\theta</Katex> are the parameters of our model. They include the parameters of <Katex>P_F, P_B, Z</Katex> and we can update them using the loss above.
+      <br>Below you find more detailed background for the parts of the trajectory balance loss as well as the algorithm for training.
+
+
+
+      <CollapsibleCard {open}>
+        <h2 slot='header' class='collapsible-header'>
+          More math
+        </h2>
+        <p slot='body' class='collapsible-body'>
+          Let's look at the parts of this loss function:
+          <span class="li">
+            <Katex>P_F(s_{"t+1"}|s_t;\theta)</Katex>
+            The forward policy. It represents the distribution over the next states (the children) of the current state.
+          </span>
+          <span class="li">
+            <Katex>P_B(s_t|s_{"t+1"};\theta)</Katex>
+            The backward policy. Similar to as we defined the forward policy, we can define the backward policy as a distribution over the previous states (the parents) of a state.
+            We can also estimate it using a NN (not the same as for the forward policy).
+          </span>
+          <span class="li">
+            <Katex>Z_{"\\theta"}</Katex>
+            The partition function. It is equal to the total flow of the system.
+            It is another parameter to be learned by our agent and should approach the true partition function given enough training.
+            In our case, the true partition function is 2 (the number of gaussians), however it is usually not known.
+            The partition function for a mixture of gaussians is the sum of its mixture weights, so always 1 (therefore logZ is 0).
+            However we do not compute a real mixture of gaussians here, as we do not use mixture weights but simply sum up over all gaussians.
+          </span>
+          <span class="li">
+            <Katex>R(x)</Katex>
+            The reward for the final object x of the trajectory. Note that if we propagate the reward backward using our backward policy, only a small part of it goes through one trajectory, as there are usually many ways to sample x using different trajectories.
+          </span>
+        </p>
+      </CollapsibleCard>
+      <CollapsibleCard {open}>
+        <h2 slot='header' class='collapsible-header'>
+          The algorithm
+        </h2>
+        <pre slot='body' class='collapsible-body'>
+          Input: Reward function (part of the environment), model, hyperparameters
+          1. Initialize model parameters for PF, PB, logZ
+          2. Repeat for a number of iterations or until convergence:
+          3.    Repeat for trajectory length:
+          4.        Sample action for current state from PF
+          5.        Take step according to action
+          6.        Add new state to trajectory
+          7.    Calculate reward of final state according to reward function
+          8.    Calculate the sum of the log probabilities of all actions of the trajectory for each PF and PB
+          9.    Calculate the TB-Loss: (logZ + log probabilities PF - log probabilities PB - log reward)^2
+          10.   Update the parameters PF, PB, logZ
+        </pre>
+      </CollapsibleCard>
+
+      We trained a GFN on this environment for 2000 Iterations.
+      Below you see the progress of our GFN during training. While it first samples randomly, it learns to match the true distribution of our environment.
+
+
     </p>
     <div class="image-container">
       <img src="/images/run1.png" class="image" alt="GFN samples from the underlying distribution">
     </div>
+    <p class="section-text">
+      Sampling according to the underlying distribution is one of the big advantages of GFlowNets: Other approaches usually learn to maximize the reward, so they would not sample from both of our modes (or everything in between), but they would find one of them and then just sample from it (especially if one of our modes would be greater than the other). This might be suboptimal e.g. in molecule discovery, where you might not want the most promising molecule, but many different of themmight be interesting.
+    </p>
 
     <h2 class="section-title">Mode Collapse</h2>
     <p class="section-text">
-      If there is little probability mass between modes, we see mode collapse.
+      So far, our distribution to match was very easy. Lets make it more challenging: If we lower the variance, we see the two modes are more seperated.
     </p>
     <div class="image-container">
       <img src="/images/run2.png" class="image" alt="Low variance leads to sampling from one mode">
     </div>
     <p class="section-text">
-      Training off-policy mitigates this issue.
-      We added variance to each step -> more exploring
+      Well thats not what we want! Instead of sampling from the true distribution we only sample from one mode, thats what common RL methods do. We can do better!
+      <br><br>
+      There are two main possibilities to fix this:
+      <span class="li">We could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:<Katex>R_{"new"}(x)=R(x)^\beta</Katex>. This would change the "peakyness" of the reward function and we would not sample proportional to the reward function but according to <Katex>/pi(x|\beta) \propto R(x)^\beta</Katex>. It is also possible to use <Katex>\beta</Katex> as a trainable parameter and condition the model on it.</span>
+      <span class="li">A similar but simpler way is to just train off-policy. By adding a fixed variance to the logits of the forward policy, we explore more during training. As this is a very easy implementation let's go with this one.</span>
+      <CollapsibleCard {open}>
+        <h2 slot='header' class='collapsible-header'>
+          Changes to the algorithm
+        </h2>
+        <p slot='body' class='collapsible-body'>
+          Training off-policy is even more helpful when we schedule it. We start with more a higher variance and scale it down during training until we reach on-policy training.
+          <br>Our new hyperparameter is the initial value for the off policy training, during each step we gradually decrease it until we reach 0.
+          <br>
+          <br>Important changes:
+          <br>Define schedule in the beginning: [start=initial value, stop=0, step=-initial value/number of iterations\]
+          <br>When sampling the actions we compute the logits as usual.
+          <br>Instead of just defining the policy distribution with them, we also define a exploratory distribution by adding the scheduled value to the variance.
+          <br>We then sample our actions from the exploratory distribution. We need the policy distribution later to compute the log probabilities of our actions.
+          <br>We do not use the scheduled values with the backward policy and during inference.
+
+        </p>
+      </CollapsibleCard>
     </p>
     <div class="image-container">
       <img src="/images/run3.png" class="image" alt="Off-policy training helps">
     </div>
+
   </section>
 
   <section class="section">
@@ -527,7 +778,7 @@
           type="range"
           min="100"
           max="10000"
-          step="10"
+          step="1"
           bind:value="{n_iterations_value}"
           id="n_iterations"
           disabled={isRunning}
@@ -625,9 +876,38 @@
 
   <section class="section">
     <h2 class="section-title">Sources</h2>
-    <p class="section-text">
-      Add sources
-    </p>
+    <h3 class="section-title3">Literature</h3>
+      <p class="section-text">
+        Malkin, N., Jain, M., Bengio, E., Sun, C., & Bengio, Y. (2022). Trajectory balance: Improved credit
+        assignment in gflownets. Advances in Neural Information Processing Systems, 35, 5955-5967.
+        <br><br>
+        Shen, M. W., Bengio, E., Hajiramezanali, E., Loukas, A., Cho, K., & Biancalani, T. (2023, July).
+        Towards understanding and improving gflownet training. In International Conference on Machine
+        Learning (pp. 30956-30975). PMLR.
+        <br><br>
+        Bengio, Y., Lahlou, S., Deleu, T., Hu, E. J., Tiwari, M., & Bengio, E. (2023). Gflownet foundations. The
+        Journal of Machine Learning Research, 24(1), 10006-10060.
+        <br><br>
+        Bengio, E., Jain, M., Korablyov, M., Precup, D., & Bengio, Y. (2021). Flow network based generative
+        models for non-iterative diverse candidate generation. Advances in Neural Information Processing
+        Systems, 34, 27381-27394.
+        <br><br>
+        Nica, A. C., Jain, M., Bengio, E., Liu, C. H., Korablyov, M., Bronstein, M. M., & Bengio, Y. (2022). Evaluating generalization in gflownets for molecule design. In ICLR2022 Machine Learning for Drug Discovery.
+      </p>
+    <h3 class="section-title3">Tutorials</h3>
+      <p class="section-text">
+        https://milayb.notion.site/The-GFlowNet-Tutorial-95434ef0e2d94c24aab90e69b30be9b3
+        <br><br>
+        https://colab.research.google.com/drive/1fUMwgu2OhYpQagpzU5mhe9_Esib3Q2VR
+      </p>
+    <h3 class="section-title3">GFlowNet Libraries</h3>
+      <p class="section-text">
+        https://github.com/alexhernandezgarcia/gflownet
+        <br><br>
+        https://github.com/GFNOrg/torchgfn
+        <br><br>
+        https://github.com/augustwester/gflownet
+      </p>
   </section>
 </main>
 
@@ -653,7 +933,7 @@
     max-width: 1200px;
   }
 
-  .header {
+  .header-top {
     background: linear-gradient(90deg, #32263d, #3e412d);
     color: white;
     padding: 3rem 0;
@@ -679,34 +959,43 @@
   }
 
   .section-title {
+    width: 1000px;
     font-size: 2rem;
+    margin: 0 auto;
     font-weight: 600;
+    color: #24291e;
+    margin-bottom: 1rem;
+  }
+  .section-title3 {
+    width: 1000px;
+    font-size: 1.5rem;
+    margin: 0 auto;
+    font-weight: 500;
     color: #24291e;
     margin-bottom: 1rem;
   }
 
   .section-text {
+    width: 1000px;
+    margin: 0 auto;
     font-size: 1rem;
     line-height: 1.6;
     color: #191913;
     margin-bottom: 1.5rem;
   }
 
-  .bullet-list {
-    list-style-type: disc;
-    margin-left: 20px;
-    margin-bottom: 2rem;
-  }
 
   .image-container {
+    width: 1000px;
     display: flex;
+    margin:0 auto;
     justify-content: center;
     margin-bottom: 2rem;
   }
 
   .image {
     max-width: 100%;
-    width: 50%;
+    width: 90%;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
@@ -809,6 +1098,8 @@ span {
   }
   .controls {
     margin-bottom: 20px;
+    width: 1000px;
+    margin: 0 auto
   }
 
   .slider {
@@ -829,7 +1120,8 @@ span {
     position: relative;
     left: 4px;
     width: 1000px;
-    height: 600px;
+    height: 500px;
+    margin: 0 auto;
     }
 
   .canvas-container {
@@ -888,6 +1180,44 @@ span {
   button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+  .collapsible-header {
+    margin: 0;
+    font-size: 14px;
+    padding: 0.5em;
+    border: 1px solid rgb(100,120,140);
+    border-radius: 2px;
+    background: rgb(244, 244, 244);
+    transition: border-radius 0.5s step-end;
+  }
+  .collapsible-body {
+    margin: 0;
+    font-size: 12px;
+    padding: 0.5em;
+    border-left: 1px solid rgb(100,120,140);
+    border-radius: 2px;
+    background: rgb(244, 244, 244);
+    transition: border-radius 0.5s step-end;
+  }
+
+  span.li {
+    width: 100%;
+    display: list-item;
+    list-style-type: disc;
+    margin-left: 40px;
+    text-align: left;
+  }
+
+  .mathexpl {
+    display: block;
+    text-align: center;
+    font-size: 0.8rem;
+    color: grey;
+    margin-top: 5px;
+    width: 500px; /* or a fixed width */
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1rem;
   }
 
 </style>

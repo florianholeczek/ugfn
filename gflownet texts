@@ -33,7 +33,7 @@ This places an important constraint on our model: Preservation of Flow. The pipe
 We now can set the flow going out of a terminal state equal to it's reward. 
 Assuming edge flow F(s,s')>0, we can then express the Flow from one state s to its children s' as:
 
-\sum_{s' \in \varpsilon} F(s,s') = R(s') + \sum_{s'' \in \varpsilon} F(s',s'')  (1)
+\sum_{s' \in \varepsilon} F(s,s') = R(s') + \sum_{s'' \in \varepsilon} F(s',s'')  (1)
 
 We now define our forward policy as the proportion of the Flow s -> s' to the total Flow of s:
 
