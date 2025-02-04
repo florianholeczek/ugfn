@@ -10,8 +10,8 @@ import numpy as np
 # set hyperparameters
 n_inference=4096 # batch size for inference after the training
 batch_size=1024 # batch size during training
-n_iterations=5000 # number of iteration to train for
-trajectory_length = 3 # trajectory length
+n_iterations=2000 # number of iteration to train for
+trajectory_length = 10 # trajectory length
 off_policy = 0 # variance to add during action sampling. 0 to train on-policy.
 n_hidden_layers=2 # number of hidden layers for forward and backward policy
 hidden_dim=64 # size for forward and backward policy
@@ -63,3 +63,21 @@ plt.show()
 trajectories = gflownet.inference(env, batch_size=n_inference, trajectory_length=trajectory_length)
 fig = plot.plot_states_2d(env, trajectories, alpha=0.8, ground_truth="contour", colormap="viridis", levels=10)
 plt.show()
+torch.save(gflownet, "model.pth")
+
+plot.plot_flows(
+    env,
+    gflownet,
+    step =trajectory_length,
+    title = None,
+    grid_size=10,
+    static=False,
+)
+plot.plot_flow(
+    env,
+    gflownet,
+    step =trajectory_length,
+    title = None,
+    grid_size=10,
+    static=False,
+)

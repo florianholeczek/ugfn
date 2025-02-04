@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 import io
 import base64
+import plotly.figure_factory as ff
+import plotly.graph_objects as go
+import plotly
 
 
 
@@ -269,3 +272,91 @@ def plot_states_2d(
     buf.close()
 
     return fig, img_base64
+
+def plot_flow(
+        model,
+        step=0,
+        grid_size=10,
+        static = True
+        ):
+    """
+    Plots the flow as a vectorfield
+    :param model: the trained gflownet
+    :param step: the step for which to visualize. Int in range [0, trajectory_length].
+    :param grid_size: size of the grid. Massive impact on computation time.
+    :param static: animated or static visualization. animated plots for all steps up to trajectory_length.
+    :return: None
+    """
+
+    x_grid, y_grid, grid_points = grid(grid_size=grid_size)
+
+    if static:
+        states = torch.cat((torch.ones((len(grid_points),1))*step, grid_points), dim=1)
+    else:
+        steps = torch.repeat_interleave(torch.arange(step+1), len(grid_points)).reshape(-1, 1)
+        grid_points = grid_points.repeat(step+1,1)
+        states = torch.cat((steps, grid_points), dim=1)
+
+    with torch.no_grad():
+        model.forward_model.eval()
+        policy = model.forward_model(states)
+    mus, sigmas = torch.tensor_split(policy, [2], dim=1)
+    #sigmas = torch.sigmoid(sigmas) * 0.9 + 0.1
+    flow_vectors = mus
+
+
+    if static:
+        fig = ff.create_quiver(
+            grid_points[:,0],
+            grid_points[:,1],
+            flow_vectors[:,0],
+            flow_vectors[:,1],
+            line=dict(color='teal'),
+            scaleratio=1,
+            scale=0.4
+        )
+
+    else:
+        frames = []
+        fig = ff.create_quiver(
+            grid_points[:grid_size**2, 0],
+            grid_points[:grid_size**2, 1],
+            flow_vectors[:grid_size**2, 0],
+            flow_vectors[:grid_size**2, 1],
+            line=dict(color='teal'),
+            scaleratio=1,
+            scale=0.4
+        )
+        for f in range(step):
+            a = f*grid_size**2
+            b= (f+1)*grid_size**2
+            fig_temp = ff.create_quiver(
+                grid_points[a:b,0],
+                grid_points[a:b,1],
+                flow_vectors[a:b,0],
+                flow_vectors[a:b,1],
+                line=dict(color='teal'),
+                scaleratio=1,
+                scale=0.4
+            )
+            frames.append(go.Frame(data=[fig_temp.data[0]]))
+
+        fig.update_layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            updatemenus=[dict(type='buttons',
+                showactive=False,
+                buttons=[dict(
+                    label='Play',
+                    method='animate',
+                    args=[None, dict(frame=dict(duration=250, redraw=False),
+                                     transition=dict(duration=50),
+                                     fromcurrent=True,
+                                     mode='immediate',
+                                     loop=True)])])])
+        fig.update(frames=frames)
+
+
+    fig.show()
+
+
