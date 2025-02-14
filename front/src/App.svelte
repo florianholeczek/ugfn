@@ -12,7 +12,7 @@
   let lr_logz_value = 0.1;
   let trajectory_length_value = 2;
   let hidden_layer_value = 2;
-  let hidden_dim_value = 2;
+  let hidden_dim_value = 64;
   let seed_value = 42;
   let batch_size_exponent = 5;
   $: batch_size_value = 2**batch_size_exponent;
@@ -59,7 +59,7 @@
       lr_logz_value = 0.1;
       trajectory_length_value = 2;
       hidden_layer_value = 2;
-      hidden_dim_value = 2;
+      hidden_dim_value = 64;
       seed_value = 7614;
       batch_size_exponent = 6;
   }
@@ -816,7 +816,7 @@
         <input
           type="range"
           min="1"
-          max="8"
+          max="10"
           step="1"
           bind:value="{trajectory_length_value}"
           id="trajectory_lenght"
@@ -829,7 +829,7 @@
         <input
           type="range"
           min="1"
-          max="8"
+          max="6"
           step="1"
           bind:value="{hidden_layer_value}"
           id="hidden_layer"
@@ -838,11 +838,24 @@
         <span>{hidden_layer_value}</span>
       </div>
       <div class="slider">
+        <label for="hidden_layer">Dimension of hidden layers</label>
+        <input
+          type="range"
+          min="8"
+          max="128"
+          step="8"
+          bind:value="{hidden_dim_value}"
+          id="hidden_dim"
+          disabled={isRunning}
+        />
+        <span>{hidden_dim_value}</span>
+      </div>
+      <div class="slider">
         <label for="seed">Seed</label>
         <input
           type="range"
           min="0"
-          max="9999"
+          max="99"
           step="1"
           bind:value="{seed_value}"
           id="seed"
