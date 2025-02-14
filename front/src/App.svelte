@@ -4,11 +4,13 @@
   import Katex from 'svelte-katex'
   import 'katex/dist/katex.min.css';
   import { CollapsibleCard } from 'svelte-collapsible'
+  import {plotEnvironment} from "./env.js";
+  import './styles.css';
 
   // default values
   let off_policy_value = 0;
   let n_iterations_value = 2000;
-  let lr_model_value = 0.005;
+  let lr_model_value = 0.001;
   let lr_logz_value = 0.1;
   let trajectory_length_value = 2;
   let hidden_layer_value = 2;
@@ -26,8 +28,8 @@
 
   // storing gaussians
   const gaussians = writable([
-    { mean: { x: -1, y: -1 }, variance: 0.2 },
-    { mean: { x: 1, y: 1 }, variance: 0.2 }
+    { mean: { x: -1, y: -1 }, variance: 0.4 },
+    { mean: { x: 1, y: 1 }, variance: 0.4 }
   ]);
 
   // ranges for means and variances
@@ -60,8 +62,8 @@
       trajectory_length_value = 2;
       hidden_layer_value = 2;
       hidden_dim_value = 64;
-      seed_value = 7614;
-      batch_size_exponent = 6;
+      seed_value = 42;
+      batch_size_exponent = 5;
   }
 
   let Plotly; // Load Plotly from CDN
@@ -167,13 +169,13 @@
       }
       return gs;
     });
-    plotEnvironment(plotContainerId, $gaussians, {
+    plotEnvironment(Plotly, plotContainerId, $gaussians, {
         gridSize: 100,
         alpha2D: 1.0,
         alpha3D: 0.8,
         levels: 50,
       });
-    plotEnvironment(plotContainerId2, $gaussians, {
+    plotEnvironment(Plotly, plotContainerId2, $gaussians, {
         gridSize: 100,
         alpha2D: 1.0,
         alpha3D: 0.8,
@@ -188,13 +190,13 @@
       }
       return gs;
     });
-    plotEnvironment(plotContainerId, $gaussians, {
+    plotEnvironment(Plotly, plotContainerId, $gaussians, {
         gridSize: 100,
         alpha2D: 1.0,
         alpha3D: 0.8,
         levels: 50,
       });
-    plotEnvironment(plotContainerId2, $gaussians, {
+    plotEnvironment(Plotly, plotContainerId2, $gaussians, {
         gridSize: 100,
         alpha2D: 1.0,
         alpha3D: 0.8,
@@ -242,13 +244,13 @@
   const stopDrag = () => {
     if(isDraggingMean || isDraggingVariance){
       console.log($gaussians);
-      plotEnvironment(plotContainerId, $gaussians, {
+      plotEnvironment(Plotly, plotContainerId, $gaussians, {
         gridSize: 100,
         alpha2D: 1.0,
         alpha3D: 0.8,
         levels: 50,
       });
-      plotEnvironment(plotContainerId2, $gaussians, {
+      plotEnvironment(Plotly, plotContainerId2, $gaussians, {
         gridSize: 100,
         alpha2D: 1.0,
         alpha3D: 0.8,
@@ -261,81 +263,7 @@
     selectedGaussian = null;
   };
 
-  // functions for computing the reward and visualizing the Environment
 
-  // calculate reward
-  function gaussianPDF(x, y, mean, variance) {
-    const dx = x - mean.x;
-    const dy = y - mean.y;
-    const sigma2 = variance;
-    return Math.exp(-(dx ** 2 + dy ** 2) / (2 * sigma2)) / (2 * Math.PI * Math.sqrt(sigma2));
-  }
-
-  // Density (reward for whole grid)
-  function computeDensity(grid, gaussians) {
-    const { x, y } = grid;
-    const density = Array.from({ length: x.length }, () => Array(y.length).fill(0));
-
-    for (const { mean, variance } of gaussians) {
-      for (let i = 0; i < x.length; i++) {
-        for (let j = 0; j < y.length; j++) {
-          density[j][i] += gaussianPDF(x[i], y[j], mean, variance);
-        }
-      }
-    }
-    return density;
-  }
-  function plotEnvironment(containerId, gaussians, options = {}) {
-    const gridSize = options.gridSize || 100;
-    const alpha2D = options.alpha2D || 1.0;
-    const alpha3D = options.alpha3D || 0.8;
-
-    // Generate grid
-    const range = [-3, 3];
-    const x = Array.from({ length: gridSize }, (_, i) => range[0] + i * (range[1] - range[0]) / (gridSize - 1));
-    const y = Array.from({ length: gridSize }, (_, i) => range[0] + i * (range[1] - range[0]) / (gridSize - 1));
-
-    const density = computeDensity({ x, y }, gaussians);
-
-    // 2D plot data
-    const contourData = {
-      x: x,
-      y: y,
-      z: density,
-      type: "contour",
-      colorscale: "Viridis",
-      opacity: alpha2D,
-      contours: { coloring: "fill", showlines: false },
-      colorbar: { len: 0.8, x: 0.45, thickness: 20 }, // Position shared colorbar in the middle
-    };
-
-    // 3D plot data
-    const surfaceData = {
-      x: x,
-      y: y,
-      z: density,
-      type: "surface",
-      colorscale: "Viridis",
-      opacity: alpha3D,
-      showscale: false, // Disable individual colorbar
-    };
-
-    const layout = {
-      title: options.title || null,
-      grid: { rows: 1, columns: 2, pattern: "independent" },
-      xaxis: { title: "x", domain: [0, 0.45] }, // Left plot domain
-      yaxis: { title: "y", scaleanchor: "x" },
-      scene: { domain: { x: [0.55, 1] } }, // Right plot domain for 3D scene
-      margin: { t: 50, b: 50, l: 50, r: 50 },
-    };
-
-    const config = {
-      staticplot: true,
-      displayModeBar: false, // Hide toolbar
-    };
-
-    Plotly.newPlot(containerId, [contourData, surfaceData], layout, config);
-  }
 
   let plotContainerId = "plot-container";
   let plotContainerId2 = "plot-container2";
@@ -344,14 +272,14 @@
   onMount(async () => {
     //visualize the environment
     await loadPlotly();
-    plotEnvironment(plotContainerId, $gaussians, {
+    plotEnvironment(Plotly, plotContainerId, $gaussians, {
         title: null,
         gridSize: 100,
         alpha2D: 1.0,
         alpha3D: 0.8,
         levels: 50,
       });
-    plotEnvironment(plotContainerId2, $gaussians, {
+    plotEnvironment(Plotly, plotContainerId2, $gaussians, {
         title: null,
         gridSize: 100,
         alpha2D: 1.0,
@@ -373,6 +301,7 @@
 
 </script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
 
 
 
@@ -627,7 +556,7 @@
       Well thats not what we want! Instead of sampling from the true distribution we only sample from one mode, thats what common RL methods do. We can do better!
       <br><br>
       There are two main possibilities to fix this:
-      <span class="li">We could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:<Katex>R_{"new"}(x)=R(x)^\beta</Katex>. This would change the "peakyness" of the reward function and we would not sample proportional to the reward function but according to <Katex>/pi(x|\beta) \propto R(x)^\beta</Katex>. It is also possible to use <Katex>\beta</Katex> as a trainable parameter and condition the model on it.</span>
+      <span class="li">We could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:<Katex>R_{"new"}(x)=R(x)^\beta</Katex>. This would change the "peakyness" of the reward function and we would not sample proportional to the reward function but according to <Katex>\pi(x|\beta) \propto R(x)^\beta</Katex>. It is also possible to use <Katex>\beta</Katex> as a trainable parameter and condition the model on it.</span>
       <span class="li">A similar but simpler way is to just train off-policy. By adding a fixed variance to the logits of the forward policy, we explore more during training. As this is a very easy implementation let's go with this one.</span>
       <CollapsibleCard {open}>
         <h2 slot='header' class='collapsible-header'>
@@ -928,289 +857,11 @@
 
 
 <style>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
 
-  body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f7fafc;
-    color: #333;
-  }
-
-  .container {
-    width: 90%;
-    margin: 0 auto;
-    max-width: 1200px;
-  }
-
-  .header-top {
-    background: linear-gradient(90deg, #32263d, #3e412d);
-    color: white;
-    padding: 3rem 0;
+  span {
+    width: 50px;
     text-align: center;
-  }
-
-  .title {
-    font-size: 3rem;
-    font-weight: 700;
-  }
-
-  .subtitle {
-    font-size: 1.25rem;
-    margin-top: 1rem;
-  }
-
-  .section {
-    padding: 3rem 0;
-  }
-
-  .section-light {
-    background-color: #f8f8f0;
-  }
-
-  .section-title {
-    width: 1000px;
-    font-size: 2rem;
-    margin: 0 auto;
-    font-weight: 600;
-    color: #24291e;
-    margin-bottom: 1rem;
-  }
-  .section-title3 {
-    width: 1000px;
-    font-size: 1.5rem;
-    margin: 0 auto;
-    font-weight: 500;
-    color: #24291e;
-    margin-bottom: 1rem;
-  }
-
-  .section-text {
-    width: 1000px;
-    margin: 0 auto;
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #191913;
-    margin-bottom: 1.5rem;
-  }
-
-
-  .image-container {
-    width: 1000px;
-    display: flex;
-    margin:0 auto;
-    justify-content: center;
-    margin-bottom: 2rem;
-  }
-
-  .image {
-    max-width: 100%;
-    width: 90%;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  .playground {
-    background: linear-gradient(90deg, #382d48, #582897);
-    color: white;
-    padding: 4rem 0;
-    text-align: center;
-  }
-
-
-  @media (max-width: 768px) {
-    .title {
-      font-size: 2.5rem;
-    }
-
-    .subtitle {
-      font-size: 1rem;
-    }
-
-    .section-title {
-      font-size: 1.5rem;
-    }
-
-    .image {
-      width: 80%;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .title {
-      font-size: 2rem;
-    }
-
-    .subtitle {
-      font-size: 0.875rem;
-    }
-
-    .section-title {
-      font-size: 1.25rem;
-    }
-
-    .image {
-      width: 100%;
-    }
-  }
-
-  .slider-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-    margin-left: 1rem;
-}
-
-  .buttonscontainer {
-  display: flex;
-  flex-direction: row;
-  align-items: normal;
-  gap: 70px;
-}
-
-.slider {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-label {
-  width: 150px; /* Adjust width as needed */
-  text-align: right;
-  color: black;
-}
-
-input[type="range"] {
-  flex: 1;
-}
-
-span {
-  width: 50px; /* Adjust width as needed */
-  text-align: center;
-  color: black;
-}
-.reset-button {
-    background-color: #cecb7e;
-    color: #000000;
-    padding: 0.5rem 1.5rem;
-    font-size: 1rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 1rem;
-    margin-left: 1rem;
-    transition: background-color 0.3s;
-  }
-
-  .reset-button:hover {
-    background-color: #97994d;
-  }
-  .controls {
-    margin-bottom: 20px;
-    width: 1000px;
-    margin: 0 auto
-  }
-
-  .slider {
-    margin: 10px 0;
-  }
-
-  .visualization {
-    margin-top: 20px;
-    text-align: center;
-  }
-
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-
-  .env-container {
-    position: relative;
-    left: 4px;
-    width: 1000px;
-    height: 500px;
-    margin: 0 auto;
-    }
-
-  .canvas-container {
-    position: absolute;
-    top: 50px;
-    left: 77px;
-    width: 352px;
-    height: 352px;
-    z-index: 2; /* Ensure the canvas is above the image */
-    pointer-events: none; /* Prevent accidental interaction with the container itself */
-    border: 1px solid #ccc;
-  }
-
-
-  .mean-circle {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: #585858;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    cursor: grab;
-    pointer-events: auto;
-  }
-
-  .mean-circle.highlight {
-    background: #5f1616;
-  }
-
-  .variance-circle {
-    position: absolute;
-    border: 4px solid #585858;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    cursor: grab;
-    pointer-events: auto;
-  }
-
-  .variance-circle.highlight {
-    background: #5f1616;
-    opacity: 0.5;
-  }
-
-  .controls {
-    margin-top: 10px;
-  }
-
-  button {
-    margin: 5px;
-  }
-
-  button:hover {
-    cursor: pointer;
-  }
-
-  button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  .collapsible-header {
-    margin: 0;
-    font-size: 14px;
-    padding: 0.5em;
-    border: 1px solid rgb(100,120,140);
-    border-radius: 2px;
-    background: rgb(244, 244, 244);
-    transition: border-radius 0.5s step-end;
-  }
-  .collapsible-body {
-    margin: 0;
-    font-size: 12px;
-    padding: 0.5em;
-    border-left: 1px solid rgb(100,120,140);
-    border-radius: 2px;
-    background: rgb(244, 244, 244);
-    transition: border-radius 0.5s step-end;
+    color: black;
   }
 
   span.li {
@@ -1226,11 +877,8 @@ span {
     text-align: center;
     font-size: 0.8rem;
     color: grey;
-    margin-top: 5px;
-    width: 500px; /* or a fixed width */
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 1rem;
+    width: 500px;
+    margin: 5px auto 1rem;
   }
 
 </style>

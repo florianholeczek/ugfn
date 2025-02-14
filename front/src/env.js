@@ -1,0 +1,75 @@
+// functions for computing the reward and visualizing the Environment
+
+// calculate reward
+function gaussianPDF(x, y, mean, variance) {
+const dx = x - mean.x;
+const dy = y - mean.y;
+const sigma2 = variance;
+return Math.exp(-(dx ** 2 + dy ** 2) / (2 * sigma2)) / (2 * Math.PI * Math.sqrt(sigma2));
+}
+
+// Density (reward for whole grid)
+function computeDensity(grid, gaussians) {
+const { x, y } = grid;
+const density = Array.from({ length: x.length }, () => Array(y.length).fill(0));
+
+for (const { mean, variance } of gaussians) {
+  for (let i = 0; i < x.length; i++) {
+    for (let j = 0; j < y.length; j++) {
+      density[j][i] += gaussianPDF(x[i], y[j], mean, variance);
+    }
+  }
+}
+return density;
+}
+export function plotEnvironment(Plotly, containerId, gaussians, options = {}) {
+const gridSize = options.gridSize || 100;
+const alpha2D = options.alpha2D || 1.0;
+const alpha3D = options.alpha3D || 0.8;
+
+// Generate grid
+const range = [-3, 3];
+const x = Array.from({ length: gridSize }, (_, i) => range[0] + i * (range[1] - range[0]) / (gridSize - 1));
+const y = Array.from({ length: gridSize }, (_, i) => range[0] + i * (range[1] - range[0]) / (gridSize - 1));
+
+const density = computeDensity({ x, y }, gaussians);
+
+// 2D plot data
+const contourData = {
+  x: x,
+  y: y,
+  z: density,
+  type: "contour",
+  colorscale: "Viridis",
+  opacity: alpha2D,
+  contours: { coloring: "fill", showlines: false },
+  colorbar: { len: 0.8, x: 0.45, thickness: 20 }, // Position shared colorbar in the middle
+};
+
+// 3D plot data
+const surfaceData = {
+  x: x,
+  y: y,
+  z: density,
+  type: "surface",
+  colorscale: "Viridis",
+  opacity: alpha3D,
+  showscale: false, // Disable individual colorbar
+};
+
+const layout = {
+  title: options.title || null,
+  grid: { rows: 1, columns: 2, pattern: "independent" },
+  xaxis: { title: "x", domain: [0, 0.45] }, // Left plot domain
+  yaxis: { title: "y", scaleanchor: "x" },
+  scene: { domain: { x: [0.55, 1] } }, // Right plot domain for 3D scene
+  margin: { t: 50, b: 50, l: 50, r: 50 },
+};
+
+const config = {
+  staticplot: true,
+  displayModeBar: false, // Hide toolbar
+};
+
+Plotly.newPlot(containerId, [contourData, surfaceData], layout, config);
+}
