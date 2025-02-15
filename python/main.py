@@ -9,16 +9,16 @@ import numpy as np
 
 # set hyperparameters
 n_inference=4096 # batch size for inference after the training
-batch_size=1024 # batch size during training
+batch_size=64 # batch size during training
 n_iterations=2000 # number of iteration to train for
-trajectory_length = 10 # trajectory length
+trajectory_length = 6 # trajectory length
 off_policy = 0 # variance to add during action sampling. 0 to train on-policy.
 n_hidden_layers=2 # number of hidden layers for forward and backward policy
 hidden_dim=64 # size for forward and backward policy
 lr_model=1e-3 # learning rate of the model
 lr_logz=1e-1 # learning rate of logZ, typically higher than the model
 device=torch.device('cpu') #device to train on. Usually no big difference.
-seed = 7614
+seed = 42
 
 # set environment
 mus = [torch.tensor([1,1]), torch.tensor([-1,-1])] # list of means for the gaussians

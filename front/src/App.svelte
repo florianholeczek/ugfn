@@ -9,15 +9,23 @@
 
   // default values
   let off_policy_value = 0;
-  let n_iterations_value = 2000;
+  let n_iterations_value = 2048;
   let lr_model_value = 0.001;
   let lr_logz_value = 0.1;
-  let trajectory_length_value = 2;
+  let trajectory_length_value = 6;
   let hidden_layer_value = 2;
   let hidden_dim_value = 64;
   let seed_value = 42;
-  let batch_size_exponent = 5;
+  let batch_size_exponent = 6;
   $: batch_size_value = 2**batch_size_exponent;
+
+  let run1_value = 2048;
+  let run2_value = 4096;
+  let run3_value = 4096;
+
+  $: run1 = `./images/run1/run1_${run1_value}.png`
+  $: run2 = `./images/run2/run2_${run2_value}.png`
+  $: run3 = `./images/run3/run3_${run3_value}.png`
 
 
   //polling every n ms
@@ -56,14 +64,14 @@
 
   function resetSliders() {
       off_policy_value = 0;
-      n_iterations_value = 2000;
+      n_iterations_value = 2048;
       lr_model_value = 0.001;
       lr_logz_value = 0.1;
-      trajectory_length_value = 2;
+      trajectory_length_value = 6;
       hidden_layer_value = 2;
       hidden_dim_value = 64;
       seed_value = 42;
-      batch_size_exponent = 5;
+      batch_size_exponent = 6;
   }
 
   let Plotly; // Load Plotly from CDN
@@ -539,18 +547,45 @@
 
     </p>
     <div class="image-container">
-      <img src="/images/run1.png" class="image" alt="GFN samples from the underlying distribution">
+      <img src="{run1}" class="image" alt="GFN samples from the underlying distribution">
+    </div>
+    <div class="slider-container">
+      <div class="slider">
+        <label for="run1_value">Training progress</label>
+        <input
+          type="range"
+          min="0"
+          max="2048"
+          step="128"
+          bind:value="{run1_value}"
+          id="run1_img"
+        />
+      </div>
     </div>
     <p class="section-text">
       Sampling according to the underlying distribution is one of the big advantages of GFlowNets: Other approaches usually learn to maximize the reward, so they would not sample from both of our modes (or everything in between), but they would find one of them and then just sample from it (especially if one of our modes would be greater than the other). This might be suboptimal e.g. in molecule discovery, where you might not want the most promising molecule, but many different of themmight be interesting.
     </p>
+
 
     <h2 class="section-title">Mode Collapse</h2>
     <p class="section-text">
       So far, our distribution to match was very easy. Lets make it more challenging: If we lower the variance, we see the two modes are more seperated.
     </p>
     <div class="image-container">
-      <img src="/images/run2.png" class="image" alt="Low variance leads to sampling from one mode">
+      <img src="{run2}" class="image" alt="The model samples only from one mode of the distribution">
+    </div>
+    <div class="slider-container">
+      <div class="slider">
+        <label for="run2_value">Training progress</label>
+        <input
+          type="range"
+          min="0"
+          max="4096"
+          step="128"
+          bind:value="{run2_value}"
+          id="run2_img"
+        />
+      </div>
     </div>
     <p class="section-text">
       Well thats not what we want! Instead of sampling from the true distribution we only sample from one mode, thats what common RL methods do. We can do better!
@@ -577,7 +612,20 @@
       </CollapsibleCard>
     </p>
     <div class="image-container">
-      <img src="/images/run3.png" class="image" alt="Off-policy training helps">
+      <img src="{run3}" class="image" alt="Training off policy helps to discover modes">
+    </div>
+    <div class="slider-container">
+      <div class="slider">
+        <label for="run3_value">Training progress</label>
+        <input
+          type="range"
+          min="0"
+          max="4096"
+          step="128"
+          bind:value="{run3_value}"
+          id="run3_img"
+        />
+      </div>
     </div>
 
   </section>

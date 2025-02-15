@@ -31,6 +31,13 @@ visualization_state = {
     "stop_requested": False
 }
 
+sample_state = {
+    "running": False,
+    "current_samples": None,
+    "stop_requested": False,
+    "iteration": None
+}
+
 # pydantic classes
 class Mean(BaseModel):
     x: float
@@ -98,6 +105,20 @@ def stop_visualization():
     else:
         return JSONResponse(status_code=400, content={"error": "No visualization running."})
 
+@app.get("/get_progress")
+def get_progress():
+    global sample_state
+
+    #if not visualization_state["running"] and visualization_state["current_image"] is None:
+    #    return {"completed": True, "samples": None}
+
+    return {
+        "completed": not sample_state["running"],
+        "samples": sample_state["current_samples"],
+        "iteration": sample_state["iteration"]
+    }
+
+
 # train and visualize if trained on enough samples
 def train_and_sample(
         params: dict,
@@ -156,7 +177,7 @@ def train_and_sample(
             title=f"Iteration {(v+1)*n_rounds}/{params['n_iterations']}",
             marginals_gradient=False
         )
-        plt.savefig(f"ims/run3_{(v+1)*n_rounds}.png")
+        #plt.savefig(f"ims/run2_{(v+1)*n_rounds}.png")
         visualization_state["current_image"] = img_base64
         plt.close()
 
@@ -179,7 +200,7 @@ def train_and_sample(
             marginals_gradient=False
         )
         visualization_state["current_image"] = img_base64
-        plt.savefig(f"ims/run3_{params['n_iterations']}.png")
+        #plt.savefig(f"ims/run2_{params['n_iterations']}.png")
         plt.close()
 
     # Mark process as completed or stop requested

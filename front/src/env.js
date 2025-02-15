@@ -9,7 +9,7 @@ return Math.exp(-(dx ** 2 + dy ** 2) / (2 * sigma2)) / (2 * Math.PI * Math.sqrt(
 }
 
 // Density (reward for whole grid)
-function computeDensity(grid, gaussians) {
+export function computeDensity(grid, gaussians) {
 const { x, y } = grid;
 const density = Array.from({ length: x.length }, () => Array(y.length).fill(0));
 
