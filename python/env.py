@@ -38,7 +38,7 @@ class Env:
     def reward(self, state):
         """
         Calculates the reward given a state
-        :param state: Tuple representing the current state
+        :param state: Tuple or tensor representing the current state
         :return: log reward as a float
         """
         logprobs = [m.log_prob(state) for m in self.mixture]

@@ -7,3 +7,4 @@ python/testing.py
 .idea/
 __pycache__/
 front/README.md
+python/model.pth

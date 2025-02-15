@@ -6,6 +6,7 @@
   import { CollapsibleCard } from 'svelte-collapsible'
   import {plotEnvironment} from "./env.js";
   import './styles.css';
+  import {plotStates} from "./training_vis.js"
 
   // default values
   let off_policy_value = 0;
@@ -22,6 +23,7 @@
   let run1_value = 2048;
   let run2_value = 4096;
   let run3_value = 4096;
+  let current_states;
 
   $: run1 = `./images/run1/run1_${run1_value}.png`
   $: run2 = `./images/run2/run2_${run2_value}.png`
@@ -153,6 +155,9 @@
         }
 
         const data = await response.json();
+        if (data.states) {
+          current_states = data.states;
+        }
 
         if (data.image) {
           currentImage = `data:image/png;base64,${data.image}`;
@@ -275,6 +280,7 @@
 
   let plotContainerId = "plot-container";
   let plotContainerId2 = "plot-container2";
+  let trainplot = "trainplot";
 
   // Mounting
   onMount(async () => {
@@ -860,6 +866,15 @@
       {:else if isRunning}
         <p>Loading visualization...</p>
       {/if}
+    </div>
+    <div class="buttonscontainer">
+      <button class="reset-button" on:click="{plotStates(Plotly, $gaussians, current_states)}">plot</button>
+    </div>
+    <p>
+      {current_states}
+    </p>
+    <div class="image-container" id="trainplot">
+
     </div>
 
   </section>

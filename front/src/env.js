@@ -4,23 +4,23 @@
 function gaussianPDF(x, y, mean, variance) {
 const dx = x - mean.x;
 const dy = y - mean.y;
-const sigma2 = variance;
-return Math.exp(-(dx ** 2 + dy ** 2) / (2 * sigma2)) / (2 * Math.PI * Math.sqrt(sigma2));
+// simplified pdf as we do not allow covariance
+return Math.exp(-(dx ** 2 + dy ** 2) / (2 * variance)) / (2 * Math.PI * variance);
 }
+
 
 // Density (reward for whole grid)
 export function computeDensity(grid, gaussians) {
-const { x, y } = grid;
-const density = Array.from({ length: x.length }, () => Array(y.length).fill(0));
-
-for (const { mean, variance } of gaussians) {
-  for (let i = 0; i < x.length; i++) {
-    for (let j = 0; j < y.length; j++) {
-      density[j][i] += gaussianPDF(x[i], y[j], mean, variance);
+  const { x, y } = grid;
+  const density = Array.from({ length: x.length }, () => Array(y.length).fill(0));
+  for (const { mean, variance } of gaussians) {
+    for (let i = 0; i < x.length; i++) {
+      for (let j = 0; j < y.length; j++) {
+        density[j][i] += gaussianPDF(x[i], y[j], mean, variance);
+      }
     }
   }
-}
-return density;
+  return density;
 }
 export function plotEnvironment(Plotly, containerId, gaussians, options = {}) {
 const gridSize = options.gridSize || 100;

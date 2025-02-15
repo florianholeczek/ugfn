@@ -122,7 +122,14 @@ class GFlowNet:
         log_probs = policy_dist.log_prob(actions)
         return log_probs
 
-    def train(self, env, batch_size=64, trajectory_length=2, n_iterations=5000, off_policy=None):
+    def train(self,
+              env,
+              batch_size=64,
+              trajectory_length=2,
+              n_iterations=5000,
+              off_policy=None,
+              collect_trajectories=0
+              ):
         """
         Train the model, Loss is Trajectory Balance Loss
         :param env: The environment to train in
@@ -133,12 +140,15 @@ class GFlowNet:
         None or 0 to train on-policy.
         A constant (int, float) will be added to the variance and lead to higher exploration.
         A list of int or float will be used as a schedule. The length must be equal to n_iterations.
+        :param collect_trajectories: will collect the last n trajectories if True.
+        shape: (collect_trajectories, trajectory_length+1, 3)
         :return: tuple(List of losses, list of logZs, True Logz), tensor with last trajectories for visualization
         """
 
         losses = []
-        trajectory_vis_n = 2048 # keep the last n trajectories for visualization
-        trajectory_vis = torch.zeros((trajectory_vis_n, trajectory_length+1, 3), device=self.device)
+        last_trajectories = None
+        if collect_trajectories:
+            last_trajectories = torch.zeros((collect_trajectories, trajectory_length+1, 3), device=self.device)
         logzs = []
         logz_true = env.log_partition
         self.forward_model.train()
@@ -183,11 +193,13 @@ class GFlowNet:
             self.optimizer.step()
             losses.append(loss.item())
             logzs.append(self.logz.item())
-            trajectory_vis = torch.cat((trajectory_vis, trajectory), dim=0)
 
-            # keep last n trajectories for visualization
-            if len(trajectory_vis)>trajectory_vis_n:
-                trajectory_vis = trajectory_vis[-trajectory_vis_n:]
+            if collect_trajectories:
+                last_trajectories = torch.cat((last_trajectories, trajectory), dim=0)
+                # keep last n trajectories
+                if len(last_trajectories)>collect_trajectories:
+                    last_trajectories = last_trajectories[-collect_trajectories:]
+
 
             if i%20 == 0:
                 progress_bar.set_postfix({
@@ -196,7 +208,7 @@ class GFlowNet:
                     "logZ True": f"{logz_true.item():.3f}"
                 })
 
-        return (losses, logzs, logz_true.item()), trajectory_vis
+        return (losses, logzs, logz_true.item()), last_trajectories
 
     def inference(self, env, batch_size=4096, trajectory_length=2):
         """

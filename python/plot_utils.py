@@ -200,6 +200,8 @@ def plot_states_2d(
     density_env = density_env.reshape(grid_size, grid_size).numpy()
 
     # Marginal densities
+    # Normalization: Divide through number of gaussians as we sum up over them without weights
+    # (6/(gridsize-1) is the step, multiplying with the delta to approximate the integral
     density_x = (6 / (grid_size - 1)) * np.sum(density_env, axis=0) / len(env.mus)
     density_y = (6 / (grid_size - 1)) * np.sum(density_env, axis=1) / len(env.mus)
 

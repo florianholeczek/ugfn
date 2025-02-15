@@ -24,12 +24,6 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-# Global state to track training processes
-visualization_state = {
-    "running": False,
-    "current_image": None,
-    "stop_requested": False
-}
 
 sample_state = {
     "running": False,
@@ -37,6 +31,19 @@ sample_state = {
     "stop_requested": False,
     "iteration": None
 }
+current_states = torch.zeros(2048,2).tolist()
+
+
+
+# Global state to track training processes
+visualization_state = {
+    "running": False,
+    "current_image": None,
+    "stop_requested": False,
+    "states": current_states,
+}
+
+
 
 # pydantic classes
 class Mean(BaseModel):
@@ -88,10 +95,10 @@ def get_visualization():
 
     if not visualization_state["running"] and visualization_state["current_image"] is None:
         return {"completed": True, "image_data": None}
-
     return {
         "completed": not visualization_state["running"],
-        "image": visualization_state["current_image"]
+        "image": visualization_state["current_image"],
+        "states": visualization_state["states"],
     }
 
 # when user stops training process
@@ -105,8 +112,8 @@ def stop_visualization():
     else:
         return JSONResponse(status_code=400, content={"error": "No visualization running."})
 
-@app.get("/get_progress")
-def get_progress():
+@app.get("/update")
+def update():
     global sample_state
 
     #if not visualization_state["running"] and visualization_state["current_image"] is None:
@@ -168,6 +175,7 @@ def train_and_sample(
             trajectory_length=params['trajectory_length'],
             n_iterations=n_rounds,
             off_policy=off_policy[v*n_rounds:(v+1)*n_rounds],
+            collect_trajectories=trajectory_vis_n,
         )
 
         # visualize
@@ -179,6 +187,8 @@ def train_and_sample(
         )
         #plt.savefig(f"ims/run2_{(v+1)*n_rounds}.png")
         visualization_state["current_image"] = img_base64
+        states = trajectory[:, -1, 1:].tolist()
+        visualization_state["states"] = states
         plt.close()
 
     # train for the remainder of the division
