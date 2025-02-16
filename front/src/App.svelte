@@ -32,7 +32,7 @@
 
 
   //polling every n ms
-  const POLLING_INTERVAL = 200;
+  const POLLING_INTERVAL = 50;
   let isRunning = false;
   let currentImage = null;
   let pollingTimer;
@@ -161,7 +161,7 @@
         }
         if (data.states) {
           current_states = data.states;
-          plotStates(Plotly, $gaussians, current_states,current_losses)
+          plotStates(Plotly, $gaussians, current_states,current_losses);
         }
 
         if (data.image) {
@@ -169,6 +169,7 @@
         }
         if (data.completed) {
           console.log("Visualization process completed.");
+          plotStates(Plotly, $gaussians, current_states,current_losses);
           isRunning = false; // Update the UI state to reflect the stopped process
           clearInterval(pollingTimer); // Stop the polling
           return; // Stop polling
@@ -764,9 +765,9 @@
         <label for="n_iterations">Iterations to train</label>
         <input
           type="range"
-          min="100"
-          max="10000"
-          step="1"
+          min="32"
+          max="10240"
+          step="8"
           bind:value="{n_iterations_value}"
           id="n_iterations"
           disabled={isRunning}
@@ -865,24 +866,6 @@
         <span>{batch_size_value}</span>
       </div>
     </div>
-    <div class="visualization">
-      {#if currentImage}
-        <img src={currentImage} alt="Visualization" />
-      {:else if isRunning}
-        <p>Loading visualization...</p>
-      {/if}
-    </div>
-    <div class="buttonscontainer">
-      <button class="reset-button" on:click="{plotStates(
-              Plotly,
-              $gaussians,
-              current_states,
-              current_losses
-              )}">plot</button>
-    </div>
-    <p>
-      {current_states}
-    </p>
     <div class="image-container" id="trainplot">
 
     </div>

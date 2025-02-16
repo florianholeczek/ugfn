@@ -128,7 +128,8 @@ class GFlowNet:
               trajectory_length=2,
               n_iterations=5000,
               off_policy=None,
-              collect_trajectories=0
+              collect_trajectories=0,
+              progress_bar = True
               ):
         """
         Train the model, Loss is Trajectory Balance Loss
@@ -142,13 +143,12 @@ class GFlowNet:
         A list of int or float will be used as a schedule. The length must be equal to n_iterations.
         :param collect_trajectories: will collect the last n trajectories if True.
         shape: (collect_trajectories, trajectory_length+1, 3)
+        :param progress_bar: show progressbar for iterations
         :return: tuple(List of losses, list of logZs, True Logz), tensor with last trajectories for visualization
         """
 
         losses = []
         last_trajectories = None
-        if collect_trajectories:
-            last_trajectories = torch.zeros((collect_trajectories, trajectory_length+1, 3), device=self.device)
         logzs = []
         logz_true = env.log_partition
         self.forward_model.train()
@@ -165,7 +165,7 @@ class GFlowNet:
             exploration_schedule = torch.linspace(off_policy, 0, n_iterations)
 
         # start training
-        progress_bar = tqdm(range(n_iterations), desc="Training...")
+        progress_bar = tqdm(range(n_iterations), desc="Training...", disable=not progress_bar)
         for i in progress_bar:
             self.optimizer.zero_grad()
             x = self.init_state(env, batch_size)
@@ -195,10 +195,13 @@ class GFlowNet:
             logzs.append(self.logz.item())
 
             if collect_trajectories:
-                last_trajectories = torch.cat((last_trajectories, trajectory), dim=0)
-                # keep last n trajectories
-                if len(last_trajectories)>collect_trajectories:
-                    last_trajectories = last_trajectories[-collect_trajectories:]
+                if last_trajectories is not None:
+                    last_trajectories = torch.cat((last_trajectories, trajectory), dim=0)
+                    # keep last n trajectories
+                    if len(last_trajectories)>collect_trajectories:
+                        last_trajectories = last_trajectories[-collect_trajectories:]
+                else:
+                    last_trajectories = trajectory
 
 
             if i%20 == 0:

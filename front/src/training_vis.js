@@ -134,7 +134,7 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
         mode:'lines',
         xaxis: 'x4',
         yaxis: 'y4',
-        line: { color: 'rgb(68, 1, 84)', width: 1},
+        line: { color: '#1f77b4', width: 1},
     }
     const logzplot = {
         x:iters,
@@ -144,7 +144,7 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
         mode:'lines',
         xaxis: 'x4',
         yaxis: 'y4',
-        line: { color: 'rgb(39, 127, 142)', width: 1},
+        line: { color: '#ff7f0e', width: 1},
     }
     const truelogzplot = {
         x:iters,
@@ -154,7 +154,7 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
         mode:'lines',
         xaxis: 'x4',
         yaxis: 'y4',
-        line: { color: 'rgb(74, 193, 109)', width: 2},
+        line: { color: '#d62728', width: 1},
     }
 
     // Layout configuration

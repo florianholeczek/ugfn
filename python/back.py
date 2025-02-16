@@ -26,7 +26,7 @@ app.add_middleware(
 
 
 
-start_states = torch.zeros(2048,2).tolist()
+start_states = torch.zeros(1,2).tolist()
 start_losses = {
     "losses": [],
     "logzs": [],
@@ -95,8 +95,8 @@ def start_visualization(request: VisualizationRequest, background_tasks: Backgro
 def get_visualization():
     global visualization_state
 
-    if not visualization_state["running"] and visualization_state["current_image"] is None:
-        return {"completed": True, "image_data": None}
+    #if not visualization_state["running"] and visualization_state["current_image"] is None:
+    #    return {"completed": True, "image_data": None}
     return {
         "completed": not visualization_state["running"],
         "image": visualization_state["current_image"],
@@ -126,15 +126,17 @@ def train_and_sample(
     visualization_state["losses"] = start_losses
     visualization_state["states"] = start_states
 
-    # basically the batch size for the sampling
-    # upper bound: send vis to frontend if trained for n trajectories
-    trajectory_vis_n = 2048
+    trajectory_max = 2048 # number of states to send to frontend for visualization,basically batch size for sampling
+    train_interval =4 # number of iterations to train before updating states for visualization
+    current_states = None
 
-    n_rounds = int(trajectory_vis_n/params['batch_size'])
-    n_visualizations = params['n_iterations']//n_rounds
+
+
+    #n_rounds = int(trajectory_vis_n/params['batch_size'])
+    #n_visualizations = params['n_iterations']//n_rounds
     torch.manual_seed(params['seed'])
 
-    # set up the environment
+    # set up the environment and model
     mus = []
     sigmas = []
     for g in params['curr_gaussians']:
@@ -142,7 +144,6 @@ def train_and_sample(
         mus.append(torch.Tensor(m))
         sigmas.append(torch.ones(2) * g["variance"])
     env = Env(mus, sigmas)
-
     model = GFlowNet(
         n_hidden_layers=params['hidden_layer'],
         hidden_dim=params['hidden_dim'],
@@ -158,7 +159,7 @@ def train_and_sample(
         off_policy = [None]*params['n_iterations']
 
     # start training
-    for v in range(n_visualizations):
+    for v in range(params['n_iterations']//train_interval):
 
         if visualization_state["stop_requested"]:
             break
@@ -167,32 +168,41 @@ def train_and_sample(
             env,
             batch_size=params['batch_size'],
             trajectory_length=params['trajectory_length'],
-            n_iterations=n_rounds,
-            off_policy=off_policy[v*n_rounds:(v+1)*n_rounds],
-            collect_trajectories=trajectory_vis_n,
+            n_iterations=train_interval,
+            off_policy=off_policy[v*train_interval:(v+1)*train_interval],
+            collect_trajectories=trajectory_max,
+            progress_bar=False,
         )
 
-        # visualize
+        """# visualize
         fig, img_base64=plot_states_2d(
             env,
             trajectory,
-            title=f"Iteration {(v+1)*n_rounds}/{params['n_iterations']}",
+            title=f"Iteration {(v+1)*8}/{params['n_iterations']}",
             marginals_gradient=False
         )
         #plt.savefig(f"ims/run2_{(v+1)*n_rounds}.png")
         visualization_state["current_image"] = img_base64
-        states = trajectory[:, -1, 1:].tolist()
-        visualization_state["states"] = states
+        plt.close()"""
+
+        states = trajectory[:, -1, 1:]
+        if current_states is not None:
+            current_states = torch.cat((current_states, states), dim=0)
+            if len(current_states) > trajectory_max:
+                current_states = current_states[-trajectory_max:]
+        else:
+            current_states = states
+        visualization_state["states"] = current_states.tolist()
         visualization_state["losses"]={
             "losses": visualization_state["losses"]["losses"] + losses[0],
             "logzs": visualization_state["losses"]["logzs"] + losses[1],
             "truelogz": visualization_state["losses"]["truelogz"] + ([losses[2]]*len(losses[0])),
             "n_iterations": params['n_iterations'],
         }
-        plt.close()
+
 
     # train for the remainder of the division
-    if params['n_iterations']/n_rounds != n_visualizations:
+    """if params['n_iterations']/n_rounds != n_visualizations:
         mod = params['n_iterations']%n_rounds
         losses, trajectory = model.train(
             env,
@@ -219,10 +229,11 @@ def train_and_sample(
             "n_iterations": params['n_iterations'],
         }
         #plt.savefig(f"ims/run2_{params['n_iterations']}.png")
-        plt.close()
+        plt.close()"""
 
     # Mark process as completed or stop requested
     visualization_state["running"] = False
+    print(len(visualization_state['losses']['losses']))
     if visualization_state["stop_requested"]:
         print("Visualization stopped by user.")
 
