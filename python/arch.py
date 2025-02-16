@@ -140,6 +140,7 @@ class GFlowNet:
         :param off_policy: None, constant or list
         None or 0 to train on-policy.
         A constant (int, float) will be added to the variance and lead to higher exploration.
+        This will decay to 0 over the course of the training.
         A list of int or float will be used as a schedule. The length must be equal to n_iterations.
         :param collect_trajectories: will collect the last n trajectories if True.
         shape: (collect_trajectories, trajectory_length+1, 3)
@@ -154,19 +155,19 @@ class GFlowNet:
         self.forward_model.train()
         self.backward_model.train()
 
-        # set off policy schedule
+        # set off-policy schedule: If used, off-policy decays from its initial value to 0 over the course of training.
         if isinstance(off_policy, list) or isinstance(off_policy, torch.Tensor):
-            #assert len(off_policy) == n_iterations, "Length of off_policy must be equal to n_iterations"
             exploration_schedule = off_policy
         elif not off_policy:
             exploration_schedule = [None] * n_iterations
         else:
-            #assert isinstance(off_policy, int) or isinstance(off_policy, float), "no valid off_policy given"
             exploration_schedule = torch.linspace(off_policy, 0, n_iterations)
 
         # start training
         progress_bar = tqdm(range(n_iterations), desc="Training...", disable=not progress_bar)
         for i in progress_bar:
+
+            # initialize
             self.optimizer.zero_grad()
             x = self.init_state(env, batch_size)
             trajectory = torch.zeros(batch_size, trajectory_length+1, 3, device=self.device)
@@ -194,6 +195,7 @@ class GFlowNet:
             losses.append(loss.item())
             logzs.append(self.logz.item())
 
+            # collect trajectories
             if collect_trajectories:
                 if last_trajectories is not None:
                     last_trajectories = torch.cat((last_trajectories, trajectory), dim=0)
@@ -203,7 +205,7 @@ class GFlowNet:
                 else:
                     last_trajectories = trajectory
 
-
+            # update pbar
             if i%20 == 0:
                 progress_bar.set_postfix({
                     "Loss": f"{loss.item():.3f}",

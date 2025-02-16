@@ -1,17 +1,16 @@
 """
-This script handles the backend for the webserver
+Handles the backend for the webserver.
+Not neccessary if you use just the python scripts.
 """
 
 from arch import GFlowNet
 from env import Env
-from plot_utils import plot_states_2d
 
 import torch
 from pydantic import BaseModel
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-import matplotlib.pyplot as plt
 
 app = FastAPI()
 
@@ -24,8 +23,8 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-
-
+# set up beginning states.
+# training states is the variable which will be fetched by the frontend
 start_states = torch.zeros(1,2).tolist()
 start_losses = {
     "losses": [],
@@ -33,19 +32,13 @@ start_losses = {
     "truelogz": [],
     "n_iterations": 0
 }
-
-
-
-# Global state to track training processes
-visualization_state = {
+training_state = {
     "running": False,
     "current_image": None,
     "stop_requested": False,
     "states": start_states,
     "losses": start_losses,
 }
-
-
 
 # pydantic classes
 class Mean(BaseModel):
@@ -56,7 +49,7 @@ class Gaussian(BaseModel):
     mean: Mean
     variance: float
 
-class VisualizationRequest(BaseModel):
+class TrainingRequest(BaseModel):
     off_policy_value: float
     n_iterations_value: int
     lr_model_value: float
@@ -69,21 +62,21 @@ class VisualizationRequest(BaseModel):
     curr_gaussians: list[Gaussian]
 
 # when user is starting the training process
-@app.post("/start_visualization")
-def start_visualization(request: VisualizationRequest, background_tasks: BackgroundTasks):
-    global visualization_state
+@app.post("/start_training")
+def start_training(request: TrainingRequest, background_tasks: BackgroundTasks):
+    global training_state
     params = {}
     for k,v in request.dict().items():
         params[k.replace("_value","")]=v
 
-    if visualization_state["running"]:
+    if training_state["running"]:
         return JSONResponse(status_code=400, content={"error": "Visualization already running."})
 
-    visualization_state["running"] = True
-    visualization_state["stop_requested"] = False
-    visualization_state["current_image"] = None
+    training_state["running"] = True
+    training_state["stop_requested"] = False
+    training_state["current_image"] = None
 
-    # Start the visualization in the background
+    # Start the training in the background
     background_tasks.add_task(
         train_and_sample,
         params
@@ -91,49 +84,45 @@ def start_visualization(request: VisualizationRequest, background_tasks: Backgro
     return {"status": "Visualization started."}
 
 # updates in the training process via polling
-@app.get("/get_visualization")
-def get_visualization():
-    global visualization_state
-
-    #if not visualization_state["running"] and visualization_state["current_image"] is None:
-    #    return {"completed": True, "image_data": None}
+@app.get("/get_training_update")
+def get_training_update():
+    global training_state
     return {
-        "completed": not visualization_state["running"],
-        "image": visualization_state["current_image"],
-        "states": visualization_state["states"],
-        "losses": visualization_state["losses"],
+        "completed": not training_state["running"],
+        "image": training_state["current_image"],
+        "states": training_state["states"],
+        "losses": training_state["losses"],
     }
 
 # when user stops training process
-@app.post("/stop_visualization")
-def stop_visualization():
-    global visualization_state
+@app.post("/stop_training")
+def stop_training():
+    global training_state
     # Request stop if a process is running
-    if visualization_state["running"]:
-        visualization_state["stop_requested"] = True
+    if training_state["running"]:
+        training_state["stop_requested"] = True
         return {"status": "Stop requested."}
     else:
-        return JSONResponse(status_code=400, content={"error": "No visualization running."})
+        return JSONResponse(status_code=400, content={"error": "No training running."})
 
 
-# train and visualize if trained on enough samples
+# train and save samples for visualization
 def train_and_sample(
         params: dict,
 ):
-    global visualization_state
+    global training_state
     global start_losses
     global start_states
-    visualization_state["losses"] = start_losses
-    visualization_state["states"] = start_states
+    training_state["losses"] = start_losses
+    training_state["states"] = start_states
 
-    trajectory_max = 2048 # number of states to send to frontend for visualization,basically batch size for sampling
+    # as the model samples only n=batch size samples in one iteration and we need to update the visualization
+    # frequently, we would only have very few samples for each update.
+    # To mitigate this, we always keep the last n samples, set via trajectory_max.
+    # This is the number of states to send to frontend for visualization,basically batch size for sampling
+    trajectory_max = 2048
     train_interval =4 # number of iterations to train before updating states for visualization
     current_states = None
-
-
-
-    #n_rounds = int(trajectory_vis_n/params['batch_size'])
-    #n_visualizations = params['n_iterations']//n_rounds
     torch.manual_seed(params['seed'])
 
     # set up the environment and model
@@ -152,7 +141,7 @@ def train_and_sample(
         device = 'cpu'
     )
 
-    # set up off policy schedule beforehand, as training is interrupted for visualizations
+    # set up off policy schedule beforehand, as training is interrupted for trainings
     if params['off_policy']:
         off_policy = torch.linspace(params['off_policy'], 0, params['n_iterations'])
     else:
@@ -161,7 +150,7 @@ def train_and_sample(
     # start training
     for v in range(params['n_iterations']//train_interval):
 
-        if visualization_state["stop_requested"]:
+        if training_state["stop_requested"]:
             break
 
         losses, trajectory = model.train(
@@ -174,66 +163,29 @@ def train_and_sample(
             progress_bar=False,
         )
 
-        """# visualize
-        fig, img_base64=plot_states_2d(
-            env,
-            trajectory,
-            title=f"Iteration {(v+1)*8}/{params['n_iterations']}",
-            marginals_gradient=False
-        )
-        #plt.savefig(f"ims/run2_{(v+1)*n_rounds}.png")
-        visualization_state["current_image"] = img_base64
-        plt.close()"""
-
+        # keep only x and y of last state of trajectory
         states = trajectory[:, -1, 1:]
+
+        # update current states
         if current_states is not None:
             current_states = torch.cat((current_states, states), dim=0)
             if len(current_states) > trajectory_max:
                 current_states = current_states[-trajectory_max:]
         else:
             current_states = states
-        visualization_state["states"] = current_states.tolist()
-        visualization_state["losses"]={
-            "losses": visualization_state["losses"]["losses"] + losses[0],
-            "logzs": visualization_state["losses"]["logzs"] + losses[1],
-            "truelogz": visualization_state["losses"]["truelogz"] + ([losses[2]]*len(losses[0])),
+
+        # update training state so frontend can fetch new data
+        training_state["states"] = current_states.tolist()
+        training_state["losses"]={
+            "losses": training_state["losses"]["losses"] + losses[0],
+            "logzs": training_state["losses"]["logzs"] + losses[1],
+            "truelogz": training_state["losses"]["truelogz"] + ([losses[2]]*len(losses[0])),
             "n_iterations": params['n_iterations'],
         }
 
 
-    # train for the remainder of the division
-    """if params['n_iterations']/n_rounds != n_visualizations:
-        mod = params['n_iterations']%n_rounds
-        losses, trajectory = model.train(
-            env,
-            batch_size=params['batch_size'],
-            trajectory_length=params['trajectory_length'],
-            n_iterations=mod,
-            off_policy=off_policy[-mod:]
-        )
-        # sample via inference function to ensure enough samples
-        trajectory = model.inference(env, batch_size=trajectory_vis_n, trajectory_length=params['trajectory_length'])
-        fig, img_base64 = plot_states_2d(
-            env,
-            trajectory,
-            title=f"Iteration {params['n_iterations']}/{params['n_iterations']}",
-            marginals_gradient=False
-        )
-        visualization_state["current_image"] = img_base64
-        states = trajectory[:, -1, 1:].tolist()
-        visualization_state["states"] = states
-        visualization_state["losses"] = {
-            "losses": visualization_state["losses"]["losses"] + losses[0],
-            "logzs": visualization_state["losses"]["logzs"] + losses[1],
-            "truelogz": visualization_state["losses"]["truelogz"] + ([losses[2]] * len(losses[0])),
-            "n_iterations": params['n_iterations'],
-        }
-        #plt.savefig(f"ims/run2_{params['n_iterations']}.png")
-        plt.close()"""
-
-    # Mark process as completed or stop requested
-    visualization_state["running"] = False
-    print(len(visualization_state['losses']['losses']))
-    if visualization_state["stop_requested"]:
+    # done
+    training_state["running"] = False
+    if training_state["stop_requested"]:
         print("Visualization stopped by user.")
 

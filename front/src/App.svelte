@@ -93,13 +93,13 @@
 
 
   // Functions used to start, stop and update the training process
-  async function startVisualization() {
+  async function startTraining() {
     try {
       // Disable sliders and switch button state
       isRunning = true;
       const curr_gaussians = $gaussians;
-      // Start visualization on backend
-      const response = await fetch('http://localhost:8000/start_visualization', {
+      // Start training
+      const response = await fetch('http://localhost:8000/start_training', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -117,26 +117,26 @@
       });
 
       if (!response.ok) {
-        throw new Error('Failed to start visualization.');
+        throw new Error('Failed to start training.');
       }
 
-      // Start polling for visualizations
-      pollVisualization();
+      // Start polling for trainings
+      pollTraining();
     } catch (error) {
       console.error(error);
       isRunning = false;
     }
   }
 
-  async function stopVisualization() {
+  async function stopTraining() {
     try {
-      // Stop visualization on backend
-      const response = await fetch('http://localhost:8000/stop_visualization',{
+      // Stop training on backend
+      const response = await fetch('http://localhost:8000/stop_training',{
         method: 'POST',
       });
 
       if (!response.ok) {
-        throw new Error('Failed to stop visualization.');
+        throw new Error('Failed to stop training.');
       }
 
       // Stop polling and reset button state
@@ -147,12 +147,12 @@
     }
   }
 
-  function pollVisualization() {
+  function pollTraining() {
     pollingTimer = setInterval(async () => {
       try {
-        const response = await fetch('http://localhost:8000/get_visualization');
+        const response = await fetch('http://localhost:8000/get_training_update');
         if (!response.ok) {
-          throw new Error('Failed to fetch visualization.');
+          throw new Error('Failed to fetch training.');
         }
 
         const data = await response.json();
@@ -168,7 +168,7 @@
           currentImage = `data:image/png;base64,${data.image}`;
         }
         if (data.completed) {
-          console.log("Visualization process completed.");
+          console.log("Training process completed.");
           plotStates(Plotly, $gaussians, current_states,current_losses);
           isRunning = false; // Update the UI state to reflect the stopped process
           clearInterval(pollingTimer); // Stop the polling
@@ -744,7 +744,7 @@
     </p>
     <div class="buttonscontainer">
       <button class="reset-button" on:click="{resetSliders}" disabled="{isRunning}">Reset</button>
-      <button class="reset-button" on:click="{isRunning ? stopVisualization : startVisualization}">
+      <button class="reset-button" on:click="{isRunning ? stopTraining : startTraining}">
         {isRunning ? 'Stop' : 'Start'}</button>
     </div>
     <div class="slider-container">
