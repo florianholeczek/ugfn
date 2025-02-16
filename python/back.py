@@ -25,13 +25,14 @@ app.add_middleware(
 )
 
 
-sample_state = {
-    "running": False,
-    "current_samples": None,
-    "stop_requested": False,
-    "iteration": None
+
+start_states = torch.zeros(2048,2).tolist()
+start_losses = {
+    "losses": [],
+    "logzs": [],
+    "truelogz": [],
+    "n_iterations": 0
 }
-current_states = torch.zeros(2048,2).tolist()
 
 
 
@@ -40,7 +41,8 @@ visualization_state = {
     "running": False,
     "current_image": None,
     "stop_requested": False,
-    "states": current_states,
+    "states": start_states,
+    "losses": start_losses,
 }
 
 
@@ -99,6 +101,7 @@ def get_visualization():
         "completed": not visualization_state["running"],
         "image": visualization_state["current_image"],
         "states": visualization_state["states"],
+        "losses": visualization_state["losses"],
     }
 
 # when user stops training process
@@ -112,25 +115,16 @@ def stop_visualization():
     else:
         return JSONResponse(status_code=400, content={"error": "No visualization running."})
 
-@app.get("/update")
-def update():
-    global sample_state
-
-    #if not visualization_state["running"] and visualization_state["current_image"] is None:
-    #    return {"completed": True, "samples": None}
-
-    return {
-        "completed": not sample_state["running"],
-        "samples": sample_state["current_samples"],
-        "iteration": sample_state["iteration"]
-    }
-
 
 # train and visualize if trained on enough samples
 def train_and_sample(
         params: dict,
 ):
     global visualization_state
+    global start_losses
+    global start_states
+    visualization_state["losses"] = start_losses
+    visualization_state["states"] = start_states
 
     # basically the batch size for the sampling
     # upper bound: send vis to frontend if trained for n trajectories
@@ -189,6 +183,12 @@ def train_and_sample(
         visualization_state["current_image"] = img_base64
         states = trajectory[:, -1, 1:].tolist()
         visualization_state["states"] = states
+        visualization_state["losses"]={
+            "losses": visualization_state["losses"]["losses"] + losses[0],
+            "logzs": visualization_state["losses"]["logzs"] + losses[1],
+            "truelogz": visualization_state["losses"]["truelogz"] + ([losses[2]]*len(losses[0])),
+            "n_iterations": params['n_iterations'],
+        }
         plt.close()
 
     # train for the remainder of the division
@@ -210,6 +210,14 @@ def train_and_sample(
             marginals_gradient=False
         )
         visualization_state["current_image"] = img_base64
+        states = trajectory[:, -1, 1:].tolist()
+        visualization_state["states"] = states
+        visualization_state["losses"] = {
+            "losses": visualization_state["losses"]["losses"] + losses[0],
+            "logzs": visualization_state["losses"]["logzs"] + losses[1],
+            "truelogz": visualization_state["losses"]["truelogz"] + ([losses[2]] * len(losses[0])),
+            "n_iterations": params['n_iterations'],
+        }
         #plt.savefig(f"ims/run2_{params['n_iterations']}.png")
         plt.close()
 

@@ -22,9 +22,8 @@ function grid(between = [-3, 3], gridSize = 100) {
     return [xGrid, yGrid, gridPoints];
 }
 
-export function plotStates(Plotly, gaussians, states, options = {}) {
+export function plotStates(Plotly, gaussians, states, losses, options = {}) {
     const {
-        title = null,
         levels = 10,
         alpha = 1.0,
         gridSize = 100,
@@ -53,6 +52,8 @@ export function plotStates(Plotly, gaussians, states, options = {}) {
     densityX.forEach((v, i) => densityX[i] *= normfact);
     densityY.forEach((v, i) => densityY[i] *= normfact);
 
+    // Prepare losses
+    const iters = Array.from(Array(losses['n_iterations']+1),(x,i)=>i)
 
     // Contour plot for density
     const contourTrace = {
@@ -63,7 +64,8 @@ export function plotStates(Plotly, gaussians, states, options = {}) {
         colorscale: colormap,
         showscale:false,
         contours: { coloring: 'lines'},
-        line:{width: 2}
+        line:{width: 2},
+        showlegend:false,
     };
 
     // Scatter plot for sampled states
@@ -72,7 +74,8 @@ export function plotStates(Plotly, gaussians, states, options = {}) {
         y: y,
         mode: 'markers',
         type: 'scatter',
-        marker: { color: sec_col, symbol: 137, opacity: alpha }
+        marker: { color: sec_col, symbol: 137, opacity: alpha },
+        showlegend:false,
     };
 
     // Marginal histograms
@@ -83,7 +86,8 @@ export function plotStates(Plotly, gaussians, states, options = {}) {
         marker: { color: sec_col },
         xaxis: 'x2',
         yaxis: 'y2',
-        xbins: {size:0.2}
+        xbins: {size:0.2},
+        showlegend:false,
     };
     const histY = {
         y: y,
@@ -93,9 +97,11 @@ export function plotStates(Plotly, gaussians, states, options = {}) {
         xaxis: 'x3',
         yaxis: 'y3',
         orientation: 'h',
-        ybins: {size:0.2}
+        ybins: {size:0.2},
+        showlegend:false,
     };
 
+    // Marginal lines
     const densX = {
         x: ls,
         y: densityX,
@@ -104,6 +110,7 @@ export function plotStates(Plotly, gaussians, states, options = {}) {
         yaxis: 'y2',
         mode:'lines',
         marker: { color: f_col },
+        showlegend:false,
     };
     const densY = {
         y: ls,
@@ -114,28 +121,66 @@ export function plotStates(Plotly, gaussians, states, options = {}) {
         orientation: 'h',
         mode:'lines',
         marker: { color: f_col },
+        showlegend:false,
     };
+
+    //Losses
+    const lossplot = {
+        x:iters,
+        y:losses['losses'],
+        name: 'Loss',
+        textposition: 'top',
+        type:'scatter',
+        mode:'lines',
+        xaxis: 'x4',
+        yaxis: 'y4',
+        line: { color: 'rgb(68, 1, 84)', width: 1},
+    }
+    const logzplot = {
+        x:iters,
+        y:losses['logzs'],
+        name: 'logZ',
+        type:'scatter',
+        mode:'lines',
+        xaxis: 'x4',
+        yaxis: 'y4',
+        line: { color: 'rgb(39, 127, 142)', width: 1},
+    }
+    const truelogzplot = {
+        x:iters,
+        y:losses['truelogz'],
+        name: 'True logZ',
+        type:'scatter',
+        mode:'lines',
+        xaxis: 'x4',
+        yaxis: 'y4',
+        line: { color: 'rgb(74, 193, 109)', width: 2},
+    }
 
     // Layout configuration
     const layout = {
-        title,
+        title: `Iteration ${losses['losses'].length}/${losses['n_iterations']} `,
+        showlegend:true,
+        legend: {
+            x: 1,
+            y: 1,
+            xanchor: 'right',
+            yanchor: 'top',
+        },
         autosize: false,
-        showlegend:false,
-        width: 800,
-        height: 800,
-        grid: { rows: 2, columns: 2, subplots: [['xy', 'x2y2'], ['x3y3', null]] },
+        width: 900,
+        height: 900,
+        grid: { rows: 2, columns: 2, subplots: [['xy', 'x2y2'], ['x3y3', 'x4y4']] },
         xaxis: { domain: [0, 0.75], title: "x", range: [-3, 3] },
         yaxis: { domain: [0, 0.75], title: "y", range: [-3, 3] },
         xaxis2: { domain: [0, 0.75], showticklabels: false, title: 'Marginal of x', side:'top', anchor: 'y2',  range: [-3, 3]},
-        yaxis2: { domain: [0.8, 1], showticklabels: true, range:[0, 0.5] },
-        xaxis3: { domain: [0.8, 1], showticklabels: true, range:[0, 0.5] },
-        yaxis3: { domain: [0, 0.75], showticklabels: false, title: 'Marginal of y', side:'right', anchor: 'x3', range: [-3, 3]}
+        yaxis2: { domain: [0.8, 1], showticklabels: true, range:[0, 0.61] },
+        xaxis3: { domain: [0.8, 1], showticklabels: true, range:[0, 0.61] },
+        yaxis3: { domain: [0, 0.75], showticklabels: false, title: 'Marginal of y', side:'right', anchor: 'x3', range: [-3, 3]},
+        xaxis4: { domain: [0.8, 1], showticklabels: true, range:[0, losses['n_iterations']] },
+        yaxis4: { domain: [0.8, 1], showticklabels: true, range: [-1, 3]}
     };
-    const layout2 = {
-        xaxis: { autorange: false, range:[-3, 3]},
-        yaxis: { autorange: false, range:[-3, 3]},
-    }
 
-    // Render the plot
-    Plotly.newPlot('trainplot', [contourTrace, samplesTrace, histX, histY, densY, densX], layout);
+    const allplots = [contourTrace, samplesTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot]
+    Plotly.react('trainplot', allplots, layout);
 }

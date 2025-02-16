@@ -71,5 +71,5 @@ const config = {
   displayModeBar: false, // Hide toolbar
 };
 
-Plotly.newPlot(containerId, [contourData, surfaceData], layout, config);
+Plotly.react(containerId, [contourData, surfaceData], layout, config);
 }

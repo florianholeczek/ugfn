@@ -24,6 +24,7 @@
   let run2_value = 4096;
   let run3_value = 4096;
   let current_states;
+  let current_losses;
 
   $: run1 = `./images/run1/run1_${run1_value}.png`
   $: run2 = `./images/run2/run2_${run2_value}.png`
@@ -155,8 +156,12 @@
         }
 
         const data = await response.json();
+        if (data.losses) {
+          current_losses = data.losses;
+        }
         if (data.states) {
           current_states = data.states;
+          plotStates(Plotly, $gaussians, current_states,current_losses)
         }
 
         if (data.image) {
@@ -868,7 +873,12 @@
       {/if}
     </div>
     <div class="buttonscontainer">
-      <button class="reset-button" on:click="{plotStates(Plotly, $gaussians, current_states)}">plot</button>
+      <button class="reset-button" on:click="{plotStates(
+              Plotly,
+              $gaussians,
+              current_states,
+              current_losses
+              )}">plot</button>
     </div>
     <p>
       {current_states}
