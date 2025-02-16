@@ -19,6 +19,8 @@
   let seed_value = 42;
   let batch_size_exponent = 6;
   $: batch_size_value = 2**batch_size_exponent;
+  let frames = [];
+  let training_frame = 0;
 
   let run1_value = 2048;
   let run2_value = 4096;
@@ -34,7 +36,6 @@
   //polling every n ms
   const POLLING_INTERVAL = 50;
   let isRunning = false;
-  let currentImage = null;
   let pollingTimer;
 
   // storing gaussians
@@ -97,6 +98,7 @@
     try {
       // Disable sliders and switch button state
       isRunning = true;
+      display_trainhistory = true;
       const curr_gaussians = $gaussians;
       // Start training
       const response = await fetch('http://localhost:8000/start_training', {
@@ -119,6 +121,7 @@
       if (!response.ok) {
         throw new Error('Failed to start training.');
       }
+      frames = [];
 
       // Start polling for trainings
       pollTraining();
@@ -162,11 +165,13 @@
         if (data.states) {
           current_states = data.states;
           plotStates(Plotly, $gaussians, current_states,current_losses);
+          frames.push({
+            'gaussians': JSON.parse(JSON.stringify($gaussians)),
+            'states': current_states,
+            'losses': current_losses
+          })
         }
 
-        if (data.image) {
-          currentImage = `data:image/png;base64,${data.image}`;
-        }
         if (data.completed) {
           console.log("Training process completed.");
           plotStates(Plotly, $gaussians, current_states,current_losses);
@@ -286,6 +291,7 @@
 
   let plotContainerId = "plot-container";
   let plotContainerId2 = "plot-container2";
+  let training_history = "traininghistory"
   let trainplot = "trainplot";
 
   // Mounting
@@ -315,7 +321,8 @@
       window.removeEventListener('mouseup', stopDrag);
     };
   });
-  let open = false
+  let open = false;
+  let display_trainhistory=false;
 
 
 
@@ -867,8 +874,28 @@
       </div>
     </div>
     <div class="image-container" id="trainplot">
-
     </div>
+    {#if !isRunning & display_trainhistory}
+      <div class="slider-container">
+        <div class="slider">
+          <label for="training_history">Training progress</label>
+          <input
+            type="range"
+            min="0"
+            max="{frames.length}"
+            step="1"
+            bind:value="{training_frame}"
+            id="training_history"
+            on:input={plotStates(
+                    Plotly,
+                    frames[training_frame]['gaussians'],
+                    frames[training_frame]['states'],
+                    frames[training_frame]['losses']
+                    )}
+          />
+        </div>
+      </div>
+    {/if}
 
   </section>
 
