@@ -8,6 +8,7 @@
   import './styles.css';
   import {plotStates} from "./training_vis.js"
   import Accordion, {Panel, Header, Content } from '@smui-extra/accordion';
+  import Slider from '@smui/slider';
   import Button, { Label } from '@smui/button';
   import 'svelte-material-ui/themes/fixation.css';
 
@@ -579,18 +580,16 @@
     <div class="image-container">
       <img src="{run1}" class="image" alt="GFN samples from the underlying distribution">
     </div>
-    <div class="slider-container">
-      <div class="slider">
-        <label for="run1_value">Training progress</label>
-        <input
-          type="range"
-          min="0"
-          max="2048"
-          step="128"
-          bind:value="{run1_value}"
-          id="run1_img"
-        />
-      </div>
+    <div style="width: 600px; margin: auto; text-align:center;">
+    <Slider
+        bind:value="{run1_value}"
+        min={0}
+        max={2048}
+        step={128}
+        discrete
+        input$aria-label="Discrete slider"
+      />
+      Show training Progress
     </div>
     <p class="section-text">
       Sampling according to the underlying distribution is one of the big advantages of GFlowNets: Other approaches usually learn to maximize the reward, so they would not sample from both of our modes (or everything in between), but they would find one of them and then just sample from it (especially if one of our modes would be greater than the other). This might be suboptimal e.g. in molecule discovery, where you might not want the most promising molecule, but many different of themmight be interesting.
@@ -604,18 +603,15 @@
     <div class="image-container">
       <img src="{run2}" class="image" alt="The model samples only from one mode of the distribution">
     </div>
-    <div class="slider-container">
-      <div class="slider">
-        <label for="run2_value">Training progress</label>
-        <input
-          type="range"
-          min="0"
-          max="4096"
-          step="128"
-          bind:value="{run2_value}"
-          id="run2_img"
-        />
-      </div>
+    <div style="width: 600px; margin: auto; text-align:center;">
+    <Slider
+        bind:value="{run2_value}"
+        min={0}
+        max={4096}
+        step={128}
+        discrete
+        input$aria-label="Discrete slider"
+      />
     </div>
     <p class="section-text">
       Well thats not what we want! Instead of sampling from the true distribution we only sample from one mode, thats what common RL methods do. We can do better!
@@ -657,18 +653,15 @@
     <div class="image-container">
       <img src="{run3}" class="image" alt="Training off policy helps to discover modes">
     </div>
-    <div class="slider-container">
-      <div class="slider">
-        <label for="run3_value">Training progress</label>
-        <input
-          type="range"
-          min="0"
-          max="4096"
-          step="128"
-          bind:value="{run3_value}"
-          id="run3_img"
-        />
-      </div>
+    <div style="width: 600px; margin: auto; text-align:center;">
+    <Slider
+        bind:value="{run3_value}"
+        min={0}
+        max={4096}
+        step={128}
+        discrete
+        input$aria-label="Discrete slider"
+      />
     </div>
 
   </section>
@@ -676,9 +669,7 @@
   <section class="section">
     <h2 class="section-title">Flow</h2>
     <p class="section-text">
-      Visualize flow between states. Probably interactive:
-      Hovering over env and displaying flow in 8 directions with arrows.
-      Probably need to discretize for this?
+      Add vectorfield (done) or program Flow Field?
     </p>
   </section>
 
