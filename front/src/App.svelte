@@ -8,6 +8,11 @@
   import './styles.css';
   import {plotStates} from "./training_vis.js"
   import Accordion, {Panel, Header, Content } from '@smui-extra/accordion';
+  import Button, { Label } from '@smui/button';
+  import 'svelte-material-ui/themes/fixation.css';
+
+
+  let clicked = 0;
 
   // default values
   let off_policy_value = 0;
@@ -343,53 +348,6 @@
     </div>
   </header>
 
-  <div class="accordion-container">
-  <Accordion>
-    <Panel>
-      <Header>Panel 1</Header>
-      <Content>
-        The content for panel 1.
-
-        <ul>
-          <li>Some</li>
-          <li>List</li>
-          <li>Items</li>
-        </ul>
-      </Content>
-    </Panel>
-    <Panel>
-      <Header>Panel 2</Header>
-      <Content>The content for panel 2.</Content>
-    </Panel>
-    <Panel>
-      <Header>Panel 3</Header>
-      <Content>
-        The content for panel 3.
-
-        <ul>
-          <li>Some</li>
-          <li>More</li>
-          <li>List</li>
-          <li>Items</li>
-          <li>To</li>
-          <li>Show</li>
-          <li>Big</li>
-          <li>Height</li>
-        </ul>
-      </Content>
-    </Panel>
-    <Panel>
-      <Header>Panel 4</Header>
-      <Content>
-        If you like this component, you can thank <a
-          href="https://github.com/NickantX"
-          target="_blank">nick</a
-        > who pushed me to make it. He was right, accordions are awesome! :D
-      </Content>
-    </Panel>
-  </Accordion>
-</div>
-
   <section class="section">
     <h2 class="section-title">What is a GFlowNet?</h2>
     <p class="section-text">
@@ -400,25 +358,29 @@
 
       <br>As we do not rely on a external dataset but only on our internal reward function we are only limited by compute - we can generate objects and query the reward function as often as we like.
 
-      <CollapsibleCard {open}>
-        <h2 slot='header' class='collapsible-header'>
-          Example (And more introduction)
-        </h2>
-        <p slot='body' class='collapsible-body'>
-        Imagine building a Lego Pyramid. There are different blocks, and you can place them rotated and at different places.
-        <br>You might start with an empty plane and add a 2x4 block and so on. After some steps you might end up with an object which is more or less pyramid-shaped.
-        <br>
-        <br>The different possibilities of states of the object form a graph: While in the beginning (state 0) you can only place something in the first level, later on you might have different options, and they depend on your first choices. One option is always to choose to be finished instead of continuing building.
-        <br>
-        <br>If you want to use a GFlowNet for your task, it is important that the resulting graph is acyclic, i.e. it is not possible to reach a previous state.
-        <br>If we built a pyramid, in the end we have a trajectory (a sequence of states <Katex>s_0 \to s_1 \to ... \to s_{"final"}</Katex>). As we can choose to stop anytime, our trajectories can have different lengts, e.g. we can build a pyramid from 1 piece or from 100.
-        <br>
-        <br>As you might have guessed from the vocabulary, GFlowNets are very similar to Reinforcement learning methods, we sample trajectories and assign a reward R(x) to them (or to the states). The main difference is that usual RL methods try to find solutions which maximize the reward, whereas GFlowNets learn the underlying distribution p(x). So we want to train a model such that p(x) is proportional to the reward function R(x). This allows us to sample not only from the mode which has the highest reward, but also all other modes which might be almost as good. Imagine a pyramid from two 2x4 blocks next to each other and a 2x2 block centered on top or we could just use 2x2 blocks. Both are valid and we might be interested in finding many possible ways to build pyramids.
-        <br>
-        <br>Building Lego Pyramids is maybe not usecase number one for GFlowNets, but they are used for is drug discovery (Nica et al., 2022), where sampling from multiple modes is really what you want in order to discover not only the most promising molecule.
-        </p>
-      </CollapsibleCard>
+    </p>
+      <div class="image-container">
+        <Accordion multiple>
+          <Panel color="secondary">
+            <Header>Example (And more introduction)</Header>
+            <Content>
+              Imagine building a Lego Pyramid. There are different blocks, and you can place them rotated and at different places.
+              <br>You might start with an empty plane and add a 2x4 block and so on. After some steps you might end up with an object which is more or less pyramid-shaped.
+              <br>
+              <br>The different possibilities of states of the object form a graph: While in the beginning (state 0) you can only place something in the first level, later on you might have different options, and they depend on your first choices. One option is always to choose to be finished instead of continuing building.
+              <br>
+              <br>If you want to use a GFlowNet for your task, it is important that the resulting graph is acyclic, i.e. it is not possible to reach a previous state.
+              <br>If we built a pyramid, in the end we have a trajectory (a sequence of states <Katex>s_0 \to s_1 \to ... \to s_{"final"}</Katex>). As we can choose to stop anytime, our trajectories can have different lengts, e.g. we can build a pyramid from 1 piece or from 100.
+              <br>
+              <br>As you might have guessed from the vocabulary, GFlowNets are very similar to Reinforcement learning methods, we sample trajectories and assign a reward R(x) to them (or to the states). The main difference is that usual RL methods try to find solutions which maximize the reward, whereas GFlowNets learn the underlying distribution p(x). So we want to train a model such that p(x) is proportional to the reward function R(x). This allows us to sample not only from the mode which has the highest reward, but also all other modes which might be almost as good. Imagine a pyramid from two 2x4 blocks next to each other and a 2x2 block centered on top or we could just use 2x2 blocks. Both are valid and we might be interested in finding many possible ways to build pyramids.
+              <br>
+              <br>Building Lego Pyramids is maybe not usecase number one for GFlowNets, but they are used for is drug discovery (Nica et al., 2022), where sampling from multiple modes is really what you want in order to discover not only the most promising molecule.
 
+            </Content>
+          </Panel>
+        </Accordion>
+      </div>
+    <p class="section-text">
       When sequentially generating an object, we need to take actions which give us the next state:
       We could add one of the possible components or decide we are done.
       For this we use a neural net which represents our forward policy
@@ -435,7 +397,7 @@
       <br>Imagine water flowing from the start space through the intermediate states to the final states, following the edges of the DAG like pipes.
       <br>
     </p>
-      <div class="image-container">
+      <div class="image-container-small">
         <img src="/images/gflownet_anim.gif" class="image" alt="A visualization of the flow through the DAG">
       </div>
     <p class="section-text">
@@ -558,59 +520,59 @@
       Simply put, the upper part tells us what fraction of the total flow goes through this trajectory and the lower part tells us what fraction of the reward of the final object x goes through this trajectory.
       <br>Here <Katex>\theta</Katex> are the parameters of our model. They include the parameters of <Katex>P_F, P_B, Z</Katex> and we can update them using the loss above.
       <br>Below you find more detailed background for the parts of the trajectory balance loss as well as the algorithm for training.
-
-
-
-      <CollapsibleCard {open}>
-        <h2 slot='header' class='collapsible-header'>
-          More math
-        </h2>
-        <p slot='body' class='collapsible-body'>
-          Let's look at the parts of this loss function:
-          <span class="li">
-            <Katex>P_F(s_{"t+1"}|s_t;\theta)</Katex>
-            The forward policy. It represents the distribution over the next states (the children) of the current state.
-          </span>
-          <span class="li">
-            <Katex>P_B(s_t|s_{"t+1"};\theta)</Katex>
-            The backward policy. Similar to as we defined the forward policy, we can define the backward policy as a distribution over the previous states (the parents) of a state.
-            We can also estimate it using a NN (not the same as for the forward policy).
-          </span>
-          <span class="li">
-            <Katex>Z_{"\\theta"}</Katex>
-            The partition function. It is equal to the total flow of the system.
-            It is another parameter to be learned by our agent and should approach the true partition function given enough training.
-            In our case, the true partition function is 2 (the number of gaussians), however it is usually not known.
-            The partition function for a mixture of gaussians is the sum of its mixture weights, so always 1 (therefore logZ is 0).
-            However we do not compute a real mixture of gaussians here, as we do not use mixture weights but simply sum up over all gaussians.
-          </span>
-          <span class="li">
-            <Katex>R(x)</Katex>
-            The reward for the final object x of the trajectory. Note that if we propagate the reward backward using our backward policy, only a small part of it goes through one trajectory, as there are usually many ways to sample x using different trajectories.
-          </span>
-        </p>
-      </CollapsibleCard>
-      <CollapsibleCard {open}>
-        <h2 slot='header' class='collapsible-header'>
-          The algorithm
-        </h2>
-        <pre slot='body' class='collapsible-body'>
-          Input: Reward function (part of the environment), model, hyperparameters
-          1. Initialize model parameters for PF, PB, logZ
-          2. Repeat for a number of iterations or until convergence:
-          3.    Repeat for trajectory length:
-          4.        Sample action for current state from PF
-          5.        Take step according to action
-          6.        Add new state to trajectory
-          7.    Calculate reward of final state according to reward function
-          8.    Calculate the sum of the log probabilities of all actions of the trajectory for each PF and PB
-          9.    Calculate the TB-Loss: (logZ + log probabilities PF - log probabilities PB - log reward)^2
-          10.   Update the parameters PF, PB, logZ
-        </pre>
-      </CollapsibleCard>
-
-      We trained a GFN on this environment for 2000 Iterations.
-      Below you see the progress of our GFN during training. While it first samples randomly, it learns to match the true distribution of our environment.
+    </p>
+    <div class="image-container">
+      <Accordion multiple>
+        <Panel color="secondary">
+          <Header>More math</Header>
+          <Content>
+            Let's look at the parts of this loss function:
+            <ul>
+              <li>
+                <Katex>P_F(s_{"t+1"}|s_t;\theta)</Katex>
+                The forward policy. It represents the distribution over the next states (the children) of the current state.
+              </li>
+              <li>
+                <Katex>P_B(s_t|s_{"t+1"};\theta)</Katex>
+                The backward policy. Similar to as we defined the forward policy, we can define the backward policy as a distribution over the previous states (the parents) of a state.
+                We can also estimate it using a NN (not the same as for the forward policy).
+              </li>
+              <li>
+                <Katex>Z_{"\\theta"}</Katex>
+                The partition function. It is equal to the total flow of the system.
+                It is another parameter to be learned by our agent and should approach the true partition function given enough training.
+                In our case, the true partition function is 2 (the number of gaussians), however it is usually not known.
+                The partition function for a mixture of gaussians is the sum of its mixture weights, so always 1 (therefore logZ is 0).
+                However we do not compute a real mixture of gaussians here, as we do not use mixture weights but simply sum up over all gaussians.
+              </li>
+              <li>
+                <Katex>R(x)</Katex>
+                The reward for the final object x of the trajectory. Note that if we propagate the reward backward using our backward policy, only a small part of it goes through one trajectory, as there are usually many ways to sample x using different trajectories.
+              </li>
+            </ul>
+          </Content>
+        </Panel>
+        <Panel color="secondary">
+          <Header>The algorithm</Header>
+          <Content style="white-space: pre;">
+              Input: Reward function (part of the environment), model, hyperparameters
+              <br>  1. Initialize model parameters for PF, PB, logZ
+              <br>  2. Repeat for a number of iterations or until convergence:
+              <br>  3.      Repeat for trajectory length:
+              <br>  4.            Sample action for current state from PF
+              <br>  5.            Take step according to action
+              <br>  6.            Add new state to trajectory
+              <br>  7.      Calculate reward of final state according to reward function
+              <br>  8.      Calculate the sum of the log probabilities of all actions of the trajectory for each PF and PB
+              <br>  9.      Calculate the TB-Loss: (logZ + log probabilities PF - log probabilities PB - log reward)^2
+              <br>  10.    Update the parameters PF, PB, logZ
+          </Content>
+        </Panel>
+      </Accordion>
+    </div>
+    <p class="section-text">
+      We trained a GFlowNet on this environment for 2000 Iterations.
+      Below you see the progress of our GFlowNet during training. While it first samples randomly, it learns to match the true distribution of our environment.
 
 
     </p>
@@ -661,24 +623,37 @@
       There are two main possibilities to fix this:
       <span class="li">We could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:<Katex>R_{"new"}(x)=R(x)^\beta</Katex>. This would change the "peakyness" of the reward function and we would not sample proportional to the reward function but according to <Katex>\pi(x|\beta) \propto R(x)^\beta</Katex>. It is also possible to use <Katex>\beta</Katex> as a trainable parameter and condition the model on it.</span>
       <span class="li">A similar but simpler way is to just train off-policy. By adding a fixed variance to the logits of the forward policy, we explore more during training. As this is a very easy implementation let's go with this one.</span>
-      <CollapsibleCard {open}>
-        <h2 slot='header' class='collapsible-header'>
-          Changes to the algorithm
-        </h2>
-        <p slot='body' class='collapsible-body'>
-          Training off-policy is even more helpful when we schedule it. We start with more a higher variance and scale it down during training until we reach on-policy training.
-          <br>Our new hyperparameter is the initial value for the off policy training, during each step we gradually decrease it until we reach 0.
-          <br>
-          <br>Important changes:
-          <br>Define schedule in the beginning: [start=initial value, stop=0, step=-initial value/number of iterations\]
-          <br>When sampling the actions we compute the logits as usual.
-          <br>Instead of just defining the policy distribution with them, we also define a exploratory distribution by adding the scheduled value to the variance.
-          <br>We then sample our actions from the exploratory distribution. We need the policy distribution later to compute the log probabilities of our actions.
-          <br>We do not use the scheduled values with the backward policy and during inference.
-
-        </p>
-      </CollapsibleCard>
     </p>
+    <div class="image-container">
+      <Accordion multiple>
+        <Panel color="secondary">
+          <Header>Changes to the algorithm</Header>
+          <Content>
+            Training off-policy is even more helpful when we schedule it. We start with more a higher variance and scale it down during training until we reach on-policy training.
+            <br>Our new hyperparameter is the initial value for the off policy training, during each step we gradually decrease it until we reach 0.
+            <br>
+            <br>Important changes:
+            <ul>
+              <li>
+                Define schedule in the beginning: [start=initial value, stop=0, step=-initial value/number of iterations\]
+              </li>
+              <li>
+                When sampling the actions we compute the logits as usual.
+              </li>
+              <li>
+                Instead of just defining the policy distribution with them, we also define a exploratory distribution by adding the scheduled value to the variance.
+              </li>
+              <li>
+                We then sample our actions from the exploratory distribution. We need the policy distribution later to compute the log probabilities of our actions.
+              </li>
+              <li>
+                We do not use the scheduled values with the backward policy and during inference.
+              </li>
+            </ul>
+          </Content>
+        </Panel>
+      </Accordion>
+    </div>
     <div class="image-container">
       <img src="{run3}" class="image" alt="Training off policy helps to discover modes">
     </div>
@@ -1012,7 +987,6 @@
     width: 500px;
     margin: 5px auto 1rem;
   }
-  * :global(.accordion-container) {
-    font-style: italic;
-  }
+
+
 </style>

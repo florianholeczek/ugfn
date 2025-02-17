@@ -13,6 +13,7 @@
     "@rollup/plugin-node-resolve": "^15.0.0",
     "@rollup/plugin-terser": "^0.4.0",
     "@smui-extra/accordion": "^7.0.0",
+    "@smui/button": "^7.0.0",
     "@types/plotly.js": "^2.35.1",
     "rollup": "^3.15.0",
     "rollup-plugin-css-only": "^4.3.0",
@@ -22,11 +23,13 @@
     "svelte-range-slider-pips": "^2.3.1"
   },
   "dependencies": {
+    "@smui/icon-button": "^8.0.0-beta.3",
     "plotly.js": "^2.35.3",
     "plotly.js-dist": "^2.35.3",
     "sirv-cli": "^2.0.0",
     "svelte-collapsible": "^0.3.1",
     "svelte-katex": "^0.1.2",
+    "svelte-material-ui": "^8.0.0-beta.3",
     "wx-svelte-core": "^2.0.0-beta-2"
   }
 }

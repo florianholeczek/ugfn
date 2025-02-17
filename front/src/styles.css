@@ -65,6 +65,12 @@
       justify-content: center;
       margin: 0 auto 2rem;
   }
+  .image-container-small {
+    width: 600px;
+    display: flex;
+      justify-content: center;
+      margin: 0 auto 2rem;
+  }
 
   .image {
     max-width: 100%;
@@ -264,6 +270,7 @@ input[type="range"] {
     background: rgb(244, 244, 244);
     transition: border-radius 0.5s step-end;
   }
+
 
 
 
