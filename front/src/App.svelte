@@ -7,6 +7,7 @@
   import {plotEnvironment} from "./env.js";
   import './styles.css';
   import {plotStates} from "./training_vis.js"
+  import Accordion, {Panel, Header, Content } from '@smui-extra/accordion';
 
   // default values
   let off_policy_value = 0;
@@ -333,6 +334,7 @@
 
 
 
+
 <main class="main-content">
   <header class="header-top">
     <div class="container">
@@ -340,6 +342,53 @@
       <p class="subtitle">Gaining intuition for Generative Flow Networks and how to train them</p>
     </div>
   </header>
+
+  <div class="accordion-container">
+  <Accordion>
+    <Panel>
+      <Header>Panel 1</Header>
+      <Content>
+        The content for panel 1.
+
+        <ul>
+          <li>Some</li>
+          <li>List</li>
+          <li>Items</li>
+        </ul>
+      </Content>
+    </Panel>
+    <Panel>
+      <Header>Panel 2</Header>
+      <Content>The content for panel 2.</Content>
+    </Panel>
+    <Panel>
+      <Header>Panel 3</Header>
+      <Content>
+        The content for panel 3.
+
+        <ul>
+          <li>Some</li>
+          <li>More</li>
+          <li>List</li>
+          <li>Items</li>
+          <li>To</li>
+          <li>Show</li>
+          <li>Big</li>
+          <li>Height</li>
+        </ul>
+      </Content>
+    </Panel>
+    <Panel>
+      <Header>Panel 4</Header>
+      <Content>
+        If you like this component, you can thank <a
+          href="https://github.com/NickantX"
+          target="_blank">nick</a
+        > who pushed me to make it. He was right, accordions are awesome! :D
+      </Content>
+    </Panel>
+  </Accordion>
+</div>
 
   <section class="section">
     <h2 class="section-title">What is a GFlowNet?</h2>
@@ -963,5 +1012,7 @@
     width: 500px;
     margin: 5px auto 1rem;
   }
-
+  * :global(.accordion-container) {
+    font-style: italic;
+  }
 </style>
