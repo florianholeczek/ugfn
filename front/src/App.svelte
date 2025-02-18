@@ -11,9 +11,11 @@
   import Slider from '@smui/slider';
   import Button, { Label } from '@smui/button';
   import 'svelte-material-ui/themes/fixation.css';
+  import Tab from '@smui/tab';
+  import TabBar from '@smui/tab-bar';
+  import Paper from '@smui/paper';
 
 
-  let clicked = 0;
 
   // default values
   let off_policy_value = 0;
@@ -328,8 +330,9 @@
       window.removeEventListener('mouseup', stopDrag);
     };
   });
-  let open = false;
   let display_trainhistory=false;
+  let pg_tabs_active = 'Basic';
+  let active = 'Basic';
 
 
 
@@ -348,6 +351,57 @@
       <p class="subtitle">Gaining intuition for Generative Flow Networks and how to train them</p>
     </div>
   </header>
+
+
+
+
+  <!-- Playground -->
+  <div class="pg-container">
+    <div class="pg-top">
+    </div>
+    <div class="pg-side">
+      <div>
+        <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active>
+          <Tab {tab}>
+            <Label>{tab}</Label>
+          </Tab>
+        </TabBar>
+
+        {#if active === 'Basic'}
+          <Paper variant="unelevated">
+            <Content>
+              Basic
+              <Slider
+                bind:value="{run1_value}"
+                min={0}
+                max={2048}
+                step={128}
+                discrete
+                input$aria-label="Discrete slider"
+              />
+            </Content>
+          </Paper>
+        {:else if active === 'Advanced'}
+          <Paper variant="unelevated">
+            <Content>
+              Advanced
+            </Content>
+          </Paper>
+        {/if}
+      </div>
+    </div>
+    <div class="pg-vis"></div>
+    <div class="pg-bottom">
+      <Slider
+        bind:value="{run1_value}"
+        min={0}
+        max={2048}
+        step={128}
+        discrete
+        input$aria-label="Discrete slider"
+      />
+    </div>
+  </div>
 
   <section class="section">
     <h2 class="section-title">What is a GFlowNet?</h2>

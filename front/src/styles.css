@@ -271,6 +271,50 @@ input[type="range"] {
     transition: border-radius 0.5s step-end;
   }
 
+  .pg-container {
+    border-style:solid;
+    width: 1000px;
+    height: 900px;
+    display: flex;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    position: relative;
+  }
+
+  .pg-top {
+    border-style:solid;
+    position: absolute;
+    top: 0;
+    left: 0px;
+    width: 1000px; /* 1000 - 200 = 800 */
+    height: 75px;
+  }
+  .pg-side {
+    border-style:solid;
+    position: absolute;
+    top: 75px;
+    left: 0px;
+    width: 225px;
+    height:825px;
+  }
+  .pg-vis {
+    border-style:solid;
+    position: absolute;
+    top: 75px;
+    left: 225px;
+    width: 775px;
+    height:775px;
+  }
+  .pg-bottom {
+    border-style:solid;
+    position: absolute;
+    top: 850px;
+    left: 225px;
+    width: 775px;
+    height:50px;
+  }
+
+
 
 
 
