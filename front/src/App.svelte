@@ -14,6 +14,7 @@
   import Tab from '@smui/tab';
   import TabBar from '@smui/tab-bar';
   import Paper from '@smui/paper';
+  import LinearProgress from '@smui/linear-progress';
 
 
 
@@ -28,8 +29,26 @@
   let seed_value = 42;
   let batch_size_exponent = 6;
   $: batch_size_value = 2**batch_size_exponent;
+
+
   let frames = [];
   let training_frame = 0;
+  $: plot_trainingframe(training_frame)
+  function plot_trainingframe(frame) {
+    if (!isRunning & display_trainhistory){
+      plotStates(
+        Plotly,
+        frames[frame]['gaussians'],
+        frames[frame]['states'],
+        frames[frame]['losses']
+      );
+    }
+  }
+
+  let training_progress = 0;
+  $: training_progress_perc = training_progress / n_iterations_value
+
+
 
   let run1_value = 2048;
   let run2_value = 4096;
@@ -87,6 +106,8 @@
       batch_size_exponent = 6;
   }
 
+
+
   let Plotly; // Load Plotly from CDN
   async function loadPlotly() {
     const script = document.createElement('script');
@@ -108,6 +129,7 @@
       // Disable sliders and switch button state
       isRunning = true;
       display_trainhistory = true;
+      training_progress = 0;
       const curr_gaussians = $gaussians;
       // Start training
       const response = await fetch('http://localhost:8000/start_training', {
@@ -170,6 +192,7 @@
         const data = await response.json();
         if (data.losses) {
           current_losses = data.losses;
+          training_progress = current_losses['losses'].length
         }
         if (data.states) {
           current_states = data.states;
@@ -333,6 +356,15 @@
   let display_trainhistory=false;
   let active_tab = 'Basic';
 
+  function handleInput(event) {
+    plotStates(
+      Plotly,
+      frames[event.detail.value]['gaussians'],
+      frames[event.detail.value]['states'],
+      frames[event.detail.value]['losses']
+    );
+  }
+
 
 
 </script>
@@ -351,7 +383,11 @@
     </div>
   </header>
 
-
+<div class="buttonscontainer">
+      <button class="reset-button" on:click="{resetSliders}" disabled="{isRunning}">Reset</button>
+      <button class="reset-button" on:click="{isRunning ? stopTraining : startTraining}">
+        {isRunning ? 'Stop' : 'Start'}</button>
+    </div>
 
 
   <!-- Playground -->
@@ -369,38 +405,107 @@
         {#if active_tab === 'Basic'}
           <Paper variant="unelevated">
             <Content>
-              Basic
+              Batch size: {batch_size_value}
               <Slider
-                bind:value="{run1_value}"
-                min={0}
-                max={2048}
-                step={128}
-                discrete
-                input$aria-label="Discrete slider"
+                bind:value="{batch_size_exponent}"
+                min={3}
+                max={11}
+                step={1}
+                disabled="{isRunning}"
+                input$aria-label="Set the batch size: 2 to the power of n"
+              />
+              Trajectory length: {trajectory_length_value}
+              <Slider
+                bind:value="{trajectory_length_value}"
+                min={1}
+                max={10}
+                step={1}
+                disabled="{isRunning}"
+                input$aria-label="Set the length of the trajectory"
+              />
+              Learning rate model: {lr_model_value.toFixed(4)}
+              <Slider
+                bind:value="{lr_model_value}"
+                min={0.0001}
+                max={0.1}
+                step={0.0001}
+                disabled="{isRunning}"
+                input$aria-label="Set the learning rate of the model"
+              />
+              Learning rate logZ: {lr_logz_value.toFixed(3)}
+              <Slider
+                bind:value="{lr_logz_value}"
+                min={0.001}
+                max={0.3}
+                step={0.001}
+                disabled="{isRunning}"
+                input$aria-label="Set the learning rate of logZ"
               />
             </Content>
           </Paper>
         {:else if active_tab === 'Advanced'}
           <Paper variant="unelevated">
             <Content>
-              Advanced
+              Off-policy: {off_policy_value}
+              <Slider
+                bind:value="{off_policy_value}"
+                min={0}
+                max={3}
+                step={0.1}
+                disabled="{isRunning}"
+                input$aria-label="Set the Off-policy training"
+              />
+              Hidden Layers: {hidden_layer_value}
+              <Slider
+                bind:value="{hidden_layer_value}"
+                min={1}
+                max={6}
+                step={1}
+                disabled="{isRunning}"
+                input$aria-label="Set the number of hidden layers"
+              />
+              Hidden Layers size: {hidden_dim_value}
+              <Slider
+                bind:value="{hidden_dim_value}"
+                min={8}
+                max={128}
+                step={8}
+                disabled="{isRunning}"
+                input$aria-label="Set the dimension of the hidden layers"
+              />
+              Seed: {seed_value}
+              <Slider
+                bind:value="{seed_value}"
+                min={1}
+                max={99}
+                step={1}
+                disabled="{isRunning}"
+                input$aria-label="Set the seed"
+              />
             </Content>
           </Paper>
         {/if}
       </div>
     </div>
-    <div class="pg-vis"></div>
+    <div class="pg-vis" id="trainplot">
+    </div>
     <div class="pg-bottom">
-      <Slider
-        bind:value="{run1_value}"
-        min={0}
-        max={2048}
-        step={128}
-        discrete
-        input$aria-label="Discrete slider"
-      />
+      {#if !isRunning & display_trainhistory}
+        <Slider
+          bind:value="{training_frame}"
+          min={0}
+          max={frames.length}
+          step={1}
+          input$aria-label="View the iterations"
+        />
+      {:else if isRunning}
+
+      {/if}
     </div>
   </div>
+  {n_iterations_value}, {training_progress}, {training_progress_perc}
+
+  <LinearProgress value="{ training_progress / n_iterations_value}" />
 
   <section class="section">
     <h2 class="section-title">What is a GFlowNet?</h2>
@@ -941,6 +1046,7 @@
         <span>{batch_size_value}</span>
       </div>
     </div>
+    <!--
     <div class="image-container" id="trainplot">
     </div>
     {#if !isRunning & display_trainhistory}
@@ -964,6 +1070,7 @@
         </div>
       </div>
     {/if}
+    -->
 
   </section>
 

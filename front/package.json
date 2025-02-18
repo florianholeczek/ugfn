@@ -14,6 +14,7 @@
     "@rollup/plugin-terser": "^0.4.0",
     "@smui-extra/accordion": "^7.0.0",
     "@smui/button": "^7.0.0",
+    "@smui/linear-progress": "^7.0.0",
     "@smui/paper": "^7.0.0",
     "@smui/slider": "^7.0.0",
     "@smui/tab": "^7.0.0",
