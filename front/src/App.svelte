@@ -331,8 +331,7 @@
     };
   });
   let display_trainhistory=false;
-  let pg_tabs_active = 'Basic';
-  let active = 'Basic';
+  let active_tab = 'Basic';
 
 
 
@@ -361,13 +360,13 @@
     </div>
     <div class="pg-side">
       <div>
-        <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active>
+        <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active={active_tab}>
           <Tab {tab}>
             <Label>{tab}</Label>
           </Tab>
         </TabBar>
 
-        {#if active === 'Basic'}
+        {#if active_tab === 'Basic'}
           <Paper variant="unelevated">
             <Content>
               Basic
@@ -381,7 +380,7 @@
               />
             </Content>
           </Paper>
-        {:else if active === 'Advanced'}
+        {:else if active_tab === 'Advanced'}
           <Paper variant="unelevated">
             <Content>
               Advanced
