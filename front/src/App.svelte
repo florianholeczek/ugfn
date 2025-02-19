@@ -22,7 +22,7 @@
 
   // default values
   let off_policy_value = 0;
-  let n_iterations_value = 2048;
+  let n_iterations_value;
   let lr_model_value = 0.001;
   let lr_logz_value = 0.1;
   let trajectory_length_value = 6;
@@ -97,7 +97,7 @@
 
   function resetSliders() {
       off_policy_value = 0;
-      n_iterations_value = 2048;
+      n_iterations_str = "2048";
       lr_model_value = 0.001;
       lr_logz_value = 0.1;
       trajectory_length_value = 6;
@@ -160,6 +160,7 @@
     } catch (error) {
       console.error(error);
       isRunning = false;
+      pg_button = false;
     }
   }
 
@@ -177,6 +178,7 @@
       // Stop polling and reset button state
       clearInterval(pollingTimer);
       isRunning = false;
+      pg_button = false;
     } catch (error) {
       console.error(error);
     }
@@ -209,6 +211,7 @@
           console.log("Training process completed.");
           plotStates(Plotly, $gaussians, current_states,current_losses);
           isRunning = false; // Update the UI state to reflect the stopped process
+          pg_button = false;
           clearInterval(pollingTimer); // Stop the polling
           return; // Stop polling
         }
@@ -357,27 +360,15 @@
   let display_trainhistory=false;
   let active_tab = 'Basic';
 
-  function handleInput(event) {
-    plotStates(
-      Plotly,
-      frames[event.detail.value]['gaussians'],
-      frames[event.detail.value]['states'],
-      frames[event.detail.value]['losses']
-    );
-  }
-  let n_iterations_select = [128, 1024, 2048, 4096, 8192, 10240]
-  let losses_select = ["Trajectory Balance", "Flow Matching"]
-  let loss_choice = "Trajectory Balance"
+  let n_iterations_select = ["128", "1024", "2048", "4096", "8192", "10240"];
+  let n_iterations_str = "2048";
+  $: n_iterations_value = parseInt(n_iterations_str, 10);
+  let losses_select = ["Trajectory Balance", "Flow Matching"];
+  let loss_choice = "Trajectory Balance";
 
 
-  let pg_button_initialoff = false;
-  let fruits = ['Apple', 'Orange', 'Banana', 'Mango'];
-  let value = 'Orange'; // Direct reactive variable
+  let pg_button = false;
 
-  // Change the value programmatically
-  function changeValue(newValue) {
-    n_iterations_value = newValue; // Updates the select component when value changes
-  }
 
 
 
@@ -388,15 +379,6 @@
   rel="stylesheet"
 />
 
-<button on:click={() => changeValue(128)}>Change to Banana</button>
-
-  <Select bind:value={n_iterations_value} label="Select Menu" key={(nr) => `${nr ? nr.id : ''}`}>
-    {#each n_iterations_select as fruit}
-      <Option value={fruit}>{fruit}</Option>
-    {/each}
-  </Select>
-
-  <pre class="status">Selected: {value}</pre>
 
 
 
@@ -417,17 +399,22 @@
                 class="material-icons"
                 on:click={resetSliders}
                 style="font-size: 32px;display: flex; justify-content: center; align-items: center;"
+                disabled="{isRunning}"
         >replay</IconButton>
       </div>
       <div class="pg-play">
-        <IconButton on:click={isRunning ? stopTraining : startTraining} toggle bind:pressed={pg_button_initialoff}>
+        <IconButton
+                on:click={isRunning ? stopTraining : startTraining}
+                toggle
+                bind:pressed={pg_button}
+        >
           <Icon class="material-icons" style="font-size: 50px" on>stop_circle</Icon>
           <Icon class="material-icons" style="font-size: 50px">play_circle</Icon>
         </IconButton>
       </div>
       <div class="pg-loss">
         <div class="columns margins" style="justify-content: flex-start;">
-          <Select bind:value="{loss_choice}" label="Loss">
+          <Select bind:value="{loss_choice}" label="Loss" disabled="{isRunning}">
             {#each losses_select as select}
               <Option value={select}>{select}</Option>
             {/each}
@@ -436,9 +423,9 @@
         <div class="pg-iterations">
           <div class="columns margins" style="justify-content: flex-start;">
             <Select
-              key={(nr) => `${nr ? nr.id : ''}`}
-              bind:value="{n_iterations_value}"
+              bind:value="{n_iterations_str}"
               label="Iterations"
+              disabled="{isRunning}"
             >
               {#each n_iterations_select as select}
                 <Option value={select}>{select}</Option>
@@ -448,7 +435,6 @@
         </div>
       </div>
     </div>
-    {n_iterations_value}
 
     <div class="pg-side">
       <div>
@@ -470,6 +456,7 @@
                 disabled="{isRunning}"
                 input$aria-label="Set the batch size: 2 to the power of n"
               />
+              <br>
               Trajectory length: {trajectory_length_value}
               <Slider
                 bind:value="{trajectory_length_value}"
@@ -479,7 +466,8 @@
                 disabled="{isRunning}"
                 input$aria-label="Set the length of the trajectory"
               />
-              Learning rate model: {lr_model_value.toFixed(4)}
+              <br>
+              Learning rate of the model: {lr_model_value.toFixed(4)}
               <Slider
                 bind:value="{lr_model_value}"
                 min={0.0001}
@@ -488,7 +476,8 @@
                 disabled="{isRunning}"
                 input$aria-label="Set the learning rate of the model"
               />
-              Learning rate logZ: {lr_logz_value.toFixed(3)}
+              <br>
+              Learning rate of <br> logZ: {lr_logz_value.toFixed(3)}
               <Slider
                 bind:value="{lr_logz_value}"
                 min={0.001}
@@ -511,7 +500,8 @@
                 disabled="{isRunning}"
                 input$aria-label="Set the Off-policy training"
               />
-              Hidden Layers: {hidden_layer_value}
+              <br>
+              Number of hidden layers: {hidden_layer_value}
               <Slider
                 bind:value="{hidden_layer_value}"
                 min={1}
@@ -520,7 +510,8 @@
                 disabled="{isRunning}"
                 input$aria-label="Set the number of hidden layers"
               />
-              Hidden Layers size: {hidden_dim_value}
+              <br>
+              Size of the hidden layers: {hidden_dim_value}
               <Slider
                 bind:value="{hidden_dim_value}"
                 min={8}
@@ -529,6 +520,7 @@
                 disabled="{isRunning}"
                 input$aria-label="Set the dimension of the hidden layers"
               />
+              <br>
               Seed: {seed_value}
               <Slider
                 bind:value="{seed_value}"
@@ -998,19 +990,6 @@
           disabled={isRunning}
         />
         <span>{off_policy_value}</span>
-      </div>
-      <div class="slider">
-        <label for="n_iterations">Iterations to train</label>
-        <input
-          type="range"
-          min="32"
-          max="10240"
-          step="8"
-          bind:value="{n_iterations_value}"
-          id="n_iterations"
-          disabled={isRunning}
-        />
-        <span>{n_iterations_value}</span>
       </div>
       <div class="slider">
         <label for="lr_model">Learning rate of the model</label>
