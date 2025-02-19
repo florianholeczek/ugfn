@@ -10,11 +10,13 @@
   import Accordion, {Panel, Header, Content } from '@smui-extra/accordion';
   import Slider from '@smui/slider';
   import Button, { Label } from '@smui/button';
+  import IconButton, { Icon } from '@smui/icon-button';
   import 'svelte-material-ui/themes/fixation.css';
   import Tab from '@smui/tab';
   import TabBar from '@smui/tab-bar';
   import Paper from '@smui/paper';
   import LinearProgress from '@smui/linear-progress';
+  import Select, { Option } from '@smui/select';
 
 
 
@@ -46,7 +48,6 @@
   }
 
   let training_progress = 0;
-  $: training_progress_perc = training_progress / n_iterations_value
 
 
 
@@ -364,14 +365,38 @@
       frames[event.detail.value]['losses']
     );
   }
+  let n_iterations_select = [128, 1024, 2048, 4096, 8192, 10240]
+  let losses_select = ["Trajectory Balance", "Flow Matching"]
+  let loss_choice = "Trajectory Balance"
+
+
+  let pg_button_initialoff = false;
+  let fruits = ['Apple', 'Orange', 'Banana', 'Mango'];
+  let value = 'Orange'; // Direct reactive variable
+
+  // Change the value programmatically
+  function changeValue(newValue) {
+    n_iterations_value = newValue; // Updates the select component when value changes
+  }
 
 
 
 </script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+<link
+  href="https://fonts.googleapis.com/css2?family=Material+Icons&display=swap"
+  rel="stylesheet"
+/>
 
+<button on:click={() => changeValue(128)}>Change to Banana</button>
 
+  <Select bind:value={n_iterations_value} label="Select Menu" key={(nr) => `${nr ? nr.id : ''}`}>
+    {#each n_iterations_select as fruit}
+      <Option value={fruit}>{fruit}</Option>
+    {/each}
+  </Select>
 
+  <pre class="status">Selected: {value}</pre>
 
 
 
@@ -383,17 +408,48 @@
     </div>
   </header>
 
-<div class="buttonscontainer">
-      <button class="reset-button" on:click="{resetSliders}" disabled="{isRunning}">Reset</button>
-      <button class="reset-button" on:click="{isRunning ? stopTraining : startTraining}">
-        {isRunning ? 'Stop' : 'Start'}</button>
-    </div>
-
 
   <!-- Playground -->
   <div class="pg-container">
     <div class="pg-top">
+      <div class="pg-reset">
+        <IconButton
+                class="material-icons"
+                on:click={resetSliders}
+                style="font-size: 32px;display: flex; justify-content: center; align-items: center;"
+        >replay</IconButton>
+      </div>
+      <div class="pg-play">
+        <IconButton on:click={isRunning ? stopTraining : startTraining} toggle bind:pressed={pg_button_initialoff}>
+          <Icon class="material-icons" style="font-size: 50px" on>stop_circle</Icon>
+          <Icon class="material-icons" style="font-size: 50px">play_circle</Icon>
+        </IconButton>
+      </div>
+      <div class="pg-loss">
+        <div class="columns margins" style="justify-content: flex-start;">
+          <Select bind:value="{loss_choice}" label="Loss">
+            {#each losses_select as select}
+              <Option value={select}>{select}</Option>
+            {/each}
+          </Select>
+        </div>
+        <div class="pg-iterations">
+          <div class="columns margins" style="justify-content: flex-start;">
+            <Select
+              key={(nr) => `${nr ? nr.id : ''}`}
+              bind:value="{n_iterations_value}"
+              label="Iterations"
+            >
+              {#each n_iterations_select as select}
+                <Option value={select}>{select}</Option>
+              {/each}
+            </Select>
+          </div>
+        </div>
+      </div>
     </div>
+    {n_iterations_value}
+
     <div class="pg-side">
       <div>
         <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active={active_tab}>
@@ -489,6 +545,7 @@
     </div>
     <div class="pg-vis" id="trainplot">
     </div>
+
     <div class="pg-bottom">
       {#if !isRunning & display_trainhistory}
         <Slider
@@ -499,13 +556,14 @@
           input$aria-label="View the iterations"
         />
       {:else if isRunning}
+        <div class = "pg-progress">
+          <LinearProgress progress="{ training_progress / n_iterations_value}" />
+        </div>
 
       {/if}
     </div>
   </div>
-  {n_iterations_value}, {training_progress}, {training_progress_perc}
 
-  <LinearProgress value="{ training_progress / n_iterations_value}" />
 
   <section class="section">
     <h2 class="section-title">What is a GFlowNet?</h2>
