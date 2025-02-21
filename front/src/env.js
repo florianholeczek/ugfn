@@ -98,7 +98,7 @@ export function plotEnvironment(Plotly, containerId, gaussians, options = {}) {
   if (containerId === "plot-container" | containerId === "plot-container2") {
     Plotly.react(containerId, [contourData, surfaceData], layout_both, config);
   } else if (containerId === "plot-container2d") {
-    Plotly.react(containerId, [contourData], layout_2d);
+    Plotly.react(containerId, [contourData], layout_2d, config);
   } else if (containerId === "plot-container3d") {
     Plotly.react(containerId, [surfaceData], layout_3d, config);
   }

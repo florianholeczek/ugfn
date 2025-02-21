@@ -78,28 +78,9 @@
       { mean: { x: -1, y: -1 }, variance: 0.4 },
       { mean: { x: 1, y: 1 }, variance: 0.4 }
     ]);
-    plotEnvironment(Plotly, plotContainerId, $gaussians, {
-        title: null,
-        gridSize: 100,
-        alpha2D: 1.0,
-        alpha3D: 0.8,
-        levels: 50,
-      });
-    plotEnvironment(Plotly, plotContainerId2, $gaussians, {
-        title: null,
-        gridSize: 100,
-        alpha2D: 1.0,
-        alpha3D: 0.8,
-        levels: 50,
-      });
-
-    plotEnvironment(Plotly, plotContainerId2d, $gaussians, {
-        title: null,
-        gridSize: 100,
-        alpha2D: 1.0,
-        alpha3D: 0.8,
-        levels: 50,
-      });
+    plotEnvironment(Plotly, plotContainerId, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerId2, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerId2d, $gaussians, {title: null});
     plotEnvironment(Plotly, plotContainerId3d, $gaussians, {title: null});
   }
 
@@ -259,18 +240,10 @@
       }
       return gs;
     });
-    plotEnvironment(Plotly, plotContainerId, $gaussians, {
-        gridSize: 100,
-        alpha2D: 1.0,
-        alpha3D: 0.8,
-        levels: 50,
-      });
-    plotEnvironment(Plotly, plotContainerId2, $gaussians, {
-        gridSize: 100,
-        alpha2D: 1.0,
-        alpha3D: 0.8,
-        levels: 50,
-      });
+    plotEnvironment(Plotly, plotContainerId, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerId2, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerId2d, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerId3d, $gaussians, {title: null});
   };
 
   const removeGaussian = () => {
@@ -280,18 +253,10 @@
       }
       return gs;
     });
-    plotEnvironment(Plotly, plotContainerId, $gaussians, {
-        gridSize: 100,
-        alpha2D: 1.0,
-        alpha3D: 0.8,
-        levels: 50,
-      });
-    plotEnvironment(Plotly, plotContainerId2, $gaussians, {
-        gridSize: 100,
-        alpha2D: 1.0,
-        alpha3D: 0.8,
-        levels: 50,
-      });
+    plotEnvironment(Plotly, plotContainerId, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerId2, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerId2d, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerId3d, $gaussians, {title: null});
   };
 
   const startDragMean = (event, gaussian) => {
@@ -334,18 +299,10 @@
   const stopDrag = () => {
     if(isDraggingMean || isDraggingVariance){
       console.log($gaussians);
-      plotEnvironment(Plotly, plotContainerId, $gaussians, {
-        gridSize: 100,
-        alpha2D: 1.0,
-        alpha3D: 0.8,
-        levels: 50,
-      });
-      plotEnvironment(Plotly, plotContainerId2, $gaussians, {
-        gridSize: 100,
-        alpha2D: 1.0,
-        alpha3D: 0.8,
-        levels: 50,
-      });
+      plotEnvironment(Plotly, plotContainerId, $gaussians, {title: null});
+      plotEnvironment(Plotly, plotContainerId2, $gaussians, {title: null});
+      plotEnvironment(Plotly, plotContainerId2d, $gaussians, {title: null});
+      plotEnvironment(Plotly, plotContainerId3d, $gaussians, {title: null});
     }
 
     isDraggingMean = false;
@@ -361,33 +318,16 @@
   let plotContainerId3d = "plot-container3d";
   let training_history = "traininghistory"
   let trainplot = "trainplot";
+  let plotlyready=false;
 
   // Mounting
   onMount(async () => {
     //visualize the environment
     await loadPlotly();
-    plotEnvironment(Plotly, plotContainerId, $gaussians, {
-        title: null,
-        gridSize: 100,
-        alpha2D: 1.0,
-        alpha3D: 0.8,
-        levels: 50,
-      });
-    plotEnvironment(Plotly, plotContainerId2, $gaussians, {
-        title: null,
-        gridSize: 100,
-        alpha2D: 1.0,
-        alpha3D: 0.8,
-        levels: 50,
-      });
-
-    plotEnvironment(Plotly, plotContainerId2d, $gaussians, {
-        title: null,
-        gridSize: 100,
-        alpha2D: 1.0,
-        alpha3D: 0.8,
-        levels: 50,
-      });
+    plotlyready = true;
+    plotEnvironment(Plotly, plotContainerId, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerId2, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerId2d, $gaussians, {title: null});
     plotEnvironment(Plotly, plotContainerId3d, $gaussians, {title: null});
     // add listeners for changing the Environment
     window.addEventListener('mousemove', handleMouseMove);
@@ -409,17 +349,21 @@
   let view = "Environment";
   $: viewChange(view);
   function viewChange (view){
-    setTimeout(() => {
-    if (view === "Environment"){
-      console.log("Env View")
-      plotEnvironment(Plotly, plotContainerId2d, $gaussians, {title: null});
-      plotEnvironment(Plotly, plotContainerId3d, $gaussians, {title: null});
-    } else if (view ==="Training"){
-      console.log("Train View");
-      plot_trainingframe(training_frame);
-    } else {
-      console.log("Flow View")
-    }}, 50);
+    if (plotlyready) {
+      setTimeout(() => {
+        if (view === "Environment"){
+          console.log("Env View")
+          plotEnvironment(Plotly, plotContainerId2d, $gaussians, {title: null});
+          plotEnvironment(Plotly, plotContainerId3d, $gaussians, {title: null});
+        } else if (view ==="Training"){
+          console.log("Train View");
+          plot_trainingframe(training_frame);
+        } else {
+          console.log("Flow View")
+        }
+      }, 5);
+    }
+
   }
 
 
