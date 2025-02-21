@@ -17,6 +17,9 @@
   import Paper from '@smui/paper';
   import LinearProgress from '@smui/linear-progress';
   import Select, { Option } from '@smui/select';
+  import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
+  import Textfield from '@smui/textfield';
+  import HelperText from '@smui/textfield/helper-text';
 
 
 
@@ -353,6 +356,7 @@
 
 
   let pg_button = false;
+  let testvalue = 1;
 
 
 
@@ -375,6 +379,9 @@
     </div>
   </header>
 
+  <div>
+    <Textfield bind:value={testvalue} label="Hallo">
+    </Textfield>
 
 
   <!-- Playground -->
@@ -410,6 +417,25 @@
                     disabled={isRunning}
             >play_circle</IconButton>
           </div>
+          <div class="pg-loss" style="font-size: 20px">
+            Number of Gaussians:
+            <IconButton
+                    class="material-icons"
+                    on:click={removeGaussian}
+                    on:mouseover={() => highlightGaussian($gaussians.length - 1)}
+                    on:mouseout={clearHighlight}
+                    style="font-size: 32px;display: flex; justify-content: center; align-items: center;color: #a76295;"
+                    disabled="{isRunning || $gaussians.length === 1}"
+            >remove</IconButton>
+            {$gaussians.length}
+            <IconButton
+                    class="material-icons"
+                    on:click={addGaussian}
+                    style="font-size: 32px;display: flex; justify-content: center; align-items: center;color: #a76295;"
+                    disabled="{isRunning || $gaussians.length === 4}"
+            >add</IconButton>
+          </div>
+
 
         </div>
         <div id={plotContainerEnv2d} class = "pg-2dplot">
@@ -443,6 +469,26 @@
         </div>
 
         <div id={plotContainerEnv3d} class = "pg-3dplot">
+        </div>
+        <div class= "pg-gauss-table">
+          <DataTable table$aria-label="People list" style="width: 100%;">
+            <Head>
+              <Row>
+                <Cell><Katex>\mu_x</Katex></Cell>
+                <Cell><Katex>\mu_y</Katex></Cell>
+                <Cell><Katex>\sigma^2</Katex></Cell>
+              </Row>
+            </Head>
+            <Body>
+              {#each [...Array($gaussians.length).keys()] as i}
+                <Row>
+                  <Cell><Textfield bind:value={$gaussians[i]["mean"]["x"]} style="width:90%"helperLine$style="width: 90%;"></Textfield></Cell>
+                  <Cell><Textfield bind:value={$gaussians[i]["mean"]["y"]} style="width:90%"helperLine$style="width: 90%;"></Textfield></Cell>
+                  <Cell><Textfield bind:value={$gaussians[i]["variance"]} style="width:90%"helperLine$style="width: 90%;"></Textfield></Cell>
+                </Row>
+              {/each}
+            </Body>
+          </DataTable>
         </div>
       </div>
 

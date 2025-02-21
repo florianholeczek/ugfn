@@ -293,7 +293,7 @@ input[type="range"] {
   }
 
   .pg-container {
-    border: solid;
+    /*border: 1px solid #ccc;*/
     top:50px;
     left:0;
     width: 1000px;
@@ -306,7 +306,7 @@ input[type="range"] {
   }
 
   .pg-top {
-    border: solid;
+    /*border: 1px solid #ccc;*/
     position: absolute;
     top: 0;
     left: 0;
@@ -366,7 +366,7 @@ input[type="range"] {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    margin-left:360px
+    margin-left:360px;
   }
   .pg-iterations {
     display: flex;
@@ -376,7 +376,7 @@ input[type="range"] {
   }
 
   .pg-2dplot {
-    border:solid;
+    /*border: 1px solid #ccc;*/
     width: 300px;
     top: 100px;
     left: 5px;
@@ -391,14 +391,23 @@ input[type="range"] {
     height: 264px;
     z-index: 2; /* Ensure the canvas is above the image */
     pointer-events: none; /* Prevent accidental interaction with the container itself */
-    border: 1px solid #ccc;
+    /*border: 1px solid #ccc;*/
   }
   .pg-3dplot {
     width: 600px;
-    top: 200px;
+    top: 100px;
     left: 350px;
     position: absolute;
-    border: solid;
+    /*border: 1px solid #ccc;*/
+  }
+
+  .pg-gauss-table {
+    width: 264px;
+    height: 500px;
+    top: 500px;
+    left: 30px;
+    position: absolute;
+    /*border: 1px solid #ccc;*/
   }
 
 
