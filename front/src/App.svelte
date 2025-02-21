@@ -276,8 +276,8 @@
   const handleMouseMove = (event) => {
     if (!selectedGaussian || isRunning) return;
 
-    const dx = (event.clientX - initialMouse.x) / 100;
-    const dy = (event.clientY - initialMouse.y) / 100;
+    const dx = (event.clientX - initialMouse.x) / 44;
+    const dy = (event.clientY - initialMouse.y) / 44;
 
     gaussians.update(gs => {
       const g = gs.find(g => g === selectedGaussian);
@@ -428,7 +428,35 @@
 
         </div>
         <div id={plotContainerId2d} class = "pg-2dplot">
+          <div class="pg-circles-container">
+            {#each $gaussians as g, i}
+              <!-- Variance circle -->
+              <div
+                class="variance-circle"
+                class:highlight={i === hoveredGaussian || isRunning}
+                style="
+                  width: {129 * g.variance}px;
+                  height: {129 * g.variance}px;
+                  left: {132 + 132/3 * g.mean.x}px;
+                  top: {132 - 132/3 * g.mean.y}px;
+                "
+                on:mousedown={(e) => startDragVariance(e, g)}
+              ></div>
+
+              <!-- Mean circle -->
+              <div
+                class="mean-circle"
+                class:highlight={i === hoveredGaussian}
+                style="
+                  left: {132 + 132/3 * g.mean.x}px;
+                  top: {132 - 132/3 * g.mean.y}px;
+                "
+                on:mousedown={(e) => startDragMean(e, g)}
+              ></div>
+            {/each}
+          </div>
         </div>
+
         <div id={plotContainerId3d} class = "pg-3dplot">
         </div>
       </div>

@@ -388,8 +388,18 @@ input[type="range"] {
     position: absolute;
     z-index: 1;
   }
+  .pg-circles-container {
+    position: absolute;
+    top: 10px;
+    left: 25px;
+    width: 264px;
+    height: 264px;
+    z-index: 2; /* Ensure the canvas is above the image */
+    pointer-events: none; /* Prevent accidental interaction with the container itself */
+    border: 1px solid #ccc;
+  }
   .pg-3dplot {
-    width: 650px;
+    width: 600px;
     top: 200px;
     left: 350px;
     position: absolute;

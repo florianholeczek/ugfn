@@ -78,8 +78,8 @@ export function plotEnvironment(Plotly, containerId, gaussians, options = {}) {
   };
 
   const layout_3d = {
-    width: 550,
-    height: 550,
+    width: 600,
+    height: 600,
     showlegend: false,
     title: options.title || null,
     scene: {
