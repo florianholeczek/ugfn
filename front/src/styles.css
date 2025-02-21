@@ -282,16 +282,31 @@ input[type="range"] {
     height:900px;
     background-color: #cfe1e5;
   }
-  .pg-container {
+
+  .pg-views {
     width: 1000px;
-    height: 900px;
+    height: 1000px;
     display: flex;
     justify-content: center;
     margin: 0 auto 2rem;
     position: relative;
   }
 
+  .pg-container {
+    border: solid;
+    top:50px;
+    left:0;
+    width: 1000px;
+    height: 900px;
+    display: flex;
+    margin: 0 auto 2rem;
+    position: absolute;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
   .pg-top {
+    border: solid;
     position: absolute;
     top: 0;
     left: 0;
@@ -358,6 +373,22 @@ input[type="range"] {
     justify-content: flex-start;
     align-items: center;
     margin-left: 40px;
+  }
+
+  .pg-2dplot {
+    border:solid;
+    width: 300px;
+    top: 100px;
+    left: 5px;
+    position: absolute;
+    z-index: 1;
+  }
+  .pg-3dplot {
+    width: 650px;
+    top: 200px;
+    left: 350px;
+    position: absolute;
+    border: solid;
   }
 
 

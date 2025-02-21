@@ -23,53 +23,84 @@ export function computeDensity(grid, gaussians) {
   return density;
 }
 export function plotEnvironment(Plotly, containerId, gaussians, options = {}) {
-const gridSize = options.gridSize || 100;
-const alpha2D = options.alpha2D || 1.0;
-const alpha3D = options.alpha3D || 0.8;
+  const gridSize = options.gridSize || 100;
+  const alpha2D = options.alpha2D || 1.0;
+  const alpha3D = options.alpha3D || 0.8;
 
-// Generate grid
-const range = [-3, 3];
-const x = Array.from({ length: gridSize }, (_, i) => range[0] + i * (range[1] - range[0]) / (gridSize - 1));
-const y = Array.from({ length: gridSize }, (_, i) => range[0] + i * (range[1] - range[0]) / (gridSize - 1));
+  // Generate grid
+  const range = [-3, 3];
+  const x = Array.from({ length: gridSize }, (_, i) => range[0] + i * (range[1] - range[0]) / (gridSize - 1));
+  const y = Array.from({ length: gridSize }, (_, i) => range[0] + i * (range[1] - range[0]) / (gridSize - 1));
 
-const density = computeDensity({ x, y }, gaussians);
+  const density = computeDensity({ x, y }, gaussians);
 
-// 2D plot data
-const contourData = {
-  x: x,
-  y: y,
-  z: density,
-  type: "contour",
-  colorscale: "Viridis",
-  opacity: alpha2D,
-  contours: { coloring: "fill", showlines: false },
-  colorbar: { len: 0.8, x: 0.45, thickness: 20 }, // Position shared colorbar in the middle
-};
+  // 2D plot data
+  const contourData = {
+    x: x,
+    y: y,
+    z: density,
+    type: "contour",
+    colorscale: "Viridis",
+    opacity: alpha2D,
+    contours: { coloring: "fill", showlines: false },
+    //colorbar: { len: 0.8, x: 0.45, thickness: 20 }, // Position shared colorbar in the middle
+    showscale: false
+  };
 
-// 3D plot data
-const surfaceData = {
-  x: x,
-  y: y,
-  z: density,
-  type: "surface",
-  colorscale: "Viridis",
-  opacity: alpha3D,
-  showscale: false, // Disable individual colorbar
-};
+  // 3D plot data
+  const surfaceData = {
+    x: x,
+    y: y,
+    z: density,
+    type: "surface",
+    colorscale: "Viridis",
+    opacity: alpha3D,
+    showscale: false,
+  };
 
-const layout = {
-  title: options.title || null,
-  grid: { rows: 1, columns: 2, pattern: "independent" },
-  xaxis: { title: "x", domain: [0, 0.45] }, // Left plot domain
-  yaxis: { title: "y", scaleanchor: "x" },
-  scene: { domain: { x: [0.55, 1] } }, // Right plot domain for 3D scene
-  margin: { t: 50, b: 50, l: 50, r: 50 },
-};
+  const layout_both = {
+    title: options.title || null,
+    grid: { rows: 1, columns: 2, pattern: "independent" },
+    xaxis: { title: "x", domain: [0, 0.45] }, // Left plot domain
+    yaxis: { title: "y", scaleanchor: "x" },
+    scene: { domain: { x: [0.55, 1] } }, // Right plot domain for 3D scene
+    margin: { t: 50, b: 50, l: 50, r: 50 },
+  };
 
-const config = {
-  staticplot: true,
-  displayModeBar: false, // Hide toolbar
-};
+  const layout_2d = {
+    width: 300,
+    height: 300,
+    showlegend: false,
+    title: options.title || null,
+    xaxis: { title: null, range: [-3, 3] },
+    yaxis: { title: null, scaleanchor: "x", range: [-3, 3] },
+    margin: { t: 10, b: 25, l: 25, r: 10 },
+  };
 
-Plotly.react(containerId, [contourData, surfaceData], layout, config);
+  const layout_3d = {
+    width: 550,
+    height: 550,
+    showlegend: false,
+    title: options.title || null,
+    scene: {
+        xaxis: { title: "x", range: [-3, 3] },
+        yaxis: { title: "y", range: [-3, 3] },
+        zaxis: { title: "Reward" } // Rename the Z axis
+    },
+    margin: { t: 10, b: 10, l: 10, r: 10 },
+  };
+
+  const config = {
+    staticplot: true,
+    displayModeBar: false, // Hide toolbar
+  };
+
+  if (containerId === "plot-container" | containerId === "plot-container2") {
+    Plotly.react(containerId, [contourData, surfaceData], layout_both, config);
+  } else if (containerId === "plot-container2d") {
+    Plotly.react(containerId, [contourData], layout_2d);
+  } else if (containerId === "plot-container3d") {
+    Plotly.react(containerId, [surfaceData], layout_3d, config);
+  }
+
 }

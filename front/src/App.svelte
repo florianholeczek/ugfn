@@ -73,6 +73,36 @@
     { mean: { x: 1, y: 1 }, variance: 0.4 }
   ]);
 
+  function resetGaussians(){
+    gaussians.set([
+      { mean: { x: -1, y: -1 }, variance: 0.4 },
+      { mean: { x: 1, y: 1 }, variance: 0.4 }
+    ]);
+    plotEnvironment(Plotly, plotContainerId, $gaussians, {
+        title: null,
+        gridSize: 100,
+        alpha2D: 1.0,
+        alpha3D: 0.8,
+        levels: 50,
+      });
+    plotEnvironment(Plotly, plotContainerId2, $gaussians, {
+        title: null,
+        gridSize: 100,
+        alpha2D: 1.0,
+        alpha3D: 0.8,
+        levels: 50,
+      });
+
+    plotEnvironment(Plotly, plotContainerId2d, $gaussians, {
+        title: null,
+        gridSize: 100,
+        alpha2D: 1.0,
+        alpha3D: 0.8,
+        levels: 50,
+      });
+    plotEnvironment(Plotly, plotContainerId3d, $gaussians, {title: null});
+  }
+
   // ranges for means and variances
   const range = { min: -3, max: 3 };
   const varianceRange = { min: 0.1, max: 1.0 };
@@ -327,6 +357,8 @@
 
   let plotContainerId = "plot-container";
   let plotContainerId2 = "plot-container2";
+  let plotContainerId2d = "plot-container2d";
+  let plotContainerId3d = "plot-container3d";
   let training_history = "traininghistory"
   let trainplot = "trainplot";
 
@@ -349,6 +381,14 @@
         levels: 50,
       });
 
+    plotEnvironment(Plotly, plotContainerId2d, $gaussians, {
+        title: null,
+        gridSize: 100,
+        alpha2D: 1.0,
+        alpha3D: 0.8,
+        levels: 50,
+      });
+    plotEnvironment(Plotly, plotContainerId3d, $gaussians, {title: null});
     // add listeners for changing the Environment
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', stopDrag);
@@ -365,6 +405,22 @@
   $: n_iterations_value = parseInt(n_iterations_str, 10);
   let losses_select = ["Trajectory Balance", "Flow Matching"];
   let loss_choice = "Trajectory Balance";
+
+  let view = "Environment";
+  $: viewChange(view);
+  function viewChange (view){
+    setTimeout(() => {
+    if (view === "Environment"){
+      console.log("Env View")
+      plotEnvironment(Plotly, plotContainerId2d, $gaussians, {title: null});
+      plotEnvironment(Plotly, plotContainerId3d, $gaussians, {title: null});
+    } else if (view ==="Training"){
+      console.log("Train View");
+      plot_trainingframe(training_frame);
+    } else {
+      console.log("Flow View")
+    }}, 50);
+  }
 
 
   let pg_button = false;
@@ -391,170 +447,226 @@
   </header>
 
 
+
   <!-- Playground -->
-  <div class="pg-container">
-    <div class="pg-top">
-      <div class="pg-reset">
-        <IconButton
-                class="material-icons"
-                on:click={resetSliders}
-                style="font-size: 32px;display: flex; justify-content: center; align-items: center;"
-                disabled="{isRunning}"
-        >replay</IconButton>
-      </div>
-      <div class="pg-play">
-        <IconButton
-                on:click={isRunning ? stopTraining : startTraining}
-                toggle
-                bind:pressed={pg_button}
-        >
-          <Icon class="material-icons" style="font-size: 50px" on>stop_circle</Icon>
-          <Icon class="material-icons" style="font-size: 50px">play_circle</Icon>
-        </IconButton>
-      </div>
-      <div class="pg-loss">
-        <div class="columns margins" style="justify-content: flex-start;">
-          <Select bind:value="{loss_choice}" label="Loss" disabled="{isRunning}">
-            {#each losses_select as select}
-              <Option value={select}>{select}</Option>
-            {/each}
-          </Select>
+  <div class="pg-views">
+    <TabBar
+            tabs={["Environment", "Training", "Flow"]}
+            let:tab
+            bind:active={view}
+    >
+      <Tab {tab} disabled={isRunning}>
+        <Label>{tab}</Label>
+      </Tab>
+    </TabBar>
+    {#if view === 'Environment'}
+
+
+      <!-- Environment View -->
+      <div class="pg-container">
+        <div class="pg-top">
+          <div class="pg-reset">
+            <IconButton
+                    class="material-icons"
+                    on:click={resetGaussians}
+                    style="font-size: 32px;display: flex; justify-content: flex-start; align-items: center;"
+                    disabled="{isRunning}"
+            >replay</IconButton>
+          </div>
+          <div class="pg-play">
+            <IconButton
+                    class="material-icons"
+                    on:click={() => view="Training"}
+                    style="font-size: 50px;display: flex; justify-content: center; align-items: center;"
+                    disabled={isRunning}
+            >play_circle</IconButton>
+          </div>
+
         </div>
-        <div class="pg-iterations">
-          <div class="columns margins" style="justify-content: flex-start;">
-            <Select
-              bind:value="{n_iterations_str}"
-              label="Iterations"
-              disabled="{isRunning}"
+        <div id={plotContainerId2d} class = "pg-2dplot">
+        </div>
+        <div id={plotContainerId3d} class = "pg-3dplot">
+        </div>
+      </div>
+
+
+    {:else if view === "Training"}
+
+
+      <!-- Training View -->
+      <div class="pg-container">
+        <div class="pg-top">
+          <div class="pg-reset">
+            <IconButton
+                    class="material-icons"
+                    on:click={resetSliders}
+                    style="font-size: 32px;display: flex; justify-content: center; align-items: center;"
+                    disabled="{isRunning}"
+            >replay</IconButton>
+          </div>
+          <div class="pg-play">
+            <IconButton
+                    on:click={isRunning ? stopTraining : startTraining}
+                    toggle
+                    bind:pressed={pg_button}
             >
-              {#each n_iterations_select as select}
-                <Option value={select}>{select}</Option>
-              {/each}
-            </Select>
+              <Icon class="material-icons" style="font-size: 50px" on>stop_circle</Icon>
+              <Icon class="material-icons" style="font-size: 50px">play_circle</Icon>
+            </IconButton>
+          </div>
+          <div class="pg-loss">
+            <div class="columns margins" style="justify-content: flex-start;">
+              <Select bind:value="{loss_choice}" label="Loss" disabled="{isRunning}">
+                {#each losses_select as select}
+                  <Option value={select}>{select}</Option>
+                {/each}
+              </Select>
+            </div>
+            <div class="pg-iterations">
+              <div class="columns margins" style="justify-content: flex-start;">
+                <Select
+                  bind:value="{n_iterations_str}"
+                  label="Iterations"
+                  disabled="{isRunning}"
+                >
+                  {#each n_iterations_select as select}
+                    <Option value={select}>{select}</Option>
+                  {/each}
+                </Select>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="pg-side">
-      <div>
-        <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active={active_tab}>
-          <Tab {tab}>
-            <Label>{tab}</Label>
-          </Tab>
-        </TabBar>
+        <div class="pg-side">
+          <div>
+            <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active={active_tab}>
+              <Tab {tab}>
+                <Label>{tab}</Label>
+              </Tab>
+            </TabBar>
 
-        {#if active_tab === 'Basic'}
-          <Paper variant="unelevated">
-            <Content>
-              Batch size: {batch_size_value}
-              <Slider
-                bind:value="{batch_size_exponent}"
-                min={3}
-                max={11}
-                step={1}
-                disabled="{isRunning}"
-                input$aria-label="Set the batch size: 2 to the power of n"
-              />
-              <br>
-              Trajectory length: {trajectory_length_value}
-              <Slider
-                bind:value="{trajectory_length_value}"
-                min={1}
-                max={10}
-                step={1}
-                disabled="{isRunning}"
-                input$aria-label="Set the length of the trajectory"
-              />
-              <br>
-              Learning rate of the model: {lr_model_value.toFixed(4)}
-              <Slider
-                bind:value="{lr_model_value}"
-                min={0.0001}
-                max={0.1}
-                step={0.0001}
-                disabled="{isRunning}"
-                input$aria-label="Set the learning rate of the model"
-              />
-              <br>
-              Learning rate of <br> logZ: {lr_logz_value.toFixed(3)}
-              <Slider
-                bind:value="{lr_logz_value}"
-                min={0.001}
-                max={0.3}
-                step={0.001}
-                disabled="{isRunning}"
-                input$aria-label="Set the learning rate of logZ"
-              />
-            </Content>
-          </Paper>
-        {:else if active_tab === 'Advanced'}
-          <Paper variant="unelevated">
-            <Content>
-              Off-policy: {off_policy_value}
-              <Slider
-                bind:value="{off_policy_value}"
-                min={0}
-                max={3}
-                step={0.1}
-                disabled="{isRunning}"
-                input$aria-label="Set the Off-policy training"
-              />
-              <br>
-              Number of hidden layers: {hidden_layer_value}
-              <Slider
-                bind:value="{hidden_layer_value}"
-                min={1}
-                max={6}
-                step={1}
-                disabled="{isRunning}"
-                input$aria-label="Set the number of hidden layers"
-              />
-              <br>
-              Size of the hidden layers: {hidden_dim_value}
-              <Slider
-                bind:value="{hidden_dim_value}"
-                min={8}
-                max={128}
-                step={8}
-                disabled="{isRunning}"
-                input$aria-label="Set the dimension of the hidden layers"
-              />
-              <br>
-              Seed: {seed_value}
-              <Slider
-                bind:value="{seed_value}"
-                min={1}
-                max={99}
-                step={1}
-                disabled="{isRunning}"
-                input$aria-label="Set the seed"
-              />
-            </Content>
-          </Paper>
-        {/if}
-      </div>
-    </div>
-    <div class="pg-vis" id="trainplot">
-    </div>
+            {#if active_tab === 'Basic'}
+              <Paper variant="unelevated">
+                <Content>
+                  Batch size: {batch_size_value}
+                  <Slider
+                    bind:value="{batch_size_exponent}"
+                    min={3}
+                    max={11}
+                    step={1}
+                    disabled="{isRunning}"
+                    input$aria-label="Set the batch size: 2 to the power of n"
+                  />
+                  <br>
+                  Trajectory length: {trajectory_length_value}
+                  <Slider
+                    bind:value="{trajectory_length_value}"
+                    min={1}
+                    max={10}
+                    step={1}
+                    disabled="{isRunning}"
+                    input$aria-label="Set the length of the trajectory"
+                  />
+                  <br>
+                  Learning rate of the model: {lr_model_value.toFixed(4)}
+                  <Slider
+                    bind:value="{lr_model_value}"
+                    min={0.0001}
+                    max={0.1}
+                    step={0.0001}
+                    disabled="{isRunning}"
+                    input$aria-label="Set the learning rate of the model"
+                  />
+                  <br>
+                  Learning rate of <br> logZ: {lr_logz_value.toFixed(3)}
+                  <Slider
+                    bind:value="{lr_logz_value}"
+                    min={0.001}
+                    max={0.3}
+                    step={0.001}
+                    disabled="{isRunning}"
+                    input$aria-label="Set the learning rate of logZ"
+                  />
+                </Content>
+              </Paper>
+            {:else if active_tab === 'Advanced'}
+              <Paper variant="unelevated">
+                <Content>
+                  Off-policy: {off_policy_value}
+                  <Slider
+                    bind:value="{off_policy_value}"
+                    min={0}
+                    max={3}
+                    step={0.1}
+                    disabled="{isRunning}"
+                    input$aria-label="Set the Off-policy training"
+                  />
+                  <br>
+                  Number of hidden layers: {hidden_layer_value}
+                  <Slider
+                    bind:value="{hidden_layer_value}"
+                    min={1}
+                    max={6}
+                    step={1}
+                    disabled="{isRunning}"
+                    input$aria-label="Set the number of hidden layers"
+                  />
+                  <br>
+                  Size of the hidden layers: {hidden_dim_value}
+                  <Slider
+                    bind:value="{hidden_dim_value}"
+                    min={8}
+                    max={128}
+                    step={8}
+                    disabled="{isRunning}"
+                    input$aria-label="Set the dimension of the hidden layers"
+                  />
+                  <br>
+                  Seed: {seed_value}
+                  <Slider
+                    bind:value="{seed_value}"
+                    min={1}
+                    max={99}
+                    step={1}
+                    disabled="{isRunning}"
+                    input$aria-label="Set the seed"
+                  />
+                </Content>
+              </Paper>
+            {/if}
+          </div>
+        </div>
+        <div class="pg-vis" id="trainplot">
+        </div>
 
-    <div class="pg-bottom">
-      {#if !isRunning & display_trainhistory}
-        <Slider
-          bind:value="{training_frame}"
-          min={0}
-          max={frames.length}
-          step={1}
-          input$aria-label="View the iterations"
-        />
+        <div class="pg-bottom">
+          {#if !isRunning & display_trainhistory}
+            <Slider
+              bind:value="{training_frame}"
+              min={0}
+              max={frames.length}
+              step={1}
+              input$aria-label="View the iterations"
+            />
       {:else if isRunning}
         <div class = "pg-progress">
           <LinearProgress progress="{ training_progress / n_iterations_value}" />
         </div>
-
       {/if}
     </div>
   </div>
+
+    {:else if view === "Flow"}
+      <!-- FlowView -->
+      <div class="pg-container">
+        Flow
+      </div>
+    {/if}
+  </div>
+
+
+
 
 
   <section class="section">
