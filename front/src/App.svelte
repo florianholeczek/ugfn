@@ -78,10 +78,8 @@
       { mean: { x: -1, y: -1 }, variance: 0.4 },
       { mean: { x: 1, y: 1 }, variance: 0.4 }
     ]);
-    plotEnvironment(Plotly, plotContainerId, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerId2, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerId2d, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerId3d, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
   }
 
   // ranges for means and variances
@@ -240,10 +238,8 @@
       }
       return gs;
     });
-    plotEnvironment(Plotly, plotContainerId, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerId2, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerId2d, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerId3d, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
   };
 
   const removeGaussian = () => {
@@ -253,10 +249,8 @@
       }
       return gs;
     });
-    plotEnvironment(Plotly, plotContainerId, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerId2, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerId2d, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerId3d, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
   };
 
   const startDragMean = (event, gaussian) => {
@@ -299,10 +293,8 @@
   const stopDrag = () => {
     if(isDraggingMean || isDraggingVariance){
       console.log($gaussians);
-      plotEnvironment(Plotly, plotContainerId, $gaussians, {title: null});
-      plotEnvironment(Plotly, plotContainerId2, $gaussians, {title: null});
-      plotEnvironment(Plotly, plotContainerId2d, $gaussians, {title: null});
-      plotEnvironment(Plotly, plotContainerId3d, $gaussians, {title: null});
+      plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
+      plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
     }
 
     isDraggingMean = false;
@@ -311,13 +303,8 @@
   };
 
 
-
-  let plotContainerId = "plot-container";
-  let plotContainerId2 = "plot-container2";
-  let plotContainerId2d = "plot-container2d";
-  let plotContainerId3d = "plot-container3d";
-  let training_history = "traininghistory"
-  let trainplot = "trainplot";
+  let plotContainerEnv2d = "plot-container2d";
+  let plotContainerEnv3d = "plot-container3d";
   let plotlyready=false;
 
   // Mounting
@@ -325,10 +312,8 @@
     //visualize the environment
     await loadPlotly();
     plotlyready = true;
-    plotEnvironment(Plotly, plotContainerId, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerId2, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerId2d, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerId3d, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
     // add listeners for changing the Environment
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', stopDrag);
@@ -353,8 +338,8 @@
       setTimeout(() => {
         if (view === "Environment"){
           console.log("Env View")
-          plotEnvironment(Plotly, plotContainerId2d, $gaussians, {title: null});
-          plotEnvironment(Plotly, plotContainerId3d, $gaussians, {title: null});
+          plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
+          plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
         } else if (view ==="Training"){
           console.log("Train View");
           plot_trainingframe(training_frame);
@@ -427,7 +412,7 @@
           </div>
 
         </div>
-        <div id={plotContainerId2d} class = "pg-2dplot">
+        <div id={plotContainerEnv2d} class = "pg-2dplot">
           <div class="pg-circles-container">
             {#each $gaussians as g, i}
               <!-- Variance circle -->
@@ -457,7 +442,7 @@
           </div>
         </div>
 
-        <div id={plotContainerId3d} class = "pg-3dplot">
+        <div id={plotContainerEnv3d} class = "pg-3dplot">
         </div>
       </div>
 
@@ -743,58 +728,11 @@
       <br>
       <br>Above we stated that GFlowNets build an Acyclic Graph, so each state can only be visited once. We currently violate this assumption: While it is unlikely that a state gets visited twice in our continuous environment, it is still possible. To mitigate this we simply include a counter in our state which represents the current step.
 
-    </section>
-    <div class="env-container">
-        <!--<img src="/images/env1.png" class="env-image" alt="Rendering of the environment">-->
-        <div id={plotContainerId2}
-         style="width: 1000px;
-         position: relative;
-         top: 0;
-         left: 0;
-         z-index: 1; /* Ensure the image is below the canvas */">
-        </div>
-        <div class="canvas-container">
-          {#each $gaussians as g, i}
-            <!-- Variance circle -->
-            <div
-              class="variance-circle"
-              class:highlight={i === hoveredGaussian || isRunning}
-              style="
-                width: {129 * g.variance}px;
-                height: {129 * g.variance}px;
-                left: {176 + 176/3 * g.mean.x}px;
-                top: {176 - 176/3 * g.mean.y}px;
-              "
-              on:mousedown={(e) => startDragVariance(e, g)}
-            ></div>
+  </section>
 
-            <!-- Mean circle -->
-            <div
-              class="mean-circle"
-              class:highlight={i === hoveredGaussian}
-              style="
-                left: {176 + 176/3 * g.mean.x}px;
-                top: {176 - 176/3 * g.mean.y}px;
-              "
-              on:mousedown={(e) => startDragMean(e, g)}
-            ></div>
-          {/each}
-        </div>
-      </div>
 
-      <div class="controls">
-        Number of Gaussians:
-        <button
-          on:mouseover={() => highlightGaussian($gaussians.length - 1)}
-          on:mouseout={clearHighlight}
-          on:click={removeGaussian}
-          disabled={isRunning || $gaussians.length === 1}
-        >
-          -
-        </button>
-        <span>{$gaussians.length}</span>
-        <button on:click={addGaussian} disabled={isRunning || $gaussians.length === 4}>+</button>
-      </div>
+
+
 
   <section class="section section-light">
     <h2 class="section-title">Training</h2>
@@ -965,235 +903,6 @@
     </p>
   </section>
 
-  <section class="playground">
-    <div class="container">
-      <h1 class="title">Playground</h1>
-      <p class="subtitle">
-        Change the environment and train your own GFlowNet to get a feeling on how they work.
-      </p>
-    </div>
-  </section>
-
-  <section class="section-light">
-    <p class="section-text">
-      Here you can change the environment.
-      Drag the center of the circles to change the mean and the border to change the variance.
-      You can also add more Gaussians if you want.
-    </p>
-
-    <div class="env-container">
-      <!--<img src="/images/env1.png" class="env-image" alt="Rendering of the environment">-->
-      <div id={plotContainerId}
-       style="width: 1000px;
-       position: relative;
-       top: 0;
-       left: 0;
-       z-index: 1; /* Ensure the image is below the canvas */">
-      </div>
-      <div class="canvas-container">
-        {#each $gaussians as g, i}
-          <!-- Variance circle -->
-          <div
-            class="variance-circle"
-            class:highlight={i === hoveredGaussian || isRunning}
-            style="
-              width: {129 * g.variance}px;
-              height: {129 * g.variance}px;
-              left: {176 + 176/3 * g.mean.x}px;
-              top: {176 - 176/3 * g.mean.y}px;
-            "
-            on:mousedown={(e) => startDragVariance(e, g)}
-          ></div>
-
-          <!-- Mean circle -->
-          <div
-            class="mean-circle"
-            class:highlight={i === hoveredGaussian}
-            style="
-              left: {176 + 176/3 * g.mean.x}px;
-              top: {176 - 176/3 * g.mean.y}px;
-            "
-            on:mousedown={(e) => startDragMean(e, g)}
-          ></div>
-        {/each}
-      </div>
-    </div>
-
-    <div class="controls">
-      Number of Gaussians:
-      <button
-        on:mouseover={() => highlightGaussian($gaussians.length - 1)}
-        on:mouseout={clearHighlight}
-        on:click={removeGaussian}
-        disabled={isRunning || $gaussians.length === 1}
-      >
-        -
-      </button>
-      <span>{$gaussians.length}</span>
-      <button on:click={addGaussian} disabled={isRunning || $gaussians.length === 4}>+</button>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Mean X</th>
-          <th>Mean Y</th>
-          <th>Variance</th>
-        </tr>
-      </thead>
-      <tbody>
-        {#each $gaussians as g, _}
-          <tr>
-            <td>{g.mean.x.toFixed(2)}</td>
-            <td>{g.mean.y.toFixed(2)}</td>
-            <td>{g.variance.toFixed(2)}</td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
-
-    <p class="section-text">
-      change training settings and start training (visualize training by sampling every n steps),
-      all interactivty deactivated while training, add stop button.
-    </p>
-    <div class="buttonscontainer">
-      <button class="reset-button" on:click="{resetSliders}" disabled="{isRunning}">Reset</button>
-      <button class="reset-button" on:click="{isRunning ? stopTraining : startTraining}">
-        {isRunning ? 'Stop' : 'Start'}</button>
-    </div>
-    <div class="slider-container">
-      <div class="slider">
-        <label for="off_policy">Off-policy</label>
-        <input
-          type="range"
-          min="0"
-          max="3"
-          step="0.1"
-          bind:value="{off_policy_value}"
-          id="off_policy"
-          disabled={isRunning}
-        />
-        <span>{off_policy_value}</span>
-      </div>
-      <div class="slider">
-        <label for="lr_model">Learning rate of the model</label>
-        <input
-          type="range"
-          min="0.0001"
-          max="0.1"
-          step="0.0001"
-          bind:value="{lr_model_value}"
-          id="lr_model"
-          disabled={isRunning}
-        />
-        <span>{lr_model_value.toFixed(4)}</span>
-      </div>
-      <div class="slider">
-        <label for="lr_logz">Learning rate of LogZ</label>
-        <input
-          type="range"
-          min="0.001"
-          max="0.3"
-          step="0.001"
-          bind:value="{lr_logz_value}"
-          id="lr_logz"
-          disabled={isRunning}
-        />
-        <span>{lr_logz_value.toFixed(3)}</span>
-      </div>
-      <div class="slider">
-        <label for="trajectory_length">Length of trajectory</label>
-        <input
-          type="range"
-          min="1"
-          max="10"
-          step="1"
-          bind:value="{trajectory_length_value}"
-          id="trajectory_lenght"
-          disabled={isRunning}
-        />
-        <span>{trajectory_length_value}</span>
-      </div>
-      <div class="slider">
-        <label for="hidden_layer">Number of hidden layers</label>
-        <input
-          type="range"
-          min="1"
-          max="6"
-          step="1"
-          bind:value="{hidden_layer_value}"
-          id="hidden_layer"
-          disabled={isRunning}
-        />
-        <span>{hidden_layer_value}</span>
-      </div>
-      <div class="slider">
-        <label for="hidden_layer">Dimension of hidden layers</label>
-        <input
-          type="range"
-          min="8"
-          max="128"
-          step="8"
-          bind:value="{hidden_dim_value}"
-          id="hidden_dim"
-          disabled={isRunning}
-        />
-        <span>{hidden_dim_value}</span>
-      </div>
-      <div class="slider">
-        <label for="seed">Seed</label>
-        <input
-          type="range"
-          min="0"
-          max="99"
-          step="1"
-          bind:value="{seed_value}"
-          id="seed"
-          disabled={isRunning}
-        />
-        <span>{seed_value}</span>
-      </div>
-      <div class="slider">
-        <label for="batch_size">Training batch size</label>
-        <input
-          type="range"
-          min="3"
-          max="11"
-          step="1"
-          bind:value="{batch_size_exponent}"
-          id="batch_size"
-          disabled={isRunning}
-        />
-        <span>{batch_size_value}</span>
-      </div>
-    </div>
-    <!--
-    <div class="image-container" id="trainplot">
-    </div>
-    {#if !isRunning & display_trainhistory}
-      <div class="slider-container">
-        <div class="slider">
-          <label for="training_history">Training progress</label>
-          <input
-            type="range"
-            min="0"
-            max="{frames.length}"
-            step="1"
-            bind:value="{training_frame}"
-            id="training_history"
-            on:input={plotStates(
-                    Plotly,
-                    frames[training_frame]['gaussians'],
-                    frames[training_frame]['states'],
-                    frames[training_frame]['losses']
-                    )}
-          />
-        </div>
-      </div>
-    {/if}
-    -->
-
-  </section>
 
   <section class="section">
     <h2 class="section-title">Sources</h2>
