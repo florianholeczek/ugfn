@@ -10,7 +10,8 @@
   import Slider from '@smui/slider';
   import Button, { Label } from '@smui/button';
   import IconButton, { Icon } from '@smui/icon-button';
-  import 'svelte-material-ui/themes/fixation.css';
+  //import 'svelte-material-ui/themes/fixation.css';
+  import "./theme.css"
   import Tab from '@smui/tab';
   import TabBar from '@smui/tab-bar';
   import Paper from '@smui/paper';
@@ -404,15 +405,6 @@
     </div>
   </header>
 
-  <section class="section" id="Intro" bind:this={tutorialstart}>
-    <p class="section-text">
-      Here you can explore how GFlowNets learn.
-      <br>Make your own reward function, adjust the hyperparameters and watch the training progress.
-      <br>If you have no clue what a GFlowNet actually is you might want to look into the tutorial below first.
-      <br> Or don't, who am I to tell you.
-    </p>
-  </section>
-
 
   <!-- Playground -->
 
@@ -451,7 +443,7 @@
             </Fab>
 
           </div>
-          <div class="pg-loss">
+          <div class="pg-ngaussians">
             <div class="columns margins" style="justify-content: flex-start;">
               <Select bind:value="{n_gaussians}" label="N Gaussians" disabled="{isRunning}">
                 {#each ["1","2","3","4"] as select}
@@ -583,7 +575,7 @@
           </div>
           <div class="pg-loss">
             <div class="columns margins" style="justify-content: flex-start;">
-              <Select bind:value="{loss_choice}" label="Loss" disabled="{isRunning}">
+              <Select bind:value="{loss_choice}" label="Loss" color="primary" disabled="{isRunning}">
                 {#each losses_select as select}
                   <Option value={select}>{select}</Option>
                 {/each}
@@ -705,7 +697,7 @@
           </div>
         </div>
         {#if !display_trainhistory && !isRunning}
-          <div class="pg-vis" style="text-align:center; padding:100px">
+          <div class="pg-vis" style="text-align:center; padding:100px; color: #323232;">
             Press Play to start training a GFlowNet
           </div>
         {:else}
@@ -756,6 +748,13 @@
 
 
   <section class="section" id="Tutorial" bind:this={tutorialstart}>
+    <h2 class="section-title">What is this about?</h2>
+    <p class="section-text">
+      Here you can explore how GFlowNets learn.
+      <br>Make your own reward function, adjust the hyperparameters and watch the training progress.
+      If you have no idea what a GFlowNet actually is you might want to look into this basic tutorial first.
+      <br> Or just explore!
+    </p>
     <h2 class="section-title">What is a GFlowNet?</h2>
     <p class="section-text">
 

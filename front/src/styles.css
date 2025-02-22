@@ -1,4 +1,6 @@
-  body {
+
+
+    body {
     font-family: 'Arial', sans-serif;
     background-color: #f7fafc;
     color: #333;
@@ -11,7 +13,7 @@
   }
 
   .header-top {
-    background: linear-gradient(90deg, #32263d, #3e412d);
+    background: linear-gradient(90deg, #26132d, #2d3a45);
     color: white;
     padding: 3rem 0;
     text-align: center;
@@ -60,7 +62,7 @@
 
 
   .image-container {
-    width: 1000px;
+    width: 800px;
     display: flex;
       justify-content: center;
       margin: 0 auto 2rem;
@@ -79,12 +81,6 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
-  .playground {
-    background: linear-gradient(90deg, #382d48, #582897);
-    color: white;
-    padding: 4rem 0;
-    text-align: center;
-  }
 
 
   @media (max-width: 768px) {
@@ -123,26 +119,7 @@
     }
   }
 
-  .slider-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-    margin-left: 1rem;
-}
 
-  .buttonscontainer {
-  display: flex;
-  flex-direction: row;
-  align-items: normal;
-  gap: 70px;
-}
-
-.slider {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
 
 label {
   width: 150px; /* Adjust width as needed */
@@ -154,58 +131,13 @@ input[type="range"] {
   flex: 1;
 }
 
-.reset-button {
-    background-color: #cecb7e;
-    color: #000000;
-    padding: 0.5rem 1.5rem;
-    font-size: 1rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 1rem;
-    margin-left: 1rem;
-    transition: background-color 0.3s;
-  }
 
-  .reset-button:hover {
-    background-color: #97994d;
-  }
-  .controls {
-    width: 1000px;
-    margin: 0 auto
-  }
-
-  .slider {
-    margin: 10px 0;
-  }
-
-  .visualization {
-    margin-top: 20px;
-    text-align: center;
-  }
 
   img {
     max-width: 100%;
     height: auto;
   }
-.env-container {
-    position: relative;
-    left: 4px;
-    width: 1000px;
-    height: 500px;
-    margin: 0 auto;
-    }
 
-  .canvas-container {
-    position: absolute;
-    top: 50px;
-    left: 77px;
-    width: 352px;
-    height: 352px;
-    z-index: 2; /* Ensure the canvas is above the image */
-    pointer-events: none; /* Prevent accidental interaction with the container itself */
-    border: 1px solid #ccc;
-  }
 
   .mean-circle {
     position: absolute;
@@ -236,9 +168,6 @@ input[type="range"] {
     opacity: 0.5;
   }
 
-  .controls {
-    margin-top: 10px;
-  }
 
   button {
     margin: 5px;
@@ -252,25 +181,6 @@ input[type="range"] {
     opacity: 0.5;
     cursor: not-allowed;
   }
-  .collapsible-header {
-    margin: 0;
-    font-size: 14px;
-    padding: 0.5em;
-    border: 1px solid rgb(100,120,140);
-    border-radius: 2px;
-    background: rgb(244, 244, 244);
-    transition: border-radius 0.5s step-end;
-  }
-  .collapsible-body {
-    margin: 0;
-    font-size: 12px;
-    padding: 0.5em;
-    border-left: 1px solid rgb(100,120,140);
-    border-radius: 2px;
-    background: rgb(244, 244, 244);
-    transition: border-radius 0.5s step-end;
-  }
-
 
 
 
@@ -285,7 +195,7 @@ input[type="range"] {
   .pg-top-background{
     height: 125px;
     width:100%;
-    background-color: #f9f5fc;
+    background-color: #F9F5FCFF;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     position:absolute;
     z-index: 0;
@@ -332,6 +242,7 @@ input[type="range"] {
     left: 225px;
     width: 775px;
     height:775px;
+    color: #707070;
   }
   .pg-bottom {
     position: absolute;
@@ -348,19 +259,10 @@ input[type="range"] {
     align-items: center;
   }
 
-  .pg-reset{
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    color: #a76295;
-    margin-left:40px
-  }
-
   .pg-play{
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    color: #a76295;
     margin-left:80px
   }
 
@@ -375,6 +277,13 @@ input[type="range"] {
     justify-content: flex-start;
     align-items: center;
     margin-left: 40px;
+  }
+
+  .pg-ngaussians {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-left: 580px;
   }
 
   .pg-2dplot {
@@ -410,6 +319,7 @@ input[type="range"] {
     width: 950px;
     height: 100px;
     text-align: center;
+    color: #707070;
   }
 
   .pg-gauss-table {
