@@ -273,36 +273,37 @@ input[type="range"] {
 
 
 
-  .pg-top-back{
-    height: 75px;
+
+  .pg-background{
+    height:950px;
+    width:100%;
     background-color: #ffffff;
+    position:relative;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 0;
   }
-  .pg-back{
-    height:900px;
-    background-color: #cfe1e5;
+  .pg-top-background{
+    height: 115px;
+    width:100%;
+    background-color: #f9f5fc;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    position:absolute;
+    z-index: 0;
   }
 
   .pg-views {
     width: 1000px;
     height: 1000px;
-    display: flex;
-    justify-content: center;
-    margin: 0 auto 2rem;
-    position: relative;
+    margin: auto;
+    z-index: 2;
   }
 
   .pg-container {
     /*border: 1px solid #ccc;*/
-    top:50px;
-    left:0;
     width: 1000px;
     height: 900px;
-    display: flex;
-    margin: 0 auto 2rem;
-    position: absolute;
-    justify-content: flex-start;
-    align-items: center;
+    margin: auto;
+    position: relative;
   }
 
   .pg-top {
@@ -327,7 +328,7 @@ input[type="range"] {
   }
   .pg-vis {
     position: absolute;
-    top: 75px;
+    top: 80px;
     left: 225px;
     width: 775px;
     height:775px;
@@ -352,7 +353,7 @@ input[type="range"] {
     justify-content: flex-start;
     align-items: center;
     color: #a76295;
-    margin-left:20px
+    margin-left:40px
   }
 
   .pg-play{

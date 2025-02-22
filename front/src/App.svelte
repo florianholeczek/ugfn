@@ -390,6 +390,11 @@
 
 
   <!-- Playground -->
+
+  <div class="pg-background">
+  <div class = "pg-top-background">
+  </div>
+
   <div class="pg-views">
     <TabBar
             tabs={["Environment", "Training", "Flow"]}
@@ -422,7 +427,7 @@
                     disabled={isRunning}
             >play_circle</IconButton>
           </div>
-          <div class="pg-loss" style="font-size: 20px">
+          <div class="pg-loss" style="font-size: 20px;">
             Number of Gaussians:
             <IconButton
                     class="material-icons"
@@ -706,6 +711,9 @@
         Flow
       </div>
     {/if}
+  </div>
+
+
   </div>
 
 
