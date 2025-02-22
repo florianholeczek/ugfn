@@ -85,7 +85,7 @@ export function plotEnvironment(Plotly, containerId, gaussians, options = {}) {
     scene: {
         xaxis: { title: "x", range: [-3, 3] },
         yaxis: { title: "y", range: [-3, 3] },
-        zaxis: { title: "Reward" } // Rename the Z axis
+        zaxis: { title: "Reward", range: [0,1] } // Rename the Z axis
     },
     margin: { t: 10, b: 10, l: 10, r: 10 },
   };
@@ -95,7 +95,7 @@ export function plotEnvironment(Plotly, containerId, gaussians, options = {}) {
     displayModeBar: false, // Hide toolbar
   };
 
-  if (containerId === "plot-container" | containerId === "plot-container2") {
+  if (containerId === "plot-container" || containerId === "plot-container2") {
     Plotly.react(containerId, [contourData, surfaceData], layout_both, config);
   } else if (containerId === "plot-container2d") {
     Plotly.react(containerId, [contourData], layout_2d, config);

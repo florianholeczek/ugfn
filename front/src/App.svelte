@@ -3,7 +3,6 @@
   import {writable} from 'svelte/store';
   import Katex from 'svelte-katex'
   import 'katex/dist/katex.min.css';
-  import { CollapsibleCard } from 'svelte-collapsible'
   import {plotEnvironment} from "./env.js";
   import './styles.css';
   import {plotStates} from "./training_vis.js"
@@ -19,7 +18,6 @@
   import Select, { Option } from '@smui/select';
   import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
   import Textfield from '@smui/textfield';
-  import HelperText from '@smui/textfield/helper-text';
 
 
 
@@ -40,7 +38,7 @@
   let training_frame = 0;
   $: plot_trainingframe(training_frame)
   function plot_trainingframe(frame) {
-    if (!isRunning & display_trainhistory){
+    if (!isRunning && display_trainhistory){
       plotStates(
         Plotly,
         frames[frame]['gaussians'],
@@ -75,27 +73,7 @@
     { mean: { x: -1, y: -1 }, variance: 0.4 },
     { mean: { x: 1, y: 1 }, variance: 0.4 }
   ]);
-  $: {gaussians.subscribe(values => {
-      const clamped = values.map(g => ({
-        mean: {
-          x: clampAndRound(g.mean.x, -3, 3),
-          y: clampAndRound(g.mean.y, -3, 3)
-        },
-        variance: clampAndRound(g.variance, 0.1, 1)
-      }));
-      // Only update if there is a change to prevent an infinite loop
-      if (JSON.stringify(values) !== JSON.stringify(clamped)) {
-        gaussians.set(clamped);
-        plotEnv();
-      }
-    });
-  }
 
-  function clampAndRound(value, min, max) {
-    let num = parseFloat(value);
-    if (isNaN(num)) return 0;
-    return Math.min(max, Math.max(min, parseFloat(num.toFixed(2))));
-  }
 
   function resetGaussians(){
     gaussians.set([
@@ -301,12 +279,13 @@
         g.mean.x = clamp(g.mean.x + dx, range.min, range.max);
         g.mean.y = clamp(g.mean.y - dy, range.min, range.max);
       } else if (isDraggingVariance && g) {
-        const newVariance = g.variance + dx;
+        const newVariance = g.variance + dx+dy;
         g.variance = clamp(newVariance, varianceRange.min, varianceRange.max);
       }
 
       return gs;
     });
+    plotEnv();
 
     initialMouse = { x: event.clientX, y: event.clientY };
   };
@@ -409,8 +388,6 @@
     </div>
   </header>
 
-  <div>
-
 
   <!-- Playground -->
   <div class="pg-views">
@@ -480,6 +457,11 @@
                   top: {132 - 132/3 * g.mean.y}px;
                 "
                 on:mousedown={(e) => startDragVariance(e, g)}
+                role="slider"
+                aria-valuenow="{g.variance}"
+                aria-valuemin="0.1"
+                aria-valuemax="1"
+                tabindex="0"
               ></div>
 
               <!-- Mean circle -->
@@ -491,6 +473,11 @@
                   top: {132 - 132/3 * g.mean.y}px;
                 "
                 on:mousedown={(e) => startDragMean(e, g)}
+                role="slider"
+                aria-valuenow="{g.mean.x}, {g.mean.y}"
+                aria-valuemin="-3"
+                aria-valuemax="3"
+                tabindex="0"
               ></div>
             {/each}
           </div>
@@ -513,19 +500,29 @@
                   <Cell>
                     <Textfield
                             bind:value={$gaussians[i]["mean"]["x"]}
-                            style="width:90%"helperLine$style="width: 90%;"
+                            on:input={(e) => gaussians_textinput(e,i,"x")}
+                            type="number"
+                            input$step="0.1"
+                            style="width:100%" helperLine$style="width: 100%;"
                     ></Textfield>
                   </Cell>
+
                   <Cell>
                     <Textfield
                             bind:value={$gaussians[i]["mean"]["y"]}
-                            style="width:90%"helperLine$style="width: 90%;"
+                            on:input={(e) => gaussians_textinput(e,i,"y")}
+                            type="number"
+                            input$step="0.1"
+                            style="width:100%" helperLine$style="width: 100%;"
                     ></Textfield>
                   </Cell>
                   <Cell>
                     <Textfield
                             bind:value={$gaussians[i]["variance"]}
-                            style="width:90%"helperLine$style="width: 90%;"
+                            on:input={(e) => gaussians_textinput(e,i,"variance")}
+                            type="number"
+                            input$step="0.1"
+                            style="width:100%" helperLine$style="width: 100%;"
                     ></Textfield>
                   </Cell>
                 </Row>

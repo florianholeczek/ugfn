@@ -390,7 +390,7 @@ input[type="range"] {
     width: 264px;
     height: 264px;
     z-index: 2; /* Ensure the canvas is above the image */
-    pointer-events: none; /* Prevent accidental interaction with the container itself */
+    /*pointer-events: none; /* Prevent accidental interaction with the container itself */
     /*border: 1px solid #ccc;*/
   }
   .pg-3dplot {
