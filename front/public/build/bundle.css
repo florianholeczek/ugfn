@@ -405,6 +405,15 @@ input[type="range"] {
     /*border: 1px solid #ccc;*/
   }
 
+  .pg-env-help {
+    position: absolute;
+    top: 825px;
+    left: 25px;
+    width: 950px;
+    height: 100px;
+    text-align: center;
+  }
+
   .pg-gauss-table {
     width: 264px;
     height: 450px;

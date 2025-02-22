@@ -33,11 +33,24 @@
   let seed_value = 42;
   let batch_size_exponent = 6;
   $: batch_size_value = 2**batch_size_exponent;
+  let n_gaussians="2";
+  $:changeNGaussians(n_gaussians);
+  function changeNGaussians(n) {
+    while ($gaussians.length < parseInt(n)) {
+      addGaussian();
+    }
+    while ($gaussians.length > parseInt(n)) {
+      removeGaussian();
+    }
+    if (plotlyready){
+      plotEnv();
+    }
+  }
 
 
   let frames = [];
   let training_frame = 0;
-  $: plot_trainingframe(training_frame)
+  $: plot_trainingframe(training_frame);
   function plot_trainingframe(frame) {
     if (!isRunning && display_trainhistory){
       plotStates(
@@ -81,6 +94,7 @@
       { mean: { x: -1, y: -1 }, variance: 0.4 },
       { mean: { x: 1, y: 1 }, variance: 0.4 }
     ]);
+    n_gaussians="2";
     plotEnv();
   }
 
@@ -171,7 +185,6 @@
     } catch (error) {
       console.error(error);
       isRunning = false;
-      pg_button = false;
     }
   }
 
@@ -189,7 +202,6 @@
       // Stop polling and reset button state
       clearInterval(pollingTimer);
       isRunning = false;
-      pg_button = false;
     } catch (error) {
       console.error(error);
     }
@@ -222,7 +234,6 @@
           console.log("Training process completed.");
           plotStates(Plotly, $gaussians, current_states,current_losses);
           isRunning = false; // Update the UI state to reflect the stopped process
-          pg_button = false;
           clearInterval(pollingTimer); // Stop the polling
           return; // Stop polling
         }
@@ -370,6 +381,7 @@
     }
   }
   let tutorialstart;
+  let intro;
 
 
 
@@ -391,6 +403,15 @@
       <p class="subtitle">Gaining intuition for Generative Flow Networks and how to train them</p>
     </div>
   </header>
+
+  <section class="section" id="Intro" bind:this={tutorialstart}>
+    <p class="section-text">
+      Here you can explore how GFlowNets learn.
+      <br>Make your own reward function, adjust the hyperparameters and watch the training progress.
+      <br>If you have no clue what a GFlowNet actually is you might want to look into the tutorial below first.
+      <br> Or don't, who am I to tell you.
+    </p>
+  </section>
 
 
   <!-- Playground -->
@@ -430,23 +451,14 @@
             </Fab>
 
           </div>
-          <div class="pg-loss" style="font-size: 20px;">
-            Number of Gaussians:
-            <Fab
-              on:click={removeGaussian}
-              on:mouseover={() => highlightGaussian($gaussians.length - 1)}
-              on:mouseout={clearHighlight}
-              disabled="{isRunning|| $gaussians.length === 1}"
-              mini
-            >
-              <Icon class="material-icons" style="font-size: 32px;display: flex; justify-content: center; align-items: center;">remove</Icon></Fab>
-            {$gaussians.length}
-            <Fab
-              on:click={addGaussian}
-              disabled="{isRunning|| $gaussians.length === 4}"
-              mini
-            >
-              <Icon class="material-icons">add</Icon></Fab>
+          <div class="pg-loss">
+            <div class="columns margins" style="justify-content: flex-start;">
+              <Select bind:value="{n_gaussians}" label="N Gaussians" disabled="{isRunning}">
+                {#each ["1","2","3","4"] as select}
+                  <Option value={select}>{select}</Option>
+                {/each}
+              </Select>
+            </div>
           </div>
 
 
@@ -537,6 +549,10 @@
               {/each}
             </Body>
           </DataTable>
+        </div>
+        <div class="pg-env-help">
+          Adjust the reward function by dragging the circles and dots in the left plot or by setting the parameters in the table.
+          <br>By setting the mean and variance of multiple 2D Multivariate Gaussians we get the reward function on the right as a mixture.
         </div>
       </div>
 

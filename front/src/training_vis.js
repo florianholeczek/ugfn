@@ -173,10 +173,10 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
         grid: { rows: 2, columns: 2, subplots: [['xy', 'x2y2'], ['x3y3', 'x4y4']] },
         xaxis: { domain: [0, 0.75], title: "x", range: [-3, 3] },
         yaxis: { domain: [0, 0.75], title: "y", range: [-3, 3] },
-        xaxis2: { domain: [0, 0.75], showticklabels: false, title: 'Marginal of x', side:'top', anchor: 'y2',  range: [-3, 3]},
+        xaxis2: { domain: [0, 0.75], showticklabels: false, title: 'Marginal of x', side:'top', anchor: 'y2',scaleanchor:'x',  range: [-3, 3]},
         yaxis2: { domain: [0.8, 1], showticklabels: true, range:[0, 0.61] },
         xaxis3: { domain: [0.8, 1], showticklabels: true, range:[0, 0.61] },
-        yaxis3: { domain: [0, 0.75], showticklabels: false, title: 'Marginal of y', side:'right', anchor: 'x3', range: [-3, 3]},
+        yaxis3: { domain: [0, 0.75], showticklabels: true, title: 'Marginal of y', side:'right', anchor: 'x3', scaleanchor:'y', range: [-3,3]},
         xaxis4: { domain: [0.8, 1], showticklabels: true, range:[0, losses['n_iterations']] },
         yaxis4: { domain: [0.8, 1], showticklabels: true, range: [-1, 3]}
     };
