@@ -18,6 +18,7 @@
   import Select, { Option } from '@smui/select';
   import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
   import Textfield from '@smui/textfield';
+  import Fab from '@smui/fab';
 
 
 
@@ -363,9 +364,16 @@
     }
     plotEnv();
   }
+  function scrollToTutorial() {
+    if (tutorialstart) {
+      tutorialstart.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
 
 
   let pg_button = false;
+  let tutorialstart;
 
 
 
@@ -411,39 +419,38 @@
       <!-- Environment View -->
       <div class="pg-container">
         <div class="pg-top">
-          <div class="pg-reset">
-            <IconButton
-                    class="material-icons"
-                    on:click={resetGaussians}
-                    style="font-size: 32px;display: flex; justify-content: flex-start; align-items: center;"
-                    disabled="{isRunning}"
-            >replay</IconButton>
-          </div>
           <div class="pg-play">
-            <IconButton
-                    class="material-icons"
-                    on:click={() => view="Training"}
-                    style="font-size: 50px;display: flex; justify-content: center; align-items: center;"
-                    disabled={isRunning}
-            >play_circle</IconButton>
+            <Fab
+              on:click={resetGaussians}
+              mini
+              disabled="{isRunning}"
+            ><Icon class="material-icons" style="font-size: 22px">replay</Icon>
+            </Fab>
+            <Fab
+              on:click={() => view="Training"}
+              disabled="{isRunning}"
+            >
+                <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
+            </Fab>
+
           </div>
           <div class="pg-loss" style="font-size: 20px;">
             Number of Gaussians:
-            <IconButton
-                    class="material-icons"
-                    on:click={removeGaussian}
-                    on:mouseover={() => highlightGaussian($gaussians.length - 1)}
-                    on:mouseout={clearHighlight}
-                    style="font-size: 32px;display: flex; justify-content: center; align-items: center;color: #a76295;"
-                    disabled="{isRunning || $gaussians.length === 1}"
-            >remove</IconButton>
+            <Fab
+              on:click={removeGaussian}
+              on:mouseover={() => highlightGaussian($gaussians.length - 1)}
+              on:mouseout={clearHighlight}
+              disabled="{isRunning|| $gaussians.length === 1}"
+              mini
+            >
+              <Icon class="material-icons" style="font-size: 32px;display: flex; justify-content: center; align-items: center;">remove</Icon></Fab>
             {$gaussians.length}
-            <IconButton
-                    class="material-icons"
-                    on:click={addGaussian}
-                    style="font-size: 32px;display: flex; justify-content: center; align-items: center;color: #a76295;"
-                    disabled="{isRunning || $gaussians.length === 4}"
-            >add</IconButton>
+            <Fab
+              on:click={addGaussian}
+              disabled="{isRunning|| $gaussians.length === 4}"
+              mini
+            >
+              <Icon class="material-icons">add</Icon></Fab>
           </div>
 
 
@@ -544,23 +551,23 @@
       <!-- Training View -->
       <div class="pg-container">
         <div class="pg-top">
-          <div class="pg-reset">
-            <IconButton
-                    class="material-icons"
-                    on:click={resetSliders}
-                    style="font-size: 32px;display: flex; justify-content: center; align-items: center;"
-                    disabled="{isRunning}"
-            >replay</IconButton>
-          </div>
           <div class="pg-play">
-            <IconButton
-                    on:click={isRunning ? stopTraining : startTraining}
-                    toggle
-                    bind:pressed={pg_button}
+            <Fab
+              on:click={resetSliders}
+              mini
+              disabled="{isRunning}"
+            ><Icon class="material-icons" style="font-size: 22px">replay</Icon>
+            </Fab>
+            <Fab
+              on:click={isRunning ? stopTraining : startTraining}
             >
-              <Icon class="material-icons" style="font-size: 50px" on>stop_circle</Icon>
-              <Icon class="material-icons" style="font-size: 50px">play_circle</Icon>
-            </IconButton>
+              {#if isRunning}
+                <Icon class="material-icons" style="font-size: 50px">stop</Icon>
+              {:else}
+                <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
+              {/if}
+            </Fab>
+
           </div>
           <div class="pg-loss">
             <div class="columns margins" style="justify-content: flex-start;">
@@ -712,6 +719,14 @@
       </div>
     {/if}
   </div>
+    <div class="pg-scrollbutton">
+      <Fab
+        on:click={scrollToTutorial}
+        disabled="{isRunning}"
+      >
+        <Icon class="material-icons">keyboard_arrow_down</Icon></Fab>
+    </div>
+
 
 
   </div>
@@ -720,7 +735,7 @@
 
 
 
-  <section class="section">
+  <section class="section" id="Tutorial" bind:this={tutorialstart}>
     <h2 class="section-title">What is a GFlowNet?</h2>
     <p class="section-text">
 

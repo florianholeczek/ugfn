@@ -15,6 +15,7 @@
     "@smui-extra/accordion": "^7.0.0",
     "@smui/button": "^7.0.0",
     "@smui/data-table": "^7.0.0",
+    "@smui/fab": "^7.0.0",
     "@smui/icon-button": "^7.0.0",
     "@smui/linear-progress": "^7.0.0",
     "@smui/paper": "^7.0.0",

@@ -277,7 +277,7 @@ input[type="range"] {
 
 
   .pg-background{
-    height:950px;
+    height:1035px;
     width:100%;
     background-color: #ffffff;
     position:relative;
@@ -285,7 +285,7 @@ input[type="range"] {
     z-index: 0;
   }
   .pg-top-background{
-    height: 115px;
+    height: 125px;
     width:100%;
     background-color: #f9f5fc;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
@@ -330,14 +330,14 @@ input[type="range"] {
   }
   .pg-vis {
     position: absolute;
-    top: 80px;
+    top: 90px;
     left: 225px;
     width: 775px;
     height:775px;
   }
   .pg-bottom {
     position: absolute;
-    top: 850px;
+    top: 860px;
     left: 225px;
     width: 775px;
     height:50px;
@@ -363,13 +363,14 @@ input[type="range"] {
     justify-content: flex-start;
     align-items: center;
     color: #a76295;
+    margin-left:80px
   }
 
   .pg-loss{
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    margin-left:360px;
+    margin-left:340px;
   }
   .pg-iterations {
     display: flex;
@@ -411,6 +412,11 @@ input[type="range"] {
     left: 30px;
     position: absolute;
     /*border: 1px solid #ccc;*/
+  }
+  .pg-scrollbutton {
+    /*border: 1px solid #ccc;*/
+    left:50%;
+    position: absolute;
   }
 
 
