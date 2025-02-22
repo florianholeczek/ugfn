@@ -41,11 +41,16 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
     const ls = linspace(-3, 3, gridSize);
 
     let densityEnv = computeDensity({x:ls,y:ls}, gaussians);
+    console.log("start")
+    console.log(densityEnv)
     densityEnv = densityEnv.map(row => row.slice());
+    const densityEnvTransposed = densityEnv[0].map((_, colIndex) => densityEnv.map(row => row[colIndex]));
+    console.log(densityEnv)
 
     // Compute marginal densities
     const densityX = densityEnv.reduce((sum, row) => sum.map((v, i) => v + row[i]), Array(gridSize).fill(0));
-    const densityY = densityEnv[0].map((_, i) => densityEnv.reduce((sum, row) => sum + row[i], 0));
+    const densityY = densityEnvTransposed.reduce((sum, row) => sum.map((v, i) => v + row[i]), Array(gridSize).fill(0));
+    console.log(densityX, densityY)
 
     // Normalize marginals
     const normfact = 6/((gridSize-1)*gaussians.length)
