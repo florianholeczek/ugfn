@@ -27047,7 +27047,7 @@ var app = (function () {
 	}
 
 	// (56:2) {:else}
-	function create_else_block_1$2(ctx) {
+	function create_else_block_1$3(ctx) {
 		let input_1;
 		let input_1_class_value;
 		let mounted;
@@ -27132,7 +27132,7 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_else_block_1$2.name,
+			id: create_else_block_1$3.name,
 			type: "else",
 			source: "(56:2) {:else}",
 			ctx
@@ -27880,7 +27880,7 @@ var app = (function () {
 
 		function select_block_type(ctx, dirty) {
 			if (/*range*/ ctx[6]) return create_if_block_5$3;
-			return create_else_block_1$2;
+			return create_else_block_1$3;
 		}
 
 		let current_block_type = select_block_type(ctx);
@@ -50766,7 +50766,7 @@ var app = (function () {
 	const file$8 = "node_modules/@smui/data-table/dist/Cell.svelte";
 
 	// (43:0) {:else}
-	function create_else_block_1$1(ctx) {
+	function create_else_block_1$2(ctx) {
 		let td;
 		let td_class_value;
 		let useActions_action;
@@ -50876,7 +50876,7 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_else_block_1$1.name,
+			id: create_else_block_1$2.name,
 			type: "else",
 			source: "(43:0) {:else}",
 			ctx
@@ -51207,7 +51207,7 @@ var app = (function () {
 		let if_block;
 		let if_block_anchor;
 		let current;
-		const if_block_creators = [create_if_block$5, create_else_block_1$1];
+		const if_block_creators = [create_if_block$5, create_else_block_1$2];
 		const if_blocks = [];
 
 		function select_block_type(ctx, dirty) {
@@ -54759,7 +54759,7 @@ var app = (function () {
 	const get_label_slot_context = ctx => ({});
 
 	// (167:0) {:else}
-	function create_else_block_1(ctx) {
+	function create_else_block_1$1(ctx) {
 		let div;
 		let t0;
 		let contextfragment0;
@@ -55019,7 +55019,7 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_else_block_1.name,
+			id: create_else_block_1$1.name,
 			type: "else",
 			source: "(167:0) {:else}",
 			ctx
@@ -55048,7 +55048,7 @@ var app = (function () {
 		let current;
 		let mounted;
 		let dispose;
-		let if_block0 = !/*textarea*/ ctx[14] && /*variant*/ ctx[15] !== 'outlined' && create_if_block_8(ctx);
+		let if_block0 = !/*textarea*/ ctx[14] && /*variant*/ ctx[15] !== 'outlined' && create_if_block_8$1(ctx);
 		let if_block1 = (/*textarea*/ ctx[14] || /*variant*/ ctx[15] === 'outlined') && create_if_block_6$1(ctx);
 
 		contextfragment0 = new ContextFragment({
@@ -55199,7 +55199,7 @@ var app = (function () {
 							transition_in(if_block0, 1);
 						}
 					} else {
-						if_block0 = create_if_block_8(ctx);
+						if_block0 = create_if_block_8$1(ctx);
 						if_block0.c();
 						transition_in(if_block0, 1);
 						if_block0.m(label_1, t0);
@@ -55525,7 +55525,7 @@ var app = (function () {
 	}
 
 	// (60:4) {#if !textarea && variant !== 'outlined'}
-	function create_if_block_8(ctx) {
+	function create_if_block_8$1(ctx) {
 		let t;
 		let if_block1_anchor;
 		let current;
@@ -55603,7 +55603,7 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_if_block_8.name,
+			id: create_if_block_8$1.name,
 			type: "if",
 			source: "(60:4) {#if !textarea && variant !== 'outlined'}",
 			ctx
@@ -57014,7 +57014,7 @@ var app = (function () {
 		let t;
 		let if_block1_anchor;
 		let current;
-		const if_block_creators = [create_if_block_1$2, create_else_block_1];
+		const if_block_creators = [create_if_block_1$2, create_else_block_1$1];
 		const if_blocks = [];
 
 		function select_block_type(ctx, dirty) {
@@ -58835,34 +58835,34 @@ var app = (function () {
 
 	function get_each_context_2(ctx, list, i) {
 		const child_ctx = ctx.slice();
-		child_ctx[98] = list[i];
+		child_ctx[97] = list[i];
 		return child_ctx;
 	}
 
 	function get_each_context_3(ctx, list, i) {
 		const child_ctx = ctx.slice();
-		child_ctx[98] = list[i];
+		child_ctx[97] = list[i];
 		return child_ctx;
 	}
 
 	function get_each_context(ctx, list, i) {
 		const child_ctx = ctx.slice();
-		child_ctx[92] = list[i];
-		child_ctx[93] = list;
-		child_ctx[94] = i;
+		child_ctx[91] = list[i];
+		child_ctx[92] = list;
+		child_ctx[93] = i;
 		return child_ctx;
 	}
 
 	function get_each_context_1(ctx, list, i) {
 		const child_ctx = ctx.slice();
-		child_ctx[95] = list[i];
-		child_ctx[92] = i;
+		child_ctx[94] = list[i];
+		child_ctx[91] = i;
 		return child_ctx;
 	}
 
-	// (413:8) <Label>
+	// (409:8) <Label>
 	function create_default_slot_76(ctx) {
-		let t_value = /*tab*/ ctx[97] + "";
+		let t_value = /*tab*/ ctx[96] + "";
 		let t;
 
 		const block = {
@@ -58873,7 +58873,7 @@ var app = (function () {
 				insert_dev(target, t, anchor);
 			},
 			p: function update(ctx, dirty) {
-				if (dirty[3] & /*tab*/ 16 && t_value !== (t_value = /*tab*/ ctx[97] + "")) set_data_dev(t, t_value);
+				if (dirty[3] & /*tab*/ 8 && t_value !== (t_value = /*tab*/ ctx[96] + "")) set_data_dev(t, t_value);
 			},
 			d: function destroy(detaching) {
 				if (detaching) {
@@ -58886,14 +58886,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_76.name,
 			type: "slot",
-			source: "(413:8) <Label>",
+			source: "(409:8) <Label>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (412:6) <Tab {tab} disabled={isRunning}>
+	// (408:6) <Tab {tab} disabled={isRunning}>
 	function create_default_slot_75(ctx) {
 		let label;
 		let current;
@@ -58917,7 +58917,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const label_changes = {};
 
-				if (dirty[3] & /*$$scope, tab*/ 1040) {
+				if (dirty[3] & /*$$scope, tab*/ 520) {
 					label_changes.$$scope = { dirty, ctx };
 				}
 
@@ -58941,21 +58941,21 @@ var app = (function () {
 			block,
 			id: create_default_slot_75.name,
 			type: "slot",
-			source: "(412:6) <Tab {tab} disabled={isRunning}>",
+			source: "(408:6) <Tab {tab} disabled={isRunning}>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (407:4) <TabBar             tabs={["Environment", "Training", "Flow"]}             let:tab             bind:active={view}     >
+	// (403:4) <TabBar             tabs={["Environment", "Training", "Flow"]}             let:tab             bind:active={view}     >
 	function create_default_slot_74(ctx) {
 		let tab;
 		let current;
 
 		tab = new Tab({
 				props: {
-					tab: /*tab*/ ctx[97],
+					tab: /*tab*/ ctx[96],
 					disabled: /*isRunning*/ ctx[17],
 					$$slots: { default: [create_default_slot_75] },
 					$$scope: { ctx }
@@ -58973,10 +58973,10 @@ var app = (function () {
 			},
 			p: function update(ctx, dirty) {
 				const tab_changes = {};
-				if (dirty[3] & /*tab*/ 16) tab_changes.tab = /*tab*/ ctx[97];
+				if (dirty[3] & /*tab*/ 8) tab_changes.tab = /*tab*/ ctx[96];
 				if (dirty[0] & /*isRunning*/ 131072) tab_changes.disabled = /*isRunning*/ ctx[17];
 
-				if (dirty[3] & /*$$scope, tab*/ 1040) {
+				if (dirty[3] & /*$$scope, tab*/ 520) {
 					tab_changes.$$scope = { dirty, ctx };
 				}
 
@@ -59000,51 +59000,58 @@ var app = (function () {
 			block,
 			id: create_default_slot_74.name,
 			type: "slot",
-			source: "(407:4) <TabBar             tabs={[\\\"Environment\\\", \\\"Training\\\", \\\"Flow\\\"]}             let:tab             bind:active={view}     >",
+			source: "(403:4) <TabBar             tabs={[\\\"Environment\\\", \\\"Training\\\", \\\"Flow\\\"]}             let:tab             bind:active={view}     >",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (715:30) 
-	function create_if_block_7(ctx) {
-		let div;
+	// (717:30) 
+	function create_if_block_8(ctx) {
+		let div1;
+		let div0;
 
 		const block = {
 			c: function create() {
-				div = element("div");
-				div.textContent = "Flow";
-				attr_dev(div, "class", "pg-container");
-				add_location(div, file, 716, 6, 21788);
+				div1 = element("div");
+				div0 = element("div");
+				div0.textContent = "Flow. Bald auch in ihrer Visualisierung.";
+				attr_dev(div0, "class", "pg-vis");
+				set_style(div0, "text-align", "center");
+				set_style(div0, "padding", "100px");
+				add_location(div0, file, 719, 8, 22050);
+				attr_dev(div1, "class", "pg-container");
+				add_location(div1, file, 718, 6, 22015);
 			},
 			m: function mount(target, anchor) {
-				insert_dev(target, div, anchor);
+				insert_dev(target, div1, anchor);
+				append_dev(div1, div0);
 			},
 			p: noop,
 			i: noop,
 			o: noop,
 			d: function destroy(detaching) {
 				if (detaching) {
-					detach_dev(div);
+					detach_dev(div1);
 				}
 			}
 		};
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_if_block_7.name,
+			id: create_if_block_8.name,
 			type: "if",
-			source: "(715:30) ",
+			source: "(717:30) ",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (548:34) 
+	// (544:34) 
 	function create_if_block_1(ctx) {
-		let div10;
+		let div9;
 		let div5;
 		let div0;
 		let fab0;
@@ -59069,11 +59076,10 @@ var app = (function () {
 		let current_block_type_index;
 		let if_block0;
 		let t5;
-		let div8;
 		let t6;
-		let div9;
+		let div8;
 		let current_block_type_index_1;
-		let if_block1;
+		let if_block2;
 		let current;
 
 		fab0 = new Fab({
@@ -59149,8 +59155,8 @@ var app = (function () {
 			$$slots: {
 				default: [
 					create_default_slot_62,
-					({ tab }) => ({ 97: tab }),
-					({ tab }) => [0, 0, 0, tab ? 16 : 0]
+					({ tab }) => ({ 96: tab }),
+					({ tab }) => [0, 0, 0, tab ? 8 : 0]
 				]
 			},
 			$$scope: { ctx }
@@ -59162,7 +59168,7 @@ var app = (function () {
 
 		tabbar = new TabBar({ props: tabbar_props, $$inline: true });
 		binding_callbacks.push(() => bind(tabbar, 'active', tabbar_active_binding_1));
-		const if_block_creators = [create_if_block_4, create_if_block_5];
+		const if_block_creators = [create_if_block_5, create_if_block_6];
 		const if_blocks = [];
 
 		function select_block_type_2(ctx, dirty) {
@@ -59175,22 +59181,29 @@ var app = (function () {
 			if_block0 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
 		}
 
+		function select_block_type_3(ctx, dirty) {
+			if (!/*display_trainhistory*/ ctx[19] && !/*isRunning*/ ctx[17]) return create_if_block_4;
+			return create_else_block;
+		}
+
+		let current_block_type = select_block_type_3(ctx);
+		let if_block1 = current_block_type(ctx);
 		const if_block_creators_1 = [create_if_block_2, create_if_block_3];
 		const if_blocks_1 = [];
 
-		function select_block_type_3(ctx, dirty) {
+		function select_block_type_4(ctx, dirty) {
 			if (!/*isRunning*/ ctx[17] & /*display_trainhistory*/ ctx[19]) return 0;
 			if (/*isRunning*/ ctx[17]) return 1;
 			return -1;
 		}
 
-		if (~(current_block_type_index_1 = select_block_type_3(ctx))) {
-			if_block1 = if_blocks_1[current_block_type_index_1] = if_block_creators_1[current_block_type_index_1](ctx);
+		if (~(current_block_type_index_1 = select_block_type_4(ctx))) {
+			if_block2 = if_blocks_1[current_block_type_index_1] = if_block_creators_1[current_block_type_index_1](ctx);
 		}
 
 		const block = {
 			c: function create() {
-				div10 = element("div");
+				div9 = element("div");
 				div5 = element("div");
 				div0 = element("div");
 				create_component(fab0.$$.fragment);
@@ -59211,39 +59224,35 @@ var app = (function () {
 				t4 = space();
 				if (if_block0) if_block0.c();
 				t5 = space();
-				div8 = element("div");
-				div8.innerHTML = ``;
+				if_block1.c();
 				t6 = space();
-				div9 = element("div");
-				if (if_block1) if_block1.c();
+				div8 = element("div");
+				if (if_block2) if_block2.c();
 				attr_dev(div0, "class", "pg-play");
-				add_location(div0, file, 553, 10, 16038);
+				add_location(div0, file, 549, 10, 16040);
 				attr_dev(div1, "class", "columns margins");
 				set_style(div1, "justify-content", "flex-start");
-				add_location(div1, file, 572, 12, 16688);
+				add_location(div1, file, 568, 12, 16690);
 				attr_dev(div2, "class", "columns margins");
 				set_style(div2, "justify-content", "flex-start");
-				add_location(div2, file, 580, 14, 17069);
+				add_location(div2, file, 576, 14, 17071);
 				attr_dev(div3, "class", "pg-iterations");
-				add_location(div3, file, 579, 12, 17027);
+				add_location(div3, file, 575, 12, 17029);
 				attr_dev(div4, "class", "pg-loss");
-				add_location(div4, file, 571, 10, 16654);
+				add_location(div4, file, 567, 10, 16656);
 				attr_dev(div5, "class", "pg-top");
-				add_location(div5, file, 552, 8, 16007);
-				add_location(div6, file, 596, 10, 17588);
+				add_location(div5, file, 548, 8, 16009);
+				add_location(div6, file, 592, 10, 17590);
 				attr_dev(div7, "class", "pg-side");
-				add_location(div7, file, 595, 8, 17556);
-				attr_dev(div8, "class", "pg-vis");
-				attr_dev(div8, "id", "trainplot");
-				add_location(div8, file, 694, 8, 21189);
-				attr_dev(div9, "class", "pg-bottom");
-				add_location(div9, file, 697, 8, 21249);
-				attr_dev(div10, "class", "pg-container");
-				add_location(div10, file, 551, 6, 15972);
+				add_location(div7, file, 591, 8, 17558);
+				attr_dev(div8, "class", "pg-bottom");
+				add_location(div8, file, 699, 8, 21476);
+				attr_dev(div9, "class", "pg-container");
+				add_location(div9, file, 547, 6, 15974);
 			},
 			m: function mount(target, anchor) {
-				insert_dev(target, div10, anchor);
-				append_dev(div10, div5);
+				insert_dev(target, div9, anchor);
+				append_dev(div9, div5);
 				append_dev(div5, div0);
 				mount_component(fab0, div0, null);
 				append_dev(div0, t0);
@@ -59256,8 +59265,8 @@ var app = (function () {
 				append_dev(div4, div3);
 				append_dev(div3, div2);
 				mount_component(select1, div2, null);
-				append_dev(div10, t3);
-				append_dev(div10, div7);
+				append_dev(div9, t3);
+				append_dev(div9, div7);
 				append_dev(div7, div6);
 				mount_component(tabbar, div6, null);
 				append_dev(div6, t4);
@@ -59266,13 +59275,13 @@ var app = (function () {
 					if_blocks[current_block_type_index].m(div6, null);
 				}
 
-				append_dev(div10, t5);
-				append_dev(div10, div8);
-				append_dev(div10, t6);
-				append_dev(div10, div9);
+				append_dev(div9, t5);
+				if_block1.m(div9, null);
+				append_dev(div9, t6);
+				append_dev(div9, div8);
 
 				if (~current_block_type_index_1) {
-					if_blocks_1[current_block_type_index_1].m(div9, null);
+					if_blocks_1[current_block_type_index_1].m(div8, null);
 				}
 
 				current = true;
@@ -59282,14 +59291,14 @@ var app = (function () {
 				const fab0_changes = {};
 				if (dirty[0] & /*isRunning*/ 131072) fab0_changes.disabled = /*isRunning*/ ctx[17];
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					fab0_changes.$$scope = { dirty, ctx };
 				}
 
 				fab0.$set(fab0_changes);
 				const fab1_changes = {};
 
-				if (dirty[0] & /*isRunning*/ 131072 | dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[0] & /*isRunning*/ 131072 | dirty[3] & /*$$scope*/ 512) {
 					fab1_changes.$$scope = { dirty, ctx };
 				}
 
@@ -59297,7 +59306,7 @@ var app = (function () {
 				const select0_changes = {};
 				if (dirty[0] & /*isRunning*/ 131072) select0_changes.disabled = /*isRunning*/ ctx[17];
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					select0_changes.$$scope = { dirty, ctx };
 				}
 
@@ -59311,7 +59320,7 @@ var app = (function () {
 				const select1_changes = {};
 				if (dirty[0] & /*isRunning*/ 131072) select1_changes.disabled = /*isRunning*/ ctx[17];
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					select1_changes.$$scope = { dirty, ctx };
 				}
 
@@ -59324,7 +59333,7 @@ var app = (function () {
 				select1.$set(select1_changes);
 				const tabbar_changes = {};
 
-				if (dirty[3] & /*$$scope, tab*/ 1040) {
+				if (dirty[3] & /*$$scope, tab*/ 520) {
 					tabbar_changes.$$scope = { dirty, ctx };
 				}
 
@@ -59370,15 +59379,25 @@ var app = (function () {
 					}
 				}
 
+				if (current_block_type !== (current_block_type = select_block_type_3(ctx))) {
+					if_block1.d(1);
+					if_block1 = current_block_type(ctx);
+
+					if (if_block1) {
+						if_block1.c();
+						if_block1.m(div9, t6);
+					}
+				}
+
 				let previous_block_index_1 = current_block_type_index_1;
-				current_block_type_index_1 = select_block_type_3(ctx);
+				current_block_type_index_1 = select_block_type_4(ctx);
 
 				if (current_block_type_index_1 === previous_block_index_1) {
 					if (~current_block_type_index_1) {
 						if_blocks_1[current_block_type_index_1].p(ctx, dirty);
 					}
 				} else {
-					if (if_block1) {
+					if (if_block2) {
 						group_outros();
 
 						transition_out(if_blocks_1[previous_block_index_1], 1, 1, () => {
@@ -59389,19 +59408,19 @@ var app = (function () {
 					}
 
 					if (~current_block_type_index_1) {
-						if_block1 = if_blocks_1[current_block_type_index_1];
+						if_block2 = if_blocks_1[current_block_type_index_1];
 
-						if (!if_block1) {
-							if_block1 = if_blocks_1[current_block_type_index_1] = if_block_creators_1[current_block_type_index_1](ctx);
-							if_block1.c();
+						if (!if_block2) {
+							if_block2 = if_blocks_1[current_block_type_index_1] = if_block_creators_1[current_block_type_index_1](ctx);
+							if_block2.c();
 						} else {
-							if_block1.p(ctx, dirty);
+							if_block2.p(ctx, dirty);
 						}
 
-						transition_in(if_block1, 1);
-						if_block1.m(div9, null);
+						transition_in(if_block2, 1);
+						if_block2.m(div8, null);
 					} else {
-						if_block1 = null;
+						if_block2 = null;
 					}
 				}
 			},
@@ -59413,7 +59432,7 @@ var app = (function () {
 				transition_in(select1.$$.fragment, local);
 				transition_in(tabbar.$$.fragment, local);
 				transition_in(if_block0);
-				transition_in(if_block1);
+				transition_in(if_block2);
 				current = true;
 			},
 			o: function outro(local) {
@@ -59423,12 +59442,12 @@ var app = (function () {
 				transition_out(select1.$$.fragment, local);
 				transition_out(tabbar.$$.fragment, local);
 				transition_out(if_block0);
-				transition_out(if_block1);
+				transition_out(if_block2);
 				current = false;
 			},
 			d: function destroy(detaching) {
 				if (detaching) {
-					detach_dev(div10);
+					detach_dev(div9);
 				}
 
 				destroy_component(fab0);
@@ -59441,6 +59460,8 @@ var app = (function () {
 					if_blocks[current_block_type_index].d();
 				}
 
+				if_block1.d();
+
 				if (~current_block_type_index_1) {
 					if_blocks_1[current_block_type_index_1].d();
 				}
@@ -59451,14 +59472,14 @@ var app = (function () {
 			block,
 			id: create_if_block_1.name,
 			type: "if",
-			source: "(548:34) ",
+			source: "(544:34) ",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (416:4) {#if view === 'Environment'}
+	// (412:4) {#if view === 'Environment'}
 	function create_if_block(ctx) {
 		let div7;
 		let div2;
@@ -59542,8 +59563,8 @@ var app = (function () {
 
 		datatable = new DataTable({
 				props: {
-					"table$aria-label": "People list",
-					style: "width: 100%;",
+					"table$aria-label": "Parameters of Gaussians",
+					style: "width: 100%;border-radius: 1px",
 					$$slots: { default: [create_default_slot_36] },
 					$$scope: { ctx }
 				},
@@ -59580,24 +59601,24 @@ var app = (function () {
 				div6 = element("div");
 				create_component(datatable.$$.fragment);
 				attr_dev(div0, "class", "pg-play");
-				add_location(div0, file, 421, 10, 11303);
+				add_location(div0, file, 417, 10, 11275);
 				attr_dev(div1, "class", "pg-loss");
 				set_style(div1, "font-size", "20px");
-				add_location(div1, file, 436, 10, 11786);
+				add_location(div1, file, 432, 10, 11758);
 				attr_dev(div2, "class", "pg-top");
-				add_location(div2, file, 420, 8, 11272);
+				add_location(div2, file, 416, 8, 11244);
 				attr_dev(div3, "class", "pg-circles-container");
-				add_location(div3, file, 458, 10, 12630);
+				add_location(div3, file, 454, 10, 12602);
 				attr_dev(div4, "id", /*plotContainerEnv2d*/ ctx[39]);
 				attr_dev(div4, "class", "pg-2dplot");
-				add_location(div4, file, 457, 8, 12570);
+				add_location(div4, file, 453, 8, 12542);
 				attr_dev(div5, "id", /*plotContainerEnv3d*/ ctx[40]);
 				attr_dev(div5, "class", "pg-3dplot");
-				add_location(div5, file, 497, 8, 13985);
+				add_location(div5, file, 493, 8, 13957);
 				attr_dev(div6, "class", "pg-gauss-table");
-				add_location(div6, file, 499, 8, 14058);
+				add_location(div6, file, 495, 8, 14030);
 				attr_dev(div7, "class", "pg-container");
-				add_location(div7, file, 419, 6, 11237);
+				add_location(div7, file, 415, 6, 11209);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, div7, anchor);
@@ -59635,7 +59656,7 @@ var app = (function () {
 				const fab0_changes = {};
 				if (dirty[0] & /*isRunning*/ 131072) fab0_changes.disabled = /*isRunning*/ ctx[17];
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					fab0_changes.$$scope = { dirty, ctx };
 				}
 
@@ -59643,7 +59664,7 @@ var app = (function () {
 				const fab1_changes = {};
 				if (dirty[0] & /*isRunning*/ 131072) fab1_changes.disabled = /*isRunning*/ ctx[17];
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					fab1_changes.$$scope = { dirty, ctx };
 				}
 
@@ -59651,7 +59672,7 @@ var app = (function () {
 				const fab2_changes = {};
 				if (dirty[0] & /*isRunning, $gaussians*/ 134348800) fab2_changes.disabled = /*isRunning*/ ctx[17] || /*$gaussians*/ ctx[27].length === 1;
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					fab2_changes.$$scope = { dirty, ctx };
 				}
 
@@ -59660,7 +59681,7 @@ var app = (function () {
 				const fab3_changes = {};
 				if (dirty[0] & /*isRunning, $gaussians*/ 134348800) fab3_changes.disabled = /*isRunning*/ ctx[17] || /*$gaussians*/ ctx[27].length === 4;
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					fab3_changes.$$scope = { dirty, ctx };
 				}
 
@@ -59691,7 +59712,7 @@ var app = (function () {
 
 				const datatable_changes = {};
 
-				if (dirty[0] & /*$gaussians*/ 134217728 | dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[0] & /*$gaussians*/ 134217728 | dirty[3] & /*$$scope*/ 512) {
 					datatable_changes.$$scope = { dirty, ctx };
 				}
 
@@ -59732,14 +59753,14 @@ var app = (function () {
 			block,
 			id: create_if_block.name,
 			type: "if",
-			source: "(416:4) {#if view === 'Environment'}",
+			source: "(412:4) {#if view === 'Environment'}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (559:13) <Icon class="material-icons" style="font-size: 22px">
+	// (555:13) <Icon class="material-icons" style="font-size: 22px">
 	function create_default_slot_73(ctx) {
 		let t;
 
@@ -59761,14 +59782,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_73.name,
 			type: "slot",
-			source: "(559:13) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 22px\\\">",
+			source: "(555:13) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 22px\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (555:12) <Fab               on:click={resetSliders}               mini               disabled="{isRunning}"             >
+	// (551:12) <Fab               on:click={resetSliders}               mini               disabled="{isRunning}"             >
 	function create_default_slot_72(ctx) {
 		let icon;
 		let current;
@@ -59794,7 +59815,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const icon_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					icon_changes.$$scope = { dirty, ctx };
 				}
 
@@ -59818,15 +59839,15 @@ var app = (function () {
 			block,
 			id: create_default_slot_72.name,
 			type: "slot",
-			source: "(555:12) <Fab               on:click={resetSliders}               mini               disabled=\\\"{isRunning}\\\"             >",
+			source: "(551:12) <Fab               on:click={resetSliders}               mini               disabled=\\\"{isRunning}\\\"             >",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (566:14) {:else}
-	function create_else_block(ctx) {
+	// (562:14) {:else}
+	function create_else_block_1(ctx) {
 		let icon;
 		let current;
 
@@ -59864,17 +59885,17 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_else_block.name,
+			id: create_else_block_1.name,
 			type: "else",
-			source: "(566:14) {:else}",
+			source: "(562:14) {:else}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (564:14) {#if isRunning}
-	function create_if_block_6(ctx) {
+	// (560:14) {#if isRunning}
+	function create_if_block_7(ctx) {
 		let icon;
 		let current;
 
@@ -59912,16 +59933,16 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_if_block_6.name,
+			id: create_if_block_7.name,
 			type: "if",
-			source: "(564:14) {#if isRunning}",
+			source: "(560:14) {#if isRunning}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (567:16) <Icon class="material-icons" style="font-size: 50px">
+	// (563:16) <Icon class="material-icons" style="font-size: 50px">
 	function create_default_slot_71(ctx) {
 		let t;
 
@@ -59943,14 +59964,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_71.name,
 			type: "slot",
-			source: "(567:16) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 50px\\\">",
+			source: "(563:16) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 50px\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (565:16) <Icon class="material-icons" style="font-size: 50px">
+	// (561:16) <Icon class="material-icons" style="font-size: 50px">
 	function create_default_slot_70(ctx) {
 		let t;
 
@@ -59972,20 +59993,20 @@ var app = (function () {
 			block,
 			id: create_default_slot_70.name,
 			type: "slot",
-			source: "(565:16) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 50px\\\">",
+			source: "(561:16) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 50px\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (561:12) <Fab               on:click={isRunning ? stopTraining : startTraining}             >
+	// (557:12) <Fab               on:click={isRunning ? stopTraining : startTraining}             >
 	function create_default_slot_69(ctx) {
 		let current_block_type_index;
 		let if_block;
 		let if_block_anchor;
 		let current;
-		const if_block_creators = [create_if_block_6, create_else_block];
+		const if_block_creators = [create_if_block_7, create_else_block_1];
 		const if_blocks = [];
 
 		function select_block_type_1(ctx, dirty) {
@@ -60051,16 +60072,16 @@ var app = (function () {
 			block,
 			id: create_default_slot_69.name,
 			type: "slot",
-			source: "(561:12) <Fab               on:click={isRunning ? stopTraining : startTraining}             >",
+			source: "(557:12) <Fab               on:click={isRunning ? stopTraining : startTraining}             >",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (576:18) <Option value={select}>
+	// (572:18) <Option value={select}>
 	function create_default_slot_68(ctx) {
-		let t_value = /*select*/ ctx[98] + "";
+		let t_value = /*select*/ ctx[97] + "";
 		let t;
 
 		const block = {
@@ -60082,21 +60103,21 @@ var app = (function () {
 			block,
 			id: create_default_slot_68.name,
 			type: "slot",
-			source: "(576:18) <Option value={select}>",
+			source: "(572:18) <Option value={select}>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (575:16) {#each losses_select as select}
+	// (571:16) {#each losses_select as select}
 	function create_each_block_3(ctx) {
 		let option;
 		let current;
 
 		option = new Option({
 				props: {
-					value: /*select*/ ctx[98],
+					value: /*select*/ ctx[97],
 					$$slots: { default: [create_default_slot_68] },
 					$$scope: { ctx }
 				},
@@ -60114,7 +60135,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const option_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					option_changes.$$scope = { dirty, ctx };
 				}
 
@@ -60138,14 +60159,14 @@ var app = (function () {
 			block,
 			id: create_each_block_3.name,
 			type: "each",
-			source: "(575:16) {#each losses_select as select}",
+			source: "(571:16) {#each losses_select as select}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (574:14) <Select bind:value="{loss_choice}" label="Loss" disabled="{isRunning}">
+	// (570:14) <Select bind:value="{loss_choice}" label="Loss" disabled="{isRunning}">
 	function create_default_slot_67(ctx) {
 		let each_1_anchor;
 		let current;
@@ -60237,16 +60258,16 @@ var app = (function () {
 			block,
 			id: create_default_slot_67.name,
 			type: "slot",
-			source: "(574:14) <Select bind:value=\\\"{loss_choice}\\\" label=\\\"Loss\\\" disabled=\\\"{isRunning}\\\">",
+			source: "(570:14) <Select bind:value=\\\"{loss_choice}\\\" label=\\\"Loss\\\" disabled=\\\"{isRunning}\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (588:20) <Option value={select}>
+	// (584:20) <Option value={select}>
 	function create_default_slot_66(ctx) {
-		let t_value = /*select*/ ctx[98] + "";
+		let t_value = /*select*/ ctx[97] + "";
 		let t;
 
 		const block = {
@@ -60268,21 +60289,21 @@ var app = (function () {
 			block,
 			id: create_default_slot_66.name,
 			type: "slot",
-			source: "(588:20) <Option value={select}>",
+			source: "(584:20) <Option value={select}>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (587:18) {#each n_iterations_select as select}
+	// (583:18) {#each n_iterations_select as select}
 	function create_each_block_2(ctx) {
 		let option;
 		let current;
 
 		option = new Option({
 				props: {
-					value: /*select*/ ctx[98],
+					value: /*select*/ ctx[97],
 					$$slots: { default: [create_default_slot_66] },
 					$$scope: { ctx }
 				},
@@ -60300,7 +60321,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const option_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					option_changes.$$scope = { dirty, ctx };
 				}
 
@@ -60324,14 +60345,14 @@ var app = (function () {
 			block,
 			id: create_each_block_2.name,
 			type: "each",
-			source: "(587:18) {#each n_iterations_select as select}",
+			source: "(583:18) {#each n_iterations_select as select}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (582:16) <Select                   bind:value="{n_iterations_str}"                   label="Iterations"                   disabled="{isRunning}"                 >
+	// (578:16) <Select                   bind:value="{n_iterations_str}"                   label="Iterations"                   disabled="{isRunning}"                 >
 	function create_default_slot_65(ctx) {
 		let each_1_anchor;
 		let current;
@@ -60423,16 +60444,16 @@ var app = (function () {
 			block,
 			id: create_default_slot_65.name,
 			type: "slot",
-			source: "(582:16) <Select                   bind:value=\\\"{n_iterations_str}\\\"                   label=\\\"Iterations\\\"                   disabled=\\\"{isRunning}\\\"                 >",
+			source: "(578:16) <Select                   bind:value=\\\"{n_iterations_str}\\\"                   label=\\\"Iterations\\\"                   disabled=\\\"{isRunning}\\\"                 >",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (600:16) <Label>
+	// (596:16) <Label>
 	function create_default_slot_64(ctx) {
-		let t_value = /*tab*/ ctx[97] + "";
+		let t_value = /*tab*/ ctx[96] + "";
 		let t;
 
 		const block = {
@@ -60443,7 +60464,7 @@ var app = (function () {
 				insert_dev(target, t, anchor);
 			},
 			p: function update(ctx, dirty) {
-				if (dirty[3] & /*tab*/ 16 && t_value !== (t_value = /*tab*/ ctx[97] + "")) set_data_dev(t, t_value);
+				if (dirty[3] & /*tab*/ 8 && t_value !== (t_value = /*tab*/ ctx[96] + "")) set_data_dev(t, t_value);
 			},
 			d: function destroy(detaching) {
 				if (detaching) {
@@ -60456,14 +60477,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_64.name,
 			type: "slot",
-			source: "(600:16) <Label>",
+			source: "(596:16) <Label>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (599:14) <Tab {tab}>
+	// (595:14) <Tab {tab}>
 	function create_default_slot_63(ctx) {
 		let label;
 		let current;
@@ -60487,7 +60508,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const label_changes = {};
 
-				if (dirty[3] & /*$$scope, tab*/ 1040) {
+				if (dirty[3] & /*$$scope, tab*/ 520) {
 					label_changes.$$scope = { dirty, ctx };
 				}
 
@@ -60511,21 +60532,21 @@ var app = (function () {
 			block,
 			id: create_default_slot_63.name,
 			type: "slot",
-			source: "(599:14) <Tab {tab}>",
+			source: "(595:14) <Tab {tab}>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (598:12) <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active={active_tab}>
+	// (594:12) <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active={active_tab}>
 	function create_default_slot_62(ctx) {
 		let tab;
 		let current;
 
 		tab = new Tab({
 				props: {
-					tab: /*tab*/ ctx[97],
+					tab: /*tab*/ ctx[96],
 					$$slots: { default: [create_default_slot_63] },
 					$$scope: { ctx }
 				},
@@ -60542,9 +60563,9 @@ var app = (function () {
 			},
 			p: function update(ctx, dirty) {
 				const tab_changes = {};
-				if (dirty[3] & /*tab*/ 16) tab_changes.tab = /*tab*/ ctx[97];
+				if (dirty[3] & /*tab*/ 8) tab_changes.tab = /*tab*/ ctx[96];
 
-				if (dirty[3] & /*$$scope, tab*/ 1040) {
+				if (dirty[3] & /*$$scope, tab*/ 520) {
 					tab_changes.$$scope = { dirty, ctx };
 				}
 
@@ -60568,15 +60589,15 @@ var app = (function () {
 			block,
 			id: create_default_slot_62.name,
 			type: "slot",
-			source: "(598:12) <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active={active_tab}>",
+			source: "(594:12) <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active={active_tab}>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (648:48) 
-	function create_if_block_5(ctx) {
+	// (644:48) 
+	function create_if_block_6(ctx) {
 		let paper;
 		let current;
 
@@ -60600,7 +60621,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const paper_changes = {};
 
-				if (dirty[0] & /*isRunning, seed_value, hidden_dim_value, hidden_layer_value, off_policy_value*/ 159872 | dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[0] & /*isRunning, seed_value, hidden_dim_value, hidden_layer_value, off_policy_value*/ 159872 | dirty[3] & /*$$scope*/ 512) {
 					paper_changes.$$scope = { dirty, ctx };
 				}
 
@@ -60622,17 +60643,17 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_if_block_5.name,
+			id: create_if_block_6.name,
 			type: "if",
-			source: "(648:48) ",
+			source: "(644:48) ",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (604:12) {#if active_tab === 'Basic'}
-	function create_if_block_4(ctx) {
+	// (600:12) {#if active_tab === 'Basic'}
+	function create_if_block_5(ctx) {
 		let paper;
 		let current;
 
@@ -60656,7 +60677,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const paper_changes = {};
 
-				if (dirty[0] & /*isRunning, lr_logz_value, lr_model_value, trajectory_length_value, batch_size_exponent, batch_size_value*/ 8523265 | dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[0] & /*isRunning, lr_logz_value, lr_model_value, trajectory_length_value, batch_size_exponent, batch_size_value*/ 8523265 | dirty[3] & /*$$scope*/ 512) {
 					paper_changes.$$scope = { dirty, ctx };
 				}
 
@@ -60678,16 +60699,16 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_if_block_4.name,
+			id: create_if_block_5.name,
 			type: "if",
-			source: "(604:12) {#if active_tab === 'Basic'}",
+			source: "(600:12) {#if active_tab === 'Basic'}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (650:16) <Content>
+	// (646:16) <Content>
 	function create_default_slot_61(ctx) {
 		let t0;
 		let t1;
@@ -60817,9 +60838,9 @@ var app = (function () {
 				t13 = text$2(/*seed_value*/ ctx[14]);
 				t14 = space();
 				create_component(slider3.$$.fragment);
-				add_location(br0, file, 659, 18, 19984);
-				add_location(br1, file, 669, 18, 20371);
-				add_location(br2, file, 679, 18, 20765);
+				add_location(br0, file, 655, 18, 19986);
+				add_location(br1, file, 665, 18, 20373);
+				add_location(br2, file, 675, 18, 20767);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, t0, anchor);
@@ -60940,14 +60961,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_61.name,
 			type: "slot",
-			source: "(650:16) <Content>",
+			source: "(646:16) <Content>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (649:14) <Paper variant="unelevated">
+	// (645:14) <Paper variant="unelevated">
 	function create_default_slot_60(ctx) {
 		let content;
 		let current;
@@ -60971,7 +60992,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const content_changes = {};
 
-				if (dirty[0] & /*isRunning, seed_value, hidden_dim_value, hidden_layer_value, off_policy_value*/ 159872 | dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[0] & /*isRunning, seed_value, hidden_dim_value, hidden_layer_value, off_policy_value*/ 159872 | dirty[3] & /*$$scope*/ 512) {
 					content_changes.$$scope = { dirty, ctx };
 				}
 
@@ -60995,14 +61016,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_60.name,
 			type: "slot",
-			source: "(649:14) <Paper variant=\\\"unelevated\\\">",
+			source: "(645:14) <Paper variant=\\\"unelevated\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (606:16) <Content>
+	// (602:16) <Content>
 	function create_default_slot_59(ctx) {
 		let t0;
 		let t1;
@@ -61138,10 +61159,10 @@ var app = (function () {
 				t14 = text$2(t14_value);
 				t15 = space();
 				create_component(slider3.$$.fragment);
-				add_location(br0, file, 615, 18, 18271);
-				add_location(br1, file, 625, 18, 18664);
-				add_location(br2, file, 635, 18, 19072);
-				add_location(br3, file, 636, 35, 19112);
+				add_location(br0, file, 611, 18, 18273);
+				add_location(br1, file, 621, 18, 18666);
+				add_location(br2, file, 631, 18, 19074);
+				add_location(br3, file, 632, 35, 19114);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, t0, anchor);
@@ -61266,14 +61287,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_59.name,
 			type: "slot",
-			source: "(606:16) <Content>",
+			source: "(602:16) <Content>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (605:14) <Paper variant="unelevated">
+	// (601:14) <Paper variant="unelevated">
 	function create_default_slot_58(ctx) {
 		let content;
 		let current;
@@ -61297,7 +61318,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const content_changes = {};
 
-				if (dirty[0] & /*isRunning, lr_logz_value, lr_model_value, trajectory_length_value, batch_size_exponent, batch_size_value*/ 8523265 | dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[0] & /*isRunning, lr_logz_value, lr_model_value, trajectory_length_value, batch_size_exponent, batch_size_value*/ 8523265 | dirty[3] & /*$$scope*/ 512) {
 					content_changes.$$scope = { dirty, ctx };
 				}
 
@@ -61321,14 +61342,81 @@ var app = (function () {
 			block,
 			id: create_default_slot_58.name,
 			type: "slot",
-			source: "(605:14) <Paper variant=\\\"unelevated\\\">",
+			source: "(601:14) <Paper variant=\\\"unelevated\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (707:26) 
+	// (695:8) {:else}
+	function create_else_block(ctx) {
+		let div;
+
+		const block = {
+			c: function create() {
+				div = element("div");
+				div.innerHTML = ``;
+				attr_dev(div, "class", "pg-vis");
+				attr_dev(div, "id", "trainplot");
+				add_location(div, file, 695, 10, 21400);
+			},
+			m: function mount(target, anchor) {
+				insert_dev(target, div, anchor);
+			},
+			d: function destroy(detaching) {
+				if (detaching) {
+					detach_dev(div);
+				}
+			}
+		};
+
+		dispatch_dev("SvelteRegisterBlock", {
+			block,
+			id: create_else_block.name,
+			type: "else",
+			source: "(695:8) {:else}",
+			ctx
+		});
+
+		return block;
+	}
+
+	// (691:8) {#if !display_trainhistory && !isRunning}
+	function create_if_block_4(ctx) {
+		let div;
+
+		const block = {
+			c: function create() {
+				div = element("div");
+				div.textContent = "Press Play to start training a GFlowNet";
+				attr_dev(div, "class", "pg-vis");
+				set_style(div, "text-align", "center");
+				set_style(div, "padding", "100px");
+				add_location(div, file, 691, 10, 21243);
+			},
+			m: function mount(target, anchor) {
+				insert_dev(target, div, anchor);
+			},
+			d: function destroy(detaching) {
+				if (detaching) {
+					detach_dev(div);
+				}
+			}
+		};
+
+		dispatch_dev("SvelteRegisterBlock", {
+			block,
+			id: create_if_block_4.name,
+			type: "if",
+			source: "(691:8) {#if !display_trainhistory && !isRunning}",
+			ctx
+		});
+
+		return block;
+	}
+
+	// (709:26) 
 	function create_if_block_3(ctx) {
 		let div;
 		let linearprogress;
@@ -61346,7 +61434,7 @@ var app = (function () {
 				div = element("div");
 				create_component(linearprogress.$$.fragment);
 				attr_dev(div, "class", "pg-progress");
-				add_location(div, file, 707, 8, 21569);
+				add_location(div, file, 709, 8, 21796);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, div, anchor);
@@ -61380,14 +61468,14 @@ var app = (function () {
 			block,
 			id: create_if_block_3.name,
 			type: "if",
-			source: "(707:26) ",
+			source: "(709:26) ",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (699:10) {#if !isRunning & display_trainhistory}
+	// (701:10) {#if !isRunning & display_trainhistory}
 	function create_if_block_2(ctx) {
 		let slider;
 		let updating_value;
@@ -61449,14 +61537,14 @@ var app = (function () {
 			block,
 			id: create_if_block_2.name,
 			type: "if",
-			source: "(699:10) {#if !isRunning & display_trainhistory}",
+			source: "(701:10) {#if !isRunning & display_trainhistory}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (427:13) <Icon class="material-icons" style="font-size: 22px">
+	// (423:13) <Icon class="material-icons" style="font-size: 22px">
 	function create_default_slot_57(ctx) {
 		let t;
 
@@ -61478,14 +61566,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_57.name,
 			type: "slot",
-			source: "(427:13) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 22px\\\">",
+			source: "(423:13) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 22px\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (423:12) <Fab               on:click={resetGaussians}               mini               disabled="{isRunning}"             >
+	// (419:12) <Fab               on:click={resetGaussians}               mini               disabled="{isRunning}"             >
 	function create_default_slot_56(ctx) {
 		let icon;
 		let current;
@@ -61511,7 +61599,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const icon_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					icon_changes.$$scope = { dirty, ctx };
 				}
 
@@ -61535,14 +61623,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_56.name,
 			type: "slot",
-			source: "(423:12) <Fab               on:click={resetGaussians}               mini               disabled=\\\"{isRunning}\\\"             >",
+			source: "(419:12) <Fab               on:click={resetGaussians}               mini               disabled=\\\"{isRunning}\\\"             >",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (433:16) <Icon class="material-icons" style="font-size: 50px">
+	// (429:16) <Icon class="material-icons" style="font-size: 50px">
 	function create_default_slot_55(ctx) {
 		let t;
 
@@ -61564,14 +61652,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_55.name,
 			type: "slot",
-			source: "(433:16) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 50px\\\">",
+			source: "(429:16) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 50px\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (429:12) <Fab               on:click={() => view="Training"}               disabled="{isRunning}"             >
+	// (425:12) <Fab               on:click={() => view="Training"}               disabled="{isRunning}"             >
 	function create_default_slot_54(ctx) {
 		let icon;
 		let current;
@@ -61597,7 +61685,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const icon_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					icon_changes.$$scope = { dirty, ctx };
 				}
 
@@ -61621,14 +61709,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_54.name,
 			type: "slot",
-			source: "(429:12) <Fab               on:click={() => view=\\\"Training\\\"}               disabled=\\\"{isRunning}\\\"             >",
+			source: "(425:12) <Fab               on:click={() => view=\\\"Training\\\"}               disabled=\\\"{isRunning}\\\"             >",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (446:14) <Icon class="material-icons" style="font-size: 32px;display: flex; justify-content: center; align-items: center;">
+	// (442:14) <Icon class="material-icons" style="font-size: 32px;display: flex; justify-content: center; align-items: center;">
 	function create_default_slot_53(ctx) {
 		let t;
 
@@ -61650,14 +61738,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_53.name,
 			type: "slot",
-			source: "(446:14) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 32px;display: flex; justify-content: center; align-items: center;\\\">",
+			source: "(442:14) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 32px;display: flex; justify-content: center; align-items: center;\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (439:12) <Fab               on:click={removeGaussian}               on:mouseover={() => highlightGaussian($gaussians.length - 1)}               on:mouseout={clearHighlight}               disabled="{isRunning|| $gaussians.length === 1}"               mini             >
+	// (435:12) <Fab               on:click={removeGaussian}               on:mouseover={() => highlightGaussian($gaussians.length - 1)}               on:mouseout={clearHighlight}               disabled="{isRunning|| $gaussians.length === 1}"               mini             >
 	function create_default_slot_52(ctx) {
 		let icon;
 		let current;
@@ -61683,7 +61771,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const icon_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					icon_changes.$$scope = { dirty, ctx };
 				}
 
@@ -61707,14 +61795,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_52.name,
 			type: "slot",
-			source: "(439:12) <Fab               on:click={removeGaussian}               on:mouseover={() => highlightGaussian($gaussians.length - 1)}               on:mouseout={clearHighlight}               disabled=\\\"{isRunning|| $gaussians.length === 1}\\\"               mini             >",
+			source: "(435:12) <Fab               on:click={removeGaussian}               on:mouseover={() => highlightGaussian($gaussians.length - 1)}               on:mouseout={clearHighlight}               disabled=\\\"{isRunning|| $gaussians.length === 1}\\\"               mini             >",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (453:14) <Icon class="material-icons">
+	// (449:14) <Icon class="material-icons">
 	function create_default_slot_51(ctx) {
 		let t;
 
@@ -61736,14 +61824,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_51.name,
 			type: "slot",
-			source: "(453:14) <Icon class=\\\"material-icons\\\">",
+			source: "(449:14) <Icon class=\\\"material-icons\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (448:12) <Fab               on:click={addGaussian}               disabled="{isRunning|| $gaussians.length === 4}"               mini             >
+	// (444:12) <Fab               on:click={addGaussian}               disabled="{isRunning|| $gaussians.length === 4}"               mini             >
 	function create_default_slot_50(ctx) {
 		let icon;
 		let current;
@@ -61768,7 +61856,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const icon_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					icon_changes.$$scope = { dirty, ctx };
 				}
 
@@ -61792,14 +61880,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_50.name,
 			type: "slot",
-			source: "(448:12) <Fab               on:click={addGaussian}               disabled=\\\"{isRunning|| $gaussians.length === 4}\\\"               mini             >",
+			source: "(444:12) <Fab               on:click={addGaussian}               disabled=\\\"{isRunning|| $gaussians.length === 4}\\\"               mini             >",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (460:12) {#each $gaussians as g, i}
+	// (456:12) {#each $gaussians as g, i}
 	function create_each_block_1(ctx) {
 		let div0;
 		let div0_aria_valuenow_value;
@@ -61810,11 +61898,11 @@ var app = (function () {
 		let dispose;
 
 		function mousedown_handler(...args) {
-			return /*mousedown_handler*/ ctx[48](/*g*/ ctx[95], ...args);
+			return /*mousedown_handler*/ ctx[48](/*g*/ ctx[94], ...args);
 		}
 
 		function mousedown_handler_1(...args) {
-			return /*mousedown_handler_1*/ ctx[49](/*g*/ ctx[95], ...args);
+			return /*mousedown_handler_1*/ ctx[49](/*g*/ ctx[94], ...args);
 		}
 
 		const block = {
@@ -61823,27 +61911,27 @@ var app = (function () {
 				t = space();
 				div1 = element("div");
 				attr_dev(div0, "class", "variance-circle");
-				set_style(div0, "width", 129 * /*g*/ ctx[95].variance + "px");
-				set_style(div0, "height", 129 * /*g*/ ctx[95].variance + "px");
-				set_style(div0, "left", 132 + 132 / 3 * /*g*/ ctx[95].mean.x + "px");
-				set_style(div0, "top", 132 - 132 / 3 * /*g*/ ctx[95].mean.y + "px");
+				set_style(div0, "width", 129 * /*g*/ ctx[94].variance + "px");
+				set_style(div0, "height", 129 * /*g*/ ctx[94].variance + "px");
+				set_style(div0, "left", 132 + 132 / 3 * /*g*/ ctx[94].mean.x + "px");
+				set_style(div0, "top", 132 - 132 / 3 * /*g*/ ctx[94].mean.y + "px");
 				attr_dev(div0, "role", "slider");
-				attr_dev(div0, "aria-valuenow", div0_aria_valuenow_value = /*g*/ ctx[95].variance);
+				attr_dev(div0, "aria-valuenow", div0_aria_valuenow_value = /*g*/ ctx[94].variance);
 				attr_dev(div0, "aria-valuemin", "0.1");
 				attr_dev(div0, "aria-valuemax", "1");
 				attr_dev(div0, "tabindex", "0");
-				toggle_class(div0, "highlight", /*i*/ ctx[92] === /*hoveredGaussian*/ ctx[18] || /*isRunning*/ ctx[17]);
-				add_location(div0, file, 461, 14, 12757);
+				toggle_class(div0, "highlight", /*i*/ ctx[91] === /*hoveredGaussian*/ ctx[18] || /*isRunning*/ ctx[17]);
+				add_location(div0, file, 457, 14, 12729);
 				attr_dev(div1, "class", "mean-circle");
-				set_style(div1, "left", 132 + 132 / 3 * /*g*/ ctx[95].mean.x + "px");
-				set_style(div1, "top", 132 - 132 / 3 * /*g*/ ctx[95].mean.y + "px");
+				set_style(div1, "left", 132 + 132 / 3 * /*g*/ ctx[94].mean.x + "px");
+				set_style(div1, "top", 132 - 132 / 3 * /*g*/ ctx[94].mean.y + "px");
 				attr_dev(div1, "role", "slider");
-				attr_dev(div1, "aria-valuenow", div1_aria_valuenow_value = "" + (/*g*/ ctx[95].mean.x + ", " + /*g*/ ctx[95].mean.y));
+				attr_dev(div1, "aria-valuenow", div1_aria_valuenow_value = "" + (/*g*/ ctx[94].mean.x + ", " + /*g*/ ctx[94].mean.y));
 				attr_dev(div1, "aria-valuemin", "-3");
 				attr_dev(div1, "aria-valuemax", "3");
 				attr_dev(div1, "tabindex", "0");
-				toggle_class(div1, "highlight", /*i*/ ctx[92] === /*hoveredGaussian*/ ctx[18]);
-				add_location(div1, file, 479, 14, 13419);
+				toggle_class(div1, "highlight", /*i*/ ctx[91] === /*hoveredGaussian*/ ctx[18]);
+				add_location(div1, file, 475, 14, 13391);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, div0, anchor);
@@ -61863,43 +61951,43 @@ var app = (function () {
 				ctx = new_ctx;
 
 				if (dirty[0] & /*$gaussians*/ 134217728) {
-					set_style(div0, "width", 129 * /*g*/ ctx[95].variance + "px");
+					set_style(div0, "width", 129 * /*g*/ ctx[94].variance + "px");
 				}
 
 				if (dirty[0] & /*$gaussians*/ 134217728) {
-					set_style(div0, "height", 129 * /*g*/ ctx[95].variance + "px");
+					set_style(div0, "height", 129 * /*g*/ ctx[94].variance + "px");
 				}
 
 				if (dirty[0] & /*$gaussians*/ 134217728) {
-					set_style(div0, "left", 132 + 132 / 3 * /*g*/ ctx[95].mean.x + "px");
+					set_style(div0, "left", 132 + 132 / 3 * /*g*/ ctx[94].mean.x + "px");
 				}
 
 				if (dirty[0] & /*$gaussians*/ 134217728) {
-					set_style(div0, "top", 132 - 132 / 3 * /*g*/ ctx[95].mean.y + "px");
+					set_style(div0, "top", 132 - 132 / 3 * /*g*/ ctx[94].mean.y + "px");
 				}
 
-				if (dirty[0] & /*$gaussians*/ 134217728 && div0_aria_valuenow_value !== (div0_aria_valuenow_value = /*g*/ ctx[95].variance)) {
+				if (dirty[0] & /*$gaussians*/ 134217728 && div0_aria_valuenow_value !== (div0_aria_valuenow_value = /*g*/ ctx[94].variance)) {
 					attr_dev(div0, "aria-valuenow", div0_aria_valuenow_value);
 				}
 
 				if (dirty[0] & /*hoveredGaussian, isRunning*/ 393216) {
-					toggle_class(div0, "highlight", /*i*/ ctx[92] === /*hoveredGaussian*/ ctx[18] || /*isRunning*/ ctx[17]);
+					toggle_class(div0, "highlight", /*i*/ ctx[91] === /*hoveredGaussian*/ ctx[18] || /*isRunning*/ ctx[17]);
 				}
 
 				if (dirty[0] & /*$gaussians*/ 134217728) {
-					set_style(div1, "left", 132 + 132 / 3 * /*g*/ ctx[95].mean.x + "px");
+					set_style(div1, "left", 132 + 132 / 3 * /*g*/ ctx[94].mean.x + "px");
 				}
 
 				if (dirty[0] & /*$gaussians*/ 134217728) {
-					set_style(div1, "top", 132 - 132 / 3 * /*g*/ ctx[95].mean.y + "px");
+					set_style(div1, "top", 132 - 132 / 3 * /*g*/ ctx[94].mean.y + "px");
 				}
 
-				if (dirty[0] & /*$gaussians*/ 134217728 && div1_aria_valuenow_value !== (div1_aria_valuenow_value = "" + (/*g*/ ctx[95].mean.x + ", " + /*g*/ ctx[95].mean.y))) {
+				if (dirty[0] & /*$gaussians*/ 134217728 && div1_aria_valuenow_value !== (div1_aria_valuenow_value = "" + (/*g*/ ctx[94].mean.x + ", " + /*g*/ ctx[94].mean.y))) {
 					attr_dev(div1, "aria-valuenow", div1_aria_valuenow_value);
 				}
 
 				if (dirty[0] & /*hoveredGaussian*/ 262144) {
-					toggle_class(div1, "highlight", /*i*/ ctx[92] === /*hoveredGaussian*/ ctx[18]);
+					toggle_class(div1, "highlight", /*i*/ ctx[91] === /*hoveredGaussian*/ ctx[18]);
 				}
 			},
 			d: function destroy(detaching) {
@@ -61918,14 +62006,14 @@ var app = (function () {
 			block,
 			id: create_each_block_1.name,
 			type: "each",
-			source: "(460:12) {#each $gaussians as g, i}",
+			source: "(456:12) {#each $gaussians as g, i}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (504:22) <Katex>
+	// (500:22) <Katex>
 	function create_default_slot_49(ctx) {
 		let t;
 
@@ -61947,14 +62035,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_49.name,
 			type: "slot",
-			source: "(504:22) <Katex>",
+			source: "(500:22) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (504:16) <Cell>
+	// (500:16) <Cell>
 	function create_default_slot_48(ctx) {
 		let katex;
 		let current;
@@ -61978,7 +62066,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const katex_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex_changes.$$scope = { dirty, ctx };
 				}
 
@@ -62002,14 +62090,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_48.name,
 			type: "slot",
-			source: "(504:16) <Cell>",
+			source: "(500:16) <Cell>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (505:22) <Katex>
+	// (501:22) <Katex>
 	function create_default_slot_47(ctx) {
 		let t;
 
@@ -62031,14 +62119,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_47.name,
 			type: "slot",
-			source: "(505:22) <Katex>",
+			source: "(501:22) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (505:16) <Cell>
+	// (501:16) <Cell>
 	function create_default_slot_46(ctx) {
 		let katex;
 		let current;
@@ -62062,7 +62150,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const katex_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex_changes.$$scope = { dirty, ctx };
 				}
 
@@ -62086,14 +62174,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_46.name,
 			type: "slot",
-			source: "(505:16) <Cell>",
+			source: "(501:16) <Cell>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (506:22) <Katex>
+	// (502:22) <Katex>
 	function create_default_slot_45(ctx) {
 		let t;
 
@@ -62115,14 +62203,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_45.name,
 			type: "slot",
-			source: "(506:22) <Katex>",
+			source: "(502:22) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (506:16) <Cell>
+	// (502:16) <Cell>
 	function create_default_slot_44(ctx) {
 		let katex;
 		let current;
@@ -62146,7 +62234,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const katex_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex_changes.$$scope = { dirty, ctx };
 				}
 
@@ -62170,14 +62258,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_44.name,
 			type: "slot",
-			source: "(506:16) <Cell>",
+			source: "(502:16) <Cell>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (503:14) <Row>
+	// (499:14) <Row>
 	function create_default_slot_43(ctx) {
 		let cell0;
 		let t0;
@@ -62229,21 +62317,21 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const cell0_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					cell0_changes.$$scope = { dirty, ctx };
 				}
 
 				cell0.$set(cell0_changes);
 				const cell1_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					cell1_changes.$$scope = { dirty, ctx };
 				}
 
 				cell1.$set(cell1_changes);
 				const cell2_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					cell2_changes.$$scope = { dirty, ctx };
 				}
 
@@ -62278,14 +62366,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_43.name,
 			type: "slot",
-			source: "(503:14) <Row>",
+			source: "(499:14) <Row>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (502:12) <Head>
+	// (498:12) <Head>
 	function create_default_slot_42(ctx) {
 		let row;
 		let current;
@@ -62309,7 +62397,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const row_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					row_changes.$$scope = { dirty, ctx };
 				}
 
@@ -62333,25 +62421,25 @@ var app = (function () {
 			block,
 			id: create_default_slot_42.name,
 			type: "slot",
-			source: "(502:12) <Head>",
+			source: "(498:12) <Head>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (512:18) <Cell>
+	// (508:18) <Cell>
 	function create_default_slot_41(ctx) {
 		let textfield;
 		let updating_value;
 		let current;
 
 		function textfield_value_binding(value) {
-			/*textfield_value_binding*/ ctx[50](value, /*i*/ ctx[92]);
+			/*textfield_value_binding*/ ctx[50](value, /*i*/ ctx[91]);
 		}
 
 		function input_handler(...args) {
-			return /*input_handler*/ ctx[51](/*i*/ ctx[92], ...args);
+			return /*input_handler*/ ctx[51](/*i*/ ctx[91], ...args);
 		}
 
 		let textfield_props = {
@@ -62361,8 +62449,8 @@ var app = (function () {
 			helperLine$style: "width: 100%;"
 		};
 
-		if (/*$gaussians*/ ctx[27][/*i*/ ctx[92]]["mean"]["x"] !== void 0) {
-			textfield_props.value = /*$gaussians*/ ctx[27][/*i*/ ctx[92]]["mean"]["x"];
+		if (/*$gaussians*/ ctx[27][/*i*/ ctx[91]]["mean"]["x"] !== void 0) {
+			textfield_props.value = /*$gaussians*/ ctx[27][/*i*/ ctx[91]]["mean"]["x"];
 		}
 
 		textfield = new Textfield({ props: textfield_props, $$inline: true });
@@ -62383,7 +62471,7 @@ var app = (function () {
 
 				if (!updating_value && dirty[0] & /*$gaussians*/ 134217728) {
 					updating_value = true;
-					textfield_changes.value = /*$gaussians*/ ctx[27][/*i*/ ctx[92]]["mean"]["x"];
+					textfield_changes.value = /*$gaussians*/ ctx[27][/*i*/ ctx[91]]["mean"]["x"];
 					add_flush_callback(() => updating_value = false);
 				}
 
@@ -62407,25 +62495,25 @@ var app = (function () {
 			block,
 			id: create_default_slot_41.name,
 			type: "slot",
-			source: "(512:18) <Cell>",
+			source: "(508:18) <Cell>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (522:18) <Cell>
+	// (518:18) <Cell>
 	function create_default_slot_40(ctx) {
 		let textfield;
 		let updating_value;
 		let current;
 
 		function textfield_value_binding_1(value) {
-			/*textfield_value_binding_1*/ ctx[52](value, /*i*/ ctx[92]);
+			/*textfield_value_binding_1*/ ctx[52](value, /*i*/ ctx[91]);
 		}
 
 		function input_handler_1(...args) {
-			return /*input_handler_1*/ ctx[53](/*i*/ ctx[92], ...args);
+			return /*input_handler_1*/ ctx[53](/*i*/ ctx[91], ...args);
 		}
 
 		let textfield_props = {
@@ -62435,8 +62523,8 @@ var app = (function () {
 			helperLine$style: "width: 100%;"
 		};
 
-		if (/*$gaussians*/ ctx[27][/*i*/ ctx[92]]["mean"]["y"] !== void 0) {
-			textfield_props.value = /*$gaussians*/ ctx[27][/*i*/ ctx[92]]["mean"]["y"];
+		if (/*$gaussians*/ ctx[27][/*i*/ ctx[91]]["mean"]["y"] !== void 0) {
+			textfield_props.value = /*$gaussians*/ ctx[27][/*i*/ ctx[91]]["mean"]["y"];
 		}
 
 		textfield = new Textfield({ props: textfield_props, $$inline: true });
@@ -62457,7 +62545,7 @@ var app = (function () {
 
 				if (!updating_value && dirty[0] & /*$gaussians*/ 134217728) {
 					updating_value = true;
-					textfield_changes.value = /*$gaussians*/ ctx[27][/*i*/ ctx[92]]["mean"]["y"];
+					textfield_changes.value = /*$gaussians*/ ctx[27][/*i*/ ctx[91]]["mean"]["y"];
 					add_flush_callback(() => updating_value = false);
 				}
 
@@ -62481,25 +62569,25 @@ var app = (function () {
 			block,
 			id: create_default_slot_40.name,
 			type: "slot",
-			source: "(522:18) <Cell>",
+			source: "(518:18) <Cell>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (531:18) <Cell>
+	// (527:18) <Cell>
 	function create_default_slot_39(ctx) {
 		let textfield;
 		let updating_value;
 		let current;
 
 		function textfield_value_binding_2(value) {
-			/*textfield_value_binding_2*/ ctx[54](value, /*i*/ ctx[92]);
+			/*textfield_value_binding_2*/ ctx[54](value, /*i*/ ctx[91]);
 		}
 
 		function input_handler_2(...args) {
-			return /*input_handler_2*/ ctx[55](/*i*/ ctx[92], ...args);
+			return /*input_handler_2*/ ctx[55](/*i*/ ctx[91], ...args);
 		}
 
 		let textfield_props = {
@@ -62509,8 +62597,8 @@ var app = (function () {
 			helperLine$style: "width: 100%;"
 		};
 
-		if (/*$gaussians*/ ctx[27][/*i*/ ctx[92]]["variance"] !== void 0) {
-			textfield_props.value = /*$gaussians*/ ctx[27][/*i*/ ctx[92]]["variance"];
+		if (/*$gaussians*/ ctx[27][/*i*/ ctx[91]]["variance"] !== void 0) {
+			textfield_props.value = /*$gaussians*/ ctx[27][/*i*/ ctx[91]]["variance"];
 		}
 
 		textfield = new Textfield({ props: textfield_props, $$inline: true });
@@ -62531,7 +62619,7 @@ var app = (function () {
 
 				if (!updating_value && dirty[0] & /*$gaussians*/ 134217728) {
 					updating_value = true;
-					textfield_changes.value = /*$gaussians*/ ctx[27][/*i*/ ctx[92]]["variance"];
+					textfield_changes.value = /*$gaussians*/ ctx[27][/*i*/ ctx[91]]["variance"];
 					add_flush_callback(() => updating_value = false);
 				}
 
@@ -62555,14 +62643,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_39.name,
 			type: "slot",
-			source: "(531:18) <Cell>",
+			source: "(527:18) <Cell>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (511:16) <Row>
+	// (507:16) <Row>
 	function create_default_slot_38(ctx) {
 		let cell0;
 		let t0;
@@ -62617,21 +62705,21 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const cell0_changes = {};
 
-				if (dirty[0] & /*$gaussians*/ 134217728 | dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[0] & /*$gaussians*/ 134217728 | dirty[3] & /*$$scope*/ 512) {
 					cell0_changes.$$scope = { dirty, ctx };
 				}
 
 				cell0.$set(cell0_changes);
 				const cell1_changes = {};
 
-				if (dirty[0] & /*$gaussians*/ 134217728 | dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[0] & /*$gaussians*/ 134217728 | dirty[3] & /*$$scope*/ 512) {
 					cell1_changes.$$scope = { dirty, ctx };
 				}
 
 				cell1.$set(cell1_changes);
 				const cell2_changes = {};
 
-				if (dirty[0] & /*$gaussians*/ 134217728 | dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[0] & /*$gaussians*/ 134217728 | dirty[3] & /*$$scope*/ 512) {
 					cell2_changes.$$scope = { dirty, ctx };
 				}
 
@@ -62667,14 +62755,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_38.name,
 			type: "slot",
-			source: "(511:16) <Row>",
+			source: "(507:16) <Row>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (510:14) {#each [...Array($gaussians.length).keys()] as i}
+	// (506:14) {#each [...Array($gaussians.length).keys()] as i}
 	function create_each_block(ctx) {
 		let row;
 		let current;
@@ -62698,7 +62786,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const row_changes = {};
 
-				if (dirty[0] & /*$gaussians*/ 134217728 | dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[0] & /*$gaussians*/ 134217728 | dirty[3] & /*$$scope*/ 512) {
 					row_changes.$$scope = { dirty, ctx };
 				}
 
@@ -62722,14 +62810,14 @@ var app = (function () {
 			block,
 			id: create_each_block.name,
 			type: "each",
-			source: "(510:14) {#each [...Array($gaussians.length).keys()] as i}",
+			source: "(506:14) {#each [...Array($gaussians.length).keys()] as i}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (509:12) <Body>
+	// (505:12) <Body>
 	function create_default_slot_37(ctx) {
 		let each_1_anchor;
 		let current;
@@ -62821,14 +62909,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_37.name,
 			type: "slot",
-			source: "(509:12) <Body>",
+			source: "(505:12) <Body>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (501:10) <DataTable table$aria-label="People list" style="width: 100%;">
+	// (497:10) <DataTable table$aria-label="Parameters of Gaussians" style="width: 100%;border-radius: 1px">
 	function create_default_slot_36(ctx) {
 		let head;
 		let t;
@@ -62866,14 +62954,14 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const head_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					head_changes.$$scope = { dirty, ctx };
 				}
 
 				head.$set(head_changes);
 				const body_changes = {};
 
-				if (dirty[0] & /*$gaussians*/ 134217728 | dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[0] & /*$gaussians*/ 134217728 | dirty[3] & /*$$scope*/ 512) {
 					body_changes.$$scope = { dirty, ctx };
 				}
 
@@ -62904,14 +62992,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_36.name,
 			type: "slot",
-			source: "(501:10) <DataTable table$aria-label=\\\"People list\\\" style=\\\"width: 100%;\\\">",
+			source: "(497:10) <DataTable table$aria-label=\\\"Parameters of Gaussians\\\" style=\\\"width: 100%;border-radius: 1px\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (727:8) <Icon class="material-icons">
+	// (731:8) <Icon class="material-icons">
 	function create_default_slot_35(ctx) {
 		let t;
 
@@ -62933,14 +63021,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_35.name,
 			type: "slot",
-			source: "(727:8) <Icon class=\\\"material-icons\\\">",
+			source: "(731:8) <Icon class=\\\"material-icons\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (723:6) <Fab         on:click={scrollToTutorial}         disabled="{isRunning}"       >
+	// (727:6) <Fab         on:click={scrollToTutorial}         disabled="{isRunning}"       >
 	function create_default_slot_34(ctx) {
 		let icon;
 		let current;
@@ -62965,7 +63053,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const icon_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					icon_changes.$$scope = { dirty, ctx };
 				}
 
@@ -62989,14 +63077,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_34.name,
 			type: "slot",
-			source: "(723:6) <Fab         on:click={scrollToTutorial}         disabled=\\\"{isRunning}\\\"       >",
+			source: "(727:6) <Fab         on:click={scrollToTutorial}         disabled=\\\"{isRunning}\\\"       >",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (744:51) <Katex>
+	// (748:51) <Katex>
 	function create_default_slot_33(ctx) {
 		let t;
 
@@ -63018,14 +63106,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_33.name,
 			type: "slot",
-			source: "(744:51) <Katex>",
+			source: "(748:51) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (744:209) <Katex>
+	// (748:209) <Katex>
 	function create_default_slot_32(ctx) {
 		let t;
 
@@ -63047,14 +63135,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_32.name,
 			type: "slot",
-			source: "(744:209) <Katex>",
+			source: "(748:209) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (744:262) <Katex>
+	// (748:262) <Katex>
 	function create_default_slot_31(ctx) {
 		let t;
 
@@ -63076,14 +63164,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_31.name,
 			type: "slot",
-			source: "(744:262) <Katex>",
+			source: "(748:262) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (752:12) <Header>
+	// (756:12) <Header>
 	function create_default_slot_30(ctx) {
 		let t;
 
@@ -63105,14 +63193,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_30.name,
 			type: "slot",
-			source: "(752:12) <Header>",
+			source: "(756:12) <Header>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (760:95) <Katex>
+	// (764:95) <Katex>
 	function create_default_slot_29(ctx) {
 		let t0;
 		let t1_value = "final" + "";
@@ -63140,14 +63228,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_29.name,
 			type: "slot",
-			source: "(760:95) <Katex>",
+			source: "(764:95) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (753:12) <Content>
+	// (757:12) <Content>
 	function create_default_slot_28(ctx) {
 		let t0;
 		let br0;
@@ -63207,16 +63295,16 @@ var app = (function () {
 				t10 = space();
 				br9 = element("br");
 				t11 = text$2("Building Lego Pyramids is maybe not usecase number one for GFlowNets, but they are used for is drug discovery (Nica et al., 2022), where sampling from multiple modes is really what you want in order to discover not only the most promising molecule.");
-				add_location(br0, file, 754, 14, 23423);
-				add_location(br1, file, 755, 14, 23595);
-				add_location(br2, file, 756, 14, 23614);
-				add_location(br3, file, 757, 14, 23940);
-				add_location(br4, file, 758, 14, 23959);
-				add_location(br5, file, 759, 14, 24126);
-				add_location(br6, file, 760, 14, 24406);
-				add_location(br7, file, 761, 14, 24425);
-				add_location(br8, file, 762, 14, 25215);
-				add_location(br9, file, 763, 14, 25234);
+				add_location(br0, file, 758, 14, 23777);
+				add_location(br1, file, 759, 14, 23949);
+				add_location(br2, file, 760, 14, 23968);
+				add_location(br3, file, 761, 14, 24294);
+				add_location(br4, file, 762, 14, 24313);
+				add_location(br5, file, 763, 14, 24480);
+				add_location(br6, file, 764, 14, 24760);
+				add_location(br7, file, 765, 14, 24779);
+				add_location(br8, file, 766, 14, 25569);
+				add_location(br9, file, 767, 14, 25588);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, t0, anchor);
@@ -63247,7 +63335,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const katex_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex_changes.$$scope = { dirty, ctx };
 				}
 
@@ -63296,14 +63384,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_28.name,
 			type: "slot",
-			source: "(753:12) <Content>",
+			source: "(757:12) <Content>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (751:10) <Panel color="secondary">
+	// (755:10) <Panel color="secondary">
 	function create_default_slot_27(ctx) {
 		let header;
 		let t;
@@ -63341,14 +63429,14 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const header_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					header_changes.$$scope = { dirty, ctx };
 				}
 
 				header.$set(header_changes);
 				const content_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					content_changes.$$scope = { dirty, ctx };
 				}
 
@@ -63379,14 +63467,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_27.name,
 			type: "slot",
-			source: "(751:10) <Panel color=\\\"secondary\\\">",
+			source: "(755:10) <Panel color=\\\"secondary\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (750:8) <Accordion multiple>
+	// (754:8) <Accordion multiple>
 	function create_default_slot_26(ctx) {
 		let panel;
 		let current;
@@ -63411,7 +63499,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const panel_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					panel_changes.$$scope = { dirty, ctx };
 				}
 
@@ -63435,14 +63523,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_26.name,
 			type: "slot",
-			source: "(750:8) <Accordion multiple>",
+			source: "(754:8) <Accordion multiple>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (774:6) <Katex>
+	// (778:6) <Katex>
 	function create_default_slot_25(ctx) {
 		let t0;
 		let t1_value = "{t+1}" + "";
@@ -63474,14 +63562,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_25.name,
 			type: "slot",
-			source: "(774:6) <Katex>",
+			source: "(778:6) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (805:6) <Katex displayMode>
+	// (809:6) <Katex displayMode>
 	function create_default_slot_24(ctx) {
 		let t0;
 		let t1_value = "{s'}" + "";
@@ -63522,14 +63610,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_24.name,
 			type: "slot",
-			source: "(805:6) <Katex displayMode>",
+			source: "(809:6) <Katex displayMode>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (812:6) <Katex displayMode>
+	// (816:6) <Katex displayMode>
 	function create_default_slot_23(ctx) {
 		let t0;
 		let t1_value = "{F(s,s')}{F(s)}" + "";
@@ -63557,14 +63645,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_23.name,
 			type: "slot",
-			source: "(812:6) <Katex displayMode>",
+			source: "(816:6) <Katex displayMode>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (820:6) <Katex displayMode>
+	// (824:6) <Katex displayMode>
 	function create_default_slot_22(ctx) {
 		let t0;
 		let t1_value = "{L}" + "";
@@ -63619,14 +63707,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_22.name,
 			type: "slot",
-			source: "(820:6) <Katex displayMode>",
+			source: "(824:6) <Katex displayMode>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (855:6) <Katex displayMode>
+	// (859:6) <Katex displayMode>
 	function create_default_slot_21(ctx) {
 		let t0;
 		let t1_value = "{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t;\\theta)}" + "";
@@ -63663,14 +63751,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_21.name,
 			type: "slot",
-			source: "(855:6) <Katex displayMode>",
+			source: "(859:6) <Katex displayMode>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (861:15) <Katex>
+	// (865:15) <Katex>
 	function create_default_slot_20(ctx) {
 		let t;
 
@@ -63692,14 +63780,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_20.name,
 			type: "slot",
-			source: "(861:15) <Katex>",
+			source: "(865:15) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (861:101) <Katex>
+	// (865:101) <Katex>
 	function create_default_slot_19(ctx) {
 		let t;
 
@@ -63721,14 +63809,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_19.name,
 			type: "slot",
-			source: "(861:101) <Katex>",
+			source: "(865:101) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (867:10) <Header>
+	// (871:10) <Header>
 	function create_default_slot_18(ctx) {
 		let t;
 
@@ -63750,14 +63838,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_18.name,
 			type: "slot",
-			source: "(867:10) <Header>",
+			source: "(871:10) <Header>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (872:16) <Katex>
+	// (876:16) <Katex>
 	function create_default_slot_17(ctx) {
 		let t0;
 		let t1_value = "t+1" + "";
@@ -63789,14 +63877,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_17.name,
 			type: "slot",
-			source: "(872:16) <Katex>",
+			source: "(876:16) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (876:16) <Katex>
+	// (880:16) <Katex>
 	function create_default_slot_16(ctx) {
 		let t0;
 		let t1_value = "t+1" + "";
@@ -63828,14 +63916,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_16.name,
 			type: "slot",
-			source: "(876:16) <Katex>",
+			source: "(880:16) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (881:16) <Katex>
+	// (885:16) <Katex>
 	function create_default_slot_15(ctx) {
 		let t0;
 		let t1_value = "\\theta" + "";
@@ -63863,14 +63951,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_15.name,
 			type: "slot",
-			source: "(881:16) <Katex>",
+			source: "(885:16) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (889:16) <Katex>
+	// (893:16) <Katex>
 	function create_default_slot_14(ctx) {
 		let t;
 
@@ -63892,14 +63980,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_14.name,
 			type: "slot",
-			source: "(889:16) <Katex>",
+			source: "(893:16) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (868:10) <Content>
+	// (872:10) <Content>
 	function create_default_slot_13(ctx) {
 		let t0;
 		let ul;
@@ -63971,11 +64059,11 @@ var app = (function () {
 				li3 = element("li");
 				create_component(katex3.$$.fragment);
 				t7 = text$2("\n                The reward for the final object x of the trajectory. Note that if we propagate the reward backward using our backward policy, only a small part of it goes through one trajectory, as there are usually many ways to sample x using different trajectories.");
-				add_location(li0, file, 870, 14, 32086);
-				add_location(li1, file, 874, 14, 32307);
-				add_location(li2, file, 879, 14, 32681);
-				add_location(li3, file, 887, 14, 33393);
-				add_location(ul, file, 869, 12, 32067);
+				add_location(li0, file, 874, 14, 32440);
+				add_location(li1, file, 878, 14, 32661);
+				add_location(li2, file, 883, 14, 33035);
+				add_location(li3, file, 891, 14, 33747);
+				add_location(ul, file, 873, 12, 32421);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, t0, anchor);
@@ -64000,28 +64088,28 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const katex0_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex0_changes.$$scope = { dirty, ctx };
 				}
 
 				katex0.$set(katex0_changes);
 				const katex1_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex1_changes.$$scope = { dirty, ctx };
 				}
 
 				katex1.$set(katex1_changes);
 				const katex2_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex2_changes.$$scope = { dirty, ctx };
 				}
 
 				katex2.$set(katex2_changes);
 				const katex3_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex3_changes.$$scope = { dirty, ctx };
 				}
 
@@ -64059,14 +64147,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_13.name,
 			type: "slot",
-			source: "(868:10) <Content>",
+			source: "(872:10) <Content>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (866:8) <Panel color="secondary">
+	// (870:8) <Panel color="secondary">
 	function create_default_slot_12(ctx) {
 		let header;
 		let t;
@@ -64104,14 +64192,14 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const header_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					header_changes.$$scope = { dirty, ctx };
 				}
 
 				header.$set(header_changes);
 				const content_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					content_changes.$$scope = { dirty, ctx };
 				}
 
@@ -64142,14 +64230,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_12.name,
 			type: "slot",
-			source: "(866:8) <Panel color=\\\"secondary\\\">",
+			source: "(870:8) <Panel color=\\\"secondary\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (896:10) <Header>
+	// (900:10) <Header>
 	function create_default_slot_11(ctx) {
 		let t;
 
@@ -64171,14 +64259,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_11.name,
 			type: "slot",
-			source: "(896:10) <Header>",
+			source: "(900:10) <Header>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (897:10) <Content style="white-space: pre;">
+	// (901:10) <Content style="white-space: pre;">
 	function create_default_slot_10(ctx) {
 		let t0;
 		let br0;
@@ -64225,16 +64313,16 @@ var app = (function () {
 				t9 = text$2("  9.      Calculate the TB-Loss: (logZ + log probabilities PF - log probabilities PB - log reward)^2\n              ");
 				br9 = element("br");
 				t10 = text$2("  10.    Update the parameters PF, PB, logZ");
-				add_location(br0, file, 898, 14, 34000);
-				add_location(br1, file, 899, 14, 34068);
-				add_location(br2, file, 900, 14, 34147);
-				add_location(br3, file, 901, 14, 34205);
-				add_location(br4, file, 902, 14, 34279);
-				add_location(br5, file, 903, 14, 34343);
-				add_location(br6, file, 904, 14, 34405);
-				add_location(br7, file, 905, 14, 34494);
-				add_location(br8, file, 906, 14, 34617);
-				add_location(br9, file, 907, 14, 34736);
+				add_location(br0, file, 902, 14, 34354);
+				add_location(br1, file, 903, 14, 34422);
+				add_location(br2, file, 904, 14, 34501);
+				add_location(br3, file, 905, 14, 34559);
+				add_location(br4, file, 906, 14, 34633);
+				add_location(br5, file, 907, 14, 34697);
+				add_location(br6, file, 908, 14, 34759);
+				add_location(br7, file, 909, 14, 34848);
+				add_location(br8, file, 910, 14, 34971);
+				add_location(br9, file, 911, 14, 35090);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, t0, anchor);
@@ -64291,14 +64379,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_10.name,
 			type: "slot",
-			source: "(897:10) <Content style=\\\"white-space: pre;\\\">",
+			source: "(901:10) <Content style=\\\"white-space: pre;\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (895:8) <Panel color="secondary">
+	// (899:8) <Panel color="secondary">
 	function create_default_slot_9(ctx) {
 		let header;
 		let t;
@@ -64337,14 +64425,14 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const header_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					header_changes.$$scope = { dirty, ctx };
 				}
 
 				header.$set(header_changes);
 				const content_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					content_changes.$$scope = { dirty, ctx };
 				}
 
@@ -64375,14 +64463,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_9.name,
 			type: "slot",
-			source: "(895:8) <Panel color=\\\"secondary\\\">",
+			source: "(899:8) <Panel color=\\\"secondary\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (865:6) <Accordion multiple>
+	// (869:6) <Accordion multiple>
 	function create_default_slot_8(ctx) {
 		let panel0;
 		let t;
@@ -64422,14 +64510,14 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const panel0_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					panel0_changes.$$scope = { dirty, ctx };
 				}
 
 				panel0.$set(panel0_changes);
 				const panel1_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					panel1_changes.$$scope = { dirty, ctx };
 				}
 
@@ -64460,14 +64548,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_8.name,
 			type: "slot",
-			source: "(865:6) <Accordion multiple>",
+			source: "(869:6) <Accordion multiple>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (959:66) <Katex>
+	// (963:66) <Katex>
 	function create_default_slot_7(ctx) {
 		let t;
 
@@ -64489,14 +64577,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_7.name,
 			type: "slot",
-			source: "(959:66) <Katex>",
+			source: "(963:66) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (959:112) <Katex>
+	// (963:112) <Katex>
 	function create_default_slot_6(ctx) {
 		let t0;
 		let t1_value = "new" + "";
@@ -64528,14 +64616,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_6.name,
 			type: "slot",
-			source: "(959:112) <Katex>",
+			source: "(963:112) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (959:286) <Katex>
+	// (963:286) <Katex>
 	function create_default_slot_5(ctx) {
 		let t;
 
@@ -64557,14 +64645,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_5.name,
 			type: "slot",
-			source: "(959:286) <Katex>",
+			source: "(963:286) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (959:361) <Katex>
+	// (963:361) <Katex>
 	function create_default_slot_4(ctx) {
 		let t;
 
@@ -64586,14 +64674,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_4.name,
 			type: "slot",
-			source: "(959:361) <Katex>",
+			source: "(963:361) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (965:10) <Header>
+	// (969:10) <Header>
 	function create_default_slot_3(ctx) {
 		let t;
 
@@ -64615,14 +64703,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_3.name,
 			type: "slot",
-			source: "(965:10) <Header>",
+			source: "(969:10) <Header>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (966:10) <Content>
+	// (970:10) <Content>
 	function create_default_slot_2(ctx) {
 		let t0;
 		let br0;
@@ -64666,15 +64754,15 @@ var app = (function () {
 				t11 = space();
 				li4 = element("li");
 				li4.textContent = "We do not use the scheduled values with the backward policy and during inference.";
-				add_location(br0, file, 967, 12, 38030);
-				add_location(br1, file, 968, 12, 38179);
-				add_location(br2, file, 969, 12, 38196);
-				add_location(li0, file, 971, 14, 38250);
-				add_location(li1, file, 974, 14, 38412);
-				add_location(li2, file, 977, 14, 38525);
-				add_location(li3, file, 980, 14, 38729);
-				add_location(li4, file, 983, 14, 38933);
-				add_location(ul, file, 970, 12, 38231);
+				add_location(br0, file, 971, 12, 38384);
+				add_location(br1, file, 972, 12, 38533);
+				add_location(br2, file, 973, 12, 38550);
+				add_location(li0, file, 975, 14, 38604);
+				add_location(li1, file, 978, 14, 38766);
+				add_location(li2, file, 981, 14, 38879);
+				add_location(li3, file, 984, 14, 39083);
+				add_location(li4, file, 987, 14, 39287);
+				add_location(ul, file, 974, 12, 38585);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, t0, anchor);
@@ -64714,14 +64802,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_2.name,
 			type: "slot",
-			source: "(966:10) <Content>",
+			source: "(970:10) <Content>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (964:8) <Panel color="secondary">
+	// (968:8) <Panel color="secondary">
 	function create_default_slot_1(ctx) {
 		let header;
 		let t;
@@ -64759,14 +64847,14 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const header_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					header_changes.$$scope = { dirty, ctx };
 				}
 
 				header.$set(header_changes);
 				const content_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					content_changes.$$scope = { dirty, ctx };
 				}
 
@@ -64797,14 +64885,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_1.name,
 			type: "slot",
-			source: "(964:8) <Panel color=\\\"secondary\\\">",
+			source: "(968:8) <Panel color=\\\"secondary\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (963:6) <Accordion multiple>
+	// (967:6) <Accordion multiple>
 	function create_default_slot(ctx) {
 		let panel;
 		let current;
@@ -64829,7 +64917,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const panel_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					panel_changes.$$scope = { dirty, ctx };
 				}
 
@@ -64853,7 +64941,7 @@ var app = (function () {
 			block,
 			id: create_default_slot.name,
 			type: "slot",
-			source: "(963:6) <Accordion multiple>",
+			source: "(967:6) <Accordion multiple>",
 			ctx
 		});
 
@@ -65105,8 +65193,8 @@ var app = (function () {
 			$$slots: {
 				default: [
 					create_default_slot_74,
-					({ tab }) => ({ 97: tab }),
-					({ tab }) => [0, 0, 0, tab ? 16 : 0]
+					({ tab }) => ({ 96: tab }),
+					({ tab }) => [0, 0, 0, tab ? 8 : 0]
 				]
 			},
 			$$scope: { ctx }
@@ -65118,7 +65206,7 @@ var app = (function () {
 
 		tabbar = new TabBar({ props: tabbar_props, $$inline: true });
 		binding_callbacks.push(() => bind(tabbar, 'active', tabbar_active_binding));
-		const if_block_creators = [create_if_block, create_if_block_1, create_if_block_7];
+		const if_block_creators = [create_if_block, create_if_block_1, create_if_block_8];
 		const if_blocks = [];
 
 		function select_block_type(ctx, dirty) {
@@ -65596,180 +65684,180 @@ var app = (function () {
 				attr_dev(link0, "href", "https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css");
 				attr_dev(link0, "integrity", "sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ");
 				attr_dev(link0, "crossorigin", "anonymous");
-				add_location(link0, file, 381, 0, 10248);
+				add_location(link0, file, 377, 0, 10220);
 				attr_dev(link1, "href", "https://fonts.googleapis.com/css2?family=Material+Icons&display=swap");
 				attr_dev(link1, "rel", "stylesheet");
-				add_location(link1, file, 382, 0, 10448);
+				add_location(link1, file, 378, 0, 10420);
 				attr_dev(h1, "class", "title");
-				add_location(h1, file, 393, 6, 10650);
+				add_location(h1, file, 389, 6, 10622);
 				attr_dev(p0, "class", "subtitle");
-				add_location(p0, file, 394, 6, 10703);
+				add_location(p0, file, 390, 6, 10675);
 				attr_dev(div0, "class", "container");
-				add_location(div0, file, 392, 4, 10620);
+				add_location(div0, file, 388, 4, 10592);
 				attr_dev(header, "class", "header-top");
-				add_location(header, file, 391, 2, 10588);
+				add_location(header, file, 387, 2, 10560);
 				attr_dev(div1, "class", "pg-top-background");
-				add_location(div1, file, 402, 2, 10876);
+				add_location(div1, file, 398, 2, 10848);
 				attr_dev(div2, "class", "pg-views");
-				add_location(div2, file, 405, 2, 10922);
+				add_location(div2, file, 401, 2, 10894);
 				attr_dev(div3, "class", "pg-scrollbutton");
-				add_location(div3, file, 721, 4, 21864);
+				add_location(div3, file, 725, 4, 22218);
 				attr_dev(div4, "class", "pg-background");
-				add_location(div4, file, 401, 2, 10846);
+				add_location(div4, file, 397, 2, 10818);
 				attr_dev(h20, "class", "section-title");
-				add_location(h20, file, 738, 4, 22150);
-				add_location(br0, file, 743, 6, 22490);
-				add_location(br1, file, 745, 6, 22891);
+				add_location(h20, file, 742, 4, 22504);
+				add_location(br0, file, 747, 6, 22844);
+				add_location(br1, file, 749, 6, 23245);
 				attr_dev(p1, "class", "section-text");
-				add_location(p1, file, 739, 4, 22205);
+				add_location(p1, file, 743, 4, 22559);
 				attr_dev(div5, "class", "image-container");
-				add_location(div5, file, 748, 6, 23100);
-				add_location(br2, file, 776, 6, 25956);
-				add_location(br3, file, 777, 6, 25967);
-				add_location(br4, file, 778, 6, 26042);
-				add_location(br5, file, 779, 6, 26090);
-				add_location(br6, file, 780, 6, 26101);
-				add_location(br7, file, 783, 6, 26440);
-				add_location(br8, file, 784, 6, 26589);
+				add_location(div5, file, 752, 6, 23454);
+				add_location(br2, file, 780, 6, 26310);
+				add_location(br3, file, 781, 6, 26321);
+				add_location(br4, file, 782, 6, 26396);
+				add_location(br5, file, 783, 6, 26444);
+				add_location(br6, file, 784, 6, 26455);
+				add_location(br7, file, 787, 6, 26794);
+				add_location(br8, file, 788, 6, 26943);
 				attr_dev(p2, "class", "section-text");
-				add_location(p2, file, 769, 4, 25568);
+				add_location(p2, file, 773, 4, 25922);
 				if (!src_url_equal(img0.src, img0_src_value = "/images/gflownet_anim.gif")) attr_dev(img0, "src", img0_src_value);
 				attr_dev(img0, "class", "image");
 				attr_dev(img0, "alt", "A visualization of the flow through the DAG");
-				add_location(img0, file, 787, 8, 26653);
+				add_location(img0, file, 791, 8, 27007);
 				attr_dev(div6, "class", "image-container-small");
-				add_location(div6, file, 786, 6, 26609);
+				add_location(div6, file, 790, 6, 26963);
 				attr_dev(span0, "class", "mathexpl svelte-18u8l72");
-				add_location(span0, file, 790, 6, 26803);
-				add_location(br9, file, 792, 6, 26963);
-				add_location(br10, file, 794, 6, 27145);
-				add_location(br11, file, 795, 6, 27167);
+				add_location(span0, file, 794, 6, 27157);
+				add_location(br9, file, 796, 6, 27317);
+				add_location(br10, file, 798, 6, 27499);
+				add_location(br11, file, 799, 6, 27521);
 				attr_dev(span1, "class", "li svelte-18u8l72");
-				add_location(span1, file, 797, 6, 27179);
+				add_location(span1, file, 801, 6, 27533);
 				attr_dev(span2, "class", "li svelte-18u8l72");
-				add_location(span2, file, 798, 6, 27345);
-				add_location(br12, file, 799, 6, 27486);
+				add_location(span2, file, 802, 6, 27699);
+				add_location(br12, file, 803, 6, 27840);
 				attr_dev(span3, "class", "mathexpl svelte-18u8l72");
-				add_location(span3, file, 807, 6, 27791);
+				add_location(span3, file, 811, 6, 28145);
 				attr_dev(span4, "class", "mathexpl svelte-18u8l72");
-				add_location(span4, file, 814, 6, 28122);
-				add_location(br13, file, 817, 6, 28380);
+				add_location(span4, file, 818, 6, 28476);
+				add_location(br13, file, 821, 6, 28734);
 				attr_dev(span5, "class", "mathexpl svelte-18u8l72");
-				add_location(span5, file, 822, 6, 28682);
+				add_location(span5, file, 826, 6, 29036);
 				attr_dev(p3, "class", "section-text");
-				add_location(p3, file, 789, 4, 26772);
+				add_location(p3, file, 793, 4, 27126);
 				attr_dev(h21, "class", "section-title");
-				add_location(h21, file, 831, 4, 29249);
-				add_location(br14, file, 834, 6, 29681);
-				add_location(br15, file, 835, 6, 29692);
-				add_location(br16, file, 836, 6, 30049);
-				add_location(br17, file, 837, 6, 30060);
+				add_location(h21, file, 835, 4, 29603);
+				add_location(br14, file, 838, 6, 30035);
+				add_location(br15, file, 839, 6, 30046);
+				add_location(br16, file, 840, 6, 30403);
+				add_location(br17, file, 841, 6, 30414);
 				attr_dev(p4, "class", "section-text");
-				add_location(p4, file, 832, 4, 29300);
+				add_location(p4, file, 836, 4, 29654);
 				attr_dev(section0, "class", "section");
 				attr_dev(section0, "id", "Tutorial");
-				add_location(section0, file, 737, 2, 22080);
+				add_location(section0, file, 741, 2, 22434);
 				attr_dev(h22, "class", "section-title");
-				add_location(h22, file, 846, 4, 30461);
-				add_location(br18, file, 849, 6, 30575);
-				add_location(br19, file, 852, 6, 30835);
-				add_location(br20, file, 857, 58, 31182);
+				add_location(h22, file, 850, 4, 30815);
+				add_location(br18, file, 853, 6, 30929);
+				add_location(br19, file, 856, 6, 31189);
+				add_location(br20, file, 861, 58, 31536);
 				attr_dev(span6, "class", "mathexpl svelte-18u8l72");
-				add_location(span6, file, 857, 6, 31130);
-				add_location(br21, file, 860, 6, 31534);
-				add_location(br22, file, 861, 6, 31707);
+				add_location(span6, file, 861, 6, 31484);
+				add_location(br21, file, 864, 6, 31888);
+				add_location(br22, file, 865, 6, 32061);
 				attr_dev(p5, "class", "section-text");
-				add_location(p5, file, 847, 4, 30505);
+				add_location(p5, file, 851, 4, 30859);
 				attr_dev(div7, "class", "image-container");
-				add_location(div7, file, 863, 4, 31848);
+				add_location(div7, file, 867, 4, 32202);
 				attr_dev(p6, "class", "section-text");
-				add_location(p6, file, 912, 4, 34856);
+				add_location(p6, file, 916, 4, 35210);
 				if (!src_url_equal(img1.src, img1_src_value = /*run1*/ ctx[26])) attr_dev(img1, "src", img1_src_value);
 				attr_dev(img1, "class", "image");
 				attr_dev(img1, "alt", "GFN samples from the underlying distribution");
-				add_location(img1, file, 919, 6, 35161);
+				add_location(img1, file, 923, 6, 35515);
 				attr_dev(div8, "class", "image-container");
-				add_location(div8, file, 918, 4, 35125);
+				add_location(div8, file, 922, 4, 35479);
 				set_style(div9, "width", "600px");
 				set_style(div9, "margin", "auto");
 				set_style(div9, "text-align", "center");
-				add_location(div9, file, 921, 4, 35260);
+				add_location(div9, file, 925, 4, 35614);
 				attr_dev(p7, "class", "section-text");
-				add_location(p7, file, 932, 4, 35534);
+				add_location(p7, file, 936, 4, 35888);
 				attr_dev(h23, "class", "section-title");
-				add_location(h23, file, 937, 4, 36086);
+				add_location(h23, file, 941, 4, 36440);
 				attr_dev(p8, "class", "section-text");
-				add_location(p8, file, 938, 4, 36135);
+				add_location(p8, file, 942, 4, 36489);
 				if (!src_url_equal(img2.src, img2_src_value = /*run2*/ ctx[25])) attr_dev(img2, "src", img2_src_value);
 				attr_dev(img2, "class", "image");
 				attr_dev(img2, "alt", "The model samples only from one mode of the distribution");
-				add_location(img2, file, 942, 6, 36362);
+				add_location(img2, file, 946, 6, 36716);
 				attr_dev(div10, "class", "image-container");
-				add_location(div10, file, 941, 4, 36326);
+				add_location(div10, file, 945, 4, 36680);
 				set_style(div11, "width", "600px");
 				set_style(div11, "margin", "auto");
 				set_style(div11, "text-align", "center");
-				add_location(div11, file, 944, 4, 36473);
-				add_location(br23, file, 956, 6, 36912);
-				add_location(br24, file, 956, 10, 36916);
+				add_location(div11, file, 948, 4, 36827);
+				add_location(br23, file, 960, 6, 37266);
+				add_location(br24, file, 960, 10, 37270);
 				attr_dev(span7, "class", "li svelte-18u8l72");
-				add_location(span7, file, 958, 6, 36979);
+				add_location(span7, file, 962, 6, 37333);
 				attr_dev(span8, "class", "li svelte-18u8l72");
-				add_location(span8, file, 959, 6, 37424);
+				add_location(span8, file, 963, 6, 37778);
 				attr_dev(p9, "class", "section-text");
-				add_location(p9, file, 954, 4, 36718);
+				add_location(p9, file, 958, 4, 37072);
 				attr_dev(div12, "class", "image-container");
-				add_location(div12, file, 961, 4, 37675);
+				add_location(div12, file, 965, 4, 38029);
 				if (!src_url_equal(img3.src, img3_src_value = /*run3*/ ctx[24])) attr_dev(img3, "src", img3_src_value);
 				attr_dev(img3, "class", "image");
 				attr_dev(img3, "alt", "Training off policy helps to discover modes");
-				add_location(img3, file, 992, 6, 39182);
+				add_location(img3, file, 996, 6, 39536);
 				attr_dev(div13, "class", "image-container");
-				add_location(div13, file, 991, 4, 39146);
+				add_location(div13, file, 995, 4, 39500);
 				set_style(div14, "width", "600px");
 				set_style(div14, "margin", "auto");
 				set_style(div14, "text-align", "center");
-				add_location(div14, file, 994, 4, 39280);
+				add_location(div14, file, 998, 4, 39634);
 				attr_dev(section1, "class", "section section-light");
-				add_location(section1, file, 845, 2, 30417);
+				add_location(section1, file, 849, 2, 30771);
 				attr_dev(h24, "class", "section-title");
-				add_location(h24, file, 1008, 4, 39568);
+				add_location(h24, file, 1012, 4, 39922);
 				attr_dev(p10, "class", "section-text");
-				add_location(p10, file, 1009, 4, 39608);
+				add_location(p10, file, 1013, 4, 39962);
 				attr_dev(section2, "class", "section");
-				add_location(section2, file, 1007, 2, 39538);
+				add_location(section2, file, 1011, 2, 39892);
 				attr_dev(h25, "class", "section-title");
-				add_location(h25, file, 1016, 4, 39741);
+				add_location(h25, file, 1020, 4, 40095);
 				attr_dev(h30, "class", "section-title3");
-				add_location(h30, file, 1017, 4, 39784);
-				add_location(br25, file, 1021, 8, 40073);
-				add_location(br26, file, 1021, 12, 40077);
-				add_location(br27, file, 1025, 8, 40339);
-				add_location(br28, file, 1025, 12, 40343);
-				add_location(br29, file, 1028, 8, 40535);
-				add_location(br30, file, 1028, 12, 40539);
-				add_location(br31, file, 1032, 8, 40799);
-				add_location(br32, file, 1032, 12, 40803);
+				add_location(h30, file, 1021, 4, 40138);
+				add_location(br25, file, 1025, 8, 40427);
+				add_location(br26, file, 1025, 12, 40431);
+				add_location(br27, file, 1029, 8, 40693);
+				add_location(br28, file, 1029, 12, 40697);
+				add_location(br29, file, 1032, 8, 40889);
+				add_location(br30, file, 1032, 12, 40893);
+				add_location(br31, file, 1036, 8, 41153);
+				add_location(br32, file, 1036, 12, 41157);
 				attr_dev(p11, "class", "section-text");
-				add_location(p11, file, 1018, 6, 39833);
+				add_location(p11, file, 1022, 6, 40187);
 				attr_dev(h31, "class", "section-title3");
-				add_location(h31, file, 1035, 4, 41041);
-				add_location(br33, file, 1038, 8, 41212);
-				add_location(br34, file, 1038, 12, 41216);
+				add_location(h31, file, 1039, 4, 41395);
+				add_location(br33, file, 1042, 8, 41566);
+				add_location(br34, file, 1042, 12, 41570);
 				attr_dev(p12, "class", "section-text");
-				add_location(p12, file, 1036, 6, 41089);
+				add_location(p12, file, 1040, 6, 41443);
 				attr_dev(h32, "class", "section-title3");
-				add_location(h32, file, 1041, 4, 41318);
-				add_location(br35, file, 1044, 8, 41464);
-				add_location(br36, file, 1044, 12, 41468);
-				add_location(br37, file, 1046, 8, 41524);
-				add_location(br38, file, 1046, 12, 41528);
+				add_location(h32, file, 1045, 4, 41672);
+				add_location(br35, file, 1048, 8, 41818);
+				add_location(br36, file, 1048, 12, 41822);
+				add_location(br37, file, 1050, 8, 41878);
+				add_location(br38, file, 1050, 12, 41882);
 				attr_dev(p13, "class", "section-text");
-				add_location(p13, file, 1042, 6, 41375);
+				add_location(p13, file, 1046, 6, 41729);
 				attr_dev(section3, "class", "section");
-				add_location(section3, file, 1015, 2, 39711);
+				add_location(section3, file, 1019, 2, 40065);
 				attr_dev(main, "class", "main-content");
-				add_location(main, file, 390, 0, 10558);
+				add_location(main, file, 386, 0, 10530);
 			},
 			l: function claim(nodes) {
 				throw new Error_1("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -66009,7 +66097,7 @@ var app = (function () {
 			p: function update(ctx, dirty) {
 				const tabbar_changes = {};
 
-				if (dirty[0] & /*isRunning*/ 131072 | dirty[3] & /*$$scope, tab*/ 1040) {
+				if (dirty[0] & /*isRunning*/ 131072 | dirty[3] & /*$$scope, tab*/ 520) {
 					tabbar_changes.$$scope = { dirty, ctx };
 				}
 
@@ -66058,91 +66146,91 @@ var app = (function () {
 				const fab_changes = {};
 				if (dirty[0] & /*isRunning*/ 131072) fab_changes.disabled = /*isRunning*/ ctx[17];
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					fab_changes.$$scope = { dirty, ctx };
 				}
 
 				fab.$set(fab_changes);
 				const katex0_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex0_changes.$$scope = { dirty, ctx };
 				}
 
 				katex0.$set(katex0_changes);
 				const katex1_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex1_changes.$$scope = { dirty, ctx };
 				}
 
 				katex1.$set(katex1_changes);
 				const katex2_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex2_changes.$$scope = { dirty, ctx };
 				}
 
 				katex2.$set(katex2_changes);
 				const accordion0_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					accordion0_changes.$$scope = { dirty, ctx };
 				}
 
 				accordion0.$set(accordion0_changes);
 				const katex3_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex3_changes.$$scope = { dirty, ctx };
 				}
 
 				katex3.$set(katex3_changes);
 				const katex4_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex4_changes.$$scope = { dirty, ctx };
 				}
 
 				katex4.$set(katex4_changes);
 				const katex5_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex5_changes.$$scope = { dirty, ctx };
 				}
 
 				katex5.$set(katex5_changes);
 				const katex6_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex6_changes.$$scope = { dirty, ctx };
 				}
 
 				katex6.$set(katex6_changes);
 				const katex7_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex7_changes.$$scope = { dirty, ctx };
 				}
 
 				katex7.$set(katex7_changes);
 				const katex8_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex8_changes.$$scope = { dirty, ctx };
 				}
 
 				katex8.$set(katex8_changes);
 				const katex9_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex9_changes.$$scope = { dirty, ctx };
 				}
 
 				katex9.$set(katex9_changes);
 				const accordion1_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					accordion1_changes.$$scope = { dirty, ctx };
 				}
 
@@ -66177,35 +66265,35 @@ var app = (function () {
 				slider1.$set(slider1_changes);
 				const katex10_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex10_changes.$$scope = { dirty, ctx };
 				}
 
 				katex10.$set(katex10_changes);
 				const katex11_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex11_changes.$$scope = { dirty, ctx };
 				}
 
 				katex11.$set(katex11_changes);
 				const katex12_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex12_changes.$$scope = { dirty, ctx };
 				}
 
 				katex12.$set(katex12_changes);
 				const katex13_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					katex13_changes.$$scope = { dirty, ctx };
 				}
 
 				katex13.$set(katex13_changes);
 				const accordion2_changes = {};
 
-				if (dirty[3] & /*$$scope*/ 1024) {
+				if (dirty[3] & /*$$scope*/ 512) {
 					accordion2_changes.$$scope = { dirty, ctx };
 				}
 
@@ -66693,7 +66781,6 @@ var app = (function () {
 			}
 		}
 
-		let pg_button = false;
 		let tutorialstart;
 		const writable_props = [];
 
@@ -66907,7 +66994,6 @@ var app = (function () {
 			plotEnv,
 			gaussians_textinput,
 			scrollToTutorial,
-			pg_button,
 			tutorialstart,
 			batch_size_value,
 			run3,
@@ -66952,7 +67038,6 @@ var app = (function () {
 			if ('losses_select' in $$props) $$invalidate(42, losses_select = $$props.losses_select);
 			if ('loss_choice' in $$props) $$invalidate(21, loss_choice = $$props.loss_choice);
 			if ('view' in $$props) $$invalidate(6, view = $$props.view);
-			if ('pg_button' in $$props) pg_button = $$props.pg_button;
 			if ('tutorialstart' in $$props) $$invalidate(22, tutorialstart = $$props.tutorialstart);
 			if ('batch_size_value' in $$props) $$invalidate(23, batch_size_value = $$props.batch_size_value);
 			if ('run3' in $$props) $$invalidate(24, run3 = $$props.run3);

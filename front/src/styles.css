@@ -275,7 +275,7 @@ input[type="range"] {
 
 
   .pg-background{
-    height:1035px;
+    height:1000px;
     width:100%;
     background-color: #ffffff;
     position:relative;
@@ -293,7 +293,7 @@ input[type="range"] {
 
   .pg-views {
     width: 1000px;
-    height: 1000px;
+    height: 965px;
     margin: auto;
     z-index: 2;
   }
@@ -405,7 +405,7 @@ input[type="range"] {
 
   .pg-gauss-table {
     width: 264px;
-    height: 500px;
+    height: 450px;
     top: 500px;
     left: 30px;
     position: absolute;

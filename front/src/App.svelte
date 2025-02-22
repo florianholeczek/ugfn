@@ -369,10 +369,6 @@
       tutorialstart.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
-
-
-
-  let pg_button = false;
   let tutorialstart;
 
 
@@ -498,7 +494,7 @@
         <div id={plotContainerEnv3d} class = "pg-3dplot">
         </div>
         <div class= "pg-gauss-table">
-          <DataTable table$aria-label="People list" style="width: 100%;">
+          <DataTable table$aria-label="Parameters of Gaussians" style="width: 100%;border-radius: 1px">
             <Head>
               <Row>
                 <Cell><Katex>\mu_x</Katex></Cell>
@@ -692,8 +688,14 @@
             {/if}
           </div>
         </div>
-        <div class="pg-vis" id="trainplot">
-        </div>
+        {#if !display_trainhistory && !isRunning}
+          <div class="pg-vis" style="text-align:center; padding:100px">
+            Press Play to start training a GFlowNet
+          </div>
+        {:else}
+          <div class="pg-vis" id="trainplot">
+          </div>
+        {/if}
 
         <div class="pg-bottom">
           {#if !isRunning & display_trainhistory}
@@ -715,7 +717,9 @@
     {:else if view === "Flow"}
       <!-- FlowView -->
       <div class="pg-container">
-        Flow
+        <div class="pg-vis" style="text-align:center; padding:100px">
+            Flow. Bald auch in ihrer Visualisierung.
+          </div>
       </div>
     {/if}
   </div>
