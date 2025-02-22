@@ -75,14 +75,34 @@
     { mean: { x: -1, y: -1 }, variance: 0.4 },
     { mean: { x: 1, y: 1 }, variance: 0.4 }
   ]);
+  $: {gaussians.subscribe(values => {
+      const clamped = values.map(g => ({
+        mean: {
+          x: clampAndRound(g.mean.x, -3, 3),
+          y: clampAndRound(g.mean.y, -3, 3)
+        },
+        variance: clampAndRound(g.variance, 0.1, 1)
+      }));
+      // Only update if there is a change to prevent an infinite loop
+      if (JSON.stringify(values) !== JSON.stringify(clamped)) {
+        gaussians.set(clamped);
+        plotEnv();
+      }
+    });
+  }
+
+  function clampAndRound(value, min, max) {
+    let num = parseFloat(value);
+    if (isNaN(num)) return 0;
+    return Math.min(max, Math.max(min, parseFloat(num.toFixed(2))));
+  }
 
   function resetGaussians(){
     gaussians.set([
       { mean: { x: -1, y: -1 }, variance: 0.4 },
       { mean: { x: 1, y: 1 }, variance: 0.4 }
     ]);
-    plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
+    plotEnv();
   }
 
   // ranges for means and variances
@@ -241,8 +261,7 @@
       }
       return gs;
     });
-    plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
+    plotEnv();
   };
 
   const removeGaussian = () => {
@@ -252,8 +271,7 @@
       }
       return gs;
     });
-    plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
+    plotEnv();
   };
 
   const startDragMean = (event, gaussian) => {
@@ -296,8 +314,7 @@
   const stopDrag = () => {
     if(isDraggingMean || isDraggingVariance){
       console.log($gaussians);
-      plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
-      plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
+      plotEnv();
     }
 
     isDraggingMean = false;
@@ -315,8 +332,7 @@
     //visualize the environment
     await loadPlotly();
     plotlyready = true;
-    plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
+    plotEnv();
     // add listeners for changing the Environment
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', stopDrag);
@@ -341,8 +357,7 @@
       setTimeout(() => {
         if (view === "Environment"){
           console.log("Env View")
-          plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
-          plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
+          plotEnv();
         } else if (view ==="Training"){
           console.log("Train View");
           plot_trainingframe(training_frame);
@@ -353,10 +368,25 @@
     }
 
   }
+  function plotEnv(){
+    plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
+    plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
+  }
+  function gaussians_textinput(e,i,param) {
+    let value = parseFloat(e.target.value);
+    if (isNaN(value)) value=0;
+    if (param==="variance"){
+      value = Math.min(1, Math.max(0.1, value));
+      $gaussians[i][param] = value;
+    } else {
+      value = Math.min(3, Math.max(-3, value));
+      $gaussians[i]["mean"][param] = value;
+    }
+    plotEnv();
+  }
 
 
   let pg_button = false;
-  let testvalue = 1;
 
 
 
@@ -380,8 +410,6 @@
   </header>
 
   <div>
-    <Textfield bind:value={testvalue} label="Hallo">
-    </Textfield>
 
 
   <!-- Playground -->
@@ -482,9 +510,24 @@
             <Body>
               {#each [...Array($gaussians.length).keys()] as i}
                 <Row>
-                  <Cell><Textfield bind:value={$gaussians[i]["mean"]["x"]} style="width:90%"helperLine$style="width: 90%;"></Textfield></Cell>
-                  <Cell><Textfield bind:value={$gaussians[i]["mean"]["y"]} style="width:90%"helperLine$style="width: 90%;"></Textfield></Cell>
-                  <Cell><Textfield bind:value={$gaussians[i]["variance"]} style="width:90%"helperLine$style="width: 90%;"></Textfield></Cell>
+                  <Cell>
+                    <Textfield
+                            bind:value={$gaussians[i]["mean"]["x"]}
+                            style="width:90%"helperLine$style="width: 90%;"
+                    ></Textfield>
+                  </Cell>
+                  <Cell>
+                    <Textfield
+                            bind:value={$gaussians[i]["mean"]["y"]}
+                            style="width:90%"helperLine$style="width: 90%;"
+                    ></Textfield>
+                  </Cell>
+                  <Cell>
+                    <Textfield
+                            bind:value={$gaussians[i]["variance"]}
+                            style="width:90%"helperLine$style="width: 90%;"
+                    ></Textfield>
+                  </Cell>
                 </Row>
               {/each}
             </Body>
