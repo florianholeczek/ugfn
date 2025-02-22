@@ -75,6 +75,7 @@ def start_training(request: TrainingRequest, background_tasks: BackgroundTasks):
     training_state["running"] = True
     training_state["stop_requested"] = False
     training_state["current_image"] = None
+    print(params)
 
     # Start the training in the background
     background_tasks.add_task(

@@ -79,7 +79,7 @@
 
 
   //polling every n ms
-  const POLLING_INTERVAL = 50;
+  const POLLING_INTERVAL = 30;
   let isRunning = false;
   let pollingTimer;
 
@@ -175,6 +175,18 @@
           curr_gaussians,
         })
       });
+      console.log(JSON.stringify({
+          off_policy_value,
+          n_iterations_value,
+          lr_model_value,
+          lr_logz_value,
+          trajectory_length_value,
+          hidden_layer_value,
+          hidden_dim_value,
+          seed_value,
+          batch_size_value,
+          curr_gaussians,
+        }))
 
       if (!response.ok) {
         throw new Error('Failed to start training.');
@@ -632,7 +644,7 @@
                   <Slider
                     bind:value="{lr_model_value}"
                     min={0.0001}
-                    max={0.1}
+                    max={0.01}
                     step={0.0001}
                     disabled="{isRunning}"
                     input$aria-label="Set the learning rate of the model"
