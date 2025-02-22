@@ -973,7 +973,7 @@
       />
     </div>
     <p class="section-text">
-      Well thats not what we want! Instead of sampling from the true distribution we only sample from one mode, thats what common RL methods do. We can do better!
+      Well thats not what we want! Instead of sampling from the true distribution we only sample from one mode, thats what common RL methods do. We had another goal!
       <br><br>
       There are two main possibilities to fix this:
       <span class="li">We could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:<Katex>R_{"new"}(x)=R(x)^\beta</Katex>. This would change the "peakyness" of the reward function and we would not sample proportional to the reward function but according to <Katex>\pi(x|\beta) \propto R(x)^\beta</Katex>. It is also possible to use <Katex>\beta</Katex> as a trainable parameter and condition the model on it.</span>
@@ -1022,6 +1022,9 @@
         input$aria-label="Discrete slider"
       />
     </div>
+    <p class="section-text">
+      It took some iterations, but now we match the distribution again.
+    </p>
 
   </section>
 

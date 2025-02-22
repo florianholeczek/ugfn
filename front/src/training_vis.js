@@ -41,16 +41,12 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
     const ls = linspace(-3, 3, gridSize);
 
     let densityEnv = computeDensity({x:ls,y:ls}, gaussians);
-    console.log("start")
-    console.log(densityEnv)
     densityEnv = densityEnv.map(row => row.slice());
     const densityEnvTransposed = densityEnv[0].map((_, colIndex) => densityEnv.map(row => row[colIndex]));
-    console.log(densityEnv)
 
     // Compute marginal densities
     const densityX = densityEnv.reduce((sum, row) => sum.map((v, i) => v + row[i]), Array(gridSize).fill(0));
     const densityY = densityEnvTransposed.reduce((sum, row) => sum.map((v, i) => v + row[i]), Array(gridSize).fill(0));
-    console.log(densityX, densityY)
 
     // Normalize marginals
     const normfact = 6/((gridSize-1)*gaussians.length)
@@ -167,7 +163,7 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
         title: `Iteration ${losses['losses'].length}/${losses['n_iterations']} `,
         showlegend:true,
         legend: {
-            x: 1,
+            x: 0.75,
             y: 1,
             xanchor: 'right',
             yanchor: 'top',
@@ -181,7 +177,7 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
         xaxis2: { domain: [0, 0.75], showticklabels: false, title: 'Marginal of x', side:'top', anchor: 'y2',scaleanchor:'x',  range: [-3, 3]},
         yaxis2: { domain: [0.8, 1], showticklabels: true, range:[0, 0.61] },
         xaxis3: { domain: [0.8, 1], showticklabels: true, range:[0, 0.61] },
-        yaxis3: { domain: [0, 0.75], showticklabels: true, title: 'Marginal of y', side:'right', anchor: 'x3', scaleanchor:'y', range: [-3,3]},
+        yaxis3: { domain: [0, 0.75], showticklabels: false, title: 'Marginal of y', side:'right', anchor: 'x3', scaleanchor:'y', range: [-3,3]},
         xaxis4: { domain: [0.8, 1], showticklabels: true, range:[0, losses['n_iterations']] },
         yaxis4: { domain: [0.8, 1], showticklabels: true, range: [-1, 3]}
     };
