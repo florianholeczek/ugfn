@@ -1,13 +1,13 @@
 export function plot_flow(p, vectors) {
-    const scl = 45;
+    const scl = 50;
     let cols, rows;
     let particles = [];
     let flowfield;
 
     p.setup = () => {
-      p.createCanvas(vectors.cols, vectors.rows);
-      cols = Math.ceil(p.width / scl);
-      rows = Math.ceil(p.height / scl);
+      p.createCanvas(vectors.cols*scl, vectors.rows*scl);
+      cols = Math.ceil(vectors.cols);
+      rows = Math.ceil(vectors.rows);
 
       //generate flowfield from passed vectors
       flowfield = new Array(vectors.cols * vectors.rows);
@@ -40,8 +40,8 @@ export function plot_flow(p, vectors) {
         this.pos = p.createVector(p.random(-p.width / 2, p.width / 2), p.random(-p.height / 2, p.height / 2));
         this.vel = p.createVector(0, 0);
         this.acc = p.createVector(0, 0);
-        this.maxspeed = 3;
-        this.steerStrength = 0.1;
+        this.maxspeed = 1;
+        this.steerStrength = 0.4;
         this.prevPos = this.pos.copy();
         this.size = 4;
       }

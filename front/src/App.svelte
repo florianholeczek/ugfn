@@ -56,6 +56,10 @@
   let p5;
   let flowContainer;
   let flowvis_instance;
+  let panel_algo = false;
+  let panel_loss = false;
+  let panel_example = false;
+  let panel_changes = false;
 
   // ranges for means and variances
   const range = { min: -3, max: 3 };
@@ -142,7 +146,7 @@
   }
 
   async function updateVectorfield() {
-    await get_vectorfield(750)
+    await get_vectorfield(15);
     if (!flowvis_instance){
             flowvis_instance = new p5((p) => plot_flow(p, current_vectorfield), flowContainer);
           }
@@ -963,8 +967,15 @@
             </ul>
           </Content>
         </Panel>
-        <Panel color="secondary">
-          <Header>The algorithm</Header>
+        <Panel color="secondary" bind:open={panel_algo}>
+          <Header>
+            The algorithm
+            <IconButton toggle bind:pressed="{panel_algo}"on:click={panel_algo=!panel_algo} >
+              <Icon class="material-icons"  on>expand_less</Icon>
+              <Icon class="material-icons">expand_more</Icon>
+            </IconButton>
+          </Header>
+
           <Content style="white-space: pre;">
               Input: Reward function (part of the environment), model, hyperparameters
               <br>  1. Initialize model parameters for PF, PB, logZ
@@ -977,6 +988,8 @@
               <br>  8.      Calculate the sum of the log probabilities of all actions of the trajectory for each PF and PB
               <br>  9.      Calculate the TB-Loss: (logZ + log probabilities PF - log probabilities PB - log reward)^2
               <br>  10.    Update the parameters PF, PB, logZ
+              <br><br>
+            You can find the python code for this implementation on my <a href="https://github.com/florianholeczek/ugfn" target="_blank">github</a>.
           </Content>
         </Panel>
       </Accordion>
@@ -1080,9 +1093,14 @@
   </section>
 
   <section class="section">
-    <h2 class="section-title">Flow</h2>
+    <h2 class="section-title">Flow: Is this what it looks like?</h2>
     <p class="section-text">
-      Add vectorfield (done) or program Flow Field?
+      Well, kind of. Imagine our grid would be discrete. If we are in one cell, we would have a certain Flow (a non-negative scalar) to each other cell (technically also to itself given our trick with adding the step to the state).
+      <br>Even in a discrete space, this is hard to visualize, as we would have to compute the flow from each state to every other state.
+      <br>In our continuous space this gets even more complicated, not only in terms of visualization but also mathematically - look into Lahlou et al. (2023) if you are interested.
+      <br>Instead of showing all the flows, the plot shows the <i>highest</i> flow for each state: This is a vector from it to another point on the grid.
+      If we do that for some evenly spaced points we get a vectorfield. The visualization above is just a nicer way to show it by letting particles move through the field.
+      Note that this might be a bit misleading as a lot depends on the parameters of the physics simulation. Change to view the vectorfield for more precision.
     </p>
   </section>
   <section class="section">
@@ -1102,9 +1120,8 @@
       </span>
       <span class="li">The code for the flow field visualization is mostly taken from
         <a href="https://editor.p5js.org/Mathcurious/sketches/bdp6luRil" target="_blank">Mathcurious' implementation</a>
-
-
       </span>
+      If you want to learn more about GFlowNets have a look into the literature and tutorials below.
     </p>
 
   </section>
@@ -1129,6 +1146,8 @@
         Systems, 34, 27381-27394.
         <br><br>
         Nica, A. C., Jain, M., Bengio, E., Liu, C. H., Korablyov, M., Bronstein, M. M., & Bengio, Y. (2022). Evaluating generalization in gflownets for molecule design. In ICLR2022 Machine Learning for Drug Discovery.
+        <br><br>
+        Lahlou, S., Deleu, T., Lemos, P., Zhang, D., Volokhova, A., Hernández-Garcıa, A., ... & Malkin, N. (2023, July). A theory of continuous generative flow networks. In International Conference on Machine Learning (pp. 18269-18300). PMLR.
       </p>
     <h3 class="section-title3">Tutorials</h3>
       <p class="section-text">
