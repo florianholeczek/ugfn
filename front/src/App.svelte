@@ -6,6 +6,7 @@
   import {plotEnvironment} from "./env.js";
   import './styles.css';
   import {plotStates} from "./training_vis.js"
+  import {plot_flow} from "./flow_vis.js";
   import Accordion, {Panel, Header, Content } from '@smui-extra/accordion';
   import Slider from '@smui/slider';
   import Button, { Label } from '@smui/button';
@@ -51,7 +52,10 @@
   $: n_iterations_value = parseInt(n_iterations_str, 10);
   let losses_select = ["Trajectory Balance", "Flow Matching"];
   let view = "Environment";
-  let Plotly; // Load Plotly from CDN
+  let Plotly;
+  let p5;
+  let flowContainer;
+  let flowvis_instance;
 
   // ranges for means and variances
   const range = { min: -3, max: 3 };
@@ -74,6 +78,7 @@
   let training_progress = 0; //for progressbar
   let current_states;
   let current_losses;
+  let current_vectorfield;
   let run1_value = 2048;
   let run2_value = 4096;
   let run3_value = 4096;
@@ -117,12 +122,21 @@
       setTimeout(() => {
         if (view === "Environment"){
           console.log("Env View")
+          stop_flow();
           plotEnv();
         } else if (view ==="Training"){
           console.log("Train View");
+          stop_flow();
           plot_trainingframe(training_frame);
         } else {
           console.log("Flow View")
+          current_vectorfield = get_vectorfield(750)
+
+          if (!flowvis_instance){
+            flowvis_instance = new p5(plot_flow, flowContainer);
+          }
+
+
         }
       }, 5);
     }
@@ -131,6 +145,12 @@
 
 
   // Utility functions
+  function stop_flow() {
+    if (flowvis_instance) {
+      flowvis_instance.remove();
+      flowvis_instance = null;
+    }
+  }
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
   function resetSliders() {
@@ -370,6 +390,28 @@
     plotEnv();
   }
 
+  //get vectorfield from backend
+  async function get_vectorfield(size) {
+    try {
+      // params: width and heigth
+      const response = await fetch('http://localhost:8000/get_vectorfield',{
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ size: size })
+      });
+      console.log("Field params sent:", size)
+
+      if (!response.ok) {
+        throw new Error(`Failed to get Vectorfield HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log(data)
+      return data;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
 
 
 
@@ -378,7 +420,6 @@
     //visualize the environment
     await loadPlotly();
     await loadp5();
-    new p5(sketch, sketchContainer);
     plotlyready = true;
     plotEnv();
     // add listeners for changing the Environment
@@ -390,119 +431,7 @@
     };
   });
 
-  let p5;
-  let sketchContainer;
-  function sketch(p) {
-    const scl = 45;
-    let cols, rows;
-    let particles = [];
-    let flowfield;
 
-    p.setup = () => {
-      p.createCanvas(750, 750).parent(sketchContainer);
-      cols = Math.ceil(p.width / scl);
-      rows = Math.ceil(p.height / scl);
-      flowfield = new Array(cols * rows);
-
-      for (let i = 0; i < 1000; i++) {
-        particles[i] = new Particle();
-      }
-    };
-
-    p.draw = () => {
-      p.translate(p.height / 2, p.height / 2);
-      p.scale(1, -1);
-      p.fill(0, 10);
-      p.rect(-p.width, -p.height, 2 * p.width, 2 * p.height);
-
-      for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-          let index = x + y * cols;
-          let vX = x * 2 - cols;
-          let vY = y * 2 - rows;
-          let v = p.createVector(vY, -vX);
-          v.normalize();
-          flowfield[index] = v;
-
-          p.push();
-          p.translate(x * scl - p.width / 2, y * scl - p.height / 2);
-          p.fill(255);
-          p.stroke(255);
-          p.rotate(v.heading());
-          p.line(0, 0, 0.5 * scl, 0);
-          let arrowSize = 7;
-          p.translate(0.5 * scl - arrowSize, 0);
-          p.triangle(0, arrowSize / 2, 0, -arrowSize / 2, arrowSize, 0);
-          p.pop();
-        }
-      }
-
-      for (let i = 0; i < particles.length; i++) {
-        particles[i].follow(flowfield);
-        particles[i].update();
-        particles[i].edges();
-      }
-    };
-
-    class Particle {
-      constructor() {
-        this.pos = p.createVector(p.random(-p.width / 2, p.width / 2), p.random(-p.height / 2, p.height / 2));
-        this.vel = p.createVector(0, 0);
-        this.acc = p.createVector(0, 0);
-        this.maxspeed = 3;
-        this.steerStrength = 0.1;
-        this.prevPos = this.pos.copy();
-        this.size = 4;
-      }
-
-      update() {
-        this.vel.add(this.acc);
-        this.vel.limit(this.maxspeed);
-        this.pos.add(this.vel);
-        this.acc.mult(0);
-        p.noStroke();
-        p.fill(255);
-        p.circle(this.pos.x, this.pos.y, this.size);
-      }
-
-      follow(vectors) {
-        let x = Math.floor(p.map(this.pos.x, -p.width / 2, p.width / 2, 0, cols - 1, true));
-        let y = Math.floor(p.map(this.pos.y, -p.height / 2, p.height / 2, 0, rows - 1, true));
-        let index = y * cols + x;
-        let force = vectors[index].copy();
-        force.mult(this.steerStrength);
-        this.applyForce(force);
-      }
-
-      applyForce(force) {
-        this.acc.add(force);
-      }
-
-      updatePrev() {
-        this.prevPos.x = this.pos.x;
-        this.prevPos.y = this.pos.y;
-      }
-
-      edges() {
-        if (this.pos.x > p.width / 2) {
-          this.pos.x = -p.width / 2;
-          this.updatePrev();
-        }
-        if (this.pos.x < -p.width / 2) {
-          this.pos.x = p.width / 2;
-          this.updatePrev();
-        }
-        if (this.pos.y > p.height / 2) {
-          this.pos.y = -p.height / 2;
-          this.updatePrev();
-        }
-        if (this.pos.y < -p.height / 2) {
-          this.pos.y = p.height / 2;
-          this.updatePrev();
-        }
-      }
-    }
-  }
 
 </script>
 
@@ -524,7 +453,7 @@
       <p class="subtitle">Gaining intuition for Generative Flow Networks and how to train them</p>
     </div>
   </header>
-  <div bind:this={sketchContainer}></div>
+
 
 
   <!-- Playground -->
@@ -846,11 +775,7 @@
 
     {:else if view === "Flow"}
       <!-- FlowView -->
-      <div class="pg-container">
-        <div class="pg-vis" style="text-align:center; padding:100px">
-            Flow. Bald auch in ihrer Visualisierung.
-          </div>
-      </div>
+        <div bind:this={flowContainer}></div>
     {/if}
   </div>
     <div class="pg-scrollbutton">
@@ -1155,6 +1080,29 @@
       Add vectorfield (done) or program Flow Field?
     </p>
   </section>
+  <section class="section">
+    <h2 class="section-title">Acknowledgements</h2>
+    <p class="section-text">
+      Thanks to Christina Humer for the feedback and resources.
+      <br>Some implementations and ideas are based on other great work:
+      <span class="li">The
+        <a href="https://github.com/GFNOrg/torchgfn/blob/master/tutorials/notebooks/intro_gfn_continuous_line_simple.ipynb" target="_blank">continuous line</a>
+        example by Joseph Viviano & Kolya Malkin.
+        The idea for the environment is based on their notebook and much of the training code is adapted from theirs.
+    </span>
+    <span class="li">The
+        <a href="https://playground.tensorflow.org/" target="_blank">
+          neural network playgroud</a>
+         by Daniel Smilkov and Shan Carter was an inspiration on how to visualize machine learning and the training progress in the browser.
+      </span>
+      <span class="li">The code for the flow field visualization is mostly taken from
+        <a href="https://editor.p5js.org/Mathcurious/sketches/bdp6luRil" target="_blank">Mathcurious' implementation</a>
+
+
+      </span>
+    </p>
+
+  </section>
 
 
   <section class="section">
@@ -1182,6 +1130,9 @@
         https://milayb.notion.site/The-GFlowNet-Tutorial-95434ef0e2d94c24aab90e69b30be9b3
         <br><br>
         https://colab.research.google.com/drive/1fUMwgu2OhYpQagpzU5mhe9_Esib3Q2VR
+        <br><br>
+        https://github.com/GFNOrg/torchgfn/blob/master/tutorials/notebooks/intro_gfn_continuous_line_simple.ipynb
+
       </p>
     <h3 class="section-title3">GFlowNet Libraries</h3>
       <p class="section-text">

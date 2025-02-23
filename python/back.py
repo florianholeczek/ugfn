@@ -5,6 +5,7 @@ Not neccessary if you use just the python scripts.
 
 from arch import GFlowNet
 from env import Env
+from plot_utils import grid
 
 import torch
 from pydantic import BaseModel
@@ -62,6 +63,9 @@ class TrainingRequest(BaseModel):
     batch_size_value: int
     curr_gaussians: list[Gaussian]
 
+class VectorfieldRequest(BaseModel):
+    size: int
+
 # when user is starting the training process
 @app.post("/start_training")
 def start_training(request: TrainingRequest, background_tasks: BackgroundTasks):
@@ -107,6 +111,17 @@ def stop_training():
     else:
         return JSONResponse(status_code=400, content={"error": "No training running."})
 
+
+@app.post("/get_vectorfield")
+async def generate_flowfield(request: VectorfieldRequest):
+    print(request)
+    if training_state["running"]:
+        return JSONResponse(status_code=400, content={"error": "Training running."})
+
+    #gridpoints, _, _ = grid(grid_size=request.size)
+    vectors = [{"x": 0.2, "y": 0.5}]*request.size*request.size
+
+    return {"cols":request.size, "rows": request.size, "vectors": vectors}
 
 # train and save samples for visualization
 def train_and_sample(
