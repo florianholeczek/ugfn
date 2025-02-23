@@ -76,7 +76,7 @@ class GFlowNet:
         Get the distribution for the policy given the output of the network
         :param policy: output of the Neural Network
         :param off_policy: None to train on-policy. Otherwise a constant to add to sigma.
-        :return: torch.dist.MultivariateNormal object
+        :return: torch.dist.MultivariateNormal objects: policy distribution and exploration distribution
         """
         mus, sigmas = torch.tensor_split(policy, [2], dim=1)
         sigmas = torch.sigmoid(sigmas)*0.9+0.1 # for mapping in valid [0.1-1] range

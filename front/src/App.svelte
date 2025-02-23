@@ -130,17 +130,22 @@
           plot_trainingframe(training_frame);
         } else {
           console.log("Flow View")
-          current_vectorfield = get_vectorfield(750)
+          updateVectorfield();
 
-          if (!flowvis_instance){
-            flowvis_instance = new p5(plot_flow, flowContainer);
-          }
+
 
 
         }
       }, 5);
     }
 
+  }
+
+  async function updateVectorfield() {
+    await get_vectorfield(750)
+    if (!flowvis_instance){
+            flowvis_instance = new p5((p) => plot_flow(p, current_vectorfield), flowContainer);
+          }
   }
 
 
@@ -406,7 +411,7 @@
       }
       const data = await response.json();
       console.log(data)
-      return data;
+      current_vectorfield = data;
     } catch (error) {
       console.error(error);
     }

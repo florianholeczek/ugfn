@@ -118,8 +118,19 @@ async def generate_flowfield(request: VectorfieldRequest):
     if training_state["running"]:
         return JSONResponse(status_code=400, content={"error": "Training running."})
 
-    #gridpoints, _, _ = grid(grid_size=request.size)
-    vectors = [{"x": 0.2, "y": 0.5}]*request.size*request.size
+    grid_size=request.size
+    x = torch.linspace(-3, 3, grid_size)
+    y = torch.linspace(-3, 3, grid_size)
+    X, Y = torch.meshgrid(x, y)
+    gridpoints = torch.stack([X.flatten(), Y.flatten()], dim=1)
+    print(gridpoints.shape)
+    #vectors = [{"x": 0.2, "y": 0.5}]*request.size*request.size
+    model = torch.load("model.pth")
+    states = torch.cat((gridpoints,torch.ones(len(gridpoints),1)*3), dim=1)
+    print(states.shape)
+    vectors = model.forward_model(states)[:,:-1]
+    vectors = [{"x": float(vectors[i, 0]), "y": float(vectors[i, 1])} for i in range(vectors.shape[0])]
+
 
     return {"cols":request.size, "rows": request.size, "vectors": vectors}
 

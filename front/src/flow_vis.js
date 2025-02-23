@@ -1,15 +1,21 @@
-export function plot_flow(p) {
+export function plot_flow(p, vectors) {
     const scl = 45;
     let cols, rows;
     let particles = [];
     let flowfield;
 
     p.setup = () => {
-      p.createCanvas(750, 750);
+      p.createCanvas(vectors.cols, vectors.rows);
       cols = Math.ceil(p.width / scl);
       rows = Math.ceil(p.height / scl);
-      flowfield = new Array(cols * rows);
-      console.log(flowfield)
+
+      //generate flowfield from passed vectors
+      flowfield = new Array(vectors.cols * vectors.rows);
+
+      for (let i = 0; i < flowfield.length; i++) {
+        let vData = vectors.vectors[i];
+        flowfield[i] = p.createVector(vData.x, vData.y);
+    }
 
       for (let i = 0; i < 1000; i++) {
         particles[i] = new Particle();
@@ -21,28 +27,6 @@ export function plot_flow(p) {
       p.scale(1, -1);
       p.fill(0, 10);
       p.rect(-p.width, -p.height, 2 * p.width, 2 * p.height);
-
-      for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-          let index = x + y * cols;
-          let vX = x * 2 - cols;
-          let vY = y * 2 - rows;
-          let v = p.createVector(vY, -vX);
-          v.normalize();
-          flowfield[index] = v;
-
-          p.push();
-          p.translate(x * scl - p.width / 2, y * scl - p.height / 2);
-          p.fill(255);
-          p.stroke(255);
-          p.rotate(v.heading());
-          p.line(0, 0, 0.5 * scl, 0);
-          let arrowSize = 7;
-          p.translate(0.5 * scl - arrowSize, 0);
-          p.triangle(0, arrowSize / 2, 0, -arrowSize / 2, arrowSize, 0);
-          p.pop();
-        }
-      }
 
       for (let i = 0; i < particles.length; i++) {
         particles[i].follow(flowfield);
