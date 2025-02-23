@@ -86,11 +86,11 @@ class GFlowNet:
         policy_dist = torch.distributions.MultivariateNormal(mus, torch.diag_embed(sigmas))
 
         if not off_policy:
-            return policy_dist, None
+            return policy_dist, None, mus
 
 
         exploration_dist = torch.distributions.MultivariateNormal(mus, torch.diag_embed(sigmas+off_policy))
-        return policy_dist, exploration_dist
+        return policy_dist, exploration_dist, mus
 
     def get_action(self, x, off_policy):
         """
@@ -102,13 +102,13 @@ class GFlowNet:
         For the actions: [step in x, step in y]
         """
         forward_policy = self.forward_model(x)
-        policy_dist, exploration_dist = self.get_dist(forward_policy, off_policy)
+        policy_dist, exploration_dist, mus = self.get_dist(forward_policy, off_policy)
         if off_policy:
             actions =exploration_dist.sample()
         else:
             actions = policy_dist.sample()
         log_probs = policy_dist.log_prob(actions)
-        return actions, log_probs
+        return actions, log_probs, mus
 
     def get_backward_log_probs(self, states, actions):
         """
@@ -118,7 +118,7 @@ class GFlowNet:
         :return:log_probs of the actions
         """
         backward_policy = self.backward_model(states)
-        policy_dist,_ = self.get_dist(backward_policy, None)
+        policy_dist,_,_ = self.get_dist(backward_policy, None)
         log_probs = policy_dist.log_prob(actions)
         return log_probs
 
@@ -128,6 +128,7 @@ class GFlowNet:
               trajectory_length=2,
               n_iterations=5000,
               off_policy=None,
+              loss_fn="Trajectory Balance",
               collect_trajectories=0,
               progress_bar = True
               ):
@@ -142,6 +143,7 @@ class GFlowNet:
         A constant (int, float) will be added to the variance and lead to higher exploration.
         This will decay to 0 over the course of the training.
         A list of int or float will be used as a schedule. The length must be equal to n_iterations.
+        :param loss_fn: Loss function, either "Trajectory Balance" or "Flow Matching"
         :param collect_trajectories: will collect the last n trajectories if True.
         shape: (collect_trajectories, trajectory_length+1, 3)
         :param progress_bar: show progressbar for iterations
@@ -170,26 +172,33 @@ class GFlowNet:
             # initialize
             self.optimizer.zero_grad()
             x = self.init_state(env, batch_size)
-            trajectory = torch.zeros(batch_size, trajectory_length+1, 3, device=self.device)
+            trajectory = torch.zeros((batch_size, trajectory_length+1, 3), device=self.device)
             log_probs_forward = torch.zeros((batch_size,), device=self.device)
             log_probs_backward = torch.zeros((batch_size,), device=self.device)
 
             # get actions and take steps
             for t in range(trajectory_length):
                 actions, log_probs = self.get_action(x, exploration_schedule[i])
-                log_probs_forward += log_probs
+                log_probs_forward += log_probs #adding log probabilities = log(product of probabilities)
                 x_prime = self.step(x, actions)
                 trajectory[:,t+1,:] += x_prime
                 x = x_prime
 
             # backward log probabilities
-            for t in range(trajectory_length,1,-1):
-                log_probs = self.get_backward_log_probs(trajectory[:,t,:], trajectory[:,t,1:]-trajectory[:,t-1,1:])
-                log_probs_backward += log_probs
+            if loss_fn == "Trajectory Balance":
+                for t in range(trajectory_length,1,-1):
+                    log_probs = self.get_backward_log_probs(trajectory[:,t,:], trajectory[:,t,1:]-trajectory[:,t-1,1:])
+                    log_probs_backward += log_probs
 
             # reward and backward passes
-            log_reward = env.log_reward(trajectory[:,-1,1:])
-            loss = torch.mean((self.logz+log_probs_forward-log_probs_backward-log_reward)**2)
+            if loss_fn == "Trajectory Balance":
+                log_reward = env.log_reward(trajectory[:,-1,1:])
+                loss = torch.mean((self.logz+log_probs_forward-log_probs_backward-log_reward)**2)
+            elif loss_fn == "Flow Matching":
+                raise NotImplementedError
+            else:
+                raise ValueError("Invalid loss type")
+
             loss.backward()
             self.optimizer.step()
             losses.append(loss.item())
@@ -232,7 +241,7 @@ class GFlowNet:
             x = self.init_state(env, batch_size)
 
             for t in range(trajectory_length):
-                action, _ = self.get_action(x, None)
+                action, _, _ = self.get_action(x, None)
                 x_prime = GFlowNet.step(x, action)
                 trajectory[:,t+1,:] += x_prime
                 x=x_prime

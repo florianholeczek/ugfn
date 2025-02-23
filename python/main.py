@@ -13,6 +13,7 @@ batch_size=64 # batch size during training
 n_iterations=2000 # number of iteration to train for
 trajectory_length = 6 # trajectory length
 off_policy = 0 # variance to add during action sampling. 0 to train on-policy.
+loss_fn = "Flow Matching" # loss function. For now only 'Trajectory Balance'
 n_hidden_layers=2 # number of hidden layers for forward and backward policy
 hidden_dim=64 # size for forward and backward policy
 lr_model=1e-3 # learning rate of the model
@@ -54,6 +55,7 @@ losses_, _ = gflownet.train(
     batch_size=batch_size,
     trajectory_length=trajectory_length,
     off_policy=off_policy,
+    loss_fn=loss_fn,
 )
 
 # plot
@@ -63,21 +65,12 @@ plt.show()
 trajectories = gflownet.inference(env, batch_size=n_inference, trajectory_length=trajectory_length)
 fig = plot.plot_states_2d(env, trajectories, alpha=0.8, ground_truth="contour", colormap="viridis", levels=10)
 plt.show()
-torch.save(gflownet, "model.pth")
+#torch.save(gflownet, "model.pth")
 
-plot.plot_flows(
-    env,
-    gflownet,
-    step =trajectory_length,
-    title = None,
-    grid_size=10,
-    static=False,
-)
+
 plot.plot_flow(
-    env,
     gflownet,
     step =trajectory_length,
-    title = None,
     grid_size=10,
-    static=False,
+    static=True,
 )

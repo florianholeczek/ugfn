@@ -51,6 +51,7 @@ class Gaussian(BaseModel):
 
 class TrainingRequest(BaseModel):
     off_policy_value: float
+    loss_choice: str
     n_iterations_value: int
     lr_model_value: float
     lr_logz_value: float
@@ -75,7 +76,7 @@ def start_training(request: TrainingRequest, background_tasks: BackgroundTasks):
     training_state["running"] = True
     training_state["stop_requested"] = False
     training_state["current_image"] = None
-    print(params)
+    # print(params)
 
     # Start the training in the background
     background_tasks.add_task(
@@ -160,6 +161,7 @@ def train_and_sample(
             trajectory_length=params['trajectory_length'],
             n_iterations=train_interval,
             off_policy=off_policy[v*train_interval:(v+1)*train_interval],
+            loss_fn=params["loss_choice"],
             collect_trajectories=trajectory_max,
             progress_bar=False,
         )

@@ -35,6 +35,8 @@
   let batch_size_exponent = 6;
   $: batch_size_value = 2**batch_size_exponent;
   let n_gaussians="2";
+  let loss_choice = "Trajectory Balance";
+
   $:changeNGaussians(n_gaussians);
   function changeNGaussians(n) {
     while ($gaussians.length < parseInt(n)) {
@@ -158,12 +160,9 @@
       display_trainhistory = true;
       training_progress = 0;
       const curr_gaussians = $gaussians;
-      // Start training
-      const response = await fetch('http://localhost:8000/start_training', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const send_params = JSON.stringify({
           off_policy_value,
+          loss_choice,
           n_iterations_value,
           lr_model_value,
           lr_logz_value,
@@ -174,19 +173,13 @@
           batch_size_value,
           curr_gaussians,
         })
+      // Start training
+      const response = await fetch('http://localhost:8000/start_training', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: send_params
       });
-      console.log(JSON.stringify({
-          off_policy_value,
-          n_iterations_value,
-          lr_model_value,
-          lr_logz_value,
-          trajectory_length_value,
-          hidden_layer_value,
-          hidden_dim_value,
-          seed_value,
-          batch_size_value,
-          curr_gaussians,
-        }))
+      console.log("Training params sent:", send_params)
 
       if (!response.ok) {
         throw new Error('Failed to start training.');
@@ -352,7 +345,7 @@
   let n_iterations_str = "2048";
   $: n_iterations_value = parseInt(n_iterations_str, 10);
   let losses_select = ["Trajectory Balance", "Flow Matching"];
-  let loss_choice = "Trajectory Balance";
+
 
   let view = "Environment";
   $: viewChange(view);

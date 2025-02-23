@@ -38,8 +38,8 @@ class Env:
     def reward(self, state):
         """
         Calculates the reward given a state
-        :param state: Tuple or tensor representing the current state
-        :return: log reward as a float
+        :param state: Tuple or tensor representing the current state(s)
+        :return: log reward as a tensor
         """
         logprobs = [m.log_prob(state) for m in self.mixture]
         reward = torch.sum(torch.exp(torch.stack(logprobs)), dim=0)
