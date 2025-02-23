@@ -36,7 +36,55 @@
   $: batch_size_value = 2**batch_size_exponent;
   let n_gaussians="2";
   let loss_choice = "Trajectory Balance";
+  const gaussians = writable([
+    { mean: { x: -1, y: -1 }, variance: 0.4 },
+    { mean: { x: 1, y: 1 }, variance: 0.4 }
+  ]);
 
+  // elements
+  let plotContainerEnv2d = "plot-container2d";
+  let plotContainerEnv3d = "plot-container3d";
+  let tutorialstart;
+  let active_tab = 'Basic';
+  let n_iterations_select = ["128", "1024", "2048", "4096", "8192", "10240"];
+  let n_iterations_str = "2048";
+  $: n_iterations_value = parseInt(n_iterations_str, 10);
+  let losses_select = ["Trajectory Balance", "Flow Matching"];
+  let view = "Environment";
+  let Plotly; // Load Plotly from CDN
+
+  // ranges for means and variances
+  const range = { min: -3, max: 3 };
+  const varianceRange = { min: 0.1, max: 1.0 };
+
+  // Gaussian tracking
+  let selectedGaussian = null; // Tracks the currently selected Gaussian
+  let hoveredGaussian = null; // Tracks the Gaussian to be highlighted for deletion
+
+  // Mouse interaction handlers
+  let isDraggingMean = false;
+  let isDraggingVariance = false;
+  let initialMouse = { x: 0, y: 0 };
+
+  //others
+  let plotlyready=false;
+  let display_trainhistory=false;
+  let frames = []; //saves all frames for plotting them after training
+  let training_frame = 0;
+  let training_progress = 0; //for progressbar
+  let current_states;
+  let current_losses;
+  let run1_value = 2048;
+  let run2_value = 4096;
+  let run3_value = 4096;
+
+  //polling every n ms
+  const POLLING_INTERVAL = 30;
+  let isRunning = false;
+  let pollingTimer;
+
+
+  // reactive
   $:changeNGaussians(n_gaussians);
   function changeNGaussians(n) {
     while ($gaussians.length < parseInt(n)) {
@@ -49,10 +97,6 @@
       plotEnv();
     }
   }
-
-
-  let frames = [];
-  let training_frame = 0;
   $: plot_trainingframe(training_frame);
   function plot_trainingframe(frame) {
     if (!isRunning && display_trainhistory){
@@ -64,61 +108,27 @@
       );
     }
   }
-
-  let training_progress = 0;
-
-
-
-  let run1_value = 2048;
-  let run2_value = 4096;
-  let run3_value = 4096;
-  let current_states;
-  let current_losses;
-
   $: run1 = `./images/run1/run1_${run1_value}.png`
   $: run2 = `./images/run2/run2_${run2_value}.png`
   $: run3 = `./images/run3/run3_${run3_value}.png`
+  $: viewChange(view);
+  function viewChange (view){
+    if (plotlyready) {
+      setTimeout(() => {
+        if (view === "Environment"){
+          console.log("Env View")
+          plotEnv();
+        } else if (view ==="Training"){
+          console.log("Train View");
+          plot_trainingframe(training_frame);
+        } else {
+          console.log("Flow View")
+        }
+      }, 5);
+    }
 
-
-  //polling every n ms
-  const POLLING_INTERVAL = 30;
-  let isRunning = false;
-  let pollingTimer;
-
-  // storing gaussians
-  const gaussians = writable([
-    { mean: { x: -1, y: -1 }, variance: 0.4 },
-    { mean: { x: 1, y: 1 }, variance: 0.4 }
-  ]);
-
-
-  function resetGaussians(){
-    gaussians.set([
-      { mean: { x: -1, y: -1 }, variance: 0.4 },
-      { mean: { x: 1, y: 1 }, variance: 0.4 }
-    ]);
-    n_gaussians="2";
-    plotEnv();
   }
 
-  // ranges for means and variances
-  const range = { min: -3, max: 3 };
-  const varianceRange = { min: 0.1, max: 1.0 };
-
-  // Gaussian tracking
-  let selectedGaussian = null; // Tracks the currently selected Gaussian
-  let hoveredGaussian = null; // Tracks the Gaussian to be highlighted for deletion
-  const highlightGaussian = (index) => {
-    hoveredGaussian = index;
-  };
-  const clearHighlight = () => {
-    hoveredGaussian = null;
-  };
-
-  // Mouse interaction handlers
-  let isDraggingMean = false;
-  let isDraggingVariance = false;
-  let initialMouse = { x: 0, y: 0 };
 
   // Utility functions
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
@@ -135,9 +145,6 @@
       batch_size_exponent = 6;
   }
 
-
-
-  let Plotly; // Load Plotly from CDN
   async function loadPlotly() {
     const script = document.createElement('script');
     script.src = 'https://cdn.plot.ly/plotly-latest.min.js';
@@ -149,6 +156,24 @@
         resolve();
       };
     });
+  }
+  async function loadp5() {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js';
+    document.head.appendChild(script);
+
+    return new Promise((resolve) => {
+      script.onload = () => {
+        p5 = window.p5;
+        resolve();
+      };
+    });
+  }
+
+  function scrollToTutorial() {
+    if (tutorialstart) {
+      tutorialstart.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
 
@@ -250,6 +275,16 @@
   }
 
   // Functions for setting the environment
+
+  function resetGaussians(){
+    gaussians.set([
+      { mean: { x: -1, y: -1 }, variance: 0.4 },
+      { mean: { x: 1, y: 1 }, variance: 0.4 }
+    ]);
+    n_gaussians="2";
+    plotEnv();
+  }
+
   const addGaussian = () => {
     gaussians.update(gs => {
       if (gs.length < 4) {
@@ -318,53 +353,6 @@
     isDraggingVariance = false;
     selectedGaussian = null;
   };
-
-
-  let plotContainerEnv2d = "plot-container2d";
-  let plotContainerEnv3d = "plot-container3d";
-  let plotlyready=false;
-
-  // Mounting
-  onMount(async () => {
-    //visualize the environment
-    await loadPlotly();
-    plotlyready = true;
-    plotEnv();
-    // add listeners for changing the Environment
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', stopDrag);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', stopDrag);
-    };
-  });
-  let display_trainhistory=false;
-  let active_tab = 'Basic';
-
-  let n_iterations_select = ["128", "1024", "2048", "4096", "8192", "10240"];
-  let n_iterations_str = "2048";
-  $: n_iterations_value = parseInt(n_iterations_str, 10);
-  let losses_select = ["Trajectory Balance", "Flow Matching"];
-
-
-  let view = "Environment";
-  $: viewChange(view);
-  function viewChange (view){
-    if (plotlyready) {
-      setTimeout(() => {
-        if (view === "Environment"){
-          console.log("Env View")
-          plotEnv();
-        } else if (view ==="Training"){
-          console.log("Train View");
-          plot_trainingframe(training_frame);
-        } else {
-          console.log("Flow View")
-        }
-      }, 5);
-    }
-
-  }
   function plotEnv(){
     plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
     plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
@@ -381,23 +369,150 @@
     }
     plotEnv();
   }
-  function scrollToTutorial() {
-    if (tutorialstart) {
-      tutorialstart.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+
+
+
+  // Mounting
+  onMount(async () => {
+    //visualize the environment
+    await loadPlotly();
+    await loadp5();
+    new p5(sketch, sketchContainer);
+    plotlyready = true;
+    plotEnv();
+    // add listeners for changing the Environment
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', stopDrag);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', stopDrag);
+    };
+  });
+
+  let p5;
+  let sketchContainer;
+  function sketch(p) {
+    const scl = 45;
+    let cols, rows;
+    let particles = [];
+    let flowfield;
+
+    p.setup = () => {
+      p.createCanvas(750, 750).parent(sketchContainer);
+      cols = Math.ceil(p.width / scl);
+      rows = Math.ceil(p.height / scl);
+      flowfield = new Array(cols * rows);
+
+      for (let i = 0; i < 1000; i++) {
+        particles[i] = new Particle();
+      }
+    };
+
+    p.draw = () => {
+      p.translate(p.height / 2, p.height / 2);
+      p.scale(1, -1);
+      p.fill(0, 10);
+      p.rect(-p.width, -p.height, 2 * p.width, 2 * p.height);
+
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          let index = x + y * cols;
+          let vX = x * 2 - cols;
+          let vY = y * 2 - rows;
+          let v = p.createVector(vY, -vX);
+          v.normalize();
+          flowfield[index] = v;
+
+          p.push();
+          p.translate(x * scl - p.width / 2, y * scl - p.height / 2);
+          p.fill(255);
+          p.stroke(255);
+          p.rotate(v.heading());
+          p.line(0, 0, 0.5 * scl, 0);
+          let arrowSize = 7;
+          p.translate(0.5 * scl - arrowSize, 0);
+          p.triangle(0, arrowSize / 2, 0, -arrowSize / 2, arrowSize, 0);
+          p.pop();
+        }
+      }
+
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].follow(flowfield);
+        particles[i].update();
+        particles[i].edges();
+      }
+    };
+
+    class Particle {
+      constructor() {
+        this.pos = p.createVector(p.random(-p.width / 2, p.width / 2), p.random(-p.height / 2, p.height / 2));
+        this.vel = p.createVector(0, 0);
+        this.acc = p.createVector(0, 0);
+        this.maxspeed = 3;
+        this.steerStrength = 0.1;
+        this.prevPos = this.pos.copy();
+        this.size = 4;
+      }
+
+      update() {
+        this.vel.add(this.acc);
+        this.vel.limit(this.maxspeed);
+        this.pos.add(this.vel);
+        this.acc.mult(0);
+        p.noStroke();
+        p.fill(255);
+        p.circle(this.pos.x, this.pos.y, this.size);
+      }
+
+      follow(vectors) {
+        let x = Math.floor(p.map(this.pos.x, -p.width / 2, p.width / 2, 0, cols - 1, true));
+        let y = Math.floor(p.map(this.pos.y, -p.height / 2, p.height / 2, 0, rows - 1, true));
+        let index = y * cols + x;
+        let force = vectors[index].copy();
+        force.mult(this.steerStrength);
+        this.applyForce(force);
+      }
+
+      applyForce(force) {
+        this.acc.add(force);
+      }
+
+      updatePrev() {
+        this.prevPos.x = this.pos.x;
+        this.prevPos.y = this.pos.y;
+      }
+
+      edges() {
+        if (this.pos.x > p.width / 2) {
+          this.pos.x = -p.width / 2;
+          this.updatePrev();
+        }
+        if (this.pos.x < -p.width / 2) {
+          this.pos.x = p.width / 2;
+          this.updatePrev();
+        }
+        if (this.pos.y > p.height / 2) {
+          this.pos.y = -p.height / 2;
+          this.updatePrev();
+        }
+        if (this.pos.y < -p.height / 2) {
+          this.pos.y = p.height / 2;
+          this.updatePrev();
+        }
+      }
     }
   }
-  let tutorialstart;
-  let intro;
-
-
-
 
 </script>
+
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
 <link
   href="https://fonts.googleapis.com/css2?family=Material+Icons&display=swap"
   rel="stylesheet"
 />
+
 
 
 
@@ -409,6 +524,7 @@
       <p class="subtitle">Gaining intuition for Generative Flow Networks and how to train them</p>
     </div>
   </header>
+  <div bind:this={sketchContainer}></div>
 
 
   <!-- Playground -->
