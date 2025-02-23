@@ -550,6 +550,7 @@
         <div class="pg-env-help">
           Adjust the reward function by dragging the circles and dots in the left plot or by setting the parameters in the table.
           <br>By setting the mean and variance of multiple 2D Multivariate Gaussians we get the reward function on the right as a mixture.
+          <br>Then switch to the "Training" tab to start training.
         </div>
       </div>
 
@@ -579,8 +580,8 @@
 
           </div>
           <div class="pg-loss">
-            <div class="columns margins" style="justify-content: flex-start;">
-              <Select bind:value="{loss_choice}" label="Loss" color="primary" disabled="{isRunning}">
+            <div class="columns margins" style="justify-content: flex-start; display: None">
+              <Select bind:value="{loss_choice}" label="Loss" color="primary" disabled="true" >
                 {#each losses_select as select}
                   <Option value={select}>{select}</Option>
                 {/each}

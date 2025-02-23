@@ -86,11 +86,11 @@ class GFlowNet:
         policy_dist = torch.distributions.MultivariateNormal(mus, torch.diag_embed(sigmas))
 
         if not off_policy:
-            return policy_dist, None, mus
+            return policy_dist, None
 
 
         exploration_dist = torch.distributions.MultivariateNormal(mus, torch.diag_embed(sigmas+off_policy))
-        return policy_dist, exploration_dist, mus
+        return policy_dist, exploration_dist
 
     def get_action(self, x, off_policy):
         """
@@ -102,13 +102,13 @@ class GFlowNet:
         For the actions: [step in x, step in y]
         """
         forward_policy = self.forward_model(x)
-        policy_dist, exploration_dist, mus = self.get_dist(forward_policy, off_policy)
+        policy_dist, exploration_dist = self.get_dist(forward_policy, off_policy)
         if off_policy:
             actions =exploration_dist.sample()
         else:
             actions = policy_dist.sample()
         log_probs = policy_dist.log_prob(actions)
-        return actions, log_probs, mus
+        return actions, log_probs
 
     def get_backward_log_probs(self, states, actions):
         """
@@ -118,7 +118,7 @@ class GFlowNet:
         :return:log_probs of the actions
         """
         backward_policy = self.backward_model(states)
-        policy_dist,_,_ = self.get_dist(backward_policy, None)
+        policy_dist,_ = self.get_dist(backward_policy, None)
         log_probs = policy_dist.log_prob(actions)
         return log_probs
 
@@ -241,7 +241,7 @@ class GFlowNet:
             x = self.init_state(env, batch_size)
 
             for t in range(trajectory_length):
-                action, _, _ = self.get_action(x, None)
+                action, _ = self.get_action(x, None)
                 x_prime = GFlowNet.step(x, action)
                 trajectory[:,t+1,:] += x_prime
                 x=x_prime

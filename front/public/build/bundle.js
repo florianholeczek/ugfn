@@ -59014,7 +59014,7 @@ var app = (function () {
 		return block;
 	}
 
-	// (730:30) 
+	// (731:30) 
 	function create_if_block_8(ctx) {
 		let div1;
 		let div0;
@@ -59027,9 +59027,9 @@ var app = (function () {
 				attr_dev(div0, "class", "pg-vis");
 				set_style(div0, "text-align", "center");
 				set_style(div0, "padding", "100px");
-				add_location(div0, file, 732, 8, 22427);
+				add_location(div0, file, 733, 8, 22502);
 				attr_dev(div1, "class", "pg-container");
-				add_location(div1, file, 731, 6, 22392);
+				add_location(div1, file, 732, 6, 22467);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, div1, anchor);
@@ -59049,14 +59049,14 @@ var app = (function () {
 			block,
 			id: create_if_block_8.name,
 			type: "if",
-			source: "(730:30) ",
+			source: "(731:30) ",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (557:34) 
+	// (558:34) 
 	function create_if_block_1(ctx) {
 		let div9;
 		let div5;
@@ -59124,7 +59124,7 @@ var app = (function () {
 		let select0_props = {
 			label: "Loss",
 			color: "primary",
-			disabled: /*isRunning*/ ctx[19],
+			disabled: "true",
 			$$slots: { default: [create_default_slot_65] },
 			$$scope: { ctx }
 		};
@@ -59237,26 +59237,27 @@ var app = (function () {
 				div8 = element("div");
 				if (if_block2) if_block2.c();
 				attr_dev(div0, "class", "pg-play");
-				add_location(div0, file, 562, 10, 16383);
+				add_location(div0, file, 563, 10, 16450);
 				attr_dev(div1, "class", "columns margins");
 				set_style(div1, "justify-content", "flex-start");
-				add_location(div1, file, 581, 12, 17033);
+				set_style(div1, "display", "None");
+				add_location(div1, file, 582, 12, 17100);
 				attr_dev(div2, "class", "columns margins");
 				set_style(div2, "justify-content", "flex-start");
-				add_location(div2, file, 589, 14, 17430);
+				add_location(div2, file, 590, 14, 17505);
 				attr_dev(div3, "class", "pg-iterations");
-				add_location(div3, file, 588, 12, 17388);
+				add_location(div3, file, 589, 12, 17463);
 				attr_dev(div4, "class", "pg-loss");
-				add_location(div4, file, 580, 10, 16999);
+				add_location(div4, file, 581, 10, 17066);
 				attr_dev(div5, "class", "pg-top");
-				add_location(div5, file, 561, 8, 16352);
-				add_location(div6, file, 605, 10, 17949);
+				add_location(div5, file, 562, 8, 16419);
+				add_location(div6, file, 606, 10, 18024);
 				attr_dev(div7, "class", "pg-side");
-				add_location(div7, file, 604, 8, 17917);
+				add_location(div7, file, 605, 8, 17992);
 				attr_dev(div8, "class", "pg-bottom");
-				add_location(div8, file, 712, 8, 21853);
+				add_location(div8, file, 713, 8, 21928);
 				attr_dev(div9, "class", "pg-container");
-				add_location(div9, file, 560, 6, 16317);
+				add_location(div9, file, 561, 6, 16384);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, div9, anchor);
@@ -59312,7 +59313,6 @@ var app = (function () {
 
 				fab1.$set(fab1_changes);
 				const select0_changes = {};
-				if (dirty[0] & /*isRunning*/ 524288) select0_changes.disabled = /*isRunning*/ ctx[19];
 
 				if (dirty[3] & /*$$scope*/ 16384) {
 					select0_changes.$$scope = { dirty, ctx };
@@ -59480,7 +59480,7 @@ var app = (function () {
 			block,
 			id: create_if_block_1.name,
 			type: "if",
-			source: "(557:34) ",
+			source: "(558:34) ",
 			ctx
 		});
 
@@ -59511,8 +59511,10 @@ var app = (function () {
 		let t5;
 		let div8;
 		let t6;
-		let br;
+		let br0;
 		let t7;
+		let br1;
+		let t8;
 		let current;
 
 		fab0 = new Fab({
@@ -59600,8 +59602,10 @@ var app = (function () {
 				t5 = space();
 				div8 = element("div");
 				t6 = text$2("Adjust the reward function by dragging the circles and dots in the left plot or by setting the parameters in the table.\n          ");
-				br = element("br");
-				t7 = text$2("By setting the mean and variance of multiple 2D Multivariate Gaussians we get the reward function on the right as a mixture.");
+				br0 = element("br");
+				t7 = text$2("By setting the mean and variance of multiple 2D Multivariate Gaussians we get the reward function on the right as a mixture.\n          ");
+				br1 = element("br");
+				t8 = text$2("Then switch to the \"Training\" tab to start training.");
 				attr_dev(div0, "class", "pg-play");
 				add_location(div0, file, 435, 10, 11664);
 				attr_dev(div1, "class", "columns margins");
@@ -59621,7 +59625,8 @@ var app = (function () {
 				add_location(div6, file, 502, 8, 13982);
 				attr_dev(div7, "class", "pg-gauss-table");
 				add_location(div7, file, 504, 8, 14055);
-				add_location(br, file, 551, 10, 16086);
+				add_location(br0, file, 551, 10, 16086);
+				add_location(br1, file, 552, 10, 16225);
 				attr_dev(div8, "class", "pg-env-help");
 				add_location(div8, file, 549, 8, 15920);
 				attr_dev(div9, "class", "pg-container");
@@ -59656,8 +59661,10 @@ var app = (function () {
 				append_dev(div9, t5);
 				append_dev(div9, div8);
 				append_dev(div8, t6);
-				append_dev(div8, br);
+				append_dev(div8, br0);
 				append_dev(div8, t7);
+				append_dev(div8, br1);
+				append_dev(div8, t8);
 				current = true;
 			},
 			p: function update(ctx, dirty) {
@@ -59762,7 +59769,7 @@ var app = (function () {
 		return block;
 	}
 
-	// (568:13) <Icon class="material-icons" style="font-size: 22px">
+	// (569:13) <Icon class="material-icons" style="font-size: 22px">
 	function create_default_slot_71(ctx) {
 		let t;
 
@@ -59784,14 +59791,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_71.name,
 			type: "slot",
-			source: "(568:13) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 22px\\\">",
+			source: "(569:13) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 22px\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (564:12) <Fab               on:click={resetSliders}               mini               disabled="{isRunning}"             >
+	// (565:12) <Fab               on:click={resetSliders}               mini               disabled="{isRunning}"             >
 	function create_default_slot_70(ctx) {
 		let icon;
 		let current;
@@ -59841,14 +59848,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_70.name,
 			type: "slot",
-			source: "(564:12) <Fab               on:click={resetSliders}               mini               disabled=\\\"{isRunning}\\\"             >",
+			source: "(565:12) <Fab               on:click={resetSliders}               mini               disabled=\\\"{isRunning}\\\"             >",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (575:14) {:else}
+	// (576:14) {:else}
 	function create_else_block_1(ctx) {
 		let icon;
 		let current;
@@ -59889,14 +59896,14 @@ var app = (function () {
 			block,
 			id: create_else_block_1.name,
 			type: "else",
-			source: "(575:14) {:else}",
+			source: "(576:14) {:else}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (573:14) {#if isRunning}
+	// (574:14) {#if isRunning}
 	function create_if_block_7(ctx) {
 		let icon;
 		let current;
@@ -59937,14 +59944,14 @@ var app = (function () {
 			block,
 			id: create_if_block_7.name,
 			type: "if",
-			source: "(573:14) {#if isRunning}",
+			source: "(574:14) {#if isRunning}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (576:16) <Icon class="material-icons" style="font-size: 50px">
+	// (577:16) <Icon class="material-icons" style="font-size: 50px">
 	function create_default_slot_69(ctx) {
 		let t;
 
@@ -59966,14 +59973,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_69.name,
 			type: "slot",
-			source: "(576:16) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 50px\\\">",
+			source: "(577:16) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 50px\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (574:16) <Icon class="material-icons" style="font-size: 50px">
+	// (575:16) <Icon class="material-icons" style="font-size: 50px">
 	function create_default_slot_68(ctx) {
 		let t;
 
@@ -59995,14 +60002,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_68.name,
 			type: "slot",
-			source: "(574:16) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 50px\\\">",
+			source: "(575:16) <Icon class=\\\"material-icons\\\" style=\\\"font-size: 50px\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (570:12) <Fab               on:click={isRunning ? stopTraining : startTraining}             >
+	// (571:12) <Fab               on:click={isRunning ? stopTraining : startTraining}             >
 	function create_default_slot_67(ctx) {
 		let current_block_type_index;
 		let if_block;
@@ -60074,14 +60081,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_67.name,
 			type: "slot",
-			source: "(570:12) <Fab               on:click={isRunning ? stopTraining : startTraining}             >",
+			source: "(571:12) <Fab               on:click={isRunning ? stopTraining : startTraining}             >",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (585:18) <Option value={select}>
+	// (586:18) <Option value={select}>
 	function create_default_slot_66(ctx) {
 		let t_value = /*select*/ ctx[99] + "";
 		let t;
@@ -60105,14 +60112,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_66.name,
 			type: "slot",
-			source: "(585:18) <Option value={select}>",
+			source: "(586:18) <Option value={select}>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (584:16) {#each losses_select as select}
+	// (585:16) {#each losses_select as select}
 	function create_each_block_4(ctx) {
 		let option;
 		let current;
@@ -60161,14 +60168,14 @@ var app = (function () {
 			block,
 			id: create_each_block_4.name,
 			type: "each",
-			source: "(584:16) {#each losses_select as select}",
+			source: "(585:16) {#each losses_select as select}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (583:14) <Select bind:value="{loss_choice}" label="Loss" color="primary" disabled="{isRunning}">
+	// (584:14) <Select bind:value="{loss_choice}" label="Loss" color="primary" disabled="true" >
 	function create_default_slot_65(ctx) {
 		let each_1_anchor;
 		let current;
@@ -60260,14 +60267,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_65.name,
 			type: "slot",
-			source: "(583:14) <Select bind:value=\\\"{loss_choice}\\\" label=\\\"Loss\\\" color=\\\"primary\\\" disabled=\\\"{isRunning}\\\">",
+			source: "(584:14) <Select bind:value=\\\"{loss_choice}\\\" label=\\\"Loss\\\" color=\\\"primary\\\" disabled=\\\"true\\\" >",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (597:20) <Option value={select}>
+	// (598:20) <Option value={select}>
 	function create_default_slot_64(ctx) {
 		let t_value = /*select*/ ctx[99] + "";
 		let t;
@@ -60291,14 +60298,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_64.name,
 			type: "slot",
-			source: "(597:20) <Option value={select}>",
+			source: "(598:20) <Option value={select}>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (596:18) {#each n_iterations_select as select}
+	// (597:18) {#each n_iterations_select as select}
 	function create_each_block_3(ctx) {
 		let option;
 		let current;
@@ -60347,14 +60354,14 @@ var app = (function () {
 			block,
 			id: create_each_block_3.name,
 			type: "each",
-			source: "(596:18) {#each n_iterations_select as select}",
+			source: "(597:18) {#each n_iterations_select as select}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (591:16) <Select                   bind:value="{n_iterations_str}"                   label="Iterations"                   disabled="{isRunning}"                 >
+	// (592:16) <Select                   bind:value="{n_iterations_str}"                   label="Iterations"                   disabled="{isRunning}"                 >
 	function create_default_slot_63(ctx) {
 		let each_1_anchor;
 		let current;
@@ -60446,14 +60453,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_63.name,
 			type: "slot",
-			source: "(591:16) <Select                   bind:value=\\\"{n_iterations_str}\\\"                   label=\\\"Iterations\\\"                   disabled=\\\"{isRunning}\\\"                 >",
+			source: "(592:16) <Select                   bind:value=\\\"{n_iterations_str}\\\"                   label=\\\"Iterations\\\"                   disabled=\\\"{isRunning}\\\"                 >",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (609:16) <Label>
+	// (610:16) <Label>
 	function create_default_slot_62(ctx) {
 		let t_value = /*tab*/ ctx[102] + "";
 		let t;
@@ -60479,14 +60486,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_62.name,
 			type: "slot",
-			source: "(609:16) <Label>",
+			source: "(610:16) <Label>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (608:14) <Tab {tab}>
+	// (609:14) <Tab {tab}>
 	function create_default_slot_61(ctx) {
 		let label;
 		let current;
@@ -60534,14 +60541,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_61.name,
 			type: "slot",
-			source: "(608:14) <Tab {tab}>",
+			source: "(609:14) <Tab {tab}>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (607:12) <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active={active_tab}>
+	// (608:12) <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active={active_tab}>
 	function create_default_slot_60(ctx) {
 		let tab;
 		let current;
@@ -60591,14 +60598,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_60.name,
 			type: "slot",
-			source: "(607:12) <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active={active_tab}>",
+			source: "(608:12) <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active={active_tab}>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (657:48) 
+	// (658:48) 
 	function create_if_block_6(ctx) {
 		let paper;
 		let current;
@@ -60647,14 +60654,14 @@ var app = (function () {
 			block,
 			id: create_if_block_6.name,
 			type: "if",
-			source: "(657:48) ",
+			source: "(658:48) ",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (613:12) {#if active_tab === 'Basic'}
+	// (614:12) {#if active_tab === 'Basic'}
 	function create_if_block_5(ctx) {
 		let paper;
 		let current;
@@ -60703,14 +60710,14 @@ var app = (function () {
 			block,
 			id: create_if_block_5.name,
 			type: "if",
-			source: "(613:12) {#if active_tab === 'Basic'}",
+			source: "(614:12) {#if active_tab === 'Basic'}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (659:16) <Content>
+	// (660:16) <Content>
 	function create_default_slot_59(ctx) {
 		let t0;
 		let t1;
@@ -60840,9 +60847,9 @@ var app = (function () {
 				t13 = text$2(/*seed_value*/ ctx[15]);
 				t14 = space();
 				create_component(slider3.$$.fragment);
-				add_location(br0, file, 668, 18, 20346);
-				add_location(br1, file, 678, 18, 20733);
-				add_location(br2, file, 688, 18, 21127);
+				add_location(br0, file, 669, 18, 20421);
+				add_location(br1, file, 679, 18, 20808);
+				add_location(br2, file, 689, 18, 21202);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, t0, anchor);
@@ -60963,14 +60970,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_59.name,
 			type: "slot",
-			source: "(659:16) <Content>",
+			source: "(660:16) <Content>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (658:14) <Paper variant="unelevated">
+	// (659:14) <Paper variant="unelevated">
 	function create_default_slot_58(ctx) {
 		let content;
 		let current;
@@ -61018,14 +61025,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_58.name,
 			type: "slot",
-			source: "(658:14) <Paper variant=\\\"unelevated\\\">",
+			source: "(659:14) <Paper variant=\\\"unelevated\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (615:16) <Content>
+	// (616:16) <Content>
 	function create_default_slot_57(ctx) {
 		let t0;
 		let t1;
@@ -61161,10 +61168,10 @@ var app = (function () {
 				t14 = text$2(t14_value);
 				t15 = space();
 				create_component(slider3.$$.fragment);
-				add_location(br0, file, 624, 18, 18632);
-				add_location(br1, file, 634, 18, 19025);
-				add_location(br2, file, 644, 18, 19434);
-				add_location(br3, file, 645, 35, 19474);
+				add_location(br0, file, 625, 18, 18707);
+				add_location(br1, file, 635, 18, 19100);
+				add_location(br2, file, 645, 18, 19509);
+				add_location(br3, file, 646, 35, 19549);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, t0, anchor);
@@ -61289,14 +61296,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_57.name,
 			type: "slot",
-			source: "(615:16) <Content>",
+			source: "(616:16) <Content>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (614:14) <Paper variant="unelevated">
+	// (615:14) <Paper variant="unelevated">
 	function create_default_slot_56(ctx) {
 		let content;
 		let current;
@@ -61344,14 +61351,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_56.name,
 			type: "slot",
-			source: "(614:14) <Paper variant=\\\"unelevated\\\">",
+			source: "(615:14) <Paper variant=\\\"unelevated\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (708:8) {:else}
+	// (709:8) {:else}
 	function create_else_block(ctx) {
 		let div;
 
@@ -61361,7 +61368,7 @@ var app = (function () {
 				div.innerHTML = ``;
 				attr_dev(div, "class", "pg-vis");
 				attr_dev(div, "id", "trainplot");
-				add_location(div, file, 708, 10, 21777);
+				add_location(div, file, 709, 10, 21852);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, div, anchor);
@@ -61377,14 +61384,14 @@ var app = (function () {
 			block,
 			id: create_else_block.name,
 			type: "else",
-			source: "(708:8) {:else}",
+			source: "(709:8) {:else}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (704:8) {#if !display_trainhistory && !isRunning}
+	// (705:8) {#if !display_trainhistory && !isRunning}
 	function create_if_block_4(ctx) {
 		let div;
 
@@ -61396,7 +61403,7 @@ var app = (function () {
 				set_style(div, "text-align", "center");
 				set_style(div, "padding", "100px");
 				set_style(div, "color", "#323232");
-				add_location(div, file, 704, 10, 21603);
+				add_location(div, file, 705, 10, 21678);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, div, anchor);
@@ -61412,14 +61419,14 @@ var app = (function () {
 			block,
 			id: create_if_block_4.name,
 			type: "if",
-			source: "(704:8) {#if !display_trainhistory && !isRunning}",
+			source: "(705:8) {#if !display_trainhistory && !isRunning}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (722:26) 
+	// (723:26) 
 	function create_if_block_3(ctx) {
 		let div;
 		let linearprogress;
@@ -61437,7 +61444,7 @@ var app = (function () {
 				div = element("div");
 				create_component(linearprogress.$$.fragment);
 				attr_dev(div, "class", "pg-progress");
-				add_location(div, file, 722, 8, 22173);
+				add_location(div, file, 723, 8, 22248);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, div, anchor);
@@ -61471,14 +61478,14 @@ var app = (function () {
 			block,
 			id: create_if_block_3.name,
 			type: "if",
-			source: "(722:26) ",
+			source: "(723:26) ",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (714:10) {#if !isRunning & display_trainhistory}
+	// (715:10) {#if !isRunning & display_trainhistory}
 	function create_if_block_2(ctx) {
 		let slider;
 		let updating_value;
@@ -61540,7 +61547,7 @@ var app = (function () {
 			block,
 			id: create_if_block_2.name,
 			type: "if",
-			source: "(714:10) {#if !isRunning & display_trainhistory}",
+			source: "(715:10) {#if !isRunning & display_trainhistory}",
 			ctx
 		});
 
@@ -62985,7 +62992,7 @@ var app = (function () {
 		return block;
 	}
 
-	// (744:8) <Icon class="material-icons">
+	// (745:8) <Icon class="material-icons">
 	function create_default_slot_35(ctx) {
 		let t;
 
@@ -63007,14 +63014,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_35.name,
 			type: "slot",
-			source: "(744:8) <Icon class=\\\"material-icons\\\">",
+			source: "(745:8) <Icon class=\\\"material-icons\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (740:6) <Fab         on:click={scrollToTutorial}         disabled="{isRunning}"       >
+	// (741:6) <Fab         on:click={scrollToTutorial}         disabled="{isRunning}"       >
 	function create_default_slot_34(ctx) {
 		let icon;
 		let current;
@@ -63063,14 +63070,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_34.name,
 			type: "slot",
-			source: "(740:6) <Fab         on:click={scrollToTutorial}         disabled=\\\"{isRunning}\\\"       >",
+			source: "(741:6) <Fab         on:click={scrollToTutorial}         disabled=\\\"{isRunning}\\\"       >",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (768:51) <Katex>
+	// (769:51) <Katex>
 	function create_default_slot_33(ctx) {
 		let t;
 
@@ -63092,14 +63099,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_33.name,
 			type: "slot",
-			source: "(768:51) <Katex>",
+			source: "(769:51) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (768:209) <Katex>
+	// (769:209) <Katex>
 	function create_default_slot_32(ctx) {
 		let t;
 
@@ -63121,14 +63128,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_32.name,
 			type: "slot",
-			source: "(768:209) <Katex>",
+			source: "(769:209) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (768:262) <Katex>
+	// (769:262) <Katex>
 	function create_default_slot_31(ctx) {
 		let t;
 
@@ -63150,14 +63157,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_31.name,
 			type: "slot",
-			source: "(768:262) <Katex>",
+			source: "(769:262) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (776:12) <Header>
+	// (777:12) <Header>
 	function create_default_slot_30(ctx) {
 		let t;
 
@@ -63179,14 +63186,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_30.name,
 			type: "slot",
-			source: "(776:12) <Header>",
+			source: "(777:12) <Header>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (784:95) <Katex>
+	// (785:95) <Katex>
 	function create_default_slot_29(ctx) {
 		let t0;
 		let t1_value = "final" + "";
@@ -63214,14 +63221,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_29.name,
 			type: "slot",
-			source: "(784:95) <Katex>",
+			source: "(785:95) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (777:12) <Content>
+	// (778:12) <Content>
 	function create_default_slot_28(ctx) {
 		let t0;
 		let br0;
@@ -63281,16 +63288,16 @@ var app = (function () {
 				t10 = space();
 				br9 = element("br");
 				t11 = text$2("Building Lego Pyramids is maybe not usecase number one for GFlowNets, but they are used for is drug discovery (Nica et al., 2022), where sampling from multiple modes is really what you want in order to discover not only the most promising molecule.");
-				add_location(br0, file, 778, 14, 24533);
-				add_location(br1, file, 779, 14, 24705);
-				add_location(br2, file, 780, 14, 24724);
-				add_location(br3, file, 781, 14, 25050);
-				add_location(br4, file, 782, 14, 25069);
-				add_location(br5, file, 783, 14, 25236);
-				add_location(br6, file, 784, 14, 25516);
-				add_location(br7, file, 785, 14, 25535);
-				add_location(br8, file, 786, 14, 26325);
-				add_location(br9, file, 787, 14, 26344);
+				add_location(br0, file, 779, 14, 24608);
+				add_location(br1, file, 780, 14, 24780);
+				add_location(br2, file, 781, 14, 24799);
+				add_location(br3, file, 782, 14, 25125);
+				add_location(br4, file, 783, 14, 25144);
+				add_location(br5, file, 784, 14, 25311);
+				add_location(br6, file, 785, 14, 25591);
+				add_location(br7, file, 786, 14, 25610);
+				add_location(br8, file, 787, 14, 26400);
+				add_location(br9, file, 788, 14, 26419);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, t0, anchor);
@@ -63370,14 +63377,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_28.name,
 			type: "slot",
-			source: "(777:12) <Content>",
+			source: "(778:12) <Content>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (775:10) <Panel color="secondary">
+	// (776:10) <Panel color="secondary">
 	function create_default_slot_27(ctx) {
 		let header;
 		let t;
@@ -63453,14 +63460,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_27.name,
 			type: "slot",
-			source: "(775:10) <Panel color=\\\"secondary\\\">",
+			source: "(776:10) <Panel color=\\\"secondary\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (774:8) <Accordion multiple>
+	// (775:8) <Accordion multiple>
 	function create_default_slot_26(ctx) {
 		let panel;
 		let current;
@@ -63509,14 +63516,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_26.name,
 			type: "slot",
-			source: "(774:8) <Accordion multiple>",
+			source: "(775:8) <Accordion multiple>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (798:6) <Katex>
+	// (799:6) <Katex>
 	function create_default_slot_25(ctx) {
 		let t0;
 		let t1_value = "{t+1}" + "";
@@ -63548,14 +63555,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_25.name,
 			type: "slot",
-			source: "(798:6) <Katex>",
+			source: "(799:6) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (829:6) <Katex displayMode>
+	// (830:6) <Katex displayMode>
 	function create_default_slot_24(ctx) {
 		let t0;
 		let t1_value = "{s'}" + "";
@@ -63596,14 +63603,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_24.name,
 			type: "slot",
-			source: "(829:6) <Katex displayMode>",
+			source: "(830:6) <Katex displayMode>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (836:6) <Katex displayMode>
+	// (837:6) <Katex displayMode>
 	function create_default_slot_23(ctx) {
 		let t0;
 		let t1_value = "{F(s,s')}{F(s)}" + "";
@@ -63631,14 +63638,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_23.name,
 			type: "slot",
-			source: "(836:6) <Katex displayMode>",
+			source: "(837:6) <Katex displayMode>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (844:6) <Katex displayMode>
+	// (845:6) <Katex displayMode>
 	function create_default_slot_22(ctx) {
 		let t0;
 		let t1_value = "{L}" + "";
@@ -63693,14 +63700,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_22.name,
 			type: "slot",
-			source: "(844:6) <Katex displayMode>",
+			source: "(845:6) <Katex displayMode>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (879:6) <Katex displayMode>
+	// (880:6) <Katex displayMode>
 	function create_default_slot_21(ctx) {
 		let t0;
 		let t1_value = "{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t;\\theta)}" + "";
@@ -63737,14 +63744,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_21.name,
 			type: "slot",
-			source: "(879:6) <Katex displayMode>",
+			source: "(880:6) <Katex displayMode>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (885:15) <Katex>
+	// (886:15) <Katex>
 	function create_default_slot_20(ctx) {
 		let t;
 
@@ -63766,14 +63773,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_20.name,
 			type: "slot",
-			source: "(885:15) <Katex>",
+			source: "(886:15) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (885:101) <Katex>
+	// (886:101) <Katex>
 	function create_default_slot_19(ctx) {
 		let t;
 
@@ -63795,14 +63802,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_19.name,
 			type: "slot",
-			source: "(885:101) <Katex>",
+			source: "(886:101) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (891:10) <Header>
+	// (892:10) <Header>
 	function create_default_slot_18(ctx) {
 		let t;
 
@@ -63824,14 +63831,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_18.name,
 			type: "slot",
-			source: "(891:10) <Header>",
+			source: "(892:10) <Header>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (896:16) <Katex>
+	// (897:16) <Katex>
 	function create_default_slot_17(ctx) {
 		let t0;
 		let t1_value = "t+1" + "";
@@ -63863,14 +63870,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_17.name,
 			type: "slot",
-			source: "(896:16) <Katex>",
+			source: "(897:16) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (900:16) <Katex>
+	// (901:16) <Katex>
 	function create_default_slot_16(ctx) {
 		let t0;
 		let t1_value = "t+1" + "";
@@ -63902,14 +63909,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_16.name,
 			type: "slot",
-			source: "(900:16) <Katex>",
+			source: "(901:16) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (905:16) <Katex>
+	// (906:16) <Katex>
 	function create_default_slot_15(ctx) {
 		let t0;
 		let t1_value = "\\theta" + "";
@@ -63937,14 +63944,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_15.name,
 			type: "slot",
-			source: "(905:16) <Katex>",
+			source: "(906:16) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (913:16) <Katex>
+	// (914:16) <Katex>
 	function create_default_slot_14(ctx) {
 		let t;
 
@@ -63966,14 +63973,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_14.name,
 			type: "slot",
-			source: "(913:16) <Katex>",
+			source: "(914:16) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (892:10) <Content>
+	// (893:10) <Content>
 	function create_default_slot_13(ctx) {
 		let t0;
 		let ul;
@@ -64045,11 +64052,11 @@ var app = (function () {
 				li3 = element("li");
 				create_component(katex3.$$.fragment);
 				t7 = text$2("\n                The reward for the final object x of the trajectory. Note that if we propagate the reward backward using our backward policy, only a small part of it goes through one trajectory, as there are usually many ways to sample x using different trajectories.");
-				add_location(li0, file, 894, 14, 33196);
-				add_location(li1, file, 898, 14, 33417);
-				add_location(li2, file, 903, 14, 33791);
-				add_location(li3, file, 911, 14, 34503);
-				add_location(ul, file, 893, 12, 33177);
+				add_location(li0, file, 895, 14, 33271);
+				add_location(li1, file, 899, 14, 33492);
+				add_location(li2, file, 904, 14, 33866);
+				add_location(li3, file, 912, 14, 34578);
+				add_location(ul, file, 894, 12, 33252);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, t0, anchor);
@@ -64133,14 +64140,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_13.name,
 			type: "slot",
-			source: "(892:10) <Content>",
+			source: "(893:10) <Content>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (890:8) <Panel color="secondary">
+	// (891:8) <Panel color="secondary">
 	function create_default_slot_12(ctx) {
 		let header;
 		let t;
@@ -64216,14 +64223,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_12.name,
 			type: "slot",
-			source: "(890:8) <Panel color=\\\"secondary\\\">",
+			source: "(891:8) <Panel color=\\\"secondary\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (920:10) <Header>
+	// (921:10) <Header>
 	function create_default_slot_11(ctx) {
 		let t;
 
@@ -64245,14 +64252,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_11.name,
 			type: "slot",
-			source: "(920:10) <Header>",
+			source: "(921:10) <Header>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (921:10) <Content style="white-space: pre;">
+	// (922:10) <Content style="white-space: pre;">
 	function create_default_slot_10(ctx) {
 		let t0;
 		let br0;
@@ -64299,16 +64306,16 @@ var app = (function () {
 				t9 = text$2("  9.      Calculate the TB-Loss: (logZ + log probabilities PF - log probabilities PB - log reward)^2\n              ");
 				br9 = element("br");
 				t10 = text$2("  10.    Update the parameters PF, PB, logZ");
-				add_location(br0, file, 922, 14, 35110);
-				add_location(br1, file, 923, 14, 35178);
-				add_location(br2, file, 924, 14, 35257);
-				add_location(br3, file, 925, 14, 35315);
-				add_location(br4, file, 926, 14, 35389);
-				add_location(br5, file, 927, 14, 35453);
-				add_location(br6, file, 928, 14, 35515);
-				add_location(br7, file, 929, 14, 35604);
-				add_location(br8, file, 930, 14, 35727);
-				add_location(br9, file, 931, 14, 35846);
+				add_location(br0, file, 923, 14, 35185);
+				add_location(br1, file, 924, 14, 35253);
+				add_location(br2, file, 925, 14, 35332);
+				add_location(br3, file, 926, 14, 35390);
+				add_location(br4, file, 927, 14, 35464);
+				add_location(br5, file, 928, 14, 35528);
+				add_location(br6, file, 929, 14, 35590);
+				add_location(br7, file, 930, 14, 35679);
+				add_location(br8, file, 931, 14, 35802);
+				add_location(br9, file, 932, 14, 35921);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, t0, anchor);
@@ -64365,14 +64372,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_10.name,
 			type: "slot",
-			source: "(921:10) <Content style=\\\"white-space: pre;\\\">",
+			source: "(922:10) <Content style=\\\"white-space: pre;\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (919:8) <Panel color="secondary">
+	// (920:8) <Panel color="secondary">
 	function create_default_slot_9(ctx) {
 		let header;
 		let t;
@@ -64449,14 +64456,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_9.name,
 			type: "slot",
-			source: "(919:8) <Panel color=\\\"secondary\\\">",
+			source: "(920:8) <Panel color=\\\"secondary\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (889:6) <Accordion multiple>
+	// (890:6) <Accordion multiple>
 	function create_default_slot_8(ctx) {
 		let panel0;
 		let t;
@@ -64534,14 +64541,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_8.name,
 			type: "slot",
-			source: "(889:6) <Accordion multiple>",
+			source: "(890:6) <Accordion multiple>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (983:66) <Katex>
+	// (984:66) <Katex>
 	function create_default_slot_7(ctx) {
 		let t;
 
@@ -64563,14 +64570,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_7.name,
 			type: "slot",
-			source: "(983:66) <Katex>",
+			source: "(984:66) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (983:112) <Katex>
+	// (984:112) <Katex>
 	function create_default_slot_6(ctx) {
 		let t0;
 		let t1_value = "new" + "";
@@ -64602,14 +64609,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_6.name,
 			type: "slot",
-			source: "(983:112) <Katex>",
+			source: "(984:112) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (983:286) <Katex>
+	// (984:286) <Katex>
 	function create_default_slot_5(ctx) {
 		let t;
 
@@ -64631,14 +64638,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_5.name,
 			type: "slot",
-			source: "(983:286) <Katex>",
+			source: "(984:286) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (983:361) <Katex>
+	// (984:361) <Katex>
 	function create_default_slot_4(ctx) {
 		let t;
 
@@ -64660,14 +64667,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_4.name,
 			type: "slot",
-			source: "(983:361) <Katex>",
+			source: "(984:361) <Katex>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (989:10) <Header>
+	// (990:10) <Header>
 	function create_default_slot_3(ctx) {
 		let t;
 
@@ -64689,14 +64696,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_3.name,
 			type: "slot",
-			source: "(989:10) <Header>",
+			source: "(990:10) <Header>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (990:10) <Content>
+	// (991:10) <Content>
 	function create_default_slot_2(ctx) {
 		let t0;
 		let br0;
@@ -64740,15 +64747,15 @@ var app = (function () {
 				t11 = space();
 				li4 = element("li");
 				li4.textContent = "We do not use the scheduled values with the backward policy and during inference.";
-				add_location(br0, file, 991, 12, 39143);
-				add_location(br1, file, 992, 12, 39292);
-				add_location(br2, file, 993, 12, 39309);
-				add_location(li0, file, 995, 14, 39363);
-				add_location(li1, file, 998, 14, 39525);
-				add_location(li2, file, 1001, 14, 39638);
-				add_location(li3, file, 1004, 14, 39842);
-				add_location(li4, file, 1007, 14, 40046);
-				add_location(ul, file, 994, 12, 39344);
+				add_location(br0, file, 992, 12, 39218);
+				add_location(br1, file, 993, 12, 39367);
+				add_location(br2, file, 994, 12, 39384);
+				add_location(li0, file, 996, 14, 39438);
+				add_location(li1, file, 999, 14, 39600);
+				add_location(li2, file, 1002, 14, 39713);
+				add_location(li3, file, 1005, 14, 39917);
+				add_location(li4, file, 1008, 14, 40121);
+				add_location(ul, file, 995, 12, 39419);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, t0, anchor);
@@ -64788,14 +64795,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_2.name,
 			type: "slot",
-			source: "(990:10) <Content>",
+			source: "(991:10) <Content>",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (988:8) <Panel color="secondary">
+	// (989:8) <Panel color="secondary">
 	function create_default_slot_1(ctx) {
 		let header;
 		let t;
@@ -64871,14 +64878,14 @@ var app = (function () {
 			block,
 			id: create_default_slot_1.name,
 			type: "slot",
-			source: "(988:8) <Panel color=\\\"secondary\\\">",
+			source: "(989:8) <Panel color=\\\"secondary\\\">",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (987:6) <Accordion multiple>
+	// (988:6) <Accordion multiple>
 	function create_default_slot(ctx) {
 		let panel;
 		let current;
@@ -64927,7 +64934,7 @@ var app = (function () {
 			block,
 			id: create_default_slot.name,
 			type: "slot",
-			source: "(987:6) <Accordion multiple>",
+			source: "(988:6) <Accordion multiple>",
 			ctx
 		});
 
@@ -65711,169 +65718,169 @@ var app = (function () {
 				attr_dev(div2, "class", "pg-views");
 				add_location(div2, file, 419, 2, 11283);
 				attr_dev(div3, "class", "pg-scrollbutton");
-				add_location(div3, file, 738, 4, 22595);
+				add_location(div3, file, 739, 4, 22670);
 				attr_dev(div4, "class", "pg-background");
 				add_location(div4, file, 415, 2, 11207);
 				attr_dev(h20, "class", "section-title");
-				add_location(h20, file, 755, 4, 22881);
-				add_location(br0, file, 758, 6, 23015);
-				add_location(br1, file, 760, 6, 23225);
+				add_location(h20, file, 756, 4, 22956);
+				add_location(br0, file, 759, 6, 23090);
+				add_location(br1, file, 761, 6, 23300);
 				attr_dev(p1, "class", "section-text");
-				add_location(p1, file, 756, 4, 22936);
+				add_location(p1, file, 757, 4, 23011);
 				attr_dev(h21, "class", "section-title");
-				add_location(h21, file, 762, 4, 23260);
-				add_location(br2, file, 767, 6, 23600);
-				add_location(br3, file, 769, 6, 24001);
+				add_location(h21, file, 763, 4, 23335);
+				add_location(br2, file, 768, 6, 23675);
+				add_location(br3, file, 770, 6, 24076);
 				attr_dev(p2, "class", "section-text");
-				add_location(p2, file, 763, 4, 23315);
+				add_location(p2, file, 764, 4, 23390);
 				attr_dev(div5, "class", "image-container");
-				add_location(div5, file, 772, 6, 24210);
-				add_location(br4, file, 800, 6, 27066);
-				add_location(br5, file, 801, 6, 27077);
-				add_location(br6, file, 802, 6, 27152);
-				add_location(br7, file, 803, 6, 27200);
-				add_location(br8, file, 804, 6, 27211);
-				add_location(br9, file, 807, 6, 27550);
-				add_location(br10, file, 808, 6, 27699);
+				add_location(div5, file, 773, 6, 24285);
+				add_location(br4, file, 801, 6, 27141);
+				add_location(br5, file, 802, 6, 27152);
+				add_location(br6, file, 803, 6, 27227);
+				add_location(br7, file, 804, 6, 27275);
+				add_location(br8, file, 805, 6, 27286);
+				add_location(br9, file, 808, 6, 27625);
+				add_location(br10, file, 809, 6, 27774);
 				attr_dev(p3, "class", "section-text");
-				add_location(p3, file, 793, 4, 26678);
+				add_location(p3, file, 794, 4, 26753);
 				if (!src_url_equal(img0.src, img0_src_value = "/images/gflownet_anim.gif")) attr_dev(img0, "src", img0_src_value);
 				attr_dev(img0, "class", "image");
 				attr_dev(img0, "alt", "A visualization of the flow through the DAG");
-				add_location(img0, file, 811, 8, 27763);
+				add_location(img0, file, 812, 8, 27838);
 				attr_dev(div6, "class", "image-container-small");
-				add_location(div6, file, 810, 6, 27719);
+				add_location(div6, file, 811, 6, 27794);
 				attr_dev(span0, "class", "mathexpl svelte-18u8l72");
-				add_location(span0, file, 814, 6, 27913);
-				add_location(br11, file, 816, 6, 28073);
-				add_location(br12, file, 818, 6, 28255);
-				add_location(br13, file, 819, 6, 28277);
+				add_location(span0, file, 815, 6, 27988);
+				add_location(br11, file, 817, 6, 28148);
+				add_location(br12, file, 819, 6, 28330);
+				add_location(br13, file, 820, 6, 28352);
 				attr_dev(span1, "class", "li svelte-18u8l72");
-				add_location(span1, file, 821, 6, 28289);
+				add_location(span1, file, 822, 6, 28364);
 				attr_dev(span2, "class", "li svelte-18u8l72");
-				add_location(span2, file, 822, 6, 28455);
-				add_location(br14, file, 823, 6, 28596);
+				add_location(span2, file, 823, 6, 28530);
+				add_location(br14, file, 824, 6, 28671);
 				attr_dev(span3, "class", "mathexpl svelte-18u8l72");
-				add_location(span3, file, 831, 6, 28901);
+				add_location(span3, file, 832, 6, 28976);
 				attr_dev(span4, "class", "mathexpl svelte-18u8l72");
-				add_location(span4, file, 838, 6, 29232);
-				add_location(br15, file, 841, 6, 29490);
+				add_location(span4, file, 839, 6, 29307);
+				add_location(br15, file, 842, 6, 29565);
 				attr_dev(span5, "class", "mathexpl svelte-18u8l72");
-				add_location(span5, file, 846, 6, 29792);
+				add_location(span5, file, 847, 6, 29867);
 				attr_dev(p4, "class", "section-text");
-				add_location(p4, file, 813, 4, 27882);
+				add_location(p4, file, 814, 4, 27957);
 				attr_dev(h22, "class", "section-title");
-				add_location(h22, file, 855, 4, 30359);
-				add_location(br16, file, 858, 6, 30791);
-				add_location(br17, file, 859, 6, 30802);
-				add_location(br18, file, 860, 6, 31159);
-				add_location(br19, file, 861, 6, 31170);
+				add_location(h22, file, 856, 4, 30434);
+				add_location(br16, file, 859, 6, 30866);
+				add_location(br17, file, 860, 6, 30877);
+				add_location(br18, file, 861, 6, 31234);
+				add_location(br19, file, 862, 6, 31245);
 				attr_dev(p5, "class", "section-text");
-				add_location(p5, file, 856, 4, 30410);
+				add_location(p5, file, 857, 4, 30485);
 				attr_dev(section0, "class", "section");
 				attr_dev(section0, "id", "Tutorial");
-				add_location(section0, file, 754, 2, 22811);
+				add_location(section0, file, 755, 2, 22886);
 				attr_dev(h23, "class", "section-title");
-				add_location(h23, file, 870, 4, 31571);
-				add_location(br20, file, 873, 6, 31685);
-				add_location(br21, file, 876, 6, 31945);
-				add_location(br22, file, 881, 58, 32292);
+				add_location(h23, file, 871, 4, 31646);
+				add_location(br20, file, 874, 6, 31760);
+				add_location(br21, file, 877, 6, 32020);
+				add_location(br22, file, 882, 58, 32367);
 				attr_dev(span6, "class", "mathexpl svelte-18u8l72");
-				add_location(span6, file, 881, 6, 32240);
-				add_location(br23, file, 884, 6, 32644);
-				add_location(br24, file, 885, 6, 32817);
+				add_location(span6, file, 882, 6, 32315);
+				add_location(br23, file, 885, 6, 32719);
+				add_location(br24, file, 886, 6, 32892);
 				attr_dev(p6, "class", "section-text");
-				add_location(p6, file, 871, 4, 31615);
+				add_location(p6, file, 872, 4, 31690);
 				attr_dev(div7, "class", "image-container");
-				add_location(div7, file, 887, 4, 32958);
+				add_location(div7, file, 888, 4, 33033);
 				attr_dev(p7, "class", "section-text");
-				add_location(p7, file, 936, 4, 35966);
+				add_location(p7, file, 937, 4, 36041);
 				if (!src_url_equal(img1.src, img1_src_value = /*run1*/ ctx[27])) attr_dev(img1, "src", img1_src_value);
 				attr_dev(img1, "class", "image");
 				attr_dev(img1, "alt", "GFN samples from the underlying distribution");
-				add_location(img1, file, 943, 6, 36271);
+				add_location(img1, file, 944, 6, 36346);
 				attr_dev(div8, "class", "image-container");
-				add_location(div8, file, 942, 4, 36235);
+				add_location(div8, file, 943, 4, 36310);
 				set_style(div9, "width", "600px");
 				set_style(div9, "margin", "auto");
 				set_style(div9, "text-align", "center");
-				add_location(div9, file, 945, 4, 36370);
+				add_location(div9, file, 946, 4, 36445);
 				attr_dev(p8, "class", "section-text");
-				add_location(p8, file, 956, 4, 36644);
+				add_location(p8, file, 957, 4, 36719);
 				attr_dev(h24, "class", "section-title");
-				add_location(h24, file, 961, 4, 37196);
+				add_location(h24, file, 962, 4, 37271);
 				attr_dev(p9, "class", "section-text");
-				add_location(p9, file, 962, 4, 37245);
+				add_location(p9, file, 963, 4, 37320);
 				if (!src_url_equal(img2.src, img2_src_value = /*run2*/ ctx[26])) attr_dev(img2, "src", img2_src_value);
 				attr_dev(img2, "class", "image");
 				attr_dev(img2, "alt", "The model samples only from one mode of the distribution");
-				add_location(img2, file, 966, 6, 37472);
+				add_location(img2, file, 967, 6, 37547);
 				attr_dev(div10, "class", "image-container");
-				add_location(div10, file, 965, 4, 37436);
+				add_location(div10, file, 966, 4, 37511);
 				set_style(div11, "width", "600px");
 				set_style(div11, "margin", "auto");
 				set_style(div11, "text-align", "center");
-				add_location(div11, file, 968, 4, 37583);
-				add_location(br25, file, 980, 6, 38025);
-				add_location(br26, file, 980, 10, 38029);
+				add_location(div11, file, 969, 4, 37658);
+				add_location(br25, file, 981, 6, 38100);
+				add_location(br26, file, 981, 10, 38104);
 				attr_dev(span7, "class", "li svelte-18u8l72");
-				add_location(span7, file, 982, 6, 38092);
+				add_location(span7, file, 983, 6, 38167);
 				attr_dev(span8, "class", "li svelte-18u8l72");
-				add_location(span8, file, 983, 6, 38537);
+				add_location(span8, file, 984, 6, 38612);
 				attr_dev(p10, "class", "section-text");
-				add_location(p10, file, 978, 4, 37828);
+				add_location(p10, file, 979, 4, 37903);
 				attr_dev(div12, "class", "image-container");
-				add_location(div12, file, 985, 4, 38788);
+				add_location(div12, file, 986, 4, 38863);
 				if (!src_url_equal(img3.src, img3_src_value = /*run3*/ ctx[25])) attr_dev(img3, "src", img3_src_value);
 				attr_dev(img3, "class", "image");
 				attr_dev(img3, "alt", "Training off policy helps to discover modes");
-				add_location(img3, file, 1016, 6, 40295);
+				add_location(img3, file, 1017, 6, 40370);
 				attr_dev(div13, "class", "image-container");
-				add_location(div13, file, 1015, 4, 40259);
+				add_location(div13, file, 1016, 4, 40334);
 				set_style(div14, "width", "600px");
 				set_style(div14, "margin", "auto");
 				set_style(div14, "text-align", "center");
-				add_location(div14, file, 1018, 4, 40393);
+				add_location(div14, file, 1019, 4, 40468);
 				attr_dev(p11, "class", "section-text");
-				add_location(p11, file, 1028, 4, 40638);
+				add_location(p11, file, 1029, 4, 40713);
 				attr_dev(section1, "class", "section section-light");
-				add_location(section1, file, 869, 2, 31527);
+				add_location(section1, file, 870, 2, 31602);
 				attr_dev(h25, "class", "section-title");
-				add_location(h25, file, 1035, 4, 40791);
+				add_location(h25, file, 1036, 4, 40866);
 				attr_dev(p12, "class", "section-text");
-				add_location(p12, file, 1036, 4, 40831);
+				add_location(p12, file, 1037, 4, 40906);
 				attr_dev(section2, "class", "section");
-				add_location(section2, file, 1034, 2, 40761);
+				add_location(section2, file, 1035, 2, 40836);
 				attr_dev(h26, "class", "section-title");
-				add_location(h26, file, 1043, 4, 40964);
+				add_location(h26, file, 1044, 4, 41039);
 				attr_dev(h30, "class", "section-title3");
-				add_location(h30, file, 1044, 4, 41007);
-				add_location(br27, file, 1048, 8, 41296);
-				add_location(br28, file, 1048, 12, 41300);
-				add_location(br29, file, 1052, 8, 41562);
-				add_location(br30, file, 1052, 12, 41566);
-				add_location(br31, file, 1055, 8, 41758);
-				add_location(br32, file, 1055, 12, 41762);
-				add_location(br33, file, 1059, 8, 42022);
-				add_location(br34, file, 1059, 12, 42026);
+				add_location(h30, file, 1045, 4, 41082);
+				add_location(br27, file, 1049, 8, 41371);
+				add_location(br28, file, 1049, 12, 41375);
+				add_location(br29, file, 1053, 8, 41637);
+				add_location(br30, file, 1053, 12, 41641);
+				add_location(br31, file, 1056, 8, 41833);
+				add_location(br32, file, 1056, 12, 41837);
+				add_location(br33, file, 1060, 8, 42097);
+				add_location(br34, file, 1060, 12, 42101);
 				attr_dev(p13, "class", "section-text");
-				add_location(p13, file, 1045, 6, 41056);
+				add_location(p13, file, 1046, 6, 41131);
 				attr_dev(h31, "class", "section-title3");
-				add_location(h31, file, 1062, 4, 42264);
-				add_location(br35, file, 1065, 8, 42435);
-				add_location(br36, file, 1065, 12, 42439);
+				add_location(h31, file, 1063, 4, 42339);
+				add_location(br35, file, 1066, 8, 42510);
+				add_location(br36, file, 1066, 12, 42514);
 				attr_dev(p14, "class", "section-text");
-				add_location(p14, file, 1063, 6, 42312);
+				add_location(p14, file, 1064, 6, 42387);
 				attr_dev(h32, "class", "section-title3");
-				add_location(h32, file, 1068, 4, 42541);
-				add_location(br37, file, 1071, 8, 42687);
-				add_location(br38, file, 1071, 12, 42691);
-				add_location(br39, file, 1073, 8, 42747);
-				add_location(br40, file, 1073, 12, 42751);
+				add_location(h32, file, 1069, 4, 42616);
+				add_location(br37, file, 1072, 8, 42762);
+				add_location(br38, file, 1072, 12, 42766);
+				add_location(br39, file, 1074, 8, 42822);
+				add_location(br40, file, 1074, 12, 42826);
 				attr_dev(p15, "class", "section-text");
-				add_location(p15, file, 1069, 6, 42598);
+				add_location(p15, file, 1070, 6, 42673);
 				attr_dev(section3, "class", "section");
-				add_location(section3, file, 1042, 2, 40934);
+				add_location(section3, file, 1043, 2, 41009);
 				attr_dev(main, "class", "main-content");
 				add_location(main, file, 404, 0, 10919);
 			},
