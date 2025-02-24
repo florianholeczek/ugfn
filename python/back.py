@@ -16,6 +16,10 @@ torch.set_printoptions(precision=2, sci_mode=False)
 
 app = FastAPI()
 
+env = Env()
+model = GFlowNet()
+global_trajectory_length =1
+
 # Allow CORS for development purposes
 app.add_middleware(
     CORSMiddleware,
@@ -115,28 +119,24 @@ def stop_training():
 
 @app.post("/get_vectorfield")
 async def generate_flowfield(request: VectorfieldRequest):
+    global model
+    global global_trajectory_length
     print(request)
     if training_state["running"]:
         return JSONResponse(status_code=400, content={"error": "Training running."})
 
-    trajectory_step = 10
     grid_size=request.size
     x = torch.linspace(-3, 3, grid_size)
     y = torch.linspace(-3, 3, grid_size)
     X, Y = torch.meshgrid(x, y, indexing="xy")
     gridpoints = torch.stack([X.flatten(), Y.flatten()], dim=1)
-    print(gridpoints.shape)
-    model = torch.load("model.pth")
-    states = torch.cat((torch.ones(len(gridpoints),1)*trajectory_step, gridpoints), dim=1)
-    print(states.shape)
+    #model = torch.load("model.pth") #use saved model instead
+    states = torch.cat((torch.ones(len(gridpoints),1)*global_trajectory_length, gridpoints), dim=1)
     with torch.no_grad():
         vectors = model.forward_model(states)[:,:-1]
-    print(torch.min(vectors), torch.max(vectors), torch.mean(vectors))
-    print(vectors)
-    print(states)
     # convert to pixel coordinates
     vectors = [{"x": float(vectors[i, 0]), "y": float(vectors[i, 1])} for i in range(vectors.shape[0])]
-    #vectors = [{"x": 0.2, "y": 0.5}] * request.size * request.size
+    #vectors = [{"x": 0.2, "y": 0.5}] * request.size * request.size # test flowfield
     print("sending")
 
 
@@ -150,6 +150,10 @@ def train_and_sample(
     global training_state
     global start_losses
     global start_states
+    global model
+    global env
+    global global_trajectory_length
+    global_trajectory_length = params['trajectory_length']
     training_state["losses"] = start_losses
     training_state["states"] = start_states
 
