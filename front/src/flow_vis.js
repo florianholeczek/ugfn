@@ -24,7 +24,7 @@ export function plot_flow(p, vectors) {
 
     //parameters
     const lifespan_min = 100;
-    const lifespan_max = 250;
+    const lifespan_max = 200;
 
     p.setup = () => {
       p.createCanvas(vectors.cols*scl, vectors.rows*scl);
@@ -37,7 +37,7 @@ export function plot_flow(p, vectors) {
 
 
 
-      for (let i = 0; i < 1000; i++) {
+      for (let i = 0; i < flow_n_particles_value; i++) {
         particles[i] = new Particle();
       }
     };
@@ -93,6 +93,16 @@ export function plot_flow(p, vectors) {
           particles[i].follow(flowfield);
           particles[i].update();
           particles[i].edges();
+        }
+
+        // Adjust number of particles based on flow_n_particles_value
+        if (particles.length < flow_n_particles_value) {
+            let numToAdd = flow_n_particles_value - particles.length;
+            for (let i = 0; i < numToAdd; i++) {
+                particles.push(new Particle());
+            }
+        } else if (particles.length > flow_n_particles_value) {
+            particles = particles.slice(0, flow_n_particles_value);
         }
       }
     };

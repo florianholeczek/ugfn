@@ -343,9 +343,8 @@ input[type="range"] {
 
   .pg-flow {
     position: absolute;
-    top: 135px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 95px;
+    left: 100px;
     width: 850px;
     height:850px;
   }

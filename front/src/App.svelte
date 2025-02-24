@@ -287,11 +287,11 @@
         }
 
         const data = await response.json();
-        if (data.losses) {
+        if (data.losses && isRunning) {
           current_losses = data.losses;
           training_progress = current_losses['losses'].length
         }
-        if (data.states) {
+        if (data.states && isRunning) {
           current_states = data.states;
           plotStates(Plotly, $gaussians, current_states,current_losses);
           frames.push({
