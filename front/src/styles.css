@@ -265,6 +265,9 @@ input[type="range"] {
     align-items: center;
     margin-left:80px
   }
+  .pg-top-slider{
+    width:200px;
+  }
 
   .pg-loss{
     display: flex;
@@ -334,6 +337,15 @@ input[type="range"] {
     /*border: 1px solid #ccc;*/
     left:50%;
     position: absolute;
+  }
+
+  .pg-flow {
+    position: absolute;
+    top: 135px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 850px;
+    height:850px;
   }
 
 

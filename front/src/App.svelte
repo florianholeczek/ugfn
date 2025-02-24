@@ -21,7 +21,18 @@
   import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
   import Textfield from '@smui/textfield';
   import Fab from '@smui/fab';
+  import { flow_velocity, flow_n_particles,flow_vectorfield } from './store.js';
 
+  let flow_velocity_value = 0.5;
+  let flow_n_particles_value = 1000;
+  let flow_vectorfield_value = false;
+  $: update_flowparameters(flow_velocity_value, flow_n_particles_value, flow_vectorfield_value);
+  function update_flowparameters(velocity, nParticles, vectorfield) {
+    flow_velocity.set(velocity);
+    flow_n_particles.set(nParticles);
+    flow_vectorfield.set(vectorfield);
+    //console.log(vectorfield, nParticles, velocity);
+  }
 
 
   // default values
@@ -146,7 +157,7 @@
   }
 
   async function updateVectorfield() {
-    await get_vectorfield(15);
+    await get_vectorfield(34);
     if (!flowvis_instance){
             flowvis_instance = new p5((p) => plot_flow(p, current_vectorfield), flowContainer);
           }
@@ -465,6 +476,8 @@
 
 
 
+
+
   <!-- Playground -->
 
   <div class="pg-background">
@@ -634,8 +647,8 @@
 
           </div>
           <div class="pg-loss">
-            <div class="columns margins" style="justify-content: flex-start; display: None">
-              <Select bind:value="{loss_choice}" label="Loss" color="primary" disabled="true" >
+            <div class="columns margins" style="justify-content: flex-start; visibility:hidden;">
+              <Select bind:value="{loss_choice}" label="Loss" color="primary" disabled="true" style="visibility: hidden" >
                 {#each losses_select as select}
                   <Option value={select}>{select}</Option>
                 {/each}
@@ -784,7 +797,49 @@
 
     {:else if view === "Flow"}
       <!-- FlowView -->
-        <div bind:this={flowContainer}></div>
+      <div class="pg-container">
+        <div class="pg-top">
+          <div class="pg-play">
+            <Fab mini disabled="true" style="visibility:hidden"
+            ><Icon class="material-icons" style="font-size: 22px; visibility:hidden">replay</Icon>
+            </Fab>
+            <Fab
+              on:click={() => flow_vectorfield_value = !flow_vectorfield_value}
+            >
+              {#if flow_vectorfield_value}
+                <Icon class="material-icons" style="font-size: 40px">air</Icon>
+              {:else}
+                <Icon class="material-icons" style="font-size: 40px">arrow_outward</Icon>
+              {/if}
+            </Fab>
+          </div>
+          <div style="margin-left: 275px">Velocity: </div>
+          <div class="pg-top-slider">
+            <Slider
+              bind:value="{flow_velocity_value}"
+              min={0.1}
+              max={1}
+              step={0.1}
+              discrete
+              input$aria-label="Discrete slider"
+            />
+          </div>
+          <div>Number of particles: </div>
+          <div class="pg-top-slider">
+            <Slider
+              bind:value="{flow_n_particles_value}"
+              min={500}
+              max={2000}
+              step={100}
+              discrete
+              input$aria-label="Discrete slider"
+            />
+          </div>
+        </div>
+        <div class="pg-flow">
+          <div bind:this={flowContainer}></div>
+        </div>
+      </div>
     {/if}
   </div>
     <div class="pg-scrollbutton">
@@ -967,13 +1022,15 @@
             </ul>
           </Content>
         </Panel>
-        <Panel color="secondary" bind:open={panel_algo}>
+        <Panel color="secondary"> <!--bind:open={panel_algo}>-->
           <Header>
             The algorithm
+            <!--
             <IconButton toggle bind:pressed="{panel_algo}"on:click={panel_algo=!panel_algo} >
               <Icon class="material-icons"  on>expand_less</Icon>
               <Icon class="material-icons">expand_more</Icon>
             </IconButton>
+            -->
           </Header>
 
           <Content style="white-space: pre;">
