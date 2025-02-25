@@ -8,3 +8,4 @@ python/testing.py
 __pycache__/
 front/README.md
 python/model.pth
+python/model_test.pth

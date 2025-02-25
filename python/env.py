@@ -16,16 +16,15 @@ class Env:
         """
         :param mus: List of Tensors of shape (2) containing the means of the gaussians.
                     All elements must be in the range [-3, 3].
-                    Limited to a maximum of 5 gaussians.
+                    Limited to a maximum of 4 gaussians.
         :param sigmas: List of Tensors containing the standard deviation of the gaussians.
-                    Right now only shape (2) is supported.
-                    #The Tensors can have shape (2) (no covariance) or shape (2,2), representing the covariance matrix.
+                    Right now only shape (2) is supported, so no covariance possible
                     All elements must be in the range [0.1, 1].
-                    Limited to a maximum of 5 gaussians.
+                    Limited to a maximum of 4 gaussians.
         :param start: starting point (s_0) for the agent, tensor of shape (2)
         """
         assert len(mus) == len(sigmas), "mus and sigmas have different lengths"
-        assert len(mus) <= 5, "maximum of 5 gaussians is allowed"
+        assert len(mus) <= 4, "maximum of 4 gaussians is allowed"
         assert all([torch.max(torch.abs(m)) <= 3 for m in mus]), "Means must lie in [-3, 3]."
         assert all([torch.max(s)<=1 and torch.min(s)>=0.1 for s in sigmas]), "Sigmas must lie in [0.1, 1]."
         assert torch.max(torch.abs(start)) <= 3, "State must lie in [-3, 3]"
