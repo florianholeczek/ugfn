@@ -76,7 +76,8 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
         mode: 'markers',
         type: 'scatter',
         marker: { color: sec_col, symbol: 137, opacity: alpha },
-        showlegend:false,
+        showlegend:true,
+        name: 'Samples',
     };
 
     // Marginal histograms
@@ -111,7 +112,8 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
         yaxis: 'y2',
         mode:'lines',
         marker: { color: f_col },
-        showlegend:false,
+        showlegend:true,
+        name: 'Reward function',
     };
     const densY = {
         y: ls,
@@ -163,10 +165,11 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
         title: `Iteration ${losses['losses'].length}/${losses['n_iterations']} `,
         showlegend:true,
         legend: {
-            x: 0.75,
-            y: 1,
+            x: 1,
+            y: 1.2,
             xanchor: 'right',
             yanchor: 'top',
+            //orientation: 'h'
         },
         autosize: false,
         width: 775,
