@@ -3,7 +3,7 @@
   import {writable} from 'svelte/store';
   import Katex from 'svelte-katex'
   import 'katex/dist/katex.min.css';
-  import {plotEnvironment} from "./env.js";
+  import {plotEnvironment, compute_density_plotting} from "./env.js";
   import './styles.css';
   import {plotStates} from "./training_vis.js"
   import {plot_flow} from "./flow_vis.js";
@@ -94,6 +94,7 @@
   let current_states;
   let current_losses;
   let current_vectorfield;
+  let current_plotting_density;
   let run1_value = 2048;
   let run2_value = 4096;
   let run3_value = 4096;
@@ -124,7 +125,8 @@
         Plotly,
         frames[frame]['gaussians'],
         frames[frame]['states'],
-        frames[frame]['losses']
+        frames[frame]['losses'],
+        current_plotting_density
       );
     }
   }
@@ -225,6 +227,7 @@
       display_trainhistory = true;
       training_progress = 0;
       const curr_gaussians = $gaussians;
+      current_plotting_density = compute_density_plotting(curr_gaussians, 100)
       const send_params = JSON.stringify({
           off_policy_value,
           loss_choice,
@@ -293,7 +296,7 @@
         }
         if (data.states) {
           current_states = data.states;
-          plotStates(Plotly, $gaussians, current_states,current_losses);
+          plotStates(Plotly, $gaussians, current_states,current_losses, current_plotting_density);
           frames.push({
             'gaussians': JSON.parse(JSON.stringify($gaussians)),
             'states': current_states,
@@ -303,7 +306,7 @@
 
         if (data.completed) {
           console.log("Training process completed.");
-          plotStates(Plotly, $gaussians, current_states,current_losses);
+          plotStates(Plotly, $gaussians, current_states,current_losses, current_plotting_density);
           isRunning = false; // Update the UI state to reflect the stopped process
           clearInterval(pollingTimer); // Stop the polling
           return; // Stop polling

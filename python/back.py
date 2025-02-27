@@ -204,7 +204,6 @@ def train_and_sample(
             collect_trajectories=trajectory_max,
             progress_bar=False,
         )
-        print(losses)
 
         # keep only x and y of last state of trajectory
         states = trajectory[:, -1, 1:]

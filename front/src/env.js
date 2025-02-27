@@ -8,6 +8,11 @@ const dy = y - mean.y;
 return Math.exp(-(dx ** 2 + dy ** 2) / (2 * variance)) / (2 * Math.PI * variance);
 }
 
+function linspace(start, stop, num) {
+    const step = (stop - start) / (num-1);
+    return Array.from({length: num}, (_, i) => start + step * i);
+}
+
 
 // Density (reward for whole grid)
 export function computeDensity(grid, gaussians) {
@@ -103,4 +108,30 @@ export function plotEnvironment(Plotly, containerId, gaussians, options = {}) {
     Plotly.react(containerId, [surfaceData], layout_3d, config);
   }
 
+}
+
+export function compute_density_plotting(gaussians, gridSize){
+  // Create grid for density plot
+    //const [xGrid, yGrid, gridPoints] = grid(gridSize);
+    const ls = linspace(-3, 3, gridSize);
+
+    let densityEnv = computeDensity({x:ls,y:ls}, gaussians);
+    densityEnv = densityEnv.map(row => row.slice());
+    const densityEnvTransposed = densityEnv[0].map((_, colIndex) => densityEnv.map(row => row[colIndex]));
+
+    // Compute marginal densities
+    const densityX = densityEnv.reduce((sum, row) => sum.map((v, i) => v + row[i]), Array(gridSize).fill(0));
+    const densityY = densityEnvTransposed.reduce((sum, row) => sum.map((v, i) => v + row[i]), Array(gridSize).fill(0));
+
+    // Normalize marginals
+    const normfact = 6/((gridSize-1)*gaussians.length)
+    densityX.forEach((v, i) => densityX[i] *= normfact);
+    densityY.forEach((v, i) => densityY[i] *= normfact);
+
+    return {
+      "linspace": ls,
+      "densityEnv":densityEnv,
+      "densityX": densityX,
+      "densityY": densityY,
+    }
 }

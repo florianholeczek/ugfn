@@ -22,7 +22,7 @@ function grid(between = [-3, 3], gridSize = 100) {
     return [xGrid, yGrid, gridPoints];
 }
 
-export function plotStates(Plotly, gaussians, states, losses, options = {}) {
+export function plotStates(Plotly, gaussians, states, losses, density, options = {}) {
     const {
         levels = 10,
         alpha = 1.0,
@@ -36,22 +36,6 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
     const x = states.map(s => s[0]);
     const y = states.map(s => s[1]);
 
-    // Create grid for density plot
-    //const [xGrid, yGrid, gridPoints] = grid(gridSize);
-    const ls = linspace(-3, 3, gridSize);
-
-    let densityEnv = computeDensity({x:ls,y:ls}, gaussians);
-    densityEnv = densityEnv.map(row => row.slice());
-    const densityEnvTransposed = densityEnv[0].map((_, colIndex) => densityEnv.map(row => row[colIndex]));
-
-    // Compute marginal densities
-    const densityX = densityEnv.reduce((sum, row) => sum.map((v, i) => v + row[i]), Array(gridSize).fill(0));
-    const densityY = densityEnvTransposed.reduce((sum, row) => sum.map((v, i) => v + row[i]), Array(gridSize).fill(0));
-
-    // Normalize marginals
-    const normfact = 6/((gridSize-1)*gaussians.length)
-    densityX.forEach((v, i) => densityX[i] *= normfact);
-    densityY.forEach((v, i) => densityY[i] *= normfact);
 
     // Prepare losses
     const iters = Array.from(Array(losses['n_iterations']+1),(x,i)=>i)
@@ -59,9 +43,9 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
 
     // Contour plot for density
     const contourTrace = {
-        x: ls,
-        y: ls,
-        z: densityEnv,
+        x: density["linspace"],
+        y: density["linspace"],
+        z: density["densityEnv"],
         type: 'contour',
         colorscale: colormap,
         showscale:false,
@@ -106,8 +90,8 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
 
     // Marginal lines
     const densX = {
-        x: ls,
-        y: densityX,
+        x: density["linspace"],
+        y: density["densityX"],
         type: 'scatter',
         xaxis: 'x2',
         yaxis: 'y2',
@@ -117,8 +101,8 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
         name: 'Reward function',
     };
     const densY = {
-        y: ls,
-        x: densityY,
+        y: density["linspace"],
+        x: density["densityY"],
         type: 'scatter',
         xaxis: 'x3',
         yaxis: 'y3',
