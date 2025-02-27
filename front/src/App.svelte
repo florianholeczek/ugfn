@@ -276,6 +276,7 @@
       // Stop polling and reset button state
       clearInterval(pollingTimer);
       isRunning = false;
+      training_frame=0;
     } catch (error) {
       console.error(error);
     }
@@ -308,6 +309,7 @@
           console.log("Training process completed.");
           plotStates(Plotly, $gaussians, current_states,current_losses, current_plotting_density);
           isRunning = false; // Update the UI state to reflect the stopped process
+          training_frame=0;
           clearInterval(pollingTimer); // Stop the polling
           return; // Stop polling
         }

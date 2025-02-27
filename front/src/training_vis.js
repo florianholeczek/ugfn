@@ -171,5 +171,6 @@ export function plotStates(Plotly, gaussians, states, losses, density, options =
     };
 
     const allplots = [contourTrace, samplesTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot]
-    Plotly.react('trainplot', allplots, layout);
+    Plotly.react('trainplot', allplots, layout)
+
 }
