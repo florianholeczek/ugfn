@@ -222,6 +222,7 @@ class GFlowNet:
                     "logZ True": f"{logz_true.item():.3f}"
                 })
 
+
         return (losses, logzs, logz_true.item()), last_trajectories
 
     def inference(self, env, batch_size=4096, trajectory_length=2):

@@ -204,6 +204,7 @@ def train_and_sample(
             collect_trajectories=trajectory_max,
             progress_bar=False,
         )
+        print(losses)
 
         # keep only x and y of last state of trajectory
         states = trajectory[:, -1, 1:]
@@ -221,7 +222,7 @@ def train_and_sample(
         training_state["losses"]={
             "losses": training_state["losses"]["losses"] + losses[0],
             "logzs": training_state["losses"]["logzs"] + losses[1],
-            "truelogz": training_state["losses"]["truelogz"] + ([losses[2]]*len(losses[0])),
+            "truelogz": losses[2],
             "n_iterations": params['n_iterations'],
         }
 

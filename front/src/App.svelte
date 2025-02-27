@@ -55,6 +55,8 @@
   let plotContainerEnv2d = "plot-container2d";
   let plotContainerEnv3d = "plot-container3d";
   let tutorialstart;
+  let sourcesstart;
+  let playgroundstart;
   let active_tab = 'Basic';
   let n_iterations_select = ["128", "1024", "2048", "4096", "8192", "10240"];
   let n_iterations_str = "2048";
@@ -185,7 +187,7 @@
 
   async function loadPlotly() {
     const script = document.createElement('script');
-    script.src = 'https://cdn.plot.ly/plotly-latest.min.js';
+    script.src = 'https://cdn.plot.ly/plotly-2.0.0.min.js';
     document.head.appendChild(script);
 
     return new Promise((resolve) => {
@@ -208,9 +210,9 @@
     });
   }
 
-  function scrollToTutorial() {
-    if (tutorialstart) {
-      tutorialstart.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  function scrollTo(id) {
+    if (id) {
+      id.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
@@ -478,7 +480,7 @@
 
   <!-- Playground -->
 
-  <div class="pg-background" id="Playground">
+  <div class="pg-background" id="Playground" bind:this={playgroundstart}>
   <div class = "pg-top-background">
   </div>
 
@@ -847,7 +849,7 @@
   </div>
     <div class="pg-scrollbutton">
       <Fab
-        on:click={scrollToTutorial}
+        on:click={scrollTo(tutorialstart)}
         disabled="{isRunning}"
       >
         <Icon class="material-icons">keyboard_arrow_down</Icon></Fab>
@@ -1159,7 +1161,7 @@
 
   </section>
 
-  <section class="section">
+  <section class="section" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);">
     <h2 class="section-title">Flow: Is this what it looks like?</h2>
     <p class="section-text">
       Well, kind of. Imagine our grid would be discrete. If we are in one cell, we would have a certain Flow (a non-negative scalar) to each other cell (technically also to itself given our trick with adding the step to the state).
@@ -1173,30 +1175,42 @@
   </section>
 
   <section class="section">
-    <h2 class="section-title">What now?</h2>
+    <div style="text-align: center; font-weight: bold; font-size: 22px; margin-bottom: 20px">What next?</div>
     <div class="whatnext_t">
-      <div class="whatnext_b">Train our own GFlownets? <br> Go to the top</div>
+      <div class="whatnext_b">Train your own GFlownets? <br> Go to the top</div>
       <div class="whatnext_b">Interested in the code? <br>Find it here</div>
       <div class="whatnext_b">Learn more about GFlowNets?<br>Find other tutorials</div>
     </div>
     <div class="whatnext_t">
       <div class="whatnext_b">
         <Fab
-        on:click={scrollToTutorial}
+        on:click={scrollTo(playgroundstart)}
         disabled="{isRunning}"
       >
         <Icon class="material-icons">keyboard_arrow_up</Icon></Fab>
       </div>
       <div class="whatnext_b">
-        <Fab
-        on:click={scrollToTutorial}
-        disabled="{isRunning}"
-      >
-        <Icon class="material-icons">replay</Icon></Fab>
+        <a href={"https://github.com/florianholeczek/ugfn"} target="_blank" rel="noopener noreferrer" class="github-button">
+          <Fab>
+            <Icon tag="svg">
+              <svg
+                class="github-icon"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 0.297C5.373 0.297 0 5.67 0 12.297c0 5.3 3.438 9.8 8.207 11.387.6.11.793-.26.793-.577v-2.17c-3.338.724-4.033-1.61-4.033-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.743.082-.727.082-.727 1.205.085 1.84 1.24 1.84 1.24 1.07 1.835 2.807 1.305 3.493.997.108-.776.418-1.305.76-1.605-2.667-.303-5.467-1.333-5.467-5.93 0-1.31.467-2.384 1.235-3.223-.123-.303-.535-1.524.117-3.176 0 0 1.007-.323 3.3 1.23a11.42 11.42 0 013.003-.404c1.018.005 2.042.137 3.003.404 2.29-1.553 3.296-1.23 3.296-1.23.654 1.652.242 2.873.12 3.176.77.839 1.233 1.913 1.233 3.223 0 4.607-2.805 5.624-5.478 5.92.43.373.814 1.102.814 2.22v3.293c0 .32.19.693.8.576C20.565 22.094 24 17.595 24 12.297 24 5.67 18.627.297 12 .297z"
+                />
+              </svg>
+            </Icon>
+          </Fab>
+        </a>
+
       </div>
       <div class="whatnext_b">
         <Fab
-        on:click={scrollToTutorial}
+        on:click={scrollTo(sourcesstart)}
         disabled="{isRunning}"
       >
         <Icon class="material-icons">keyboard_arrow_down</Icon></Fab>
@@ -1224,12 +1238,15 @@
         <a href="https://editor.p5js.org/Mathcurious/sketches/bdp6luRil" target="_blank">Mathcurious' implementation</a>
       </span>
       If you want to learn more about GFlowNets have a look into the literature and tutorials below.
+      <br><br><br><br>
+      Author: Florian Holeczek
+      <br>Created as seminar project in the MSc program Artificial Intelligence at JKU Linz
     </p>
 
   </section>
 
 
-  <section class="section" id="Sources">
+  <section class="section" id="Sources" bind:this={sourcesstart}>
     <h2 class="section-title">Sources</h2>
     <h3 class="section-title3">Literature</h3>
       <p class="section-text">

@@ -55,6 +55,7 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
 
     // Prepare losses
     const iters = Array.from(Array(losses['n_iterations']+1),(x,i)=>i)
+    const truelogz_array = new Array(losses['n_iterations']+1).fill(losses['truelogz']);
 
     // Contour plot for density
     const contourTrace = {
@@ -151,7 +152,7 @@ export function plotStates(Plotly, gaussians, states, losses, options = {}) {
     }
     const truelogzplot = {
         x:iters,
-        y:losses['truelogz'],
+        y:truelogz_array,
         name: 'True logZ',
         type:'scatter',
         mode:'lines',
