@@ -11,7 +11,6 @@
   import Slider from '@smui/slider';
   import Button, { Label } from '@smui/button';
   import IconButton, { Icon } from '@smui/icon-button';
-  //import 'svelte-material-ui/themes/fixation.css';
   import "./theme.css"
   import Tab from '@smui/tab';
   import TabBar from '@smui/tab-bar';
@@ -31,7 +30,6 @@
     flow_velocity.set(velocity);
     flow_n_particles.set(nParticles);
     flow_vectorfield.set(vectorfield);
-    //console.log(vectorfield, nParticles, velocity);
   }
 
 
@@ -157,7 +155,7 @@
   }
 
   async function updateVectorfield() {
-    await get_vectorfield(34);
+    await get_vectorfield(31);
     if (!flowvis_instance){
             flowvis_instance = new p5((p) => plot_flow(p, current_vectorfield), flowContainer);
           }
@@ -480,7 +478,7 @@
 
   <!-- Playground -->
 
-  <div class="pg-background">
+  <div class="pg-background" id="Playground">
   <div class = "pg-top-background">
   </div>
 
@@ -767,6 +765,9 @@
                 </Content>
               </Paper>
             {/if}
+            {#if display_trainhistory && !isRunning}
+              <div style="position: absolute; bottom: 6px; right: 0px">Training Progress:</div>
+            {/if}
           </div>
         </div>
         {#if !display_trainhistory && !isRunning}
@@ -817,6 +818,7 @@
           <div class="pg-top-slider">
             <Slider
               bind:value="{flow_velocity_value}"
+              disabled="{flow_vectorfield_value}"
               min={0.1}
               max={1}
               step={0.1}
@@ -828,6 +830,7 @@
           <div class="pg-top-slider">
             <Slider
               bind:value="{flow_n_particles_value}"
+              disabled="{flow_vectorfield_value}"
               min={500}
               max={2000}
               step={100}
@@ -862,9 +865,12 @@
     <h2 class="section-title">What is this about?</h2>
     <p class="section-text">
       Here you can explore how GFlowNets learn.
-      <br>Make your own reward function, adjust the hyperparameters and watch the training progress.
-      If you have no idea what a GFlowNet actually is you might want to look into this basic tutorial first.
-      <br> Or just explore!
+      <br>If you have no idea what a GFlowNet actually is you might want to look into this basic tutorial first to learn more.
+      <br>Of course you can always just start exploring!
+      <br>
+      <br>You can adjust the reward function directly in the Environment view. Enter the parameters or drag the circles in the left plot however you wish.
+      You can then start training in the Training view. Adjust the hyperparameters and press Play to start training a GFlowNet.
+      You can view the flow of the trained model in the Flow view. If you want to know more about what the flow shows just continue reading!
     </p>
     <h2 class="section-title">What is a GFlowNet?</h2>
     <p class="section-text">
@@ -879,17 +885,18 @@
       <div class="image-container">
         <Accordion multiple>
           <Panel color="secondary">
-            <Header>Example (And more introduction)</Header>
+            <Header>Too fast? Expand for an example and more introduction</Header>
             <Content>
               Imagine building a Lego Pyramid. There are different blocks, and you can place them rotated and at different places.
-              <br>You might start with an empty plane and add a 2x4 block and so on. After some steps you might end up with an object which is more or less pyramid-shaped.
+              <br>You might start with an empty plane,add a 2x4 block and so on. After some steps you might end up with an object which is more or less pyramid-shaped.
               <br>
               <br>The different possibilities of states of the object form a graph: While in the beginning (state 0) you can only place something in the first level, later on you might have different options, and they depend on your first choices. One option is always to choose to be finished instead of continuing building.
               <br>
-              <br>If you want to use a GFlowNet for your task, it is important that the resulting graph is acyclic, i.e. it is not possible to reach a previous state.
-              <br>If we built a pyramid, in the end we have a trajectory (a sequence of states <Katex>s_0 \to s_1 \to ... \to s_{"final"}</Katex>). As we can choose to stop anytime, our trajectories can have different lengts, e.g. we can build a pyramid from 1 piece or from 100.
+              <br>If you want to use a GFlowNet for your task, it is important that the resulting graph is acyclic, i.e. it is not possible to reach a previous state. In terms of our pyramid this means taking away blocks is not possible.
+              <br>If we built a pyramid, in the end we have a trajectory (a sequence of states <Katex>s_0 \to s_1 \to ... \to s_{"T"}</Katex>). As we can choose to stop anytime, our trajectories can have different lengts, e.g. we can build a pyramid from 1 piece or from 100.
               <br>
-              <br>As you might have guessed from the vocabulary, GFlowNets are very similar to Reinforcement learning methods, we sample trajectories and assign a reward R(x) to them (or to the states). The main difference is that usual RL methods try to find solutions which maximize the reward, whereas GFlowNets learn the underlying distribution p(x). So we want to train a model such that p(x) is proportional to the reward function R(x). This allows us to sample not only from the mode which has the highest reward, but also all other modes which might be almost as good. Imagine a pyramid from two 2x4 blocks next to each other and a 2x2 block centered on top or we could just use 2x2 blocks. Both are valid and we might be interested in finding many possible ways to build pyramids.
+              <br>As you might have guessed from the vocabulary, GFlowNets are very similar to Reinforcement learning methods, we sample trajectories and assign a reward R(x) to them (or to the states). The main difference is that usual RL methods try to find solutions which maximize the reward, whereas GFlowNets learn the underlying distribution p(x). So we want to train a model such that p(x) is proportional to the reward function R(x). This allows us to sample not only from the mode which has the highest reward, but also all other modes which might be almost as good.
+              Imagine a pyramid which contains 2x4 blocks, we could just replace them with 2 2x2 blocks. Both options are valid and we might be interested in finding many possible ways to build pyramids.
               <br>
               <br>Building Lego Pyramids is maybe not usecase number one for GFlowNets, but they are used for is drug discovery (Nica et al., 2022), where sampling from multiple modes is really what you want in order to discover not only the most promising molecule.
 
@@ -929,7 +936,7 @@
       <span class="li">Same for the nodes: The sum of the flow going into a state is the same as the sum of the flow going out of it.</span>
       <br>
       We now can set the flow going out of a terminal state equal to it's reward.
-      Assuming all flow is stricly positivy, we can express the Flow from one state s to its children s' as:
+      Assuming all flow is stricly positive, we can express the Flow from one state s to its children s' as:
 
 
       <Katex displayMode>
@@ -943,7 +950,7 @@
       P_F(s'|s) = \frac{"{F(s,s')}{F(s)}"}
       </Katex>
       <span class="mathexpl"> The probability to sample an action to get to the next state s' is the flow going from s to s' divided by the total flow through s</span>
-      By using this policy we will sample finished objects x proportional to its reward.
+      By using this policy we will sample finished objects x proportional to their reward.
 
       <br>The only thing we miss for training is the loss. The easiest way would be to turn our flow matching constraint into a MSE:
 
@@ -963,10 +970,12 @@
     <p class="section-text">
       As we want to train GFlowNets quickly to explore how they behave, we need a simple environment which allows for exploring without needing a lot of compute during training. Here we use a simple 2D grid with each variable in the range [-3,3]. We then calculate the reward according to the Mixture of Multivariate Gaussians (for now two of them).
       <br>
-      <br>For each action, the GFlowNet takes a step along both the x and y direction, this is repeated until the defined length of a trajectory is reached. Note that this is unusual: GFlowNets allow for variable trajectory lengths, so the action space usually contains an additional end of sequence action, where the current state becomes the final state.
+      <br>For each action, the GFlowNet takes a step along both the x and y direction, this is repeated until the defined length of a trajectory is reached.
+      Note that this is unusual: GFlowNets allow for variable trajectory lengths, so the action space usually contains an additional end of sequence action, where the current state becomes the final state.
+      However fixing the trajectory length keeps everything a lot simpler.
       <br>
       <br>Above we stated that GFlowNets build an Acyclic Graph, so each state can only be visited once. We currently violate this assumption: While it is unlikely that a state gets visited twice in our continuous environment, it is still possible. To mitigate this we simply include a counter in our state which represents the current step.
-      only one param for variance: <Katex>\Sigma = \sigma^2 I</Katex>
+      We also simplified the variance of the gaussians to one parameter, so the variance for x and y is the same and there is no covariance (<Katex>\Sigma = \sigma^2 I</Katex>).
   </section>
 
 
@@ -977,11 +986,11 @@
     <h2 class="section-title">Training</h2>
     <p class="section-text">
       Now, how do we train a GFlowNet?
-      <br>First we need our GFN to be able to act in the environment.
+      <br>First we need our model to be able to act in the environment.
       To do this we let it predict the parameters of a distribution from which we then sample the actions.
-      To move, we simply add the actio to the current state to get the next state.
+      To move, we simply add the action to the current state to get the next state.
       <br>That was the easy part.
-      We now want to train our GFN using Trajectory Balance loss. Here it is again:
+      We now want to train our GFlowNet using Trajectory Balance loss. Here it is again:
       <Katex displayMode>
       L(\tau) = \log\left(\frac{"{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t;\\theta)}"}{"{R(x)\\prod_t P_B(s_t|s_{t+1}; \\theta)}"} \right)^2
       </Katex>
@@ -994,7 +1003,7 @@
     <div class="image-container">
       <Accordion multiple>
         <Panel color="secondary">
-          <Header>More math</Header>
+          <Header>More Trajectory Balance</Header>
           <Content>
             Let's look at the parts of this loss function:
             <ul>
@@ -1004,8 +1013,8 @@
               </li>
               <li>
                 <Katex>P_B(s_t|s_{"t+1"};\theta)</Katex>
-                The backward policy. Similar to as we defined the forward policy, we can define the backward policy as a distribution over the previous states (the parents) of a state.
-                We can also estimate it using a NN (not the same as for the forward policy).
+                The backward policy. Similar to the definition of the forward policy, we can define the backward policy as a distribution over the previous states (the parents) of a state.
+                We can also estimate it using a NN (not the same as for the forward policy). The reason both policies are different is the DAG structure. In a tree these would be the same. But as there are different ways to traverse the DAG from one state to the other, these policies might differ.
               </li>
               <li>
                 <Katex>Z_{"\\theta"}</Katex>
@@ -1037,14 +1046,14 @@
               Input: Reward function (part of the environment), model, hyperparameters
               <br>  1. Initialize model parameters for PF, PB, logZ
               <br>  2. Repeat for a number of iterations or until convergence:
-              <br>  3.      Repeat for trajectory length:
-              <br>  4.            Sample action for current state from PF
-              <br>  5.            Take step according to action
-              <br>  6.            Add new state to trajectory
-              <br>  7.      Calculate reward of final state according to reward function
-              <br>  8.      Calculate the sum of the log probabilities of all actions of the trajectory for each PF and PB
-              <br>  9.      Calculate the TB-Loss: (logZ + log probabilities PF - log probabilities PB - log reward)^2
-              <br>  10.    Update the parameters PF, PB, logZ
+              <br>  3.  -   Repeat for trajectory length:
+              <br>  4.  -     -   Sample action for current state from PF
+              <br>  5.  -     -   Take step according to action
+              <br>  6.  -     -   Add new state to trajectory
+              <br>  7.  -   Calculate reward of final state according to reward function
+              <br>  8.  -   Calculate the sum of the log probabilities of all actions of the trajectory for each PF and PB
+              <br>  9.  -   Calculate the TB-Loss: (logZ + log probabilities PF - log probabilities PB - log reward)^2
+              <br>  10. -  Update the parameters PF, PB, logZ
               <br><br>
             You can find the python code for this implementation on my <a href="https://github.com/florianholeczek/ugfn" target="_blank">github</a>.
           </Content>
@@ -1053,7 +1062,7 @@
     </div>
     <p class="section-text">
       We trained a GFlowNet on this environment for 2000 Iterations.
-      Below you see the progress of our GFlowNet during training. While it first samples randomly, it learns to match the true distribution of our environment.
+      Below you see the progress of our model during training. While it first samples randomly, it learns to match the true distribution of our environment.
 
 
     </p>
@@ -1071,8 +1080,9 @@
       />
       Show training Progress
     </div>
+    <div style="height:50px"></div>
     <p class="section-text">
-      Sampling according to the underlying distribution is one of the big advantages of GFlowNets: Other approaches usually learn to maximize the reward, so they would not sample from both of our modes (or everything in between), but they would find one of them and then just sample from it (especially if one of our modes would be greater than the other). This might be suboptimal e.g. in molecule discovery, where you might not want the most promising molecule, but many different of themmight be interesting.
+      Sampling according to the underlying distribution is one of the big advantages of GFlowNets: Other approaches usually learn to maximize the reward, so they would not sample from both of our modes (or everything in between), but they would find one of them and then just sample from it. This might be suboptimal e.g. in molecule discovery, where you might not want the most promising molecule, but many different of them might be interesting.
     </p>
 
 
@@ -1094,7 +1104,7 @@
       />
     </div>
     <p class="section-text">
-      Well thats not what we want! Instead of sampling from the true distribution we only sample from one mode, thats what common RL methods do. We had another goal!
+      Well, thats not what we want! Instead of sampling from the true distribution we only sample from one mode!
       <br><br>
       There are two main possibilities to fix this:
       <span class="li">We could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:<Katex>R_{"new"}(x)=R(x)^\beta</Katex>. This would change the "peakyness" of the reward function and we would not sample proportional to the reward function but according to <Katex>\pi(x|\beta) \propto R(x)^\beta</Katex>. It is also possible to use <Katex>\beta</Katex> as a trainable parameter and condition the model on it.</span>
@@ -1105,7 +1115,7 @@
         <Panel color="secondary">
           <Header>Changes to the algorithm</Header>
           <Content>
-            Training off-policy is even more helpful when we schedule it. We start with more a higher variance and scale it down during training until we reach on-policy training.
+            Training off-policy is even more helpful when we schedule it. We start with a higher variance and scale it down during training until we reach on-policy training.
             <br>Our new hyperparameter is the initial value for the off policy training, during each step we gradually decrease it until we reach 0.
             <br>
             <br>Important changes:
@@ -1157,9 +1167,44 @@
       <br>In our continuous space this gets even more complicated, not only in terms of visualization but also mathematically - look into Lahlou et al. (2023) if you are interested.
       <br>Instead of showing all the flows, the plot shows the <i>highest</i> flow for each state: This is a vector from it to another point on the grid.
       If we do that for some evenly spaced points we get a vectorfield. The visualization above is just a nicer way to show it by letting particles move through the field.
-      Note that this might be a bit misleading as a lot depends on the parameters of the physics simulation. Change to view the vectorfield for more precision.
+      Note that this might be a bit misleading as a lot depends on the parameters of the physics simulation. You can change to view the vectorfield for more precision.
+      This visualization shows the flowfield for the last of the steps in the trajectory. Train your own model and you can look at how the flowfield changes from the first to the last step.
     </p>
   </section>
+
+  <section class="section">
+    <h2 class="section-title">What now?</h2>
+    <div class="whatnext_t">
+      <div class="whatnext_b">Train our own GFlownets? <br> Go to the top</div>
+      <div class="whatnext_b">Interested in the code? <br>Find it here</div>
+      <div class="whatnext_b">Learn more about GFlowNets?<br>Find other tutorials</div>
+    </div>
+    <div class="whatnext_t">
+      <div class="whatnext_b">
+        <Fab
+        on:click={scrollToTutorial}
+        disabled="{isRunning}"
+      >
+        <Icon class="material-icons">keyboard_arrow_up</Icon></Fab>
+      </div>
+      <div class="whatnext_b">
+        <Fab
+        on:click={scrollToTutorial}
+        disabled="{isRunning}"
+      >
+        <Icon class="material-icons">replay</Icon></Fab>
+      </div>
+      <div class="whatnext_b">
+        <Fab
+        on:click={scrollToTutorial}
+        disabled="{isRunning}"
+      >
+        <Icon class="material-icons">keyboard_arrow_down</Icon></Fab>
+      </div>
+    </div>
+
+  </section>
+
   <section class="section">
     <h2 class="section-title">Acknowledgements</h2>
     <p class="section-text">
@@ -1184,7 +1229,7 @@
   </section>
 
 
-  <section class="section">
+  <section class="section" id="Sources">
     <h2 class="section-title">Sources</h2>
     <h3 class="section-title3">Literature</h3>
       <p class="section-text">

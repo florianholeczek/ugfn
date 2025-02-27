@@ -22,7 +22,6 @@ export function plot_flow(p, vectors) {
     let particles = [];
     let flowfield;
 
-    //parameters
     const lifespan_min = 100;
     const lifespan_max = 200;
 
@@ -52,7 +51,7 @@ export function plot_flow(p, vectors) {
       for (let i = 0; i < flowfield.length; i++) {
         let vData = vectors.vectors[i];
         let vect = p.createVector(vData.x, vData.y);
-        vect.normalize();
+        //vect.normalize();
         flowfield[i] = vect;
       };
 
@@ -63,19 +62,19 @@ export function plot_flow(p, vectors) {
             let index = y * cols + x;
             let vect = flowfield[index];
 
-            let posX = x * scl - p.width / 2;
-            let posY = y * scl - p.height / 2;
+            let posX = x * scl - p.width / 2 + Math.floor(scl * 0.5);
+            let posY = y * scl - p.height / 2 + Math.floor(scl * 0.5);
 
             p.push();
             p.translate(posX, posY);
 
             // Scale vector for visibility
-            let arrowLength = scl * 0.5; // Adjust arrow size
+            let arrowLength = scl * 0.5 * vect.mag(x,y); // Adjust arrow size
             let angle = vect.heading();
 
             p.stroke(255);
             p.strokeWeight(1);
-            p.fill(53, 183, 121);
+            p.fill(255, 255, 255);
 
             p.rotate(angle);
             p.line(0, 0, arrowLength, 0);

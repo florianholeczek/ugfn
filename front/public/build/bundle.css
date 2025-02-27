@@ -345,9 +345,26 @@ input[type="range"] {
     position: absolute;
     top: 95px;
     left: 100px;
-    width: 850px;
-    height:850px;
+    width: 775px;
+    height:775px;
   }
+
+  .whatnext_t {
+    width: 1000px;
+    display: flex;
+    justify-content: space-evenly;
+    padding: 10px;
+    margin: 0 auto;
+  }
+  .whatnext_b {
+    display: flex;
+    flex:1;
+    align-items: center;
+    justify-content: center;
+    margin-left:20px;
+    margin-right:20px;
+    text-align: center;
+}
 
 
 
