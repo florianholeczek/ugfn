@@ -184,6 +184,13 @@ input[type="range"] {
     cursor: not-allowed;
   }
 
+  .hyperparameters {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
 
 
   .pg-background{

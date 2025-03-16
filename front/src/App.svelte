@@ -11,6 +11,7 @@
   import Slider from '@smui/slider';
   import Button, { Label } from '@smui/button';
   import IconButton, { Icon } from '@smui/icon-button';
+  import Tooltip, { Wrapper, Title } from '@smui/tooltip';
   import "./theme.css"
   import Tab from '@smui/tab';
   import TabBar from '@smui/tab-bar';
@@ -686,7 +687,23 @@
             {#if active_tab === 'Basic'}
               <Paper variant="unelevated">
                 <Content>
-                  Batch size: {batch_size_value}
+                  Batch size
+                  <div class="hyperparameters">
+                    {batch_size_value}
+                    <Wrapper rich>
+                      <IconButton size="button">
+                        <Icon class="material-icons">info</Icon>
+                      </IconButton>
+                      <Tooltip persistent>
+                        <Title style="text-align: center">How many samples to train with.</Title>
+                        <Content style="color: black; font-size: 12px; text-align: left">
+                          <br>
+                          Change the batch size to adjust how many samples are created in one iteration during training.
+                          Note that a higher batch size leads to longer training time.
+                        </Content>
+                      </Tooltip>
+                    </Wrapper>
+                  </div>
                   <Slider
                     bind:value="{batch_size_exponent}"
                     min={3}
@@ -696,7 +713,25 @@
                     input$aria-label="Set the batch size: 2 to the power of n"
                   />
                   <br>
-                  Trajectory length: {trajectory_length_value}
+                  <br>
+                  Trajectory length
+                  <div class="hyperparameters">
+                    {trajectory_length_value}
+                    <Wrapper rich>
+                      <IconButton size="button">
+                        <Icon class="material-icons">info</Icon>
+                      </IconButton>
+                      <Tooltip persistent>
+                        <Title style="text-align: center">Fixed number of steps the agent takes.</Title>
+                        <Content style="color: black; font-size: 12px; text-align: left">
+                          <br>
+                          Change the trajectory length to adjust how many step the agent takes.
+                          Starting from (0,0), the agent collects the reward after this fixed number of steps.
+                          A higher trajectory length tends to give better results, but increases training time.
+                        </Content>
+                      </Tooltip>
+                    </Wrapper>
+                  </div>
                   <Slider
                     bind:value="{trajectory_length_value}"
                     min={1}
@@ -706,7 +741,23 @@
                     input$aria-label="Set the length of the trajectory"
                   />
                   <br>
-                  Learning rate of the model: {lr_model_value.toFixed(4)}
+                  <br>
+                  Learning rate model
+                  <div class="hyperparameters">
+                    {lr_model_value.toFixed(4)}
+                    <Wrapper rich>
+                      <IconButton size="button">
+                        <Icon class="material-icons">info</Icon>
+                      </IconButton>
+                      <Tooltip persistent>
+                        <Title style="text-align: center">The learning rate of the forward and backward policies.</Title>
+                        <Content style="color: black; font-size: 12px; text-align: left">
+                          <br>
+                          Change the learning rate of the neural nets that represent the forward and backward policy.
+                        </Content>
+                      </Tooltip>
+                    </Wrapper>
+                  </div>
                   <Slider
                     bind:value="{lr_model_value}"
                     min={0.0001}
@@ -716,7 +767,24 @@
                     input$aria-label="Set the learning rate of the model"
                   />
                   <br>
-                  Learning rate of <br> logZ: {lr_logz_value.toFixed(3)}
+                  <br>
+                  Learning rate logZ
+                  <div class="hyperparameters">
+                    {lr_logz_value.toFixed(3)}
+                    <Wrapper rich>
+                      <IconButton size="button">
+                        <Icon class="material-icons">info</Icon>
+                      </IconButton>
+                      <Tooltip persistent>
+                        <Title style="text-align: center">The learning rate of the partition function.</Title>
+                        <Content style="color: black; font-size: 12px; text-align: left">
+                          <br>
+                          Change the larning rate of the parameter log(Z) which represents the partition function.
+                          Malkin et al. (2022) claim that setting this learning rate higher than that of the policies helps in training.
+                        </Content>
+                      </Tooltip>
+                    </Wrapper>
+                  </div>
                   <Slider
                     bind:value="{lr_logz_value}"
                     min={0.001}
@@ -730,7 +798,26 @@
             {:else if active_tab === 'Advanced'}
               <Paper variant="unelevated">
                 <Content>
-                  Off-policy: {off_policy_value}
+                  Off-policy
+                  <div class="hyperparameters">
+                    {off_policy_value}
+                    <Wrapper rich>
+                      <IconButton size="button">
+                        <Icon class="material-icons">info</Icon>
+                      </IconButton>
+                      <Tooltip persistent>
+                        <Title style="text-align: center">Amount of off-policy training</Title>
+                        <Content style="color: black; font-size: 12px; text-align: left">
+                          <br>
+                          Change to adjust if and to what amount the model trains off-policy.
+                          Setting the parameter to 0 is equal to on-policy training.
+                          The value gets added to the variance when sampling a new step according to the policy.
+                          This leads to higher exploration and is helpful if the modes of the reward function are far apart.
+                          The value gets scheduled and decays to 0 during training.
+                        </Content>
+                      </Tooltip>
+                    </Wrapper>
+                  </div>
                   <Slider
                     bind:value="{off_policy_value}"
                     min={0}
@@ -740,7 +827,24 @@
                     input$aria-label="Set the Off-policy training"
                   />
                   <br>
-                  Number of hidden layers: {hidden_layer_value}
+                  <br>
+                  Hidden layers:
+                  <div class="hyperparameters">
+                    {hidden_layer_value}
+                    <Wrapper rich>
+                      <IconButton size="button">
+                        <Icon class="material-icons">info</Icon>
+                      </IconButton>
+                      <Tooltip persistent>
+                        <Title style="text-align: center">Number of hidden layers in the forward and backward policies</Title>
+                        <Content style="color: black; font-size: 12px; text-align: left">
+                          <br>
+                          Change to adjust the number of hidden layers in the neural nets which represent the policies.
+                          Usually shallow networks work fine here and avoid the problems which arise with deeper architectures.
+                        </Content>
+                      </Tooltip>
+                    </Wrapper>
+                  </div>
                   <Slider
                     bind:value="{hidden_layer_value}"
                     min={1}
@@ -750,7 +854,23 @@
                     input$aria-label="Set the number of hidden layers"
                   />
                   <br>
-                  Size of the hidden layers: {hidden_dim_value}
+                  <br>
+                  Hidden layer size
+                  <div class="hyperparameters">
+                    {hidden_dim_value}
+                    <Wrapper rich>
+                      <IconButton size="button">
+                        <Icon class="material-icons">info</Icon>
+                      </IconButton>
+                      <Tooltip persistent>
+                        <Title style="text-align: center">Dimensions of the hidden layers in the forward and backward policies</Title>
+                        <Content style="color: black; font-size: 12px; text-align: left">
+                          <br>
+                          Change to adjust the size of the hidden layers in the neural nets which represent the policies.
+                        </Content>
+                      </Tooltip>
+                    </Wrapper>
+                  </div>
                   <Slider
                     bind:value="{hidden_dim_value}"
                     min={8}
@@ -760,7 +880,23 @@
                     input$aria-label="Set the dimension of the hidden layers"
                   />
                   <br>
-                  Seed: {seed_value}
+                  <br>
+                  Seed
+                  <div class="hyperparameters">
+                    {seed_value}
+                    <Wrapper rich>
+                      <IconButton size="button">
+                        <Icon class="material-icons">info</Icon>
+                      </IconButton>
+                      <Tooltip persistent>
+                        <Title style="text-align: center">Value to seed random number generators with</Title>
+                        <Content style="color: black; font-size: 12px; text-align: left">
+                          <br>
+                          The random number generators will be seeded with this value to allow for reproducible results.
+                        </Content>
+                      </Tooltip>
+                    </Wrapper>
+                  </div>
                   <Slider
                     bind:value="{seed_value}"
                     min={1}
