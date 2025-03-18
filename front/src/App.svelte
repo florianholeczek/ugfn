@@ -64,8 +64,9 @@
   $: n_iterations_value = parseInt(n_iterations_str, 10);
   let losses_select = ["Trajectory Balance", "Flow Matching"];
   let view = "Environment";
-  let Plotly;
-  let p5;
+  let Plotly; //Plotly for plotting the environment and training visualizations
+  let p5; //p5 for visualizing the flow
+  let tf; // tensorflow for ML
   let flowContainer;
   let flowvis_instance;
   let panel_algo = false;
@@ -187,7 +188,7 @@
       seed_value = 42;
       batch_size_exponent = 6;
   }
-
+  /*
   async function loadPlotly() {
     const script = document.createElement('script');
     script.src = 'https://cdn.plot.ly/plotly-2.0.0.min.js';
@@ -210,6 +211,22 @@
         p5 = window.p5;
         resolve();
       };
+    });
+  }*/
+
+  async function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        if (document.querySelector(`script[src="${src}"]`)) {
+            return resolve(); // Prevent loading the same script multiple times
+        }
+
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+
+        document.head.appendChild(script);
     });
   }
 
@@ -443,11 +460,14 @@
 
   // Mounting
   onMount(async () => {
-    //visualize the environment
-    await loadPlotly();
-    await loadp5();
+    await loadScript('https://cdn.plot.ly/plotly-2.0.0.min.js')
+    Plotly = window.Plotly;
     plotlyready = true;
     plotEnv();
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js')
+    p5 = window.p5;
+    await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js')
+    tf = window.tf
     // add listeners for changing the Environment
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', stopDrag);

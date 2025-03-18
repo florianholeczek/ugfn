@@ -1,4 +1,8 @@
 // functions for computing the reward and visualizing the Environment
+const tf = window.tf;
+import {MultivariateNormal} from "./arch.js";
+
+
 
 // calculate reward
 function gaussianPDF(x, y, mean, variance) {
@@ -134,4 +138,34 @@ export function compute_density_plotting(gaussians, gridSize){
       "densityX": densityX,
       "densityY": densityY,
     }
+}
+
+class Env{
+  constructor(
+      gaussians,
+      start
+  ){
+    this.gaussians = gaussians;
+    this.start = start;
+    const meansArray = gaussians.map(g => [g.mean.x, g.mean.y]);
+    const variancesArray = gaussians.map(g => [g.variance]);
+    this.mus = tf.tensor2d(meansArray);  // Shape (length, 2)
+    this.sigmas = tf.tensor2d(variancesArray);  // Shape (length, 1)
+    this.mixture = MultivariateNormal(this.mus, this.sigmas)
+    this.log_partition = tf.log(this.mus.shape[0])
+  }
+
+  reward(states){
+    return tf.tidy(() => {
+        const logprobs = this.mixture.log_prob(state);
+        return tf.exp(logprobs).sum(0);
+    });
+  }
+
+  log_reward(states){
+    return tf.tidy(() => {
+        const logprobs = this.mixture.log_prob(state);
+        return tf.logSumExp(logprobs,0);
+    });
+  }
 }

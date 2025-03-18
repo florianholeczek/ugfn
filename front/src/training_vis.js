@@ -1,4 +1,3 @@
-import {computeDensity} from "./env.js";
 
 function linspace(start, stop, num) {
     const step = (stop - start) / (num-1);
