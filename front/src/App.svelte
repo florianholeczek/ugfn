@@ -22,6 +22,8 @@
   import Textfield from '@smui/textfield';
   import Fab from '@smui/fab';
   import { flow_velocity, flow_n_particles,flow_vectorfield } from './store.js';
+  import {GFlowNet} from "./arch.js"
+  import {Env} from "./env.js"
 
   let flow_velocity_value = 0.5;
   let flow_n_particles_value = 1000;
@@ -223,7 +225,10 @@
         const script = document.createElement('script');
         script.src = src;
         script.async = true;
-        script.onload = () => resolve();
+        script.onload = () => {
+          resolve();
+          console.log("script loaded successfully")
+        }
         script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
 
         document.head.appendChild(script);
@@ -456,6 +461,18 @@
   }
 
 
+  async function test_training(){
+
+    let model = new GFlowNet();
+    console.log("GFlownet ok")
+    const curr_gaussians = $gaussians;
+    let env = new Env(curr_gaussians, tf.zeros([2]));
+    console.log("env ok")
+    await model.train(env);
+    console.log("Trained")
+  }
+
+
 
 
   // Mounting
@@ -467,7 +484,14 @@
     await loadScript('https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js')
     p5 = window.p5;
     await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js')
-    tf = window.tf
+    if (window.tf){
+      tf = window.tf;
+      //await window.tf.setBackend('webgl');
+      console.log("Tensorflow available")
+    }else{
+      "Tensorflow not available";
+    }
+
     // add listeners for changing the Environment
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', stopDrag);
@@ -502,7 +526,11 @@
 
 
 
-
+  <Fab
+    on:click={test_training}
+    disabled="{isRunning}"
+  ><Icon class="material-icons" style="font-size: 22px">play_arrow</Icon>
+  </Fab>
 
   <!-- Playground -->
 

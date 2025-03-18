@@ -140,18 +140,20 @@ export function compute_density_plotting(gaussians, gridSize){
     }
 }
 
-class Env{
+export class Env{
   constructor(
       gaussians,
       start
   ){
+    const tf = window.tf;
+    tf.setBackend("cpu")
     this.gaussians = gaussians;
     this.start = start;
     const meansArray = gaussians.map(g => [g.mean.x, g.mean.y]);
     const variancesArray = gaussians.map(g => [g.variance]);
     this.mus = tf.tensor2d(meansArray);  // Shape (length, 2)
     this.sigmas = tf.tensor2d(variancesArray);  // Shape (length, 1)
-    this.mixture = MultivariateNormal(this.mus, this.sigmas)
+    this.mixture = new MultivariateNormal(this.mus, this.sigmas)
     this.log_partition = tf.log(this.mus.shape[0])
   }
 
@@ -163,8 +165,11 @@ class Env{
   }
 
   log_reward(states){
+    console.log("starting logreward calc", states)
     return tf.tidy(() => {
+      console.log("logrewardcalc started")
         const logprobs = this.mixture.log_prob(state);
+        console.log("logrewcalc got from mixture")
         return tf.logSumExp(logprobs,0);
     });
   }
