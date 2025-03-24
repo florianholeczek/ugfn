@@ -485,6 +485,7 @@
     p5 = window.p5;
     await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js')
     if (window.tf){
+      window.tf = window.tf
       tf = window.tf;
       //await window.tf.setBackend('webgl');
       console.log("Tensorflow available")

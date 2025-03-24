@@ -1,5 +1,17 @@
 
 //getting the ml part in the frontend (work in progress)
+export let tf = null;
+
+if (window.tf) {
+    tf = window.tf;
+} else {
+    window.addEventListener("load", () => {
+        if (window.tf) {
+            tf = window.tf;
+            tf.setBackend("cpu");
+        }
+    });
+}
 
 export class MultivariateNormal{
     constructor(
@@ -13,8 +25,7 @@ export class MultivariateNormal{
          * @param {tf.tensor} mus - A tensor of shape (batchsize,2) representing mu_x, mu_y.
          * @param {tf.tensor} sigmas - A tensor of shape(batchsize,1) representing sigma
          */
-        const tf = window.tf;
-        tf.setBackend("cpu")
+
         this.mus = mus
         this.sigmas = sigmas
     }
@@ -32,9 +43,10 @@ export class MultivariateNormal{
         console.log("lp 1")
         const d = this.mus.shape[1];  // Number of dimensions (should be 2 for 2D)
         const log2pi = tf.scalar(Math.log(2 * Math.PI));
-        console.log("lp 2")
+        console.log("lp 2", samples, this.mus)
         // Compute (x - mu) / sigma for each sample
         const diff = samples.sub(this.mus);
+        console.log("lp 2.5")
         const diff_scaled = diff.div(this.sigmas);
         console.log("lp 3")
         // Compute the squared term (x - mu)^2 / sigma^2
@@ -76,7 +88,6 @@ export class GFlowNet{
          * @param {number} lrModel - Learning rate of the model.
          * @param {number} lrLogZ - Learning rate of logZ.
          */
-        const tf = window.tf;
         tf.setBackend("cpu")
         this.forward_model = this.createModel(n_hidden_layers, hidden_dim);
         this.backward_model = this.createModel(n_hidden_layers, hidden_dim);
@@ -208,8 +219,8 @@ export class GFlowNet{
             await tf.tidy(() => {
                 const x = this.init_state(env, batch_size);
                 console.log("state initialized")
-                let log_probs_forward = tf.zeros([batch_size]);
-                let log_probs_backward = tf.zeros([batch_size]);
+                let log_probs_forward = tf.variable(tf.zeros([batch_size]));
+                let log_probs_backward = tf.variable(tf.zeros([batch_size]));
                 let trajectory = tf.zeros([batch_size, trajectory_length + 1, 3]);
                 console.log("logprobs and trajectories initialized")
                 
@@ -234,10 +245,19 @@ export class GFlowNet{
                     }
                 }
                 
-                const logReward = env.log_reward(trajectory.slice([0, trajectory_length-1, 1], [batch_size, 1, 2]).reshape([batch_size, 2]));
+                const logReward = tf.variable(env.log_reward(trajectory.slice([0, trajectory_length-1, 1], [batch_size, 1, 2]).reshape([batch_size, 2])));
                 console.log("logreward calculated")
-                const loss = tf.mean(this.logz.add(log_probs_forward).sub(log_probs_backward).sub(logReward).square());
+                const loss = tf.tidy(() => {
+                    return tf.mean(
+                        this.logz.add(log_probs_forward)
+                            .sub(log_probs_backward)
+                            .sub(logReward)
+                            .square()
+                    );
+                });
                 console.log("loss", loss)
+                this.optimizer_model.minimize(() => log_probs_forward);
+                console.log("minimized", log_probs_backward, log_probs_forward, logReward, this.logz)
                 this.optimizer_model.minimize(() => loss);
                 this.optimizer_logz.minimize(() => loss);
                 console.log("optimized")

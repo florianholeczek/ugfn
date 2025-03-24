@@ -1,5 +1,16 @@
 // functions for computing the reward and visualizing the Environment
-const tf = window.tf;
+export let tf = null;
+
+if (window.tf) {
+    tf = window.tf;
+} else {
+    window.addEventListener("load", () => {
+        if (window.tf) {
+            tf = window.tf;
+            tf.setBackend("cpu");
+        }
+    });
+}
 import {MultivariateNormal} from "./arch.js";
 
 
@@ -145,32 +156,35 @@ export class Env{
       gaussians,
       start
   ){
-    const tf = window.tf;
-    tf.setBackend("cpu")
     this.gaussians = gaussians;
     this.start = start;
-    const meansArray = gaussians.map(g => [g.mean.x, g.mean.y]);
-    const variancesArray = gaussians.map(g => [g.variance]);
-    this.mus = tf.tensor2d(meansArray);  // Shape (length, 2)
-    this.sigmas = tf.tensor2d(variancesArray);  // Shape (length, 1)
-    this.mixture = new MultivariateNormal(this.mus, this.sigmas)
+    const ma = gaussians.map(g => [g.mean.x, g.mean.y])
+    const mv = gaussians.map(g => [g.variance])
+    console. log("ma mv", ma, mv)
+    this.mus = tf.tensor2d(ma);  // Shape (length, 2)
+    this.sigmas = tf.tensor2d(mv);  // Shape (length, 1)
+    console. log("ma mv", this.mus, this.sigmas)
+    this.mixture = [];
+    for (let i = 0; i < this.mus.shape[0]; i++) {
+      this.mixture.push(new MultivariateNormal(this.mus.slice([i,0], [1,-1]), this.sigmas.slice([i,0], [1,-1])));
+    }
     this.log_partition = tf.log(this.mus.shape[0])
   }
 
   reward(states){
     return tf.tidy(() => {
-        const logprobs = this.mixture.log_prob(state);
-        return tf.exp(logprobs).sum(0);
+        const logprobs = this.mixture.map(m => m.log_prob(states));
+        return tf.sum(tf.exp(tf.stack(logprobs)), 0);
     });
   }
 
   log_reward(states){
     console.log("starting logreward calc", states)
     return tf.tidy(() => {
-      console.log("logrewardcalc started")
-        const logprobs = this.mixture.log_prob(state);
+      console.log("logrewardcalc started", this.mixture)
+        const logprobs = this.mixture.map(m => m.log_prob(states));
         console.log("logrewcalc got from mixture")
-        return tf.logSumExp(logprobs,0);
+        return tf.logSumExp(tf.stack(logprobs),0);
     });
   }
 }
