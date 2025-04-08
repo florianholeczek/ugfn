@@ -34,7 +34,6 @@ export class MultivariateNormal{
         let samples_raw = tf.randomNormal(this.mus.shape, 0,1);
         let samples_scaled = samples_raw.mul(this.sigmas);
         let samples = samples_scaled.add(this.mus);
-        console.log("MultivariateNormal sampled", samples);
         return samples;
     }
 
@@ -43,21 +42,15 @@ export class MultivariateNormal{
         console.log("lp 1")
         const d = this.mus.shape[1];  // Number of dimensions (should be 2 for 2D)
         const log2pi = tf.scalar(Math.log(2 * Math.PI));
-        console.log("lp 2", samples, this.mus)
         // Compute (x - mu) / sigma for each sample
         const diff = samples.sub(this.mus);
-        console.log("lp 2.5")
         const diff_scaled = diff.div(this.sigmas);
-        console.log("lp 3")
         // Compute the squared term (x - mu)^2 / sigma^2
         const squared_term = diff_scaled.square();
-        console.log("lp 4")
         // Sum over the dimensions (axis 1)
         const sum_squared = squared_term.sum(1);
-        console.log("lp 5", this.sigmas)
         // Log probability calculation: log p(x) = -d/2 * log(2*pi) - sum(log(sigma)) - 1/2 * sum((x - mu)^2 / sigma^2)
         const log_sigma = tf.log(this.sigmas);
-        console.log("lp 6", log_sigma)
         const log_prob = tf.neg(
             tf.mul(
                 tf.scalar(d / 2).mul(log2pi),
@@ -156,15 +149,10 @@ export class GFlowNet{
          * @param {number} off_policy - A constant to add to sigma.
          * @returnm {[MultivariateDist, multivariateDist]} distributions - policy distribution and exploration distribution
          */
-        console.log("gd 1", policy.shape)
         const [mus, sigmas_raw] = tf.split(policy, [2,1], 1); // Split along axis 1 (columns)
-        console.log("gd 2")
         const sigmas = sigmas_raw.sigmoid().mul(0.9).add(0.1);
-        console.log("gd 3")
         let policy_dist = new MultivariateNormal(mus, sigmas);
-        console.log("gd 4")
         if(!off_policy) return [policy_dist, null];
-
         let exploration_dist = new MultivariateNormal(mus, sigmas.add(tf.scalar(off_policy)));
         return [policy_dist, exploration_dist];
     }
@@ -181,11 +169,8 @@ export class GFlowNet{
          *          - `logProbs`: A tensor of shape (batch_size, 2) containing log probabilities of the actions.
          */
         const forward_policy = this.forward_model.apply(x);
-        console.log("ga Forward pass ok")
         const [policy_dist, exploration_dist] = GFlowNet.get_dist(forward_policy, off_policy);
-        console.log("ga dists retrieved")
         const actions = off_policy ? exploration_dist.sample() : policy_dist.sample();
-        console. log("ga actions retrieved")
         const log_probs = policy_dist.log_prob(actions);
 
         return [actions, log_probs];
@@ -209,59 +194,60 @@ export class GFlowNet{
         env, 
         batch_size = 64, 
         trajectory_length = 2, 
-        n_Iterations = 5000, 
+        n_Iterations = 1024,
         off_policy = null, 
         lossFn = "Trajectory Balance"
     ) {
         const exploration_schedule = Array.isArray(off_policy) ? off_policy : tf.linspace(off_policy || 0, 0, n_Iterations).arraySync();
         console.log("exploration scheduled, start loop")
         for (let i = 0; i < n_Iterations; i++) {
-            await tf.tidy(() => {
-                const x = this.init_state(env, batch_size);
-                console.log("state initialized")
-                let log_probs_forward = tf.variable(tf.zeros([batch_size]));
-                let log_probs_backward = tf.variable(tf.zeros([batch_size]));
-                let trajectory = tf.zeros([batch_size, trajectory_length + 1, 3]);
-                console.log("logprobs and trajectories initialized")
-                
-                for (let t = 0; t < trajectory_length; t++) {
-                    const [actions, logProbs] = this.get_action(x, exploration_schedule[i]);
-                    console.log("actions retrieved")
-                    log_probs_forward = log_probs_forward.add(logProbs);
-                    const x_prime = GFlowNet.step(x, actions);
-                    console.log("step taken")
-                    trajectory = trajectory.slice([0, 0, 0], [batch_size, t + 1, 3]).concat(x_prime.expandDims(1), 1);
-                }   console.log("trajectory updated")
-                
-                if (lossFn === "Trajectory Balance") {
-                    for (let t = trajectory_length; t > 1; t--) {
-                        const logProbs = this.get_backward_log_probs(trajectory.slice([0, t, 0], [batch_size, 1, 3]).reshape([batch_size, 3]), 
-                            trajectory.slice([0, t, 1], [batch_size, 1, 2]).reshape([batch_size, 2]).sub(
-                                trajectory.slice([0, t - 1, 1], [batch_size, 1, 2]).reshape([batch_size, 2])
-                            )
-                        );
-                        log_probs_backward = log_probs_backward.add(logProbs);
-                        console.log("logprobs calculated")
+            const logz_loss = this.logz.clone()
+            let loss, non_logz_loss;
+            this.optimizer_model.minimize(() => {
+
+                return tf.tidy(() => {
+                    const x = this.init_state(env, batch_size);
+                    let log_probs_forward = tf.zeros([batch_size]);
+                    let log_probs_backward = tf.zeros([batch_size]);
+                    let trajectory = tf.zeros([batch_size, trajectory_length + 1, 3]);
+
+                    for (let t = 0; t < trajectory_length; t++) {
+                        const [actions, logProbs] = this.get_action(x, exploration_schedule[i]);
+                        log_probs_forward = log_probs_forward.add(logProbs);
+                        const x_prime = GFlowNet.step(x, actions);
+                        trajectory = trajectory.slice([0, 0, 0], [batch_size, t + 1, 3]).concat(x_prime.expandDims(1), 1);
                     }
-                }
-                
-                const logReward = tf.variable(env.log_reward(trajectory.slice([0, trajectory_length-1, 1], [batch_size, 1, 2]).reshape([batch_size, 2])));
-                console.log("logreward calculated")
-                const loss = tf.tidy(() => {
-                    return tf.mean(
-                        this.logz.add(log_probs_forward)
-                            .sub(log_probs_backward)
-                            .sub(logReward)
-                            .square()
-                    );
+                    console.log("trajectory updated")
+
+                    if (lossFn === "Trajectory Balance") {
+                        for (let t = trajectory_length; t > 1; t--) {
+                            const logProbs = this.get_backward_log_probs(trajectory.slice([0, t, 0], [batch_size, 1, 3]).reshape([batch_size, 3]),
+                                trajectory.slice([0, t, 1], [batch_size, 1, 2]).reshape([batch_size, 2]).sub(
+                                    trajectory.slice([0, t - 1, 1], [batch_size, 1, 2]).reshape([batch_size, 2])
+                                )
+                            );
+                            log_probs_backward = log_probs_backward.add(logProbs);
+                            console.log("logprobs calculated")
+                        }
+                    }
+
+                    const logReward = env.log_reward(trajectory.slice([0, trajectory_length - 1, 1], [batch_size, 1, 2]).reshape([batch_size, 2]));
+                    const non_logz_loss_temp = log_probs_forward.sub(log_probs_backward).sub(logReward);
+                    non_logz_loss = tf.keep(non_logz_loss_temp.clone());
+                    const loss_temp = tf.mean(non_logz_loss_temp.add(logz_loss).square());
+                    loss = tf.keep(loss_temp.clone());
+                    return loss_temp
                 });
-                console.log("loss", loss)
-                this.optimizer_model.minimize(() => log_probs_forward);
-                console.log("minimized", log_probs_backward, log_probs_forward, logReward, this.logz)
-                this.optimizer_model.minimize(() => loss);
-                this.optimizer_logz.minimize(() => loss);
-                console.log("optimized")
             });
+            this.optimizer_logz.minimize(() =>{
+                return tf.tidy(() => {
+                    const loss_temp = tf.mean(non_logz_loss.add(this.logz).square());
+                    non_logz_loss.dispose();
+                    return loss_temp;
+                });
+            });
+            loss.print();
+            loss.dispose();
         }
     }
 
