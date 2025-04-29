@@ -68,10 +68,7 @@
   let p5;
   let flowContainer;
   let flowvis_instance;
-  let panel_algo = false;
-  let panel_loss = false;
-  let panel_example = false;
-  let panel_changes = false;
+  let vectorgrid_size=31;
 
   // ranges for means and variances
   const range = { min: -3, max: 3 };
@@ -95,6 +92,8 @@
   let current_states;
   let current_losses;
   let current_vectorfield;
+  let current_flows;
+  let current_trajectories;
   let current_plotting_density;
   let run1_value = 2048;
   let run2_value = 4096;
@@ -160,7 +159,7 @@
   }
 
   async function updateVectorfield() {
-    await get_vectorfield(31);
+    await get_vectorfield(vectorgrid_size);
     if (!flowvis_instance){
             flowvis_instance = new p5((p) => plot_flow(p, current_vectorfield), flowContainer);
           }
@@ -278,12 +277,14 @@
       clearInterval(pollingTimer);
       isRunning = false;
       training_frame=0;
+      await get_final_data();
     } catch (error) {
       console.error(error);
     }
   }
 
   function pollTraining() {
+    let completed = false;
     pollingTimer = setInterval(async () => {
       try {
         const response = await fetch('http://localhost:8000/get_training_update');
@@ -306,18 +307,49 @@
           })
         }
 
-        if (data.completed) {
+        if (data.completed && !completed) {
+          completed = true;
           console.log("Training process completed.");
-          plotStates(Plotly, $gaussians, current_states,current_losses, current_plotting_density);
+          clearInterval(pollingTimer); //stop polling
           isRunning = false; // Update the UI state to reflect the stopped process
           training_frame=0;
-          clearInterval(pollingTimer); // Stop the polling
-          return; // Stop polling
+          await get_final_data();
+          plotStates(Plotly, $gaussians, current_states,current_losses, current_plotting_density);
+
         }
       } catch (error) {
         console.error(error);
       }
     }, POLLING_INTERVAL);
+  }
+
+  async function get_final_data() {
+    try {
+      const response = await fetch('http://localhost:8000/get_final_data',{
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to stop training.');
+      } else {
+        // const data = await response.json()
+        // console.log(data);
+        const arrayBuffer = await response.arrayBuffer();
+        const floats = new Float32Array(arrayBuffer);
+        const t1 = vectorgrid_size*vectorgrid_size*2*(trajectory_length_value+1);
+        const t2 = 2048*2*(trajectory_length_value+1);
+        const nSteps = Math.floor(floats.length / (t1+t2));
+        const cutoff = nSteps*t2;
+        console.log(nSteps, cutoff, floats.length)
+        current_trajectories = floats.slice(0, cutoff);
+        current_flows = floats.slice(cutoff);
+
+
+      }
+
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   // Functions for setting the environment

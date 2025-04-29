@@ -232,7 +232,7 @@ class GFlowNet:
         :param batch_size: Number of trajectories to sample
         :param trajectory_length: Fixed length of the trajectory,
         will only sample correctly if it is the same as in training
-        :return: Tensor of shape (batch_size, trajectory_length+1, 2) with the trajectorys of all samples
+        :return: Tensor of shape (batch_size, trajectory_length+1, 3) with the trajectorys of all samples
         """
         self.forward_model.eval()
         self.backward_model.eval()
