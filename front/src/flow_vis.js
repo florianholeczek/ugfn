@@ -1,8 +1,10 @@
-import { flow_velocity, flow_n_particles,flow_vectorfield } from './store.js';
+import { flow_velocity, flow_n_particles,flow_vectorfield,flow_step,flow_trajectory_step } from './store.js';
 
 let flow_velocity_value;
 let flow_n_particles_value;
 let flow_vectorfield_value;
+let flow_step_value;
+let flow_trajectory_step_value;
 const flow_steer_value = 0.2;
 
 flow_velocity.subscribe(value => {
@@ -13,6 +15,12 @@ flow_n_particles.subscribe(value => {
 });
 flow_vectorfield.subscribe(value => {
     flow_vectorfield_value = value;
+});
+flow_step.subscribe(value => {
+    flow_step_value = value;
+});
+flow_trajectory_step.subscribe(value => {
+    flow_trajectory_step_value = value;
 });
 
 
@@ -176,3 +184,5 @@ export function plot_flow(p, vectors) {
       }
     }
   }
+
+

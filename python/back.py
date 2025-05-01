@@ -257,7 +257,6 @@ def train_and_sample(
         # To get final data with 32 timesteps
         # if training gets interrupted add last state as well
         if (v+1) % (n_updates // 32) == 0 or training_state["stop_requested"]:
-            print("a")
             final_trajectories.append(model.inference(
                 env,
                 batch_size=trajectory_max,
@@ -306,7 +305,18 @@ def prepare_final_dump(trajectories, flows):
     flows = torch.stack(flows, dim=0).reshape(s[0], vectorgrid_size**2, -1, s[3])
     flows_temp = torch.zeros((s[0], vectorgrid_size**2, s[2], s[3]))
     flows_temp[:,:,1:,:] = flows
+
+    # To get shape (iteration, trajectory_step, vectorgrid_size**2, 2)
+    flows_temp = torch.movedim(flows_temp, 2,1)
+    # To get shape (iteration, trajectory_step, n_samples,2)
+    trajectories_temp = torch.movedim(trajectories_temp, 2, 1)
+
     print(trajectories_temp.shape, flows_temp.shape)
+    print(flows_temp[0, :, 0, :])
+    print(flows_temp[1, :, 0, :])
+    print(flows_temp[0, :, 1, :])
+    print(flows_temp[1, :, 1, :])
+
     data = torch.concatenate((trajectories_temp.flatten(), flows_temp.flatten()), axis=0).cpu().numpy()
 
     buffer = io.BytesIO()

@@ -21,16 +21,27 @@
   import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
   import Textfield from '@smui/textfield';
   import Fab from '@smui/fab';
-  import { flow_velocity, flow_n_particles,flow_vectorfield } from './store.js';
+  import { flow_velocity, flow_n_particles,flow_vectorfield, flow_step, flow_trajectory_step} from './store.js';
 
+  let current_nSteps = 33;
   let flow_velocity_value = 0.5;
   let flow_n_particles_value = 1000;
   let flow_vectorfield_value = false;
-  $: update_flowparameters(flow_velocity_value, flow_n_particles_value, flow_vectorfield_value);
-  function update_flowparameters(velocity, nParticles, vectorfield) {
+  let flow_step_value = 0;
+  let flow_trajectory_step_value = 1;
+  $: update_flowparameters(
+          flow_velocity_value,
+          flow_n_particles_value,
+          flow_vectorfield_value,
+          flow_step_value,
+          flow_trajectory_step_value
+  );
+  function update_flowparameters(velocity, nParticles, vectorfield, step, trajectory) {
     flow_velocity.set(velocity);
     flow_n_particles.set(nParticles);
     flow_vectorfield.set(vectorfield);
+    flow_step.set(step);
+    flow_trajectory_step.set(trajectory);
   }
 
 
@@ -92,12 +103,14 @@
   let current_states;
   let current_losses;
   let current_vectorfield;
+  let current_parameters;
   let current_flows;
   let current_trajectories;
   let current_plotting_density;
   let run1_value = 2048;
   let run2_value = 4096;
   let run3_value = 4096;
+
 
   //polling every n ms
   const POLLING_INTERVAL = 30;
@@ -228,8 +241,8 @@
       training_progress = 0;
       const curr_gaussians = $gaussians;
       current_plotting_density = compute_density_plotting(curr_gaussians, 100)
-      const send_params = JSON.stringify({
-          off_policy_value,
+      current_parameters = {
+        off_policy_value,
           loss_choice,
           n_iterations_value,
           lr_model_value,
@@ -240,14 +253,15 @@
           seed_value,
           batch_size_value,
           curr_gaussians,
-        })
+      }
+      const send_params = JSON.stringify(current_parameters)
       // Start training
       const response = await fetch('http://localhost:8000/start_training', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: send_params
       });
-      console.log("Training params sent:", send_params)
+      console.log("Training params sent:", current_parameters)
 
       if (!response.ok) {
         throw new Error('Failed to start training.');
@@ -336,11 +350,11 @@
         // console.log(data);
         const arrayBuffer = await response.arrayBuffer();
         const floats = new Float32Array(arrayBuffer);
-        const t1 = vectorgrid_size*vectorgrid_size*2*(trajectory_length_value+1);
-        const t2 = 2048*2*(trajectory_length_value+1);
-        const nSteps = Math.floor(floats.length / (t1+t2));
-        const cutoff = nSteps*t2;
-        console.log(nSteps, cutoff, floats.length)
+        const t1 = vectorgrid_size*vectorgrid_size*2*(current_parameters["trajectory_length_value"]+1);
+        const t2 = 2048*2*(current_parameters["trajectory_length_value"]+1);
+        current_nSteps = Math.floor(floats.length / (t1+t2));
+        const cutoff = current_nSteps*t2;
+        console.log(current_nSteps, cutoff, floats.length)
         current_trajectories = floats.slice(0, cutoff);
         current_flows = floats.slice(cutoff);
 
@@ -470,7 +484,54 @@
     }
   }
 
+  function unflatten_flows(step, trajectory) {
+    const grid = [];
+        for (let row = 0; row < vectorgrid_size; row++) {
+            const line = [];
+            for (let col = 0; col < vectorgrid_size; col++) {
+                line.push(getXY_flows(step, trajectory, row, col));
+            }
+            grid.push(line);
+        }
+        return grid;
+  }
 
+  function getXY_flows(step, trajectory, row, col) {
+    const idx = (
+        (((step * (current_parameters["trajectory_length_value"]+1)) + trajectory) *
+                vectorgrid_size * vectorgrid_size + (row * vectorgrid_size) + col) * 2
+    );
+    return [current_flows[idx], current_flows[idx + 1]];
+  }
+
+  function unflatten_flows2(s, t){
+    const height = vectorgrid_size;
+    const width = vectorgrid_size;
+    const index = (s * height * width * 2 * t) + (t * 2 * height * width);
+    // Reconstructing the (31, 31, 2) array at the specific s and t
+    let tensorSlice = [];
+
+    for (let i = 0; i < height; i++) {
+        let row = [];
+        for (let j = 0; j < width; j++) {
+            let pixel = [];
+            for (let d = 0; d < 2; d++) {
+                let flattenedIndex = index + (i * width * 2) + (j * 2) + d;
+                pixel.push(current_flows[flattenedIndex]);
+            }
+            row.push(pixel);
+        }
+        tensorSlice.push(row);
+    }
+
+    return tensorSlice;
+  }
+
+  function slice_final_data(s, t){
+    const size = vectorgrid_size**2 * 2
+    const index = (s*t*size) + (t*size)
+    return current_flows.slice(index, index+size)
+  }
 
 
   // Mounting
@@ -489,7 +550,10 @@
     };
   });
 
-
+function testlog(){
+  console.log(slice_final_data(flow_step_value, flow_trajectory_step_value))
+  console.log(current_flows)
+}
 
 </script>
 
@@ -500,7 +564,28 @@
   rel="stylesheet"
 />
 
-
+<Slider
+  bind:value="{flow_trajectory_step_value}"
+  min={0}
+  max={10}
+  step={1}
+  disabled="{isRunning}"
+  input$aria-label="Set the trajecotry step"
+/>
+<Slider
+  bind:value="{flow_step_value}"
+  min={0}
+  max={current_nSteps}
+  step={1}
+  disabled="{isRunning}"
+  input$aria-label="Set the step"
+/>
+<Fab
+  on:click={testlog}
+  mini
+  disabled="{isRunning}"
+><Icon class="material-icons" style="font-size: 22px">replay</Icon>
+</Fab>
 
 
 
