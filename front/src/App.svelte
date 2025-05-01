@@ -172,9 +172,11 @@
   }
 
   async function updateVectorfield() {
-    await get_vectorfield(vectorgrid_size);
     if (!flowvis_instance){
-            flowvis_instance = new p5((p) => plot_flow(p, current_vectorfield), flowContainer);
+            const vectors = slice_final_data(flow_step_value, flow_trajectory_step_value)
+            console.log(vectors)
+            //flowvis_instance = new p5((p) => plot_flow(p, vectorgrid_size, vectors), flowContainer);
+            console.log("updated")
           }
   }
 
@@ -346,8 +348,7 @@
       if (!response.ok) {
         throw new Error('Failed to stop training.');
       } else {
-        // const data = await response.json()
-        // console.log(data);
+        console.log("getting final data")
         const arrayBuffer = await response.arrayBuffer();
         const floats = new Float32Array(arrayBuffer);
         const t1 = vectorgrid_size*vectorgrid_size*2*(current_parameters["trajectory_length_value"]+1);
@@ -462,74 +463,11 @@
     plotEnv();
   }
 
-  //get vectorfield from backend
-  async function get_vectorfield(size) {
-    try {
-      // params: width and heigth
-      const response = await fetch('http://localhost:8000/get_vectorfield',{
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ size: size })
-      });
-      console.log("Field params sent:", size)
-
-      if (!response.ok) {
-        throw new Error(`Failed to get Vectorfield HTTP error! Status: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log(data)
-      current_vectorfield = data;
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  function unflatten_flows(step, trajectory) {
-    const grid = [];
-        for (let row = 0; row < vectorgrid_size; row++) {
-            const line = [];
-            for (let col = 0; col < vectorgrid_size; col++) {
-                line.push(getXY_flows(step, trajectory, row, col));
-            }
-            grid.push(line);
-        }
-        return grid;
-  }
-
-  function getXY_flows(step, trajectory, row, col) {
-    const idx = (
-        (((step * (current_parameters["trajectory_length_value"]+1)) + trajectory) *
-                vectorgrid_size * vectorgrid_size + (row * vectorgrid_size) + col) * 2
-    );
-    return [current_flows[idx], current_flows[idx + 1]];
-  }
-
-  function unflatten_flows2(s, t){
-    const height = vectorgrid_size;
-    const width = vectorgrid_size;
-    const index = (s * height * width * 2 * t) + (t * 2 * height * width);
-    // Reconstructing the (31, 31, 2) array at the specific s and t
-    let tensorSlice = [];
-
-    for (let i = 0; i < height; i++) {
-        let row = [];
-        for (let j = 0; j < width; j++) {
-            let pixel = [];
-            for (let d = 0; d < 2; d++) {
-                let flattenedIndex = index + (i * width * 2) + (j * 2) + d;
-                pixel.push(current_flows[flattenedIndex]);
-            }
-            row.push(pixel);
-        }
-        tensorSlice.push(row);
-    }
-
-    return tensorSlice;
-  }
 
   function slice_final_data(s, t){
     const size = vectorgrid_size**2 * 2
     const index = (s*t*size) + (t*size)
+    console.log(current_flows)
     return current_flows.slice(index, index+size)
   }
 

@@ -143,7 +143,7 @@ async def get_final_data():
     #return {"test": "success"}
 
 
-@app.post("/get_vectorfield")
+"""@app.post("/get_vectorfield")
 async def generate_flowfield(request: VectorfieldRequest):
     global model
     global global_trajectory_length
@@ -165,7 +165,7 @@ async def generate_flowfield(request: VectorfieldRequest):
     #vectors = [{"x": 0.2, "y": 0.5}] * request.size * request.size # test flowfield
     print("sending")
 
-    return {"cols":request.size, "rows": request.size, "vectors": vectors}
+    return {"cols":request.size, "rows": request.size, "vectors": vectors}"""
 
 # train and save samples for visualization
 def train_and_sample(

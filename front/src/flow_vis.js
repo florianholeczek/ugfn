@@ -24,25 +24,19 @@ flow_trajectory_step.subscribe(value => {
 });
 
 
-export function plot_flow(p, vectors) {
+export function plot_flow(p, vectorgrid_size, vectors) {
     const scl = 25;
-    let cols, rows;
     let particles = [];
     let flowfield;
 
     const lifespan_min = 100;
     const lifespan_max = 200;
+    console.log("Vectorlength", vectors.length)
 
     p.setup = () => {
-      p.createCanvas(vectors.cols*scl, vectors.rows*scl);
-      cols = Math.ceil(vectors.cols);
-      rows = Math.ceil(vectors.rows);
-
-      //generate flowfield from passed vectors
-      flowfield = new Array(vectors.cols * vectors.rows);
-
-
-
+      p.createCanvas(vectorgrid_size*scl, vectorgrid_size*scl);
+      flowfield = new Array(vectorgrid_size*vectorgrid_size);
+      console.log("flowfieldlength",flowfield.length)
 
       for (let i = 0; i < flow_n_particles_value; i++) {
         particles[i] = new Particle();
@@ -56,18 +50,19 @@ export function plot_flow(p, vectors) {
       p.rect(-p.width, -p.height, 2 * p.width, 2 * p.height);
 
       //update flowfield
-      for (let i = 0; i < flowfield.length; i++) {
-        let vData = vectors.vectors[i];
-        let vect = p.createVector(vData.x, vData.y);
+      for (let i = 0; i < flowfield.length; i+2) {
+        let vect = p.createVector(vectors[i], vectors[i+1]);
         //vect.normalize();
         flowfield[i] = vect;
+
       };
+      console.log("flowfield updated", flowfield);
 
       if (flow_vectorfield_value) {
         // Draw arrows
-        for (let y = 0; y < rows; y++) {
-          for (let x = 0; x < cols; x++) {
-            let index = y * cols + x;
+        for (let y = 0; y < vectorgrid_size; y++) {
+          for (let x = 0; x < vectorgrid_size; x++) {
+            let index = y * vectorgrid_size + x;
             let vect = flowfield[index];
 
             let posX = x * scl - p.width / 2 + Math.floor(scl * 0.5);
@@ -158,9 +153,9 @@ export function plot_flow(p, vectors) {
       }
 
       follow(vectors) {
-        let x = Math.floor(p.map(this.pos.x, -p.width / 2, p.width / 2, 0, cols - 1, true));
-        let y = Math.floor(p.map(this.pos.y, -p.height / 2, p.height / 2, 0, rows - 1, true));
-        let index = y * cols + x;
+        let x = Math.floor(p.map(this.pos.x, -p.width / 2, p.width / 2, 0, vectorgrid_size - 1, true));
+        let y = Math.floor(p.map(this.pos.y, -p.height / 2, p.height / 2, 0, vectorgrid_size - 1, true));
+        let index = y * vectorgrid_size + x;
         let force = vectors[index].copy();
         force.mult(flow_steer_value);
         this.applyForce(force);
