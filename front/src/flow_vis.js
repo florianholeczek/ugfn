@@ -1,10 +1,10 @@
-import { flow_velocity, flow_n_particles,flow_vectorfield,flow_step,flow_trajectory_step } from './store.js';
+import { flow_velocity, flow_n_particles,flow_vectorfield,flow_vectors,flow_changed } from './store.js';
 
 let flow_velocity_value;
 let flow_n_particles_value;
 let flow_vectorfield_value;
-let flow_step_value;
-let flow_trajectory_step_value;
+let flow_vectors_value;
+let flow_changed_value;
 const flow_steer_value = 0.2;
 
 flow_velocity.subscribe(value => {
@@ -16,11 +16,11 @@ flow_n_particles.subscribe(value => {
 flow_vectorfield.subscribe(value => {
     flow_vectorfield_value = value;
 });
-flow_step.subscribe(value => {
-    flow_step_value = value;
+flow_vectors.subscribe(value => {
+    flow_vectors_value = value;
 });
-flow_trajectory_step.subscribe(value => {
-    flow_trajectory_step_value = value;
+flow_changed.subscribe(value => {
+    flow_changed_value = value;
 });
 
 
@@ -43,6 +43,7 @@ export function plot_flow(p, vectorgrid_size, vectors) {
       }
     };
 
+
     p.draw = () => {
       p.translate(p.height / 2, p.height / 2);
       p.scale(1, -1);
@@ -50,11 +51,10 @@ export function plot_flow(p, vectorgrid_size, vectors) {
       p.rect(-p.width, -p.height, 2 * p.width, 2 * p.height);
 
       //update flowfield
-      for (let i = 0; i < flowfield.length; i+2) {
+      for (let i = 0; i < vectors.length; i+=2) {
         let vect = p.createVector(vectors[i], vectors[i+1]);
         //vect.normalize();
-        flowfield[i] = vect;
-
+        flowfield[i/2] = vect;
       };
       console.log("flowfield updated", flowfield);
 

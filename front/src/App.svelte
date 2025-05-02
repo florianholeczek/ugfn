@@ -21,14 +21,16 @@
   import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
   import Textfield from '@smui/textfield';
   import Fab from '@smui/fab';
-  import { flow_velocity, flow_n_particles,flow_vectorfield, flow_step, flow_trajectory_step} from './store.js';
+  import { flow_velocity, flow_n_particles,flow_vectorfield, flow_vectors, flow_changed} from './store.js';
 
-  let current_nSteps = 33;
+
   let flow_velocity_value = 0.5;
   let flow_n_particles_value = 1000;
   let flow_vectorfield_value = false;
   let flow_step_value = 0;
   let flow_trajectory_step_value = 1;
+  //let flow_vectors;
+  //let flow_changed;
   $: update_flowparameters(
           flow_velocity_value,
           flow_n_particles_value,
@@ -40,8 +42,9 @@
     flow_velocity.set(velocity);
     flow_n_particles.set(nParticles);
     flow_vectorfield.set(vectorfield);
-    flow_step.set(step);
-    flow_trajectory_step.set(trajectory);
+    //flowfield update
+    //flow_vectors.set(slice_final_data(flow_step_value, flow_trajectory_step_value))
+    //flow_changed.set(true);
   }
 
 
@@ -103,7 +106,9 @@
   let current_states;
   let current_losses;
   let current_vectorfield;
-  let current_parameters;
+  let current_parameters = {};
+  current_parameters["trajectory_length_value"] = 6
+  let current_nSteps = 33;
   let current_flows;
   let current_trajectories;
   let current_plotting_density;
@@ -160,22 +165,18 @@
           plot_trainingframe(training_frame);
         } else {
           console.log("Flow View")
-          updateVectorfield();
-
-
-
-
+          createVectorfield();
         }
       }, 5);
     }
 
   }
 
-  async function updateVectorfield() {
+  async function createVectorfield() {
     if (!flowvis_instance){
             const vectors = slice_final_data(flow_step_value, flow_trajectory_step_value)
             console.log(vectors)
-            //flowvis_instance = new p5((p) => plot_flow(p, vectorgrid_size, vectors), flowContainer);
+            flowvis_instance = new p5((p) => plot_flow(p, vectorgrid_size, vectors), flowContainer);
             console.log("updated")
           }
   }
@@ -291,9 +292,9 @@
 
       // Stop polling and reset button state
       clearInterval(pollingTimer);
-      isRunning = false;
       training_frame=0;
       await get_final_data();
+      isRunning = false;
     } catch (error) {
       console.error(error);
     }
@@ -325,11 +326,10 @@
 
         if (data.completed && !completed) {
           completed = true;
-          console.log("Training process completed.");
           clearInterval(pollingTimer); //stop polling
-          isRunning = false; // Update the UI state to reflect the stopped process
           training_frame=0;
           await get_final_data();
+          isRunning = false;
           plotStates(Plotly, $gaussians, current_states,current_losses, current_plotting_density);
 
         }
@@ -348,18 +348,17 @@
       if (!response.ok) {
         throw new Error('Failed to stop training.');
       } else {
-        console.log("getting final data")
+        console.log("Getting final data")
         const arrayBuffer = await response.arrayBuffer();
         const floats = new Float32Array(arrayBuffer);
         const t1 = vectorgrid_size*vectorgrid_size*2*(current_parameters["trajectory_length_value"]+1);
         const t2 = 2048*2*(current_parameters["trajectory_length_value"]+1);
         current_nSteps = Math.floor(floats.length / (t1+t2));
         const cutoff = current_nSteps*t2;
-        console.log(current_nSteps, cutoff, floats.length)
+        // console.log(current_nSteps, cutoff, floats.length)
         current_trajectories = floats.slice(0, cutoff);
         current_flows = floats.slice(cutoff);
-
-
+        console.log("Final data recieved, training done.")
       }
 
     } catch (error) {
@@ -466,8 +465,7 @@
 
   function slice_final_data(s, t){
     const size = vectorgrid_size**2 * 2
-    const index = (s*t*size) + (t*size)
-    console.log(current_flows)
+    const index = (s*(current_parameters["trajectory_length_value"]+1)*size) + (t*size)
     return current_flows.slice(index, index+size)
   }
 
@@ -491,6 +489,9 @@
 function testlog(){
   console.log(slice_final_data(flow_step_value, flow_trajectory_step_value))
   console.log(current_flows)
+  for (let y = 0; y <= current_parameters["trajectory_length_value"]; y++) {
+    console.log(slice_final_data(flow_step_value, y))
+  }
 }
 
 </script>
@@ -501,19 +502,24 @@ function testlog(){
   href="https://fonts.googleapis.com/css2?family=Material+Icons&display=swap"
   rel="stylesheet"
 />
-
+<div>
+  {flow_trajectory_step_value}
+</div>
 <Slider
   bind:value="{flow_trajectory_step_value}"
-  min={0}
-  max={10}
+  min={1}
+  max={current_parameters["trajectory_length_value"]}
   step={1}
   disabled="{isRunning}"
   input$aria-label="Set the trajecotry step"
 />
+<div>
+  {flow_step_value}
+</div>
 <Slider
   bind:value="{flow_step_value}"
   min={0}
-  max={current_nSteps}
+  max={current_nSteps-1}
   step={1}
   disabled="{isRunning}"
   input$aria-label="Set the step"

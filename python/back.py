@@ -291,7 +291,7 @@ def calc_vectorgrid(grid_size, trajectory_length):
     y = torch.linspace(-3, 3, grid_size)
     X, Y = torch.meshgrid(x, y, indexing="xy")
     gridpoints = torch.stack([X.flatten(), Y.flatten()], dim=1)
-    timesteps = torch.arange(1, trajectory_length + 1).view(-1, 1, 1)
+    timesteps = torch.arange(0, trajectory_length).view(-1, 1, 1)
     states = torch.cat(
         (timesteps.expand(-1, gridpoints.size(0), -1), gridpoints.unsqueeze(0).expand(timesteps.size(0), -1, -1)),
         dim=-1)
@@ -302,20 +302,34 @@ def prepare_final_dump(trajectories, flows):
     # get final trajectories and flows in format expected by frontend
     trajectories_temp = torch.stack(trajectories, dim=0)
     s = trajectories_temp.size()
-    flows = torch.stack(flows, dim=0).reshape(s[0], vectorgrid_size**2, -1, s[3])
-    flows_temp = torch.zeros((s[0], vectorgrid_size**2, s[2], s[3]))
-    flows_temp[:,:,1:,:] = flows
+    print(len(flows), len(trajectories))
+    print(s)
+    print(flows[1].shape)
+    flows = torch.stack(flows, dim=0).reshape(s[0], s[2]-1, vectorgrid_size**2, s[3])
+    flows_temp = torch.zeros((s[0], s[2], vectorgrid_size**2, s[3]))
+    flows_temp[:,1:,:,:] = flows
 
     # To get shape (iteration, trajectory_step, vectorgrid_size**2, 2)
-    flows_temp = torch.movedim(flows_temp, 2,1)
+    #flows_temp = flows_temp.permute(0,2,1,3)
+    trajectories_temp = trajectories_temp.permute(0, 2, 1, 3)
+    # flows_temp = torch.movedim(flows_temp, 2,1)
     # To get shape (iteration, trajectory_step, n_samples,2)
-    trajectories_temp = torch.movedim(trajectories_temp, 2, 1)
+    # trajectories_temp = torch.movedim(trajectories_temp, 2, 1)
 
     print(trajectories_temp.shape, flows_temp.shape)
-    print(flows_temp[0, :, 0, :])
-    print(flows_temp[1, :, 0, :])
-    print(flows_temp[0, :, 1, :])
-    print(flows_temp[1, :, 1, :])
+
+
+
+    """# test
+    flows_temp = torch.zeros((s[0], s[2], vectorgrid_size**2, s[3]))
+    flows_temp[:,1,:,:] += 1
+    flows_temp[:,3,:,:] -= 1
+    print(flows_temp[0, 0, :, :])
+    print(flows_temp[0, 1, :, :])
+    print(flows_temp[1, 0, :, :])
+    print(flows_temp[1, 1, :, :])
+    print(flows_temp[1, 2, :, :])
+    print(flows_temp[1, 3, :, :])"""
 
     data = torch.concatenate((trajectories_temp.flatten(), flows_temp.flatten()), axis=0).cpu().numpy()
 
