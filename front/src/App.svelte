@@ -29,8 +29,6 @@
   let flow_vectorfield_value = false;
   let flow_step_value = 0;
   let flow_trajectory_step_value = 1;
-  //let flow_vectors;
-  //let flow_changed;
   $: update_flowparameters(
           flow_velocity_value,
           flow_n_particles_value,
@@ -39,12 +37,14 @@
           flow_trajectory_step_value
   );
   function update_flowparameters(velocity, nParticles, vectorfield, step, trajectory) {
-    flow_velocity.set(velocity);
-    flow_n_particles.set(nParticles);
-    flow_vectorfield.set(vectorfield);
-    //flowfield update
-    //flow_vectors.set(slice_final_data(flow_step_value, flow_trajectory_step_value))
-    //flow_changed.set(true);
+    if(view == "Flow"){
+      flow_velocity.set(velocity);
+      flow_n_particles.set(nParticles);
+      flow_vectorfield.set(vectorfield);
+      flow_vectors.set(slice_final_data(step, trajectory))
+      flow_changed.set(true);
+    }
+
   }
 
 
@@ -174,10 +174,9 @@
 
   async function createVectorfield() {
     if (!flowvis_instance){
-            const vectors = slice_final_data(flow_step_value, flow_trajectory_step_value)
-            console.log(vectors)
-            flowvis_instance = new p5((p) => plot_flow(p, vectorgrid_size, vectors), flowContainer);
-            console.log("updated")
+            flow_vectors.set(slice_final_data(flow_step_value, flow_trajectory_step_value))
+            flow_changed.set(true);
+            flowvis_instance = new p5((p) => plot_flow(p, vectorgrid_size), flowContainer);
           }
   }
 

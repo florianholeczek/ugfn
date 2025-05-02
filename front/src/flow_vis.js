@@ -24,19 +24,17 @@ flow_changed.subscribe(value => {
 });
 
 
-export function plot_flow(p, vectorgrid_size, vectors) {
+export function plot_flow(p, vectorgrid_size) {
     const scl = 25;
     let particles = [];
     let flowfield;
 
     const lifespan_min = 100;
     const lifespan_max = 200;
-    console.log("Vectorlength", vectors.length)
 
     p.setup = () => {
       p.createCanvas(vectorgrid_size*scl, vectorgrid_size*scl);
       flowfield = new Array(vectorgrid_size*vectorgrid_size);
-      console.log("flowfieldlength",flowfield.length)
 
       for (let i = 0; i < flow_n_particles_value; i++) {
         particles[i] = new Particle();
@@ -51,12 +49,16 @@ export function plot_flow(p, vectorgrid_size, vectors) {
       p.rect(-p.width, -p.height, 2 * p.width, 2 * p.height);
 
       //update flowfield
-      for (let i = 0; i < vectors.length; i+=2) {
-        let vect = p.createVector(vectors[i], vectors[i+1]);
-        //vect.normalize();
-        flowfield[i/2] = vect;
-      };
-      console.log("flowfield updated", flowfield);
+      if(flow_changed_value){
+        for (let i = 0; i < flow_vectors_value.length; i+=2) {
+          let vect = p.createVector(flow_vectors_value[i], flow_vectors_value[i+1]);
+          //vect.normalize();
+          flowfield[i/2] = vect;
+        };
+        console.log("flowfield updated", flowfield);
+        flow_changed.set(false);
+      }
+
 
       if (flow_vectorfield_value) {
         // Draw arrows
@@ -127,7 +129,6 @@ export function plot_flow(p, vectorgrid_size, vectors) {
 
         this.lifespan = p.int(p.random(lifespan_min/flow_velocity_value, lifespan_max/flow_velocity_value));
         this.age = 0;
-        //console.log(this.lifespan)
       }
 
       update() {
@@ -152,11 +153,11 @@ export function plot_flow(p, vectorgrid_size, vectors) {
 
       }
 
-      follow(vectors) {
+      follow(f) {
         let x = Math.floor(p.map(this.pos.x, -p.width / 2, p.width / 2, 0, vectorgrid_size - 1, true));
         let y = Math.floor(p.map(this.pos.y, -p.height / 2, p.height / 2, 0, vectorgrid_size - 1, true));
         let index = y * vectorgrid_size + x;
-        let force = vectors[index].copy();
+        let force = f[index].copy();
         force.mult(flow_steer_value);
         this.applyForce(force);
       }
