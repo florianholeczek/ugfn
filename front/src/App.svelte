@@ -165,6 +165,8 @@
           stop_flow();
           plot_trainingframe(training_frame);
         } else {
+          flow_step_value=current_nSteps
+          flow_trajectory_step_value=current_parameters["trajectory_length_value"]
           console.log("Flow View")
           createVectorfield();
         }
@@ -949,7 +951,7 @@ function testlog(){
               </Paper>
             {/if}
             {#if display_trainhistory && !isRunning}
-              <div style="position: absolute; bottom: 6px; right: 10px">Training Progress:</div>
+              <div style="position: absolute; bottom: 6px; right: 10px">Iteration:</div>
             {/if}
           </div>
         </div>
@@ -1053,7 +1055,7 @@ function testlog(){
               input$aria-label="Set the trajecotry step"
             />
             <div style="position: absolute; bottom: 6px; right: 10px">
-              Training Progress: {flow_step_value*current_parameters["n_iterations_value"]/32}
+              Iteration: {flow_step_value*current_parameters["n_iterations_value"]/32}
               / {(current_nSteps-1)*current_parameters["n_iterations_value"]/32}
             </div>
           </div>

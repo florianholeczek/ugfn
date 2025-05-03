@@ -43,9 +43,15 @@ export function plot_flow(p, vectorgrid_size) {
 
 
     p.draw = () => {
+      /*
+      if (p.frameCount % 3600 === 0){
+        p.clear()
+      }*/
       p.translate(p.height / 2, p.height / 2);
       p.scale(1, -1);
-      p.fill(68, 1, 84, 10);
+      //p.fill(68, 1, 84, 10);
+      p.fill(35, 0, 44, 10);
+      //p.fill(0, 10);
       p.rect(-p.width, -p.height, 2 * p.width, 2 * p.height);
 
       //update flowfield
@@ -142,7 +148,8 @@ export function plot_flow(p, vectorgrid_size) {
 
         //draw particle
         p.noStroke();
-        p.fill(253, 231, 37, alpha);
+        //p.fill(253, 231, 37, alpha);
+        p.fill(255, alpha);
         p.circle(this.pos.x, this.pos.y, this.size);
 
         this.lifespan--;
