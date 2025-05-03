@@ -108,6 +108,7 @@
   let current_vectorfield;
   let current_parameters = {};
   current_parameters["trajectory_length_value"] = 6
+  current_parameters["n_iterations_value"] = 2048
   let current_nSteps = 33;
   let current_flows;
   let current_trajectories;
@@ -501,28 +502,7 @@ function testlog(){
   href="https://fonts.googleapis.com/css2?family=Material+Icons&display=swap"
   rel="stylesheet"
 />
-<div>
-  {flow_trajectory_step_value}
-</div>
-<Slider
-  bind:value="{flow_trajectory_step_value}"
-  min={1}
-  max={current_parameters["trajectory_length_value"]}
-  step={1}
-  disabled="{isRunning}"
-  input$aria-label="Set the trajecotry step"
-/>
-<div>
-  {flow_step_value}
-</div>
-<Slider
-  bind:value="{flow_step_value}"
-  min={0}
-  max={current_nSteps-1}
-  step={1}
-  disabled="{isRunning}"
-  input$aria-label="Set the step"
-/>
+
 <Fab
   on:click={testlog}
   mini
@@ -785,7 +765,7 @@ function testlog(){
                         <Title style="text-align: center">Fixed number of steps the agent takes.</Title>
                         <Content style="color: black; font-size: 12px; text-align: left">
                           <br>
-                          Change the trajectory length to adjust how many step the agent takes.
+                          Change the trajectory length to adjust how many steps the agent takes.
                           Starting from (0,0), the agent collects the reward after this fixed number of steps.
                           A higher trajectory length tends to give better results, but increases training time.
                         </Content>
@@ -969,7 +949,7 @@ function testlog(){
               </Paper>
             {/if}
             {#if display_trainhistory && !isRunning}
-              <div style="position: absolute; bottom: 6px; right: 0px">Training Progress:</div>
+              <div style="position: absolute; bottom: 6px; right: 10px">Training Progress:</div>
             {/if}
           </div>
         </div>
@@ -1042,9 +1022,60 @@ function testlog(){
             />
           </div>
         </div>
-        <div class="pg-flow">
-          <div bind:this={flowContainer}></div>
-        </div>
+        {#if display_trainhistory}
+          <div class="pg-side">
+            Step
+            <div class="hyperparameters">
+              {flow_trajectory_step_value}
+              <Wrapper rich>
+                <IconButton size="button">
+                  <Icon class="material-icons">info</Icon>
+                </IconButton>
+                <Tooltip persistent>
+                  <Title style="text-align: center">The current step of the agent [1, Trajectory length].</Title>
+                  <Content style="color: black; font-size: 12px; text-align: left">
+                    <br>
+                    The policy is learned based on the position (x / y) and the step. Therefore the flow is changes as the agent takes more steps.
+                    The number of steps the agent takes is determined by the hyperparameter "Trajectory length".
+                    Setting this value to the minimum shows the flow for the first step the agent takes.
+                    Setting this value to the maximum shows the flow for the last step before the agent collects the reward.
+                  </Content>
+                </Tooltip>
+              </Wrapper>
+            </div>
+            <Slider
+              bind:value="{flow_trajectory_step_value}"
+              min={1}
+              max={current_parameters["trajectory_length_value"]}
+              step={1}
+              orientation = "vertical"
+              disabled="{isRunning}"
+              input$aria-label="Set the trajecotry step"
+            />
+            <div style="position: absolute; bottom: 6px; right: 10px">
+              Training Progress: {flow_step_value*current_parameters["n_iterations_value"]/32}
+              / {(current_nSteps-1)*current_parameters["n_iterations_value"]/32}
+            </div>
+          </div>
+
+          <div class="pg-vis">
+            <div bind:this={flowContainer}></div>
+          </div>
+          <div class="pg-bottom">
+            <Slider
+              bind:value="{flow_step_value}"
+              min={0}
+              max={current_nSteps-1}
+              step={1}
+              disabled="{isRunning}"
+              input$aria-label="Set the step"
+            />
+          </div>
+        {:else}
+          <div class="pg-vis" style="text-align:center; padding:100px; color: #323232;">
+            Train a model first to visualize its flows
+          </div>
+        {/if}
       </div>
     {/if}
   </div>

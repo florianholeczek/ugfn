@@ -371,7 +371,13 @@ input[type="range"] {
     margin-left:20px;
     margin-right:20px;
     text-align: center;
-}
+  }
+  .vertical-slider {
+    transform: rotate(-90deg);
+    height: 200px; /* adjust as needed */
+    width: 40px;   /* adjust as needed */
+    margin: 20px;
+  }
 
 
 
