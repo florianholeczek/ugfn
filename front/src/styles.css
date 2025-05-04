@@ -60,6 +60,12 @@
       margin: 0 auto 1.5rem;
   }
 
+  .flow-container {
+    width: 750px;
+    height: 750px;
+    display: flex;
+    margin: 0 auto 2rem;
+  }
 
   .image-container {
     width: 800px;
@@ -363,6 +369,7 @@ input[type="range"] {
   }
   .whatnext_b {
     display: flex;
+    display: flex;
     flex:1;
     align-items: center;
     justify-content: center;
@@ -370,12 +377,15 @@ input[type="range"] {
     margin-right:20px;
     text-align: center;
   }
-  .vertical-slider {
-    transform: rotate(-90deg);
-    height: 200px; /* adjust as needed */
-    width: 40px;   /* adjust as needed */
-    margin: 20px;
+
+  .tutorial-flow-controls {
+    width: 1000px;
+    display:flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem auto;
   }
+
 
 
 

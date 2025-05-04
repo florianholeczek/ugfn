@@ -29,24 +29,57 @@
   let flow_vectorfield_value = false;
   let flow_step_value = 0;
   let flow_trajectory_step_value = 1;
+  let t_flow_step_value = 0;
+  let t_flow_trajectory_step_value = 1;
+  let updateflows=true;
+
   $: update_flowparameters(
           flow_velocity_value,
           flow_n_particles_value,
           flow_vectorfield_value,
           flow_step_value,
-          flow_trajectory_step_value
+          flow_trajectory_step_value,
+          t_flow_step_value,
+          t_flow_trajectory_step_value
   );
-  function update_flowparameters(velocity, nParticles, vectorfield, step, trajectory) {
-    if(view == "Flow"){
+  function update_flowparameters(
+          velocity,
+          nParticles,
+          vectorfield,
+          flow_step_value,
+          flow_trajectory_step_value,
+          t_flow_step_value,
+          t_flow_trajectory_step_value
+  ) {
+    if(((view === "Flow" && flowvis_instance) || (tutorial_flowvis_instance)) && updateflows){
+      console.log("updating")
       flow_velocity.set(velocity);
       flow_n_particles.set(nParticles);
       flow_vectorfield.set(vectorfield);
-      flow_vectors.set(slice_final_data(step, trajectory))
+      if (view === "Flow") {
+        flow_vectors.set(slice_flows(
+              flow_step_value,
+              flow_trajectory_step_value,
+              current_parameters["trajectory_length_value"],
+              current_flows
+        ));
+      } else {
+        flow_vectors.set(slice_flows(
+              t_flow_step_value,
+              t_flow_trajectory_step_value,
+              6,
+              run_data["run3_flow"]
+        ));
+      }
+
       flow_changed.set(true);
     }
 
   }
 
+
+  //tutorial visualization data
+  let run_data = {};
 
   // default values
   let off_policy_value = 0;
@@ -81,7 +114,9 @@
   let Plotly;
   let p5;
   let flowContainer;
+  let tutorial_flowContainer;
   let flowvis_instance;
+  let tutorial_flowvis_instance;
   let vectorgrid_size=31;
 
   // ranges for means and variances
@@ -158,39 +193,58 @@
       setTimeout(() => {
         if (view === "Environment"){
           console.log("Env View")
-          stop_flow();
+          if (flowvis_instance) {
+            flowvis_instance.remove();
+            flowvis_instance = null;
+          }
           plotEnv();
         } else if (view ==="Training"){
           console.log("Train View");
-          stop_flow();
+          if (flowvis_instance) {
+            flowvis_instance.remove();
+            flowvis_instance = null;
+          }
           plot_trainingframe(training_frame);
         } else {
-          flow_step_value=current_nSteps
-          flow_trajectory_step_value=current_parameters["trajectory_length_value"]
+          if(display_trainhistory){
+            updateflows=false;
+            flow_step_value=current_nSteps-1
+            flow_trajectory_step_value=current_parameters["trajectory_length_value"]
+            updateflows=true;
+            console.log(flow_step_value)
+            flowvis_instance = createVectorfield(
+                    flowvis_instance,
+                    flowContainer,
+                    current_parameters["trajectory_length_value"],
+                    current_flows
+            );
+          }
           console.log("Flow View")
-          createVectorfield();
+
         }
       }, 5);
     }
 
   }
 
-  async function createVectorfield() {
-    if (!flowvis_instance){
-            flow_vectors.set(slice_final_data(flow_step_value, flow_trajectory_step_value))
-            flow_changed.set(true);
-            flowvis_instance = new p5((p) => plot_flow(p, vectorgrid_size), flowContainer);
-          }
+  function createVectorfield(instance, container, trajectory_length, data) {
+    if (!instance){
+      console.log("creating vectorfield")
+      flow_vectors.set(slice_flows(
+              flow_step_value,
+              flow_trajectory_step_value,
+              trajectory_length,
+              data
+      ));
+      flow_changed.set(true);
+      instance = new p5((p) => plot_flow(p, vectorgrid_size), container);
+      console.log("new instance created")
+      return instance
+    }
   }
 
 
   // Utility functions
-  function stop_flow() {
-    if (flowvis_instance) {
-      flowvis_instance.remove();
-      flowvis_instance = null;
-    }
-  }
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
   function resetSliders() {
@@ -465,13 +519,13 @@
   }
 
 
-  function slice_final_data(s, t){
+  function slice_flows(s, t, t_length, data){
     const size = vectorgrid_size**2 * 2
-    const index = (s*(current_parameters["trajectory_length_value"]+1)*size) + (t*size)
-    return current_flows.slice(index, index+size)
+    const index = (s*(t_length+1)*size) + (t*size)
+    return data.slice(index, index+size)
   }
 
-
+  let tutorial_flow_observer;
   // Mounting
   onMount(async () => {
     //visualize the environment
@@ -479,22 +533,81 @@
     await loadp5();
     plotlyready = true;
     plotEnv();
+    //await load_array("/Data/run1_flow.json", "run1_flow");
+    //await load_array("/Data/run2_flow.json", "run2_flow");
+    await load_array("/Data/run3_flow.json", "run3_flow");
     // add listeners for changing the Environment
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', stopDrag);
+    tutorial_flow_observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (flowvis_instance) {
+            flowvis_instance.remove();
+            flowvis_instance = null;
+            console.log("Flowview deleted")
+          }
+
+          updateflows = false;
+          flow_trajectory_step_value=6;
+          flow_step_value = 33;
+          updateflows = true;
+          console.log("creating run3")
+
+          tutorial_flowvis_instance = createVectorfield(
+                  tutorial_flowvis_instance,
+                  tutorial_flowContainer,
+                  6,
+                  run_data["run3_flow"]
+          );
+          console.log("run3 created")
+        } else {
+          if (tutorial_flowvis_instance) {
+            tutorial_flowvis_instance.remove();
+            tutorial_flowvis_instance = null;
+          }
+        }
+      },
+      {
+        threshold: 0.1, // 10% visible
+        rootMargin: '400px 0px'
+      }
+    );
+    if (tutorial_flowContainer) {
+      tutorial_flow_observer.observe(tutorial_flowContainer);
+    }
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', stopDrag);
+      tutorial_flow_observer.disconnect();
     };
   });
 
-function testlog(){
-  console.log(slice_final_data(flow_step_value, flow_trajectory_step_value))
-  console.log(current_flows)
-  for (let y = 0; y <= current_parameters["trajectory_length_value"]; y++) {
-    console.log(slice_final_data(flow_step_value, y))
-  }
-}
+
+  function save_array(ar) {
+		const blob = new Blob([JSON.stringify(Array.from(ar))], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'current_array.json';
+		a.click();
+		URL.revokeObjectURL(url);
+        console.log("saved", ar)
+	}
+
+  async function load_array(path, name) {
+		try {
+          console.log("test")
+			const res = await fetch(path);
+			if (!res.ok) throw new Error("File not found or fetch failed");
+			const data = await res.json();
+			run_data[name] = new Float32Array(data);
+            //current_flows = new Float32Array(data);
+			console.log(`Loaded ${name}:`, data);
+		} catch (err) {
+			console.error(`Failed to load ${name}.json`, err);
+		}
+	}
 
 </script>
 
@@ -506,11 +619,19 @@ function testlog(){
 />
 
 <Fab
-  on:click={testlog}
+  on:click={save_array(current_flows)}
   mini
   disabled="{isRunning}"
-><Icon class="material-icons" style="font-size: 22px">replay</Icon>
+><Icon class="material-icons" style="font-size: 22px">save</Icon>
 </Fab>
+<Fab
+  on:click={() => load_array("/Data/testrun_flow.json", "Test")}
+  mini
+  disabled={isRunning}
+>
+  <Icon class="material-icons" style="font-size: 22px">replay</Icon>
+</Fab>
+
 
 
 
@@ -1050,9 +1171,8 @@ function testlog(){
               min={1}
               max={current_parameters["trajectory_length_value"]}
               step={1}
-              orientation = "vertical"
               disabled="{isRunning}"
-              input$aria-label="Set the trajecotry step"
+              input$aria-label="Set the trajectory step"
             />
             <div style="position: absolute; bottom: 6px; right: 10px">
               Iteration: {flow_step_value*current_parameters["n_iterations_value"]/32}
@@ -1397,6 +1517,42 @@ function testlog(){
 
   <section class="section" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);">
     <h2 class="section-title">Flow: Is this what it looks like?</h2>
+
+    <div class="flow-container">
+      <div bind:this={tutorial_flowContainer}></div>
+    </div>
+    <div style="width: 600px; margin: auto; display: flex; align-items: center;">
+      <div style="text-align: left; margin-right: 10px;">
+        <span>Step: {flow_trajectory_step_value}</span>
+      </div>
+      <div style="width: 480px; margin-left: auto;">
+        <Slider
+          bind:value="{flow_trajectory_step_value}"
+          min={1}
+          max={6}
+          step={1}
+          discrete
+          input$aria-label="Discrete slider"
+        />
+      </div>
+    </div>
+    <div style="width: 600px; margin: auto; display: flex; align-items: center;">
+      <div style="text-align: left; margin-right: 10px;">
+        <span>Iteration: {flow_step_value*128}</span>
+      </div>
+      <div style="width: 480px; margin-left: auto;">
+        <Slider
+          bind:value="{flow_step_value}"
+          min={0}
+          max={32}
+          step={1}
+          discrete
+          input$aria-label="Discrete slider"
+        />
+      </div>
+    </div>
+
+
     <p class="section-text">
       Well, kind of. Imagine our grid would be discrete. If we are in one cell, we would have a certain Flow (a non-negative scalar) to each other cell (technically also to itself given our trick with adding the step to the state).
       <br>Even in a discrete space, this is hard to visualize, as we would have to compute the flow from each state to every other state.
