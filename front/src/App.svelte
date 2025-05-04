@@ -56,7 +56,7 @@
       flow_velocity.set(velocity);
       flow_n_particles.set(nParticles);
       flow_vectorfield.set(vectorfield);
-      if (view === "Flow") {
+      if (flowvis_instance) {
         flow_vectors.set(slice_flows(
               flow_step_value,
               flow_trajectory_step_value,
@@ -64,6 +64,7 @@
               current_flows
         ));
       } else {
+        console.log("lalarun3")
         flow_vectors.set(slice_flows(
               t_flow_step_value,
               t_flow_trajectory_step_value,
@@ -211,12 +212,13 @@
             flow_step_value=current_nSteps-1
             flow_trajectory_step_value=current_parameters["trajectory_length_value"]
             updateflows=true;
-            console.log(flow_step_value)
             flowvis_instance = createVectorfield(
                     flowvis_instance,
                     flowContainer,
                     current_parameters["trajectory_length_value"],
-                    current_flows
+                    current_flows,
+                    flow_step_value,
+                    flow_trajectory_step_value
             );
           }
           console.log("Flow View")
@@ -227,12 +229,12 @@
 
   }
 
-  function createVectorfield(instance, container, trajectory_length, data) {
+  function createVectorfield(instance, container, trajectory_length, data, s, t) {
     if (!instance){
       console.log("creating vectorfield")
       flow_vectors.set(slice_flows(
-              flow_step_value,
-              flow_trajectory_step_value,
+              s,
+              t,
               trajectory_length,
               data
       ));
@@ -542,6 +544,8 @@
     tutorial_flow_observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
+
+          view = "Training"
           if (flowvis_instance) {
             flowvis_instance.remove();
             flowvis_instance = null;
@@ -549,8 +553,8 @@
           }
 
           updateflows = false;
-          flow_trajectory_step_value=6;
-          flow_step_value = 33;
+          t_flow_trajectory_step_value=6;
+          t_flow_step_value = 33;
           updateflows = true;
           console.log("creating run3")
 
@@ -558,7 +562,9 @@
                   tutorial_flowvis_instance,
                   tutorial_flowContainer,
                   6,
-                  run_data["run3_flow"]
+                  run_data["run3_flow"],
+                  t_flow_step_value,
+                  t_flow_trajectory_step_value
           );
           console.log("run3 created")
         } else {
@@ -1523,11 +1529,11 @@
     </div>
     <div style="width: 600px; margin: auto; display: flex; align-items: center;">
       <div style="text-align: left; margin-right: 10px;">
-        <span>Step: {flow_trajectory_step_value}</span>
+        <span>Step: {t_flow_trajectory_step_value}</span>
       </div>
       <div style="width: 480px; margin-left: auto;">
         <Slider
-          bind:value="{flow_trajectory_step_value}"
+          bind:value="{t_flow_trajectory_step_value}"
           min={1}
           max={6}
           step={1}
@@ -1538,11 +1544,11 @@
     </div>
     <div style="width: 600px; margin: auto; display: flex; align-items: center;">
       <div style="text-align: left; margin-right: 10px;">
-        <span>Iteration: {flow_step_value*128}</span>
+        <span>Iteration: {t_flow_step_value*128}</span>
       </div>
       <div style="width: 480px; margin-left: auto;">
         <Slider
-          bind:value="{flow_step_value}"
+          bind:value="{t_flow_step_value}"
           min={0}
           max={32}
           step={1}
