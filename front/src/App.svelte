@@ -1532,7 +1532,7 @@
   </section>
 
   <section class="section" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);">
-    <h2 class="section-title">Flow: Is this what it looks like?</h2>
+    <h2 class="section-title">Flow - Is this what it looks like?</h2>
 
     <div class="flow-container">
       <div bind:this={tutorial_flowContainer}></div>
@@ -1689,20 +1689,21 @@
       </p>
     <h3 class="section-title3">Tutorials</h3>
       <p class="section-text">
-        https://milayb.notion.site/The-GFlowNet-Tutorial-95434ef0e2d94c24aab90e69b30be9b3
+        <a href="https://milayb.notion.site/The-GFlowNet-Tutorial-95434ef0e2d94c24aab90e69b30be9b3" target="_blank">MILA Tutorial (Theory)</a>
         <br><br>
-        https://colab.research.google.com/drive/1fUMwgu2OhYpQagpzU5mhe9_Esib3Q2VR
+        <a href="https://colab.research.google.com/drive/1fUMwgu2OhYpQagpzU5mhe9_Esib3Q2VR" target="_blank">MILA Tutorial (Code)</a>
+
         <br><br>
-        https://github.com/GFNOrg/torchgfn/blob/master/tutorials/notebooks/intro_gfn_continuous_line_simple.ipynb
+        <a href="https://github.com/GFNOrg/torchgfn/blob/master/tutorials/notebooks/intro_gfn_continuous_line_simple.ipynb" target="_blank">Continuous Line Tutorial</a>
 
       </p>
     <h3 class="section-title3">GFlowNet Libraries</h3>
       <p class="section-text">
-        https://github.com/alexhernandezgarcia/gflownet
+        <a href="https://github.com/alexhernandezgarcia/gflownet" target="_blank">https://github.com/alexhernandezgarcia/gflownet</a>
         <br><br>
-        https://github.com/GFNOrg/torchgfn
+        <a href="https://github.com/GFNOrg/torchgfn" target="_blank">https://github.com/GFNOrg/torchgfn</a>
         <br><br>
-        https://github.com/augustwester/gflownet
+        <a href="https://github.com/augustwester/gflownet" target="_blank">https://github.com/augustwester/gflownet</a>
       </p>
   </section>
 </main>
