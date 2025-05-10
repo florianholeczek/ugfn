@@ -863,7 +863,7 @@
                         <Icon class="material-icons">info</Icon>
                       </IconButton>
                       <Tooltip persistent>
-                        <Title style="text-align: center">How many samples to train with.</Title>
+                        <Title style="text-align: center">How many samples to train with</Title>
                         <Content style="color: black; font-size: 12px; text-align: left">
                           <br>
                           Change the batch size to adjust how many samples are created in one iteration during training.
@@ -890,7 +890,7 @@
                         <Icon class="material-icons">info</Icon>
                       </IconButton>
                       <Tooltip persistent>
-                        <Title style="text-align: center">Fixed number of steps the agent takes.</Title>
+                        <Title style="text-align: center">Fixed number of steps the agent takes</Title>
                         <Content style="color: black; font-size: 12px; text-align: left">
                           <br>
                           Change the trajectory length to adjust how many steps the agent takes.
@@ -918,7 +918,7 @@
                         <Icon class="material-icons">info</Icon>
                       </IconButton>
                       <Tooltip persistent>
-                        <Title style="text-align: center">The learning rate of the forward and backward policies.</Title>
+                        <Title style="text-align: center">The learning rate of the forward and backward policies</Title>
                         <Content style="color: black; font-size: 12px; text-align: left">
                           <br>
                           Change the learning rate of the neural nets that represent the forward and backward policy.
@@ -944,7 +944,7 @@
                         <Icon class="material-icons">info</Icon>
                       </IconButton>
                       <Tooltip persistent>
-                        <Title style="text-align: center">The learning rate of the partition function.</Title>
+                        <Title style="text-align: center">The learning rate of the partition function</Title>
                         <Content style="color: black; font-size: 12px; text-align: left">
                           <br>
                           Change the larning rate of the parameter log(Z) which represents the partition function.
@@ -1160,13 +1160,14 @@
                   <Icon class="material-icons">info</Icon>
                 </IconButton>
                 <Tooltip persistent>
-                  <Title style="text-align: center">The current step of the agent [1, Trajectory length].</Title>
+                  <Title style="text-align: center">The current step of the agent</Title>
                   <Content style="color: black; font-size: 12px; text-align: left">
                     <br>
-                    The policy is learned based on the position (x / y) and the step. Therefore the flow is changes as the agent takes more steps.
+                    The policy is learned based on the position (x, y) and the current step. Therefore the flow changes as the agent takes more steps.
                     The number of steps the agent takes is determined by the hyperparameter "Trajectory length".
                     Setting this value to the minimum shows the flow for the first step the agent takes.
                     Setting this value to the maximum shows the flow for the last step before the agent collects the reward.
+                    Check the tutorial below for more information how to interpret the flow.
                   </Content>
                 </Tooltip>
               </Wrapper>
@@ -1217,26 +1218,29 @@
       >
         <Icon class="material-icons">keyboard_arrow_down</Icon></Fab>
     </div>
-
-
-
   </div>
 
 
 
 
 
-  <section class="section" id="Tutorial" bind:this={tutorialstart}>
+  <section class="section-light" >
     <h2 class="section-title">What is this about?</h2>
     <p class="section-text">
       Here you can explore how GFlowNets learn.
-      <br>If you have no idea what a GFlowNet actually is you might want to look into this basic tutorial first to learn more.
+      If you have no idea what a GFlowNet actually is you might want to look into this basic tutorial first to learn more.
       <br>Of course you can always just start exploring!
       <br>
-      <br>You can adjust the reward function directly in the Environment view. Enter the parameters or drag the circles in the left plot however you wish.
-      You can then start training in the Training view. Adjust the hyperparameters and press Play to start training a GFlowNet.
-      You can view the flow of the trained model in the Flow view. If you want to know more about what the flow shows just continue reading!
+      <br>If you want to start right away, you can adjust the reward function directly in the Environment view. Enter the parameters or drag the circles in the left plot however you wish.
+      <br>
+      <br>You can then start training in the Training view. Adjust the hyperparameters and press Play to start training a GFlowNet.
+      An agent will take a fixed number of steps on the grid and then collect reward according to the previously fixed reward function.
+      The visualization shows the final position of an agent. If the training is successful, the distribution of the final samples should match the reward function.
+      <br>
+      <br>You can view the flow of the trained model in the Flow view. If you want to know more about what the flow shows just continue reading!
     </p>
+  </section>
+  <section class="section" id="Tutorial" bind:this={tutorialstart}>
     <h2 class="section-title">What is a GFlowNet?</h2>
     <p class="section-text">
 
@@ -1310,7 +1314,10 @@
       <span class="mathexpl">The total Flow of a state is the Reward of its terminal children plus the Flow of its non-terminal children</span>
 
 
-      We now define our forward policy as the proportion of the Flow s -> s' to the total Flow of s:
+      We now define our forward policy as the proportion of the Flow
+      <Katex>
+        s \to s'
+      </Katex> to the total Flow of s:
       <Katex displayMode>
       P_F(s'|s) = \frac{"{F(s,s')}{F(s)}"}
       </Katex>
@@ -1362,7 +1369,7 @@
       <span class="mathexpl">The trajectory balance loss. <br> If both parts of the fraction are equal our loss goes to 0.</span>
       We want the two parts of the fraction to be equal again.
       Simply put, the upper part tells us what fraction of the total flow goes through this trajectory and the lower part tells us what fraction of the reward of the final object x goes through this trajectory.
-      <br>Here <Katex>\theta</Katex> are the parameters of our model. They include the parameters of <Katex>P_F, P_B, Z</Katex> and we can update them using the loss above.
+      <br>Here <Katex>\theta</Katex> are the parameters of the model. They include the parameters of <Katex>P_F, P_B, Z</Katex> and we can update them using the loss above.
       <br>Below you find more detailed background for the parts of the trajectory balance loss as well as the algorithm for training.
     </p>
     <div class="image-container">
@@ -1427,7 +1434,7 @@
     </div>
     <p class="section-text">
       We trained a GFlowNet on this environment for 2000 Iterations.
-      Below you see the progress of our model during training. While it first samples randomly, it learns to match the true distribution of our environment.
+      Below you see the progress of the model during training. While it first samples randomly, it learns to match the true distribution of our environment.
 
 
     </p>
@@ -1472,7 +1479,7 @@
       Well, thats not what we want! Instead of sampling from the true distribution we only sample from one mode!
       <br><br>
       There are two main possibilities to fix this:
-      <span class="li">We could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:<Katex>R_{"new"}(x)=R(x)^\beta</Katex>. This would change the "peakyness" of the reward function and we would not sample proportional to the reward function but according to <Katex>\pi(x|\beta) \propto R(x)^\beta</Katex>. It is also possible to use <Katex>\beta</Katex> as a trainable parameter and condition the model on it.</span>
+      <span class="li">We could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:<Katex>R_{"{new}"}(x)=R(x)^\beta</Katex>. This would change the "peakyness" of the reward function and we would not sample proportional to the reward function but according to <Katex>\pi(x|\beta) \propto R(x)^\beta</Katex>. It is also possible to use <Katex>\beta</Katex> as a trainable parameter and condition the model on it.</span>
       <span class="li">A similar but simpler way is to just train off-policy. By adding a fixed variance to the logits of the forward policy, we explore more during training. As this is a very easy implementation let's go with this one.</span>
     </p>
     <div class="image-container">
@@ -1481,7 +1488,7 @@
           <Header>Changes to the algorithm</Header>
           <Content>
             Training off-policy is even more helpful when we schedule it. We start with a higher variance and scale it down during training until we reach on-policy training.
-            <br>Our new hyperparameter is the initial value for the off policy training, during each step we gradually decrease it until we reach 0.
+            <br>Our new hyperparameter is the initial value for off policy training, during each step we gradually decrease it until we reach 0.
             <br>
             <br>Important changes:
             <ul>
@@ -1571,16 +1578,20 @@
       Note that this might be a bit misleading as a lot depends on the parameters of the physics simulation. You can change to view the vectorfield for more precision.
       This visualization shows the flowfield for the last of the steps in the trajectory. Train your own model and you can look at how the flowfield changes from the first to the last step.
     </p>
-  </section>
 
-  <section class="section">
-    <div style="text-align: center; font-weight: bold; font-size: 22px; margin-bottom: 20px">What next?</div>
+    <h2 class="section-title" style="position:relative">What next?</h2>
     <div class="whatnext_t">
       <div class="whatnext_b">Train your own GFlownets? <br> Go to the top</div>
       <div class="whatnext_b">Interested in the code? <br>Find it here</div>
       <div class="whatnext_b">Learn more about GFlowNets?<br>Find other tutorials</div>
     </div>
-    <div class="whatnext_t">
+
+
+
+    <div style="position:absolute; width:1000px; left: 50%;transform: translateX(-50%); ">
+
+
+      <div class="whatnext_t" >
       <div class="whatnext_b">
         <Fab
         on:click={scrollTo(playgroundstart)}
@@ -1615,6 +1626,15 @@
         <Icon class="material-icons">keyboard_arrow_down</Icon></Fab>
       </div>
     </div>
+
+
+    </div>
+
+
+
+  </section>
+
+  <section class="section">
 
   </section>
 
