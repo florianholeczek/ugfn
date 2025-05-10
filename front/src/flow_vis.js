@@ -61,7 +61,6 @@ export function plot_flow(p, vectorgrid_size) {
           //vect.normalize();
           flowfield[i/2] = vect;
         };
-        console.log("flowfield updated", flowfield);
         flow_changed.set(false);
       }
 

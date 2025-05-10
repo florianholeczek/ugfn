@@ -3,8 +3,9 @@
   import {writable} from 'svelte/store';
   import Katex from 'svelte-katex'
   import 'katex/dist/katex.min.css';
-  import {plotEnvironment, compute_density_plotting} from "./env.js";
+  import "./theme.css"
   import './styles.css';
+  import {plotEnvironment, compute_density_plotting} from "./env.js";
   import {plotStates} from "./training_vis.js"
   import {plot_flow} from "./flow_vis.js";
   import Accordion, {Panel, Header, Content } from '@smui-extra/accordion';
@@ -12,7 +13,6 @@
   import Button, { Label } from '@smui/button';
   import IconButton, { Icon } from '@smui/icon-button';
   import Tooltip, { Wrapper, Title } from '@smui/tooltip';
-  import "./theme.css"
   import Tab from '@smui/tab';
   import TabBar from '@smui/tab-bar';
   import Paper from '@smui/paper';
@@ -24,63 +24,6 @@
   import { flow_velocity, flow_n_particles,flow_vectorfield, flow_vectors, flow_changed} from './store.js';
 
 
-  let flow_velocity_value = 0.5;
-  let flow_n_particles_value = 1000;
-  let flow_vectorfield_value = false;
-  let flow_step_value = 0;
-  let flow_trajectory_step_value = 1;
-  let t_flow_step_value = 0;
-  let t_flow_trajectory_step_value = 1;
-  let updateflows=true;
-
-  $: update_flowparameters(
-          flow_velocity_value,
-          flow_n_particles_value,
-          flow_vectorfield_value,
-          flow_step_value,
-          flow_trajectory_step_value,
-          t_flow_step_value,
-          t_flow_trajectory_step_value
-  );
-  function update_flowparameters(
-          velocity,
-          nParticles,
-          vectorfield,
-          flow_step_value,
-          flow_trajectory_step_value,
-          t_flow_step_value,
-          t_flow_trajectory_step_value
-  ) {
-    if(((view === "Flow" && flowvis_instance) || (tutorial_flowvis_instance)) && updateflows){
-      console.log("updating")
-      flow_velocity.set(velocity);
-      flow_n_particles.set(nParticles);
-      flow_vectorfield.set(vectorfield);
-      if (flowvis_instance) {
-        flow_vectors.set(slice_flows(
-              flow_step_value,
-              flow_trajectory_step_value,
-              current_parameters["trajectory_length_value"],
-              current_flows
-        ));
-      } else {
-        console.log("lalarun3")
-        flow_vectors.set(slice_flows(
-              t_flow_step_value,
-              t_flow_trajectory_step_value,
-              6,
-              run_data["run3_flow"]
-        ));
-      }
-
-      flow_changed.set(true);
-    }
-
-  }
-
-
-  //tutorial visualization data
-  let run_data = {};
 
   // default values
   let off_policy_value = 0;
@@ -118,11 +61,25 @@
   let tutorial_flowContainer;
   let flowvis_instance;
   let tutorial_flowvis_instance;
+  let tutorial_flow_observer;
   let vectorgrid_size=31;
 
   // ranges for means and variances
   const range = { min: -3, max: 3 };
   const varianceRange = { min: 0.1, max: 1.0 };
+
+  // flow visualization
+  let flow_velocity_value = 0.5;
+  let flow_n_particles_value = 1000;
+  let flow_vectorfield_value = false;
+  let flow_step_value = 0;
+  let flow_trajectory_step_value = 1;
+  let t_flow_step_value = 0;
+  let t_flow_trajectory_step_value = 1;
+  let updateflows=true;
+
+  //tutorial visualization data
+  let run_data = {};
 
   // Gaussian tracking
   let selectedGaussian = null; // Tracks the currently selected Gaussian
@@ -185,9 +142,11 @@
       );
     }
   }
+
   $: run1 = `./images/run1/run1_${run1_value}.png`
   $: run2 = `./images/run2/run2_${run2_value}.png`
   $: run3 = `./images/run3/run3_${run3_value}.png`
+
   $: viewChange(view);
   function viewChange (view){
     if (plotlyready) {
@@ -231,7 +190,6 @@
 
   function createVectorfield(instance, container, trajectory_length, data, s, t) {
     if (!instance){
-      console.log("creating vectorfield")
       flow_vectors.set(slice_flows(
               s,
               t,
@@ -240,11 +198,52 @@
       ));
       flow_changed.set(true);
       instance = new p5((p) => plot_flow(p, vectorgrid_size), container);
-      console.log("new instance created")
       return instance
     }
   }
 
+  $: update_flowparameters(
+          flow_velocity_value,
+          flow_n_particles_value,
+          flow_vectorfield_value,
+          flow_step_value,
+          flow_trajectory_step_value,
+          t_flow_step_value,
+          t_flow_trajectory_step_value
+  );
+  function update_flowparameters(
+          velocity,
+          nParticles,
+          vectorfield,
+          flow_step_value,
+          flow_trajectory_step_value,
+          t_flow_step_value,
+          t_flow_trajectory_step_value
+  ) {
+    if(((view === "Flow" && flowvis_instance) || (tutorial_flowvis_instance)) && updateflows){
+      flow_velocity.set(velocity);
+      flow_n_particles.set(nParticles);
+      flow_vectorfield.set(vectorfield);
+      if (flowvis_instance) {
+        flow_vectors.set(slice_flows(
+              flow_step_value,
+              flow_trajectory_step_value,
+              current_parameters["trajectory_length_value"],
+              current_flows
+        ));
+      } else {
+        flow_vectors.set(slice_flows(
+              t_flow_step_value,
+              t_flow_trajectory_step_value,
+              6,
+              run_data["run3_flow"]
+        ));
+      }
+
+      flow_changed.set(true);
+    }
+
+  }
 
   // Utility functions
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
@@ -291,6 +290,36 @@
       id.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
+
+  function slice_flows(s, t, t_length, data){
+    const size = vectorgrid_size**2 * 2
+    const index = (s*(t_length+1)*size) + (t*size)
+    return data.slice(index, index+size)
+  }
+
+  function save_array(ar) {
+		const blob = new Blob([JSON.stringify(Array.from(ar))], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'current_array.json';
+		a.click();
+		URL.revokeObjectURL(url);
+        console.log("saved", ar)
+	}
+
+  async function load_array(path, name) {
+		try {
+			const res = await fetch(path);
+			if (!res.ok) throw new Error("File not found or fetch failed");
+			const data = await res.json();
+			run_data[name] = new Float32Array(data);
+            //current_flows = new Float32Array(data);
+			console.log(`Loaded ${name}:`, data);
+		} catch (err) {
+			console.error(`Failed to load ${name}.json`, err);
+		}
+	}
 
 
   // Functions used to start, stop and update the training process
@@ -388,8 +417,6 @@
           await get_final_data();
           training_frame = frames.length-2;
           isRunning = false;
-          console.log(frames.length);
-          console.log(frames[frames.length-1]['losses']['losses'].length)
           plotStates(Plotly, $gaussians, current_states,current_losses, current_plotting_density);
 
         }
@@ -415,7 +442,6 @@
         const t2 = 2048*2*(current_parameters["trajectory_length_value"]+1);
         current_nSteps = Math.floor(floats.length / (t1+t2));
         const cutoff = current_nSteps*t2;
-        // console.log(current_nSteps, cutoff, floats.length)
         current_trajectories = floats.slice(0, cutoff);
         current_flows = floats.slice(cutoff);
         console.log("Final data recieved, training done.")
@@ -426,8 +452,8 @@
     }
   }
 
-  // Functions for setting the environment
 
+  // Functions for setting the environment
   function resetGaussians(){
     gaussians.set([
       { mean: { x: -1, y: -1 }, variance: 0.4 },
@@ -523,13 +549,9 @@
   }
 
 
-  function slice_flows(s, t, t_length, data){
-    const size = vectorgrid_size**2 * 2
-    const index = (s*(t_length+1)*size) + (t*size)
-    return data.slice(index, index+size)
-  }
 
-  let tutorial_flow_observer;
+
+
   // Mounting
   onMount(async () => {
     //visualize the environment
@@ -540,6 +562,7 @@
     //await load_array("/Data/run1_flow.json", "run1_flow");
     //await load_array("/Data/run2_flow.json", "run2_flow");
     await load_array("/Data/run3_flow.json", "run3_flow");
+
     // add listeners for changing the Environment
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', stopDrag);
@@ -551,14 +574,12 @@
           if (flowvis_instance) {
             flowvis_instance.remove();
             flowvis_instance = null;
-            console.log("Flowview deleted")
           }
 
           updateflows = false;
           t_flow_trajectory_step_value=6;
           t_flow_step_value = 33;
           updateflows = true;
-          console.log("creating run3")
 
           tutorial_flowvis_instance = createVectorfield(
                   tutorial_flowvis_instance,
@@ -568,7 +589,6 @@
                   t_flow_step_value,
                   t_flow_trajectory_step_value
           );
-          console.log("run3 created")
         } else {
           if (tutorial_flowvis_instance) {
             tutorial_flowvis_instance.remove();
@@ -592,31 +612,6 @@
   });
 
 
-  function save_array(ar) {
-		const blob = new Blob([JSON.stringify(Array.from(ar))], { type: 'application/json' });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = 'current_array.json';
-		a.click();
-		URL.revokeObjectURL(url);
-        console.log("saved", ar)
-	}
-
-  async function load_array(path, name) {
-		try {
-          console.log("test")
-			const res = await fetch(path);
-			if (!res.ok) throw new Error("File not found or fetch failed");
-			const data = await res.json();
-			run_data[name] = new Float32Array(data);
-            //current_flows = new Float32Array(data);
-			console.log(`Loaded ${name}:`, data);
-		} catch (err) {
-			console.error(`Failed to load ${name}.json`, err);
-		}
-	}
-
 </script>
 
 
@@ -625,6 +620,8 @@
   href="https://fonts.googleapis.com/css2?family=Material+Icons&display=swap"
   rel="stylesheet"
 />
+
+<!-- Save /Load buttons for saving flow and trajectory data
 
 <Fab
   on:click={save_array(current_flows)}
@@ -640,7 +637,7 @@
   <Icon class="material-icons" style="font-size: 22px">replay</Icon>
 </Fab>
 
-
+-->
 
 
 <main class="main-content">

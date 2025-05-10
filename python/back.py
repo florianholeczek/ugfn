@@ -94,7 +94,6 @@ def start_training(request: TrainingRequest, background_tasks: BackgroundTasks):
     training_state["running"] = True
     training_state["stop_requested"] = False
     training_state["current_image"] = None
-    # print(params)
 
     # Start the training in the background
     background_tasks.add_task(
@@ -126,6 +125,7 @@ def stop_training():
         return JSONResponse(status_code=400, content={"error": "No training running."})
 
 
+# collect and send flows and trajectories after training is done
 @app.post("/get_final_data")
 async def get_final_data():
     global final_flows
@@ -134,38 +134,13 @@ async def get_final_data():
 
     while training_state["running"]:
         time.sleep(0.1)
-        print("sleeping")
 
     buffer = prepare_final_dump(final_trajectories, final_flows)
     print("sending final data")
 
     return StreamingResponse(buffer, media_type="application/octet-stream")
-    #return {"test": "success"}
 
 
-"""@app.post("/get_vectorfield")
-async def generate_flowfield(request: VectorfieldRequest):
-    global model
-    global global_trajectory_length
-    print(request)
-    if training_state["running"]:
-        return JSONResponse(status_code=400, content={"error": "Training running."})
-
-    grid_size=request.size
-    x = torch.linspace(-3, 3, grid_size)
-    y = torch.linspace(-3, 3, grid_size)
-    X, Y = torch.meshgrid(x, y, indexing="xy")
-    gridpoints = torch.stack([X.flatten(), Y.flatten()], dim=1)
-    #model = torch.load("model.pth") #use saved model instead
-    states = torch.cat((torch.ones(len(gridpoints),1)*global_trajectory_length, gridpoints), dim=1)
-    with torch.no_grad():
-        vectors = model.forward_model(states)[:,:-1]
-    # convert to pixel coordinates
-    vectors = [{"x": float(vectors[i, 0]), "y": float(vectors[i, 1])} for i in range(vectors.shape[0])]
-    #vectors = [{"x": 0.2, "y": 0.5}] * request.size * request.size # test flowfield
-    print("sending")
-
-    return {"cols":request.size, "rows": request.size, "vectors": vectors}"""
 
 # train and save samples for visualization
 def train_and_sample(
@@ -302,34 +277,12 @@ def prepare_final_dump(trajectories, flows):
     # get final trajectories and flows in format expected by frontend
     trajectories_temp = torch.stack(trajectories, dim=0)
     s = trajectories_temp.size()
-    print(len(flows), len(trajectories))
-    print(s)
-    print(flows[1].shape)
     flows = torch.stack(flows, dim=0).reshape(s[0], s[2]-1, vectorgrid_size**2, s[3])
     flows_temp = torch.zeros((s[0], s[2], vectorgrid_size**2, s[3]))
     flows_temp[:,1:,:,:] = flows
 
     # To get shape (iteration, trajectory_step, vectorgrid_size**2, 2)
-    #flows_temp = flows_temp.permute(0,2,1,3)
     trajectories_temp = trajectories_temp.permute(0, 2, 1, 3)
-    # flows_temp = torch.movedim(flows_temp, 2,1)
-    # To get shape (iteration, trajectory_step, n_samples,2)
-    # trajectories_temp = torch.movedim(trajectories_temp, 2, 1)
-
-    print(trajectories_temp.shape, flows_temp.shape)
-
-
-
-    """# test
-    flows_temp = torch.zeros((s[0], s[2], vectorgrid_size**2, s[3]))
-    flows_temp[:,1,:,:] += 1
-    flows_temp[:,3,:,:] -= 1
-    print(flows_temp[0, 0, :, :])
-    print(flows_temp[0, 1, :, :])
-    print(flows_temp[1, 0, :, :])
-    print(flows_temp[1, 1, :, :])
-    print(flows_temp[1, 2, :, :])
-    print(flows_temp[1, 3, :, :])"""
 
     data = torch.concatenate((trajectories_temp.flatten(), flows_temp.flatten()), axis=0).cpu().numpy()
 
