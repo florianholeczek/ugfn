@@ -1532,7 +1532,17 @@
   </section>
 
   <section class="section" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);">
-    <h2 class="section-title">Flow - Is this what it looks like?</h2>
+    <h2 class="section-title">Flow</h2>
+    <p class="section-text">
+      Below you can see the flow the last training run.
+      <br>
+      Use the Step slider to adjust the current step. We fixed the number of steps for the agent at 6, so it collects the reward after 6 steps on the grid.
+      <br>
+      Use the Iteration Slider to compare the flow at the start of the training to the end.
+      <br>
+      <br>
+      You see that for the trained model (last iteration) the flow is different depending on the step. In the first step the agent takes, it tends to move to the center. Later on in the trajectory the points of convergence split up and move outwards to the modes of the distribution.
+    </p>
 
     <div class="flow-container">
       <div bind:this={tutorial_flowContainer}></div>
@@ -1567,21 +1577,20 @@
         />
       </div>
     </div>
-
-
+    <h2 class="section-title">Flow - Is this what it looks like?</h2>
     <p class="section-text">
       Well, kind of. Imagine our grid would be discrete. If we are in one cell, we would have a certain Flow (a non-negative scalar) to each other cell (technically also to itself given our trick with adding the step to the state).
       <br>Even in a discrete space, this is hard to visualize, as we would have to compute the flow from each state to every other state.
       <br>In our continuous space this gets even more complicated, not only in terms of visualization but also mathematically - look into Lahlou et al. (2023) if you are interested.
       <br>Instead of showing all the flows, the plot shows the <i>highest</i> flow for each state: This is a vector from it to another point on the grid.
       If we do that for some evenly spaced points we get a vectorfield. The visualization above is just a nicer way to show it by letting particles move through the field.
-      Note that this might be a bit misleading as a lot depends on the parameters of the physics simulation. You can change to view the vectorfield for more precision.
-      This visualization shows the flowfield for the last of the steps in the trajectory. Train your own model and you can look at how the flowfield changes from the first to the last step.
+      Note that the path of the particels is not the path of the agents. The particles follow the most probable direction continuously, while the agent takes discrete steps not in the most probable direction but following the distribution of the policy.
+      Therefore the trajectories jump around more. This visualization however shows the converging points in the flowfield which direct the agents movement.
     </p>
 
     <h2 class="section-title" style="position:relative">What next?</h2>
     <div class="whatnext_t">
-      <div class="whatnext_b">Train your own GFlownets? <br> Go to the top</div>
+      <div class="whatnext_b">Train your own GFlowNets? <br> Go to the top</div>
       <div class="whatnext_b">Interested in the code? <br>Find it here</div>
       <div class="whatnext_b">Learn more about GFlowNets?<br>Find other tutorials</div>
     </div>
@@ -1589,53 +1598,45 @@
 
 
     <div style="position:absolute; width:1000px; left: 50%;transform: translateX(-50%); ">
-
-
       <div class="whatnext_t" >
-      <div class="whatnext_b">
-        <Fab
-        on:click={scrollTo(playgroundstart)}
-        disabled="{isRunning}"
-      >
-        <Icon class="material-icons">keyboard_arrow_up</Icon></Fab>
-      </div>
-      <div class="whatnext_b">
-        <a href={"https://github.com/florianholeczek/ugfn"} target="_blank" rel="noopener noreferrer" class="github-button">
-          <Fab>
-            <Icon tag="svg">
-              <svg
-                class="github-icon"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12 0.297C5.373 0.297 0 5.67 0 12.297c0 5.3 3.438 9.8 8.207 11.387.6.11.793-.26.793-.577v-2.17c-3.338.724-4.033-1.61-4.033-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.743.082-.727.082-.727 1.205.085 1.84 1.24 1.84 1.24 1.07 1.835 2.807 1.305 3.493.997.108-.776.418-1.305.76-1.605-2.667-.303-5.467-1.333-5.467-5.93 0-1.31.467-2.384 1.235-3.223-.123-.303-.535-1.524.117-3.176 0 0 1.007-.323 3.3 1.23a11.42 11.42 0 013.003-.404c1.018.005 2.042.137 3.003.404 2.29-1.553 3.296-1.23 3.296-1.23.654 1.652.242 2.873.12 3.176.77.839 1.233 1.913 1.233 3.223 0 4.607-2.805 5.624-5.478 5.92.43.373.814 1.102.814 2.22v3.293c0 .32.19.693.8.576C20.565 22.094 24 17.595 24 12.297 24 5.67 18.627.297 12 .297z"
-                />
-              </svg>
-            </Icon>
-          </Fab>
-        </a>
+        <div class="whatnext_b">
+          <Fab
+          on:click={scrollTo(playgroundstart)}
+          disabled="{isRunning}"
+        >
+          <Icon class="material-icons">keyboard_arrow_up</Icon></Fab>
+        </div>
+        <div class="whatnext_b">
+          <a href={"https://github.com/florianholeczek/ugfn"} target="_blank" rel="noopener noreferrer" class="github-button">
+            <Fab>
+              <Icon tag="svg">
+                <svg
+                  class="github-icon"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 0.297C5.373 0.297 0 5.67 0 12.297c0 5.3 3.438 9.8 8.207 11.387.6.11.793-.26.793-.577v-2.17c-3.338.724-4.033-1.61-4.033-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.743.082-.727.082-.727 1.205.085 1.84 1.24 1.84 1.24 1.07 1.835 2.807 1.305 3.493.997.108-.776.418-1.305.76-1.605-2.667-.303-5.467-1.333-5.467-5.93 0-1.31.467-2.384 1.235-3.223-.123-.303-.535-1.524.117-3.176 0 0 1.007-.323 3.3 1.23a11.42 11.42 0 013.003-.404c1.018.005 2.042.137 3.003.404 2.29-1.553 3.296-1.23 3.296-1.23.654 1.652.242 2.873.12 3.176.77.839 1.233 1.913 1.233 3.223 0 4.607-2.805 5.624-5.478 5.92.43.373.814 1.102.814 2.22v3.293c0 .32.19.693.8.576C20.565 22.094 24 17.595 24 12.297 24 5.67 18.627.297 12 .297z"
+                  />
+                </svg>
+              </Icon>
+            </Fab>
+          </a>
 
-      </div>
-      <div class="whatnext_b">
-        <Fab
-        on:click={scrollTo(sourcesstart)}
-        disabled="{isRunning}"
-      >
-        <Icon class="material-icons">keyboard_arrow_down</Icon></Fab>
+        </div>
+        <div class="whatnext_b">
+          <Fab
+          on:click={scrollTo(sourcesstart)}
+          disabled="{isRunning}"
+        >
+          <Icon class="material-icons">keyboard_arrow_down</Icon></Fab>
+        </div>
       </div>
     </div>
-
-
-    </div>
-
-
-
   </section>
 
   <section class="section">
-
   </section>
 
   <section class="section">
