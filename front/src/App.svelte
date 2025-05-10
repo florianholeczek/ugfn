@@ -349,10 +349,10 @@
       }
 
       // Stop polling and reset button state
-      clearInterval(pollingTimer);
-      training_frame=0;
-      await get_final_data();
-      isRunning = false;
+      //clearInterval(pollingTimer);
+      //training_frame=0;
+      //await get_final_data();
+      //isRunning = false;
     } catch (error) {
       console.error(error);
     }
@@ -385,9 +385,11 @@
         if (data.completed && !completed) {
           completed = true;
           clearInterval(pollingTimer); //stop polling
-          training_frame=0;
           await get_final_data();
+          training_frame = frames.length-2;
           isRunning = false;
+          console.log(frames.length);
+          console.log(frames[frames.length-1]['losses']['losses'].length)
           plotStates(Plotly, $gaussians, current_states,current_losses, current_plotting_density);
 
         }
@@ -1096,7 +1098,7 @@
             <Slider
               bind:value="{training_frame}"
               min={0}
-              max={frames.length}
+              max={frames.length-2}
               step={1}
               input$aria-label="View the iterations"
             />
@@ -1181,8 +1183,12 @@
               input$aria-label="Set the trajectory step"
             />
             <div style="position: absolute; bottom: 6px; right: 10px">
-              Iteration: {flow_step_value*current_parameters["n_iterations_value"]/32}
-              / {(current_nSteps-1)*current_parameters["n_iterations_value"]/32}
+              Iteration: {Math.min(
+                    flow_step_value*current_parameters["n_iterations_value"]/32,
+                    frames[frames.length-1]['losses']['losses'].length
+            )}
+
+
             </div>
           </div>
 
