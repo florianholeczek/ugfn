@@ -8,4 +8,3 @@ pydantic==1.10.0
 Requests==2.32.3
 plotly
 uvicorn
-

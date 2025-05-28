@@ -92,7 +92,7 @@ npm install
 
 
 
-assuming you are already in the front folder, you can start the backend with 
+assuming you are already in the back folder, you can start the backend with 
 ```shell
 uvicorn back:app --host 0.0.0.0 --port 8000
 ```
