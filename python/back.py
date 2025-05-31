@@ -15,6 +15,7 @@ from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 torch.set_printoptions(precision=2, sci_mode=False)
 
 
@@ -34,6 +35,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
+
 
 # set up beginning states.
 # training states is the variable which will be fetched by the frontend
@@ -83,6 +85,7 @@ class VectorfieldRequest(BaseModel):
 # when user is starting the training process
 @app.post("/start_training")
 def start_training(request: TrainingRequest, background_tasks: BackgroundTasks):
+    print("Starting training with params:", request)
     global training_state
     params = {}
     for k,v in request.dict().items():
@@ -290,3 +293,6 @@ def prepare_final_dump(trajectories, flows):
     buffer.write(data.tobytes())
     buffer.seek(0)
     return buffer
+
+
+app.mount("/", StaticFiles(directory="./front/public", html=True), name="frontend")
