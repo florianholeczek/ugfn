@@ -6,7 +6,10 @@ import time
 
 from arch import GFlowNet
 from env import Env
-from plot_utils import grid
+
+from uuid import uuid4
+from threading import Lock
+
 
 import torch
 from pydantic import BaseModel
@@ -15,17 +18,11 @@ from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-from fastapi.staticfiles import StaticFiles
 torch.set_printoptions(precision=2, sci_mode=False)
 
-
+vectorgrid_size = 31
 
 app = FastAPI()
-
-env = Env()
-model = GFlowNet()
-global_trajectory_length = 1
-vectorgrid_size = 31
 
 # Allow CORS for development purposes
 app.add_middleware(
@@ -36,26 +33,49 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+# Training session class for handling multiple users
+class TrainingSession:
+    def __init__(self, params):
+        self.id = str(uuid4())
+        self.params = params
+        self.env = self._init_env()
+        self.model = self._init_model()
+        self.training_state = {
+            "running": True,
+            "stop_requested": False,
+            "states": torch.zeros(1, 2).tolist(),
+            "losses": {
+                "losses": [],
+                "logzs": [],
+                "truelogz": [],
+                "n_iterations": 0,
+            },
+            "current_image": None
+        }
+        self.final_trajectories = []
+        self.final_flows = []
+        self.lock = Lock()
 
-# set up beginning states.
-# training states is the variable which will be fetched by the frontend
-start_states = torch.zeros(1,2).tolist()
-start_losses = {
-    "losses": [],
-    "logzs": [],
-    "truelogz": [],
-    "n_iterations": 0
-}
-training_state = {
-    "running": False,
-    "current_image": None,
-    "stop_requested": False,
-    "states": start_states,
-    "losses": start_losses,
-}
-# will be sent after training is done or stopped
-final_trajectories = []
-final_flows = []
+    def _init_env(self):
+        mus = []
+        sigmas = []
+        for g in self.params['curr_gaussians']:
+            m = [g["mean"]["x"], g["mean"]["y"]]
+            mus.append(torch.Tensor(m))
+            sigmas.append(torch.ones(2) * g["variance"])
+        return Env(mus, sigmas)
+
+    def _init_model(self):
+        return GFlowNet(
+            n_hidden_layers=self.params['hidden_layer'],
+            hidden_dim=self.params['hidden_dim'],
+            lr_model=self.params['lr_model'],
+            lr_logz=self.params['lr_logz'],
+            device='cpu'
+        )
+
+# Define sessions
+sessions: dict[str, TrainingSession] = {}
 
 # pydantic classes
 class Mean(BaseModel):
@@ -85,82 +105,67 @@ class VectorfieldRequest(BaseModel):
 # when user is starting the training process
 @app.post("/start_training")
 def start_training(request: TrainingRequest, background_tasks: BackgroundTasks):
-    print("Starting training with params:", request)
-    global training_state
-    params = {}
-    for k,v in request.dict().items():
-        params[k.replace("_value","")]=v
+    params = {k.replace("_value", ""): v for k, v in request.dict().items()}
+    session = TrainingSession(params)
+    sessions[session.id] = session
 
-    if training_state["running"]:
-        return JSONResponse(status_code=400, content={"error": "Visualization already running."})
-
-    training_state["running"] = True
-    training_state["stop_requested"] = False
-    training_state["current_image"] = None
-
-    # Start the training in the background
-    background_tasks.add_task(
-        train_and_sample,
-        params
-    )
-    return {"status": "Visualization started."}
+    background_tasks.add_task(train_and_sample, session)
+    return {"session_id": session.id}
 
 # updates in the training process via polling
-@app.get("/get_training_update")
-def get_training_update():
-    global training_state
-    return {
-        "completed": not training_state["running"],
-        "image": training_state["current_image"],
-        "states": training_state["states"],
-        "losses": training_state["losses"],
-    }
+@app.get("/get_training_update/{session_id}")
+def get_training_update(session_id: str):
+    session = sessions.get(session_id)
+    if not session:
+        return JSONResponse(status_code=404, content={"error": "Session not found"})
+
+    with session.lock:
+        return {
+            "completed": not session.training_state["running"],
+            "image": session.training_state["current_image"],
+            "states": session.training_state["states"],
+            "losses": session.training_state["losses"],
+        }
 
 # when user stops training process
-@app.post("/stop_training")
-def stop_training():
-    global training_state
-    # Request stop if a process is running
-    if training_state["running"]:
-        training_state["stop_requested"] = True
-        return {"status": "Stop requested."}
-    else:
-        return JSONResponse(status_code=400, content={"error": "No training running."})
+@app.post("/stop_training/{session_id}")
+def stop_training(session_id: str):
+    session = sessions.get(session_id)
+    if not session:
+        return JSONResponse(status_code=404, content={"error": "Session not found"})
+
+    with session.lock:
+        if session.training_state["running"]:
+            session.training_state["stop_requested"] = True
+            return {"status": "Stop requested."}
+        else:
+            return {"status": "Not running."}
 
 
 # collect and send flows and trajectories after training is done
-@app.post("/get_final_data")
-async def get_final_data():
-    global final_flows
-    global final_trajectories
-    global training_state
+@app.post("/get_final_data/{session_id}")
+async def get_final_data(session_id: str):
+    session = sessions.get(session_id)
+    if not session:
+        return JSONResponse(status_code=404, content={"error": "Session not found"})
 
-    while training_state["running"]:
+    while session.training_state["running"]:
         time.sleep(0.1)
 
-    buffer = prepare_final_dump(final_trajectories, final_flows)
-    print("sending final data")
-
+    buffer = prepare_final_dump(session.final_trajectories, session.final_flows)
     return StreamingResponse(buffer, media_type="application/octet-stream")
 
 
 
+
 # train and save samples for visualization
-def train_and_sample(
-        params: dict,
-):
-    global training_state
-    global start_losses
-    global start_states
-    global model
-    global env
-    global global_trajectory_length
-    global final_trajectories
-    global final_flows
+def train_and_sample(session: TrainingSession):
+    global vectorgrid_size
+    params = session.params
 
     global_trajectory_length = params['trajectory_length']
-    training_state["losses"] = start_losses
-    training_state["states"] = start_states
+    session.training_state["losses"] = dict(losses=[], logzs=[], truelogz=[], n_iterations=0)
+    session.training_state["states"] = torch.zeros(1,2).tolist()
     vectorgrid = calc_vectorgrid(vectorgrid_size, params['trajectory_length'])
 
     # as the model samples only n=batch size samples in one iteration and we need to update the visualization
@@ -179,8 +184,8 @@ def train_and_sample(
         m = [g["mean"]["x"], g["mean"]["y"]]
         mus.append(torch.Tensor(m))
         sigmas.append(torch.ones(2) * g["variance"])
-    env = Env(mus, sigmas)
-    model = GFlowNet(
+    session.env = Env(mus, sigmas)
+    session.model = GFlowNet(
         n_hidden_layers=params['hidden_layer'],
         hidden_dim=params['hidden_dim'],
         lr_model=params['lr_model'],
@@ -189,13 +194,13 @@ def train_and_sample(
     )
 
     # add state at timestep 0 to final trajectories and flows
-    final_trajectories =[model.inference(
-        env,
+    session.final_trajectories =[session.model.inference(
+        session.env,
         batch_size=trajectory_max,
         trajectory_length=params['trajectory_length']
     )[:,:,1:], ]
     with torch.no_grad():
-        final_flows = [model.forward_model(vectorgrid)[:,:-1], ]
+        session.final_flows = [session.model.forward_model(vectorgrid)[:,:-1], ]
 
     # set up off policy schedule beforehand, as training is interrupted for trainings
     if params['off_policy']:
@@ -207,11 +212,11 @@ def train_and_sample(
     n_updates = params['n_iterations']//train_interval
     for v in range(n_updates):
 
-        if training_state["stop_requested"]:
+        if session.training_state["stop_requested"]:
             break
 
-        losses, trajectory = model.train(
-            env,
+        losses, trajectory = session.model.train(
+            session.env,
             batch_size=params['batch_size'],
             trajectory_length=params['trajectory_length'],
             n_iterations=train_interval,
@@ -234,30 +239,30 @@ def train_and_sample(
 
         # To get final data with 32 timesteps
         # if training gets interrupted add last state as well
-        if (v+1) % (n_updates // 32) == 0 or training_state["stop_requested"]:
-            final_trajectories.append(model.inference(
-                env,
+        if (v+1) % (n_updates // 32) == 0 or session.training_state["stop_requested"]:
+            session.final_trajectories.append(session.model.inference(
+                session.env,
                 batch_size=trajectory_max,
                 trajectory_length=params['trajectory_length']
             )[:,:,1:])
             with torch.no_grad():
-                final_flows.append(model.forward_model(vectorgrid)[:,:-1])
+                session.final_flows.append(session.model.forward_model(vectorgrid)[:,:-1])
 
 
 
         # update training state so frontend can fetch new data
-        training_state["states"] = current_states.tolist()
-        training_state["losses"]={
-            "losses": training_state["losses"]["losses"] + losses[0],
-            "logzs": training_state["losses"]["logzs"] + losses[1],
+        session.training_state["states"] = current_states.tolist()
+        session.training_state["losses"]={
+            "losses": session.training_state["losses"]["losses"] + losses[0],
+            "logzs": session.training_state["losses"]["logzs"] + losses[1],
             "truelogz": losses[2],
             "n_iterations": params['n_iterations'],
         }
 
 
     # done
-    training_state["running"] = False
-    if training_state["stop_requested"]:
+    session.training_state["running"] = False
+    if session.training_state["stop_requested"]:
         print("Visualization stopped by user.")
 
 
@@ -294,5 +299,3 @@ def prepare_final_dump(trajectories, flows):
     buffer.seek(0)
     return buffer
 
-
-app.mount("/", StaticFiles(directory="./front/public", html=True), name="frontend")
