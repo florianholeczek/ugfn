@@ -111,6 +111,7 @@
   let run2_value = 4096;
   let run3_value = 4096;
   let session_id = null; // for identifying training sessions of multiple users
+  let isMobile = false;
 
 
   //polling every n ms
@@ -568,6 +569,8 @@
   // Mounting
   onMount(async () => {
     //visualize the environment
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
     await loadPlotly();
     await loadp5();
     plotlyready = true;
@@ -623,6 +626,7 @@
       tutorial_flow_observer.disconnect();
     };
   });
+  document.title = "GFlowNet Playground"
 
 
 </script>
@@ -654,1072 +658,1082 @@
 
 
 <main class="main-content">
-  <header class="header-top">
-    <div class="container">
-      <h1 class="title">Understanding GFlowNets</h1>
-      <p class="subtitle">Gaining intuition for Generative Flow Networks and how to train them</p>
-    </div>
-  </header>
-
-
-
-
-
-  <!-- Playground -->
-
-  <div class="pg-background" id="Playground" bind:this={playgroundstart}>
-  <div class = "pg-top-background">
-  </div>
-
-  <div class="pg-views">
-    <TabBar
-            tabs={["Environment", "Training", "Flow"]}
-            let:tab
-            bind:active={view}
-    >
-      <Tab {tab} disabled={isRunning}>
-        <Label>{tab}</Label>
-      </Tab>
-    </TabBar>
-    {#if view === 'Environment'}
-
-
-      <!-- Environment View -->
-      <div class="pg-container">
-        <div class="pg-top">
-          <div class="pg-play">
-            <Fab
-              on:click={resetGaussians}
-              mini
-              disabled="{isRunning}"
-            ><Icon class="material-icons" style="font-size: 22px">replay</Icon>
-            </Fab>
-            <Fab
-              on:click={() => view="Training"}
-              disabled="{isRunning}"
-            >
-                <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
-            </Fab>
-
-          </div>
-          <div class="pg-ngaussians">
-            <div class="columns margins" style="justify-content: flex-start;">
-              <Select bind:value="{n_gaussians}" label="N Gaussians" disabled="{isRunning}">
-                {#each ["1","2","3","4"] as select}
-                  <Option value={select}>{select}</Option>
-                {/each}
-              </Select>
-            </div>
-          </div>
-
-
-        </div>
-        <div id={plotContainerEnv2d} class = "pg-2dplot">
-          <div class="pg-circles-container">
-            {#each $gaussians as g, i}
-              <!-- Variance circle -->
-              <div
-                class="variance-circle"
-                class:highlight={i === hoveredGaussian || isRunning}
-                style="
-                  width: {129 * g.variance}px;
-                  height: {129 * g.variance}px;
-                  left: {132 + 132/3 * g.mean.x}px;
-                  top: {132 - 132/3 * g.mean.y}px;
-                "
-                on:mousedown={(e) => startDragVariance(e, g)}
-                role="slider"
-                aria-valuenow="{g.variance}"
-                aria-valuemin="0.1"
-                aria-valuemax="1"
-                tabindex="0"
-              ></div>
-
-              <!-- Mean circle -->
-              <div
-                class="mean-circle"
-                class:highlight={i === hoveredGaussian}
-                style="
-                  left: {132 + 132/3 * g.mean.x}px;
-                  top: {132 - 132/3 * g.mean.y}px;
-                "
-                on:mousedown={(e) => startDragMean(e, g)}
-                role="slider"
-                aria-valuenow="{g.mean.x}, {g.mean.y}"
-                aria-valuemin="-3"
-                aria-valuemax="3"
-                tabindex="0"
-              ></div>
-            {/each}
-          </div>
-        </div>
-
-        <div id={plotContainerEnv3d} class = "pg-3dplot">
-        </div>
-        <div class= "pg-gauss-table">
-          <DataTable table$aria-label="Parameters of Gaussians" style="width: 100%;border-radius: 1px">
-            <Head>
-              <Row>
-                <Cell><Katex>\mu_x</Katex></Cell>
-                <Cell><Katex>\mu_y</Katex></Cell>
-                <Cell><Katex>\sigma^2</Katex></Cell>
-              </Row>
-            </Head>
-            <Body>
-              {#each [...Array($gaussians.length).keys()] as i}
-                <Row>
-                  <Cell>
-                    <Textfield
-                            bind:value={$gaussians[i]["mean"]["x"]}
-                            on:input={(e) => gaussians_textinput(e,i,"x")}
-                            type="number"
-                            input$step="0.1"
-                            style="width:100%" helperLine$style="width: 100%;"
-                    ></Textfield>
-                  </Cell>
-
-                  <Cell>
-                    <Textfield
-                            bind:value={$gaussians[i]["mean"]["y"]}
-                            on:input={(e) => gaussians_textinput(e,i,"y")}
-                            type="number"
-                            input$step="0.1"
-                            style="width:100%" helperLine$style="width: 100%;"
-                    ></Textfield>
-                  </Cell>
-                  <Cell>
-                    <Textfield
-                            bind:value={$gaussians[i]["variance"]}
-                            on:input={(e) => gaussians_textinput(e,i,"variance")}
-                            type="number"
-                            input$step="0.1"
-                            style="width:100%" helperLine$style="width: 100%;"
-                    ></Textfield>
-                  </Cell>
-                </Row>
-              {/each}
-            </Body>
-          </DataTable>
-        </div>
-        <div class="pg-env-help">
-          Adjust the reward function by dragging the circles and dots in the left plot or by setting the parameters in the table.
-          <br>By setting the mean and variance of multiple 2D Multivariate Gaussians we get the reward function on the right as a mixture.
-          <br>Then switch to the "Training" tab to start training.
-        </div>
+  {#if isMobile}
+    <div class="mobile-disclaimer">
+      <div class="disclaimer-box">
+        <h1>There is no mobile version for the GFlowNet Playground</h1>
+        <p>Please visit this website on a desktop device for the best experience.</p>
       </div>
+    </div>
+  {:else}
+
+    <header class="header-top">
+      <div class="container">
+        <h1 class="title">GFlowNet Playground</h1>
+        <p class="subtitle">Building an intuitive understanding of GFlowNet training</p>
+      </div>
+    </header>
 
 
-    {:else if view === "Training"}
 
 
-      <!-- Training View -->
-      <div class="pg-container">
-        <div class="pg-top">
-          <div class="pg-play">
-            <Fab
-              on:click={resetSliders}
-              mini
-              disabled="{isRunning}"
-            ><Icon class="material-icons" style="font-size: 22px">replay</Icon>
-            </Fab>
-            <Fab
-              on:click={isRunning ? stopTraining : startTraining}
-            >
-              {#if isRunning}
-                <Icon class="material-icons" style="font-size: 50px">stop</Icon>
-              {:else}
-                <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
-              {/if}
-            </Fab>
 
-          </div>
-          <div class="pg-loss">
-            <div class="columns margins" style="justify-content: flex-start; visibility:hidden;">
-              <Select bind:value="{loss_choice}" label="Loss" color="primary" disabled="true" style="visibility: hidden" >
-                {#each losses_select as select}
-                  <Option value={select}>{select}</Option>
-                {/each}
-              </Select>
+    <!-- Playground -->
+
+    <div class="pg-background" id="Playground" bind:this={playgroundstart}>
+    <div class = "pg-top-background">
+    </div>
+
+    <div class="pg-views">
+      <TabBar
+              tabs={["Environment", "Training", "Flow"]}
+              let:tab
+              bind:active={view}
+      >
+        <Tab {tab} disabled={isRunning}>
+          <Label>{tab}</Label>
+        </Tab>
+      </TabBar>
+      {#if view === 'Environment'}
+
+
+        <!-- Environment View -->
+        <div class="pg-container">
+          <div class="pg-top">
+            <div class="pg-play">
+              <Fab
+                on:click={resetGaussians}
+                mini
+                disabled="{isRunning}"
+              ><Icon class="material-icons" style="font-size: 22px">replay</Icon>
+              </Fab>
+              <Fab
+                on:click={() => view="Training"}
+                disabled="{isRunning}"
+              >
+                  <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
+              </Fab>
+
             </div>
-            <div class="pg-iterations">
+            <div class="pg-ngaussians">
               <div class="columns margins" style="justify-content: flex-start;">
-                <Select
-                  bind:value="{n_iterations_str}"
-                  label="Iterations"
-                  disabled="{isRunning}"
-                >
-                  {#each n_iterations_select as select}
+                <Select bind:value="{n_gaussians}" label="N Gaussians" disabled="{isRunning}">
+                  {#each ["1","2","3","4"] as select}
                     <Option value={select}>{select}</Option>
                   {/each}
                 </Select>
               </div>
             </div>
+
+
+          </div>
+          <div id={plotContainerEnv2d} class = "pg-2dplot">
+            <div class="pg-circles-container">
+              {#each $gaussians as g, i}
+                <!-- Variance circle -->
+                <div
+                  class="variance-circle"
+                  class:highlight={i === hoveredGaussian || isRunning}
+                  style="
+                    width: {129 * g.variance}px;
+                    height: {129 * g.variance}px;
+                    left: {132 + 132/3 * g.mean.x}px;
+                    top: {132 - 132/3 * g.mean.y}px;
+                  "
+                  on:mousedown={(e) => startDragVariance(e, g)}
+                  role="slider"
+                  aria-valuenow="{g.variance}"
+                  aria-valuemin="0.1"
+                  aria-valuemax="1"
+                  tabindex="0"
+                ></div>
+
+                <!-- Mean circle -->
+                <div
+                  class="mean-circle"
+                  class:highlight={i === hoveredGaussian}
+                  style="
+                    left: {132 + 132/3 * g.mean.x}px;
+                    top: {132 - 132/3 * g.mean.y}px;
+                  "
+                  on:mousedown={(e) => startDragMean(e, g)}
+                  role="slider"
+                  aria-valuenow="{g.mean.x}, {g.mean.y}"
+                  aria-valuemin="-3"
+                  aria-valuemax="3"
+                  tabindex="0"
+                ></div>
+              {/each}
+            </div>
+          </div>
+
+          <div id={plotContainerEnv3d} class = "pg-3dplot">
+          </div>
+          <div class= "pg-gauss-table">
+            <DataTable table$aria-label="Parameters of Gaussians" style="width: 100%;border-radius: 1px">
+              <Head>
+                <Row>
+                  <Cell><Katex>\mu_x</Katex></Cell>
+                  <Cell><Katex>\mu_y</Katex></Cell>
+                  <Cell><Katex>\sigma^2</Katex></Cell>
+                </Row>
+              </Head>
+              <Body>
+                {#each [...Array($gaussians.length).keys()] as i}
+                  <Row>
+                    <Cell>
+                      <Textfield
+                              bind:value={$gaussians[i]["mean"]["x"]}
+                              on:input={(e) => gaussians_textinput(e,i,"x")}
+                              type="number"
+                              input$step="0.1"
+                              style="width:100%" helperLine$style="width: 100%;"
+                      ></Textfield>
+                    </Cell>
+
+                    <Cell>
+                      <Textfield
+                              bind:value={$gaussians[i]["mean"]["y"]}
+                              on:input={(e) => gaussians_textinput(e,i,"y")}
+                              type="number"
+                              input$step="0.1"
+                              style="width:100%" helperLine$style="width: 100%;"
+                      ></Textfield>
+                    </Cell>
+                    <Cell>
+                      <Textfield
+                              bind:value={$gaussians[i]["variance"]}
+                              on:input={(e) => gaussians_textinput(e,i,"variance")}
+                              type="number"
+                              input$step="0.1"
+                              style="width:100%" helperLine$style="width: 100%;"
+                      ></Textfield>
+                    </Cell>
+                  </Row>
+                {/each}
+              </Body>
+            </DataTable>
+          </div>
+          <div class="pg-env-help">
+            Adjust the reward function by dragging the circles and dots in the left plot or by setting the parameters in the table.
+            <br>By setting the mean and variance of multiple 2D Multivariate Gaussians we get the reward function on the right as a mixture.
+            <br>Then switch to the "Training" tab to start training.
           </div>
         </div>
 
-        <div class="pg-side">
-          <div>
-            <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active={active_tab}>
-              <Tab {tab}>
-                <Label>{tab}</Label>
-              </Tab>
-            </TabBar>
 
-            {#if active_tab === 'Basic'}
-              <Paper variant="unelevated">
-                <Content>
-                  Batch size
-                  <div class="hyperparameters">
-                    {batch_size_value}
-                    <Wrapper rich>
-                      <IconButton size="button">
-                        <Icon class="material-icons">info</Icon>
-                      </IconButton>
-                      <Tooltip persistent>
-                        <Title style="text-align: center">How many samples to train with</Title>
-                        <Content style="color: black; font-size: 12px; text-align: left">
-                          <br>
-                          Change the batch size to adjust how many samples are created in one iteration during training.
-                          Note that a higher batch size leads to longer training time.
-                        </Content>
-                      </Tooltip>
-                    </Wrapper>
-                  </div>
-                  <Slider
-                    bind:value="{batch_size_exponent}"
-                    min={3}
-                    max={11}
-                    step={1}
-                    disabled="{isRunning}"
-                    input$aria-label="Set the batch size: 2 to the power of n"
-                  />
-                  <br>
-                  <br>
-                  Trajectory length
-                  <div class="hyperparameters">
-                    {trajectory_length_value}
-                    <Wrapper rich>
-                      <IconButton size="button">
-                        <Icon class="material-icons">info</Icon>
-                      </IconButton>
-                      <Tooltip persistent>
-                        <Title style="text-align: center">Fixed number of steps the agent takes</Title>
-                        <Content style="color: black; font-size: 12px; text-align: left">
-                          <br>
-                          Change the trajectory length to adjust how many steps the agent takes.
-                          Starting from (0,0), the agent collects the reward after this fixed number of steps.
-                          A higher trajectory length tends to give better results, but increases training time.
-                        </Content>
-                      </Tooltip>
-                    </Wrapper>
-                  </div>
-                  <Slider
-                    bind:value="{trajectory_length_value}"
-                    min={1}
-                    max={10}
-                    step={1}
-                    disabled="{isRunning}"
-                    input$aria-label="Set the length of the trajectory"
-                  />
-                  <br>
-                  <br>
-                  Learning rate model
-                  <div class="hyperparameters">
-                    {lr_model_value.toFixed(4)}
-                    <Wrapper rich>
-                      <IconButton size="button">
-                        <Icon class="material-icons">info</Icon>
-                      </IconButton>
-                      <Tooltip persistent>
-                        <Title style="text-align: center">The learning rate of the forward and backward policies</Title>
-                        <Content style="color: black; font-size: 12px; text-align: left">
-                          <br>
-                          Change the learning rate of the neural nets that represent the forward and backward policy.
-                        </Content>
-                      </Tooltip>
-                    </Wrapper>
-                  </div>
-                  <Slider
-                    bind:value="{lr_model_value}"
-                    min={0.0001}
-                    max={0.01}
-                    step={0.0001}
-                    disabled="{isRunning}"
-                    input$aria-label="Set the learning rate of the model"
-                  />
-                  <br>
-                  <br>
-                  Learning rate logZ
-                  <div class="hyperparameters">
-                    {lr_logz_value.toFixed(3)}
-                    <Wrapper rich>
-                      <IconButton size="button">
-                        <Icon class="material-icons">info</Icon>
-                      </IconButton>
-                      <Tooltip persistent>
-                        <Title style="text-align: center">The learning rate of the partition function</Title>
-                        <Content style="color: black; font-size: 12px; text-align: left">
-                          <br>
-                          Change the larning rate of the parameter log(Z) which represents the partition function.
-                          Malkin et al. (2022) claim that setting this learning rate higher than that of the policies helps in training.
-                        </Content>
-                      </Tooltip>
-                    </Wrapper>
-                  </div>
-                  <Slider
-                    bind:value="{lr_logz_value}"
-                    min={0.001}
-                    max={0.3}
-                    step={0.001}
-                    disabled="{isRunning}"
-                    input$aria-label="Set the learning rate of logZ"
-                  />
-                </Content>
-              </Paper>
-            {:else if active_tab === 'Advanced'}
-              <Paper variant="unelevated">
-                <Content>
-                  Off-policy
-                  <div class="hyperparameters">
-                    {off_policy_value}
-                    <Wrapper rich>
-                      <IconButton size="button">
-                        <Icon class="material-icons">info</Icon>
-                      </IconButton>
-                      <Tooltip persistent>
-                        <Title style="text-align: center">Amount of off-policy training</Title>
-                        <Content style="color: black; font-size: 12px; text-align: left">
-                          <br>
-                          Change to adjust if and to what amount the model trains off-policy.
-                          Setting the parameter to 0 is equal to on-policy training.
-                          The value gets added to the variance when sampling a new step according to the policy.
-                          This leads to higher exploration and is helpful if the modes of the reward function are far apart.
-                          The value gets scheduled and decays to 0 during training.
-                        </Content>
-                      </Tooltip>
-                    </Wrapper>
-                  </div>
-                  <Slider
-                    bind:value="{off_policy_value}"
-                    min={0}
-                    max={3}
-                    step={0.1}
-                    disabled="{isRunning}"
-                    input$aria-label="Set the Off-policy training"
-                  />
-                  <br>
-                  <br>
-                  Hidden layers:
-                  <div class="hyperparameters">
-                    {hidden_layer_value}
-                    <Wrapper rich>
-                      <IconButton size="button">
-                        <Icon class="material-icons">info</Icon>
-                      </IconButton>
-                      <Tooltip persistent>
-                        <Title style="text-align: center">Number of hidden layers in the forward and backward policies</Title>
-                        <Content style="color: black; font-size: 12px; text-align: left">
-                          <br>
-                          Change to adjust the number of hidden layers in the neural nets which represent the policies.
-                          Usually shallow networks work fine here and avoid the problems which arise with deeper architectures.
-                        </Content>
-                      </Tooltip>
-                    </Wrapper>
-                  </div>
-                  <Slider
-                    bind:value="{hidden_layer_value}"
-                    min={1}
-                    max={6}
-                    step={1}
-                    disabled="{isRunning}"
-                    input$aria-label="Set the number of hidden layers"
-                  />
-                  <br>
-                  <br>
-                  Hidden layer size
-                  <div class="hyperparameters">
-                    {hidden_dim_value}
-                    <Wrapper rich>
-                      <IconButton size="button">
-                        <Icon class="material-icons">info</Icon>
-                      </IconButton>
-                      <Tooltip persistent>
-                        <Title style="text-align: center">Dimensions of the hidden layers in the forward and backward policies</Title>
-                        <Content style="color: black; font-size: 12px; text-align: left">
-                          <br>
-                          Change to adjust the size of the hidden layers in the neural nets which represent the policies.
-                        </Content>
-                      </Tooltip>
-                    </Wrapper>
-                  </div>
-                  <Slider
-                    bind:value="{hidden_dim_value}"
-                    min={8}
-                    max={128}
-                    step={8}
-                    disabled="{isRunning}"
-                    input$aria-label="Set the dimension of the hidden layers"
-                  />
-                  <br>
-                  <br>
-                  Seed
-                  <div class="hyperparameters">
-                    {seed_value}
-                    <Wrapper rich>
-                      <IconButton size="button">
-                        <Icon class="material-icons">info</Icon>
-                      </IconButton>
-                      <Tooltip persistent>
-                        <Title style="text-align: center">Value to seed random number generators with</Title>
-                        <Content style="color: black; font-size: 12px; text-align: left">
-                          <br>
-                          The random number generators will be seeded with this value to allow for reproducible results.
-                        </Content>
-                      </Tooltip>
-                    </Wrapper>
-                  </div>
-                  <Slider
-                    bind:value="{seed_value}"
-                    min={1}
-                    max={99}
-                    step={1}
-                    disabled="{isRunning}"
-                    input$aria-label="Set the seed"
-                  />
-                </Content>
-              </Paper>
-            {/if}
-            {#if display_trainhistory && !isRunning}
-              <div style="position: absolute; bottom: 6px; right: 10px">Iteration:</div>
-            {/if}
-          </div>
-        </div>
-        {#if !display_trainhistory && !isRunning}
-          <div class="pg-vis" style="text-align:center; padding:100px; color: #323232;">
-            Press Play to start training a GFlowNet
-          </div>
-        {:else}
-          <div class="pg-vis" id="trainplot">
-          </div>
-        {/if}
+      {:else if view === "Training"}
 
-        <div class="pg-bottom">
-          {#if !isRunning & display_trainhistory}
-            <Slider
-              bind:value="{training_frame}"
-              min={0}
-              max={frames.length-2}
-              step={1}
-              input$aria-label="View the iterations"
-            />
-      {:else if isRunning}
-        <div class = "pg-progress">
-          <LinearProgress progress="{ training_progress / n_iterations_value}" />
-        </div>
-      {/if}
-    </div>
-  </div>
 
-    {:else if view === "Flow"}
-      <!-- FlowView -->
-      <div class="pg-container">
-        <div class="pg-top">
-          <div class="pg-play">
-            <Fab mini disabled="true" style="visibility:hidden"
-            ><Icon class="material-icons" style="font-size: 22px; visibility:hidden">replay</Icon>
-            </Fab>
-            <Fab
-              on:click={() => flow_vectorfield_value = !flow_vectorfield_value}
-            >
-              {#if flow_vectorfield_value}
-                <Icon class="material-icons" style="font-size: 40px">air</Icon>
-              {:else}
-                <Icon class="material-icons" style="font-size: 40px">arrow_outward</Icon>
-              {/if}
-            </Fab>
+        <!-- Training View -->
+        <div class="pg-container">
+          <div class="pg-top">
+            <div class="pg-play">
+              <Fab
+                on:click={resetSliders}
+                mini
+                disabled="{isRunning}"
+              ><Icon class="material-icons" style="font-size: 22px">replay</Icon>
+              </Fab>
+              <Fab
+                on:click={isRunning ? stopTraining : startTraining}
+              >
+                {#if isRunning}
+                  <Icon class="material-icons" style="font-size: 50px">stop</Icon>
+                {:else}
+                  <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
+                {/if}
+              </Fab>
+
+            </div>
+            <div class="pg-loss">
+              <div class="columns margins" style="justify-content: flex-start; visibility:hidden;">
+                <Select bind:value="{loss_choice}" label="Loss" color="primary" disabled="true" style="visibility: hidden" >
+                  {#each losses_select as select}
+                    <Option value={select}>{select}</Option>
+                  {/each}
+                </Select>
+              </div>
+              <div class="pg-iterations">
+                <div class="columns margins" style="justify-content: flex-start;">
+                  <Select
+                    bind:value="{n_iterations_str}"
+                    label="Iterations"
+                    disabled="{isRunning}"
+                  >
+                    {#each n_iterations_select as select}
+                      <Option value={select}>{select}</Option>
+                    {/each}
+                  </Select>
+                </div>
+              </div>
+            </div>
           </div>
-          <div style="margin-left: 275px">Velocity: </div>
-          <div class="pg-top-slider">
-            <Slider
-              bind:value="{flow_velocity_value}"
-              disabled="{flow_vectorfield_value}"
-              min={0.1}
-              max={1}
-              step={0.1}
-              discrete
-              input$aria-label="Discrete slider"
-            />
-          </div>
-          <div>Number of particles: </div>
-          <div class="pg-top-slider">
-            <Slider
-              bind:value="{flow_n_particles_value}"
-              disabled="{flow_vectorfield_value}"
-              min={500}
-              max={2000}
-              step={100}
-              discrete
-              input$aria-label="Discrete slider"
-            />
-          </div>
-        </div>
-        {#if display_trainhistory}
+
           <div class="pg-side">
-            Step
-            <div class="hyperparameters">
-              {flow_trajectory_step_value}
-              <Wrapper rich>
-                <IconButton size="button">
-                  <Icon class="material-icons">info</Icon>
-                </IconButton>
-                <Tooltip persistent>
-                  <Title style="text-align: center">The current step of the agent</Title>
-                  <Content style="color: black; font-size: 12px; text-align: left">
+            <div>
+              <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active={active_tab}>
+                <Tab {tab}>
+                  <Label>{tab}</Label>
+                </Tab>
+              </TabBar>
+
+              {#if active_tab === 'Basic'}
+                <Paper variant="unelevated">
+                  <Content>
+                    Batch size
+                    <div class="hyperparameters">
+                      {batch_size_value}
+                      <Wrapper rich>
+                        <IconButton size="button">
+                          <Icon class="material-icons">info</Icon>
+                        </IconButton>
+                        <Tooltip persistent>
+                          <Title style="text-align: center">How many samples to train with</Title>
+                          <Content style="color: black; font-size: 12px; text-align: left">
+                            <br>
+                            Change the batch size to adjust how many samples are created in one iteration during training.
+                            Note that a higher batch size leads to longer training time.
+                          </Content>
+                        </Tooltip>
+                      </Wrapper>
+                    </div>
+                    <Slider
+                      bind:value="{batch_size_exponent}"
+                      min={3}
+                      max={11}
+                      step={1}
+                      disabled="{isRunning}"
+                      input$aria-label="Set the batch size: 2 to the power of n"
+                    />
                     <br>
-                    The policy is learned based on the position (x, y) and the current step. Therefore the flow changes as the agent takes more steps.
-                    The number of steps the agent takes is determined by the hyperparameter "Trajectory length".
-                    Setting this value to the minimum shows the flow for the first step the agent takes.
-                    Setting this value to the maximum shows the flow for the last step before the agent collects the reward.
-                    Check the tutorial below for more information how to interpret the flow.
+                    <br>
+                    Trajectory length
+                    <div class="hyperparameters">
+                      {trajectory_length_value}
+                      <Wrapper rich>
+                        <IconButton size="button">
+                          <Icon class="material-icons">info</Icon>
+                        </IconButton>
+                        <Tooltip persistent>
+                          <Title style="text-align: center">Fixed number of steps the agent takes</Title>
+                          <Content style="color: black; font-size: 12px; text-align: left">
+                            <br>
+                            Change the trajectory length to adjust how many steps the agent takes.
+                            Starting from (0,0), the agent collects the reward after this fixed number of steps.
+                            A higher trajectory length tends to give better results, but increases training time.
+                          </Content>
+                        </Tooltip>
+                      </Wrapper>
+                    </div>
+                    <Slider
+                      bind:value="{trajectory_length_value}"
+                      min={1}
+                      max={10}
+                      step={1}
+                      disabled="{isRunning}"
+                      input$aria-label="Set the length of the trajectory"
+                    />
+                    <br>
+                    <br>
+                    Learning rate model
+                    <div class="hyperparameters">
+                      {lr_model_value.toFixed(4)}
+                      <Wrapper rich>
+                        <IconButton size="button">
+                          <Icon class="material-icons">info</Icon>
+                        </IconButton>
+                        <Tooltip persistent>
+                          <Title style="text-align: center">The learning rate of the forward and backward policies</Title>
+                          <Content style="color: black; font-size: 12px; text-align: left">
+                            <br>
+                            Change the learning rate of the neural nets that represent the forward and backward policy.
+                          </Content>
+                        </Tooltip>
+                      </Wrapper>
+                    </div>
+                    <Slider
+                      bind:value="{lr_model_value}"
+                      min={0.0001}
+                      max={0.01}
+                      step={0.0001}
+                      disabled="{isRunning}"
+                      input$aria-label="Set the learning rate of the model"
+                    />
+                    <br>
+                    <br>
+                    Learning rate logZ
+                    <div class="hyperparameters">
+                      {lr_logz_value.toFixed(3)}
+                      <Wrapper rich>
+                        <IconButton size="button">
+                          <Icon class="material-icons">info</Icon>
+                        </IconButton>
+                        <Tooltip persistent>
+                          <Title style="text-align: center">The learning rate of the partition function</Title>
+                          <Content style="color: black; font-size: 12px; text-align: left">
+                            <br>
+                            Change the larning rate of the parameter log(Z) which represents the partition function.
+                            Malkin et al. (2022) claim that setting this learning rate higher than that of the policies helps in training.
+                          </Content>
+                        </Tooltip>
+                      </Wrapper>
+                    </div>
+                    <Slider
+                      bind:value="{lr_logz_value}"
+                      min={0.001}
+                      max={0.3}
+                      step={0.001}
+                      disabled="{isRunning}"
+                      input$aria-label="Set the learning rate of logZ"
+                    />
                   </Content>
-                </Tooltip>
-              </Wrapper>
-            </div>
-            <Slider
-              bind:value="{flow_trajectory_step_value}"
-              min={1}
-              max={current_parameters["trajectory_length_value"]}
-              step={1}
-              disabled="{isRunning}"
-              input$aria-label="Set the trajectory step"
-            />
-            <div style="position: absolute; bottom: 6px; right: 10px">
-              Iteration: {Math.min(
-                    flow_step_value*current_parameters["n_iterations_value"]/32,
-                    frames[frames.length-1]['losses']['losses'].length
-            )}
-
-
+                </Paper>
+              {:else if active_tab === 'Advanced'}
+                <Paper variant="unelevated">
+                  <Content>
+                    Off-policy
+                    <div class="hyperparameters">
+                      {off_policy_value}
+                      <Wrapper rich>
+                        <IconButton size="button">
+                          <Icon class="material-icons">info</Icon>
+                        </IconButton>
+                        <Tooltip persistent>
+                          <Title style="text-align: center">Amount of off-policy training</Title>
+                          <Content style="color: black; font-size: 12px; text-align: left">
+                            <br>
+                            Change to adjust if and to what amount the model trains off-policy.
+                            Setting the parameter to 0 is equal to on-policy training.
+                            The value gets added to the variance when sampling a new step according to the policy.
+                            This leads to higher exploration and is helpful if the modes of the reward function are far apart.
+                            The value gets scheduled and decays to 0 during training.
+                          </Content>
+                        </Tooltip>
+                      </Wrapper>
+                    </div>
+                    <Slider
+                      bind:value="{off_policy_value}"
+                      min={0}
+                      max={3}
+                      step={0.1}
+                      disabled="{isRunning}"
+                      input$aria-label="Set the Off-policy training"
+                    />
+                    <br>
+                    <br>
+                    Hidden layers:
+                    <div class="hyperparameters">
+                      {hidden_layer_value}
+                      <Wrapper rich>
+                        <IconButton size="button">
+                          <Icon class="material-icons">info</Icon>
+                        </IconButton>
+                        <Tooltip persistent>
+                          <Title style="text-align: center">Number of hidden layers in the forward and backward policies</Title>
+                          <Content style="color: black; font-size: 12px; text-align: left">
+                            <br>
+                            Change to adjust the number of hidden layers in the neural nets which represent the policies.
+                            Usually shallow networks work fine here and avoid the problems which arise with deeper architectures.
+                          </Content>
+                        </Tooltip>
+                      </Wrapper>
+                    </div>
+                    <Slider
+                      bind:value="{hidden_layer_value}"
+                      min={1}
+                      max={6}
+                      step={1}
+                      disabled="{isRunning}"
+                      input$aria-label="Set the number of hidden layers"
+                    />
+                    <br>
+                    <br>
+                    Hidden layer size
+                    <div class="hyperparameters">
+                      {hidden_dim_value}
+                      <Wrapper rich>
+                        <IconButton size="button">
+                          <Icon class="material-icons">info</Icon>
+                        </IconButton>
+                        <Tooltip persistent>
+                          <Title style="text-align: center">Dimensions of the hidden layers in the forward and backward policies</Title>
+                          <Content style="color: black; font-size: 12px; text-align: left">
+                            <br>
+                            Change to adjust the size of the hidden layers in the neural nets which represent the policies.
+                          </Content>
+                        </Tooltip>
+                      </Wrapper>
+                    </div>
+                    <Slider
+                      bind:value="{hidden_dim_value}"
+                      min={8}
+                      max={128}
+                      step={8}
+                      disabled="{isRunning}"
+                      input$aria-label="Set the dimension of the hidden layers"
+                    />
+                    <br>
+                    <br>
+                    Seed
+                    <div class="hyperparameters">
+                      {seed_value}
+                      <Wrapper rich>
+                        <IconButton size="button">
+                          <Icon class="material-icons">info</Icon>
+                        </IconButton>
+                        <Tooltip persistent>
+                          <Title style="text-align: center">Value to seed random number generators with</Title>
+                          <Content style="color: black; font-size: 12px; text-align: left">
+                            <br>
+                            The random number generators will be seeded with this value to allow for reproducible results.
+                          </Content>
+                        </Tooltip>
+                      </Wrapper>
+                    </div>
+                    <Slider
+                      bind:value="{seed_value}"
+                      min={1}
+                      max={99}
+                      step={1}
+                      disabled="{isRunning}"
+                      input$aria-label="Set the seed"
+                    />
+                  </Content>
+                </Paper>
+              {/if}
+              {#if display_trainhistory && !isRunning}
+                <div style="position: absolute; bottom: 6px; right: 10px">Iteration:</div>
+              {/if}
             </div>
           </div>
+          {#if !display_trainhistory && !isRunning}
+            <div class="pg-vis" style="text-align:center; padding:100px; color: #323232;">
+              Press Play to start training a GFlowNet
+            </div>
+          {:else}
+            <div class="pg-vis" id="trainplot">
+            </div>
+          {/if}
 
-          <div class="pg-vis">
-            <div bind:this={flowContainer}></div>
-          </div>
           <div class="pg-bottom">
-            <Slider
-              bind:value="{flow_step_value}"
-              min={0}
-              max={current_nSteps-1}
-              step={1}
-              disabled="{isRunning}"
-              input$aria-label="Set the step"
-            />
-          </div>
-        {:else}
-          <div class="pg-vis" style="text-align:center; padding:100px; color: #323232;">
-            Train a model first to visualize its flows
+            {#if !isRunning & display_trainhistory}
+              <Slider
+                bind:value="{training_frame}"
+                min={0}
+                max={frames.length-2}
+                step={1}
+                input$aria-label="View the iterations"
+              />
+        {:else if isRunning}
+          <div class = "pg-progress">
+            <LinearProgress progress="{ training_progress / n_iterations_value}" />
           </div>
         {/if}
       </div>
-    {/if}
-  </div>
-    <div class="pg-scrollbutton">
-      <Fab
-        on:click={scrollTo(tutorialstart)}
-        disabled="{isRunning}"
-      >
-        <Icon class="material-icons">keyboard_arrow_down</Icon></Fab>
     </div>
-  </div>
+
+      {:else if view === "Flow"}
+        <!-- FlowView -->
+        <div class="pg-container">
+          <div class="pg-top">
+            <div class="pg-play">
+              <Fab mini disabled="true" style="visibility:hidden"
+              ><Icon class="material-icons" style="font-size: 22px; visibility:hidden">replay</Icon>
+              </Fab>
+              <Fab
+                on:click={() => flow_vectorfield_value = !flow_vectorfield_value}
+              >
+                {#if flow_vectorfield_value}
+                  <Icon class="material-icons" style="font-size: 40px">air</Icon>
+                {:else}
+                  <Icon class="material-icons" style="font-size: 40px">arrow_outward</Icon>
+                {/if}
+              </Fab>
+            </div>
+            <div style="margin-left: 275px">Velocity: </div>
+            <div class="pg-top-slider">
+              <Slider
+                bind:value="{flow_velocity_value}"
+                disabled="{flow_vectorfield_value}"
+                min={0.1}
+                max={1}
+                step={0.1}
+                discrete
+                input$aria-label="Discrete slider"
+              />
+            </div>
+            <div>Number of particles: </div>
+            <div class="pg-top-slider">
+              <Slider
+                bind:value="{flow_n_particles_value}"
+                disabled="{flow_vectorfield_value}"
+                min={500}
+                max={2000}
+                step={100}
+                discrete
+                input$aria-label="Discrete slider"
+              />
+            </div>
+          </div>
+          {#if display_trainhistory}
+            <div class="pg-side">
+              Step
+              <div class="hyperparameters">
+                {flow_trajectory_step_value}
+                <Wrapper rich>
+                  <IconButton size="button">
+                    <Icon class="material-icons">info</Icon>
+                  </IconButton>
+                  <Tooltip persistent>
+                    <Title style="text-align: center">The current step of the agent</Title>
+                    <Content style="color: black; font-size: 12px; text-align: left">
+                      <br>
+                      The policy is learned based on the position (x, y) and the current step. Therefore the flow changes as the agent takes more steps.
+                      The number of steps the agent takes is determined by the hyperparameter "Trajectory length".
+                      Setting this value to the minimum shows the flow for the first step the agent takes.
+                      Setting this value to the maximum shows the flow for the last step before the agent collects the reward.
+                      Check the tutorial below for more information how to interpret the flow.
+                    </Content>
+                  </Tooltip>
+                </Wrapper>
+              </div>
+              <Slider
+                bind:value="{flow_trajectory_step_value}"
+                min={1}
+                max={current_parameters["trajectory_length_value"]}
+                step={1}
+                disabled="{isRunning}"
+                input$aria-label="Set the trajectory step"
+              />
+              <div style="position: absolute; bottom: 6px; right: 10px">
+                Iteration: {Math.min(
+                      flow_step_value*current_parameters["n_iterations_value"]/32,
+                      frames[frames.length-1]['losses']['losses'].length
+              )}
+
+
+              </div>
+            </div>
+
+            <div class="pg-vis">
+              <div bind:this={flowContainer}></div>
+            </div>
+            <div class="pg-bottom">
+              <Slider
+                bind:value="{flow_step_value}"
+                min={0}
+                max={current_nSteps-1}
+                step={1}
+                disabled="{isRunning}"
+                input$aria-label="Set the step"
+              />
+            </div>
+          {:else}
+            <div class="pg-vis" style="text-align:center; padding:100px; color: #323232;">
+              Train a model first to visualize its flows
+            </div>
+          {/if}
+        </div>
+      {/if}
+    </div>
+      <div class="pg-scrollbutton">
+        <Fab
+          on:click={scrollTo(tutorialstart)}
+          disabled="{isRunning}"
+        >
+          <Icon class="material-icons">keyboard_arrow_down</Icon></Fab>
+      </div>
+    </div>
 
 
 
 
 
-  <section class="section-light" >
-    <h2 class="section-title">What is this about?</h2>
-    <p class="section-text">
-      Here you can explore how GFlowNets learn.
-      If you have no idea what a GFlowNet actually is you might want to look into this basic tutorial first to learn more.
-      <br>Of course you can always just start exploring!
-      <br>
-      <br>If you want to start right away, you can adjust the reward function directly in the Environment view. Enter the parameters or drag the circles in the left plot however you wish.
-      <br>
-      <br>You can then start training in the Training view. Adjust the hyperparameters and press Play to start training a GFlowNet.
-      An agent will take a fixed number of steps on the grid and then collect reward according to the previously fixed reward function.
-      The visualization shows the final position of an agent. If the training is successful, the distribution of the final samples should match the reward function.
-      <br>
-      <br>You can view the flow of the trained model in the Flow view. If you want to know more about what the flow shows just continue reading!
-    </p>
-  </section>
-  <section class="section" id="Tutorial" bind:this={tutorialstart}>
-    <h2 class="section-title">What is a GFlowNet?</h2>
-    <p class="section-text">
+    <section class="section-light" >
+      <h2 class="section-title">What is this about?</h2>
+      <p class="section-text">
+        Here you can explore how GFlowNets learn.
+        If you have no idea what a GFlowNet actually is you might want to look into this basic tutorial first to learn more.
+        <br>Of course you can always just start exploring!
+        <br>
+        <br>If you want to start right away, you can adjust the reward function directly in the Environment view. Enter the parameters or drag the circles in the left plot however you wish.
+        <br>
+        <br>You can then start training in the Training view. Adjust the hyperparameters and press Play to start training a GFlowNet.
+        An agent will take a fixed number of steps on the grid and then collect reward according to the previously fixed reward function.
+        The visualization shows the final position of an agent. If the training is successful, the distribution of the final samples should match the reward function.
+        <br>
+        <br>You can view the flow of the trained model in the Flow view. If you want to know more about what the flow shows just continue reading!
+      </p>
+    </section>
+    <section class="section" id="Tutorial" bind:this={tutorialstart}>
+      <h2 class="section-title">What is a GFlowNet?</h2>
+      <p class="section-text">
 
-      In short, a generative flow network is a model class which allows sampling from an arbitrary probability distribution (similar to MCMC). GFlowNets allow for generating objects with sequentially built compositional structure like trees or graphs.
+        In short, a generative flow network is a model class which allows sampling from an arbitrary probability distribution (similar to MCMC). GFlowNets allow for generating objects with sequentially built compositional structure like trees or graphs.
 
-      <br>We train a model to learn a distribution <Katex>\pi(x)</Katex> (our policy), so we can sample from it. For this, we need a reward function R(x) which assigns value to each final object x and we want <Katex>\pi(x)</Katex> to sample proportional to it:  <Katex>\pi(x) \propto R(x)</Katex>. This allows us later on to sample a diversity of solutions instead of just the reward-maximizing one.
+        <br>We train a model to learn a distribution <Katex>\pi(x)</Katex> (our policy), so we can sample from it. For this, we need a reward function R(x) which assigns value to each final object x and we want <Katex>\pi(x)</Katex> to sample proportional to it:  <Katex>\pi(x) \propto R(x)</Katex>. This allows us later on to sample a diversity of solutions instead of just the reward-maximizing one.
 
-      <br>As we do not rely on a external dataset but only on our internal reward function we are only limited by compute - we can generate objects and query the reward function as often as we like.
+        <br>As we do not rely on a external dataset but only on our internal reward function we are only limited by compute - we can generate objects and query the reward function as often as we like.
 
-    </p>
+      </p>
+        <div class="image-container">
+          <Accordion multiple>
+            <Panel color="secondary">
+              <Header>Too fast? Expand for an example and more introduction</Header>
+              <Content>
+                Imagine building a Lego Pyramid. There are different blocks, and you can place them rotated and at different places.
+                <br>You might start with an empty plane,add a 2x4 block and so on. After some steps you might end up with an object which is more or less pyramid-shaped.
+                <br>
+                <br>The different possibilities of states of the object form a graph: While in the beginning (state 0) you can only place something in the first level, later on you might have different options, and they depend on your first choices. One option is always to choose to be finished instead of continuing building.
+                <br>
+                <br>If you want to use a GFlowNet for your task, it is important that the resulting graph is acyclic, i.e. it is not possible to reach a previous state. In terms of our pyramid this means taking away blocks is not possible.
+                <br>If we built a pyramid, in the end we have a trajectory (a sequence of states <Katex>s_0 \to s_1 \to ... \to s_{"T"}</Katex>). As we can choose to stop anytime, our trajectories can have different lengts, e.g. we can build a pyramid from 1 piece or from 100.
+                <br>
+                <br>As you might have guessed from the vocabulary, GFlowNets are very similar to Reinforcement learning methods, we sample trajectories and assign a reward R(x) to them (or to the states). The main difference is that usual RL methods try to find solutions which maximize the reward, whereas GFlowNets learn the underlying distribution p(x). So we want to train a model such that p(x) is proportional to the reward function R(x). This allows us to sample not only from the mode which has the highest reward, but also all other modes which might be almost as good.
+                Imagine a pyramid which contains 2x4 blocks, we could just replace them with 2 2x2 blocks. Both options are valid and we might be interested in finding many possible ways to build pyramids.
+                <br>
+                <br>Building Lego Pyramids is maybe not usecase number one for GFlowNets, but they are used for is drug discovery (Nica et al., 2022), where sampling from multiple modes is really what you want in order to discover not only the most promising molecule.
+
+              </Content>
+            </Panel>
+          </Accordion>
+        </div>
+      <p class="section-text">
+        When sequentially generating an object, we need to take actions which give us the next state:
+        We could add one of the possible components or decide we are done.
+        For this we use a neural net which represents our forward policy
+        <Katex>
+          P_F(s_{"{t+1}"}|s_t)
+        </Katex>, it gives us the action which leads to the next state.
+        <br>
+        <br>So far, everything sounds very nice, but how do we achieve this?
+        <br>Thats where the Flows come into play.
+        <br>
+        <br>If you connect all possible states from the start state to the terminal states you get a directed graph.
+        If you want to use a GFlowNet for your task it is important that the graph is acyclic, i.e. it is not possible to reach a previous state.
+        We can now interpret this directed acyclic graph (DAG) as a flow network.
+        <br>Imagine water flowing from the start space through the intermediate states to the final states, following the edges of the DAG like pipes.
+        <br>
+      </p>
+        <div class="image-container-small">
+          <img src="/images/gflownet_anim.gif" class="image" alt="A visualization of the flow through the DAG">
+        </div>
+      <p class="section-text">
+        <span class="mathexpl">Visualization from the GFlowNet Tutorial by MILA showing the flow from the start state to the terminal states as particles</span>
+
+        <br>This places an important constraint on our model: Preservation of Flow.
+        The pipes (edges) and states (nodes) must not be leaky, all of the water has to be preserved.
+        <br>This means:
+        <br>
+
+        <span class="li">The flow going into the DAG (Flow of the start state) is the same as the Flow going out of it (Sum of the flow of all terminal states).</span>
+        <span class="li">Same for the nodes: The sum of the flow going into a state is the same as the sum of the flow going out of it.</span>
+        <br>
+        We now can set the flow going out of a terminal state equal to it's reward.
+        Assuming all flow is stricly positive, we can express the Flow from one state s to its children s' as:
+
+
+        <Katex displayMode>
+          \sum_{"{s'}"} F(s,s') = \sum_{"{s'}"} R(s') + F(s')
+        </Katex>
+        <span class="mathexpl">The total Flow of a state is the Reward of its terminal children plus the Flow of its non-terminal children</span>
+
+
+        We now define our forward policy as the proportion of the Flow
+        <Katex>
+          s \to s'
+        </Katex> to the total Flow of s:
+        <Katex displayMode>
+        P_F(s'|s) = \frac{"{F(s,s')}{F(s)}"}
+        </Katex>
+        <span class="mathexpl"> The probability to sample an action to get to the next state s' is the flow going from s to s' divided by the total flow through s</span>
+        By using this policy we will sample finished objects x proportional to their reward.
+
+        <br>The only thing we miss for training is the loss. The easiest way would be to turn our flow matching constraint into a MSE:
+
+        <Katex displayMode>
+          \mathcal{"{L}"}_{"{FM}"} = \left( \log \frac{"{\\sum_{(s''\\to s)}F(s'',s)}"}{"{\\sum_{(s\\to s')}F(s,s')}"} \right)^2
+        </Katex>
+        <span class="mathexpl"> If the flow going into a state is equal to the flow going out of a state the loss goes to 0.</span>
+
+        This is actually what the authors did in the first paper (Benigo et al., 2021), however it does not perform so well as there are problems with credit assignment.
+        We will later use the Trajectory Balance Loss (Malkin et al., 2022) to calculate the loss for a whole trajectory instead of single states.
+        It converges better but is a bit more complicated, so let's ignore it for now and look at our environment.
+
+      </p>
+
+
+      <h2 class="section-title">Toy Environment</h2>
+      <p class="section-text">
+        As we want to train GFlowNets quickly to explore how they behave, we need a simple environment which allows for exploring without needing a lot of compute during training. Here we use a simple 2D grid with each variable in the range [-3,3]. We then calculate the reward according to the Mixture of Multivariate Gaussians (for now two of them).
+        <br>
+        <br>For each action, the GFlowNet takes a step along both the x and y direction, this is repeated until the defined length of a trajectory is reached.
+        Note that this is unusual: GFlowNets allow for variable trajectory lengths, so the action space usually contains an additional end of sequence action, where the current state becomes the final state.
+        However fixing the trajectory length keeps everything a lot simpler.
+        <br>
+        <br>Above we stated that GFlowNets build an Acyclic Graph, so each state can only be visited once. We currently violate this assumption: While it is unlikely that a state gets visited twice in our continuous environment, it is still possible. To mitigate this we simply include a counter in our state which represents the current step.
+        We also simplified the variance of the gaussians to one parameter, so the variance for x and y is the same and there is no covariance (<Katex>\Sigma = \sigma^2 I</Katex>).
+    </section>
+
+
+
+
+
+    <section class="section section-light">
+      <h2 class="section-title">Training</h2>
+      <p class="section-text">
+        Now, how do we train a GFlowNet?
+        <br>First we need our model to be able to act in the environment.
+        To do this we let it predict the parameters of a distribution from which we then sample the actions.
+        To move, we simply add the action to the current state to get the next state.
+        <br>That was the easy part.
+        We now want to train our GFlowNet using Trajectory Balance loss. Here it is again:
+        <Katex displayMode>
+        L(\tau) = \log\left(\frac{"{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t;\\theta)}"}{"{R(x)\\prod_t P_B(s_t|s_{t+1}; \\theta)}"} \right)^2
+        </Katex>
+        <span class="mathexpl">The trajectory balance loss. <br> If both parts of the fraction are equal our loss goes to 0.</span>
+        We want the two parts of the fraction to be equal again.
+        Simply put, the upper part tells us what fraction of the total flow goes through this trajectory and the lower part tells us what fraction of the reward of the final object x goes through this trajectory.
+        <br>Here <Katex>\theta</Katex> are the parameters of the model. They include the parameters of <Katex>P_F, P_B, Z</Katex> and we can update them using the loss above.
+        <br>Below you find more detailed background for the parts of the trajectory balance loss as well as the algorithm for training.
+      </p>
       <div class="image-container">
         <Accordion multiple>
           <Panel color="secondary">
-            <Header>Too fast? Expand for an example and more introduction</Header>
+            <Header>More Trajectory Balance</Header>
             <Content>
-              Imagine building a Lego Pyramid. There are different blocks, and you can place them rotated and at different places.
-              <br>You might start with an empty plane,add a 2x4 block and so on. After some steps you might end up with an object which is more or less pyramid-shaped.
-              <br>
-              <br>The different possibilities of states of the object form a graph: While in the beginning (state 0) you can only place something in the first level, later on you might have different options, and they depend on your first choices. One option is always to choose to be finished instead of continuing building.
-              <br>
-              <br>If you want to use a GFlowNet for your task, it is important that the resulting graph is acyclic, i.e. it is not possible to reach a previous state. In terms of our pyramid this means taking away blocks is not possible.
-              <br>If we built a pyramid, in the end we have a trajectory (a sequence of states <Katex>s_0 \to s_1 \to ... \to s_{"T"}</Katex>). As we can choose to stop anytime, our trajectories can have different lengts, e.g. we can build a pyramid from 1 piece or from 100.
-              <br>
-              <br>As you might have guessed from the vocabulary, GFlowNets are very similar to Reinforcement learning methods, we sample trajectories and assign a reward R(x) to them (or to the states). The main difference is that usual RL methods try to find solutions which maximize the reward, whereas GFlowNets learn the underlying distribution p(x). So we want to train a model such that p(x) is proportional to the reward function R(x). This allows us to sample not only from the mode which has the highest reward, but also all other modes which might be almost as good.
-              Imagine a pyramid which contains 2x4 blocks, we could just replace them with 2 2x2 blocks. Both options are valid and we might be interested in finding many possible ways to build pyramids.
-              <br>
-              <br>Building Lego Pyramids is maybe not usecase number one for GFlowNets, but they are used for is drug discovery (Nica et al., 2022), where sampling from multiple modes is really what you want in order to discover not only the most promising molecule.
+              Let's look at the parts of this loss function:
+              <ul>
+                <li>
+                  <Katex>P_F(s_{"t+1"}|s_t;\theta)</Katex>
+                  The forward policy. It represents the distribution over the next states (the children) of the current state.
+                </li>
+                <li>
+                  <Katex>P_B(s_t|s_{"t+1"};\theta)</Katex>
+                  The backward policy. Similar to the definition of the forward policy, we can define the backward policy as a distribution over the previous states (the parents) of a state.
+                  We can also estimate it using a NN (not the same as for the forward policy). The reason both policies are different is the DAG structure. In a tree these would be the same. But as there are different ways to traverse the DAG from one state to the other, these policies might differ.
+                </li>
+                <li>
+                  <Katex>Z_{"\\theta"}</Katex>
+                  The partition function. It is equal to the total flow of the system.
+                  It is another parameter to be learned by our agent and should approach the true partition function given enough training.
+                  In our case, the true partition function is 2 (the number of gaussians), however it is usually not known.
+                  The partition function for a mixture of gaussians is the sum of its mixture weights, so always 1 (therefore logZ is 0).
+                  However we do not compute a real mixture of gaussians here, as we do not use mixture weights but simply sum up over all gaussians.
+                </li>
+                <li>
+                  <Katex>R(x)</Katex>
+                  The reward for the final object x of the trajectory. Note that if we propagate the reward backward using our backward policy, only a small part of it goes through one trajectory, as there are usually many ways to sample x using different trajectories.
+                </li>
+              </ul>
+            </Content>
+          </Panel>
+          <Panel color="secondary"> <!--bind:open={panel_algo}>-->
+            <Header>
+              The algorithm
+              <!--
+              <IconButton toggle bind:pressed="{panel_algo}"on:click={panel_algo=!panel_algo} >
+                <Icon class="material-icons"  on>expand_less</Icon>
+                <Icon class="material-icons">expand_more</Icon>
+              </IconButton>
+              -->
+            </Header>
 
+            <Content style="white-space: pre;">
+                Input: Reward function (part of the environment), model, hyperparameters
+                <br>  1. Initialize model parameters for PF, PB, logZ
+                <br>  2. Repeat for a number of iterations or until convergence:
+                <br>  3.  -   Repeat for trajectory length:
+                <br>  4.  -     -   Sample action for current state from PF
+                <br>  5.  -     -   Take step according to action
+                <br>  6.  -     -   Add new state to trajectory
+                <br>  7.  -   Calculate reward of final state according to reward function
+                <br>  8.  -   Calculate the sum of the log probabilities of all actions of the trajectory for each PF and PB
+                <br>  9.  -   Calculate the TB-Loss: (logZ + log probabilities PF - log probabilities PB - log reward)^2
+                <br>  10. -  Update the parameters PF, PB, logZ
+                <br><br>
+              You can find the python code for this implementation on my <a href="https://github.com/florianholeczek/ugfn" target="_blank">github</a>.
             </Content>
           </Panel>
         </Accordion>
       </div>
-    <p class="section-text">
-      When sequentially generating an object, we need to take actions which give us the next state:
-      We could add one of the possible components or decide we are done.
-      For this we use a neural net which represents our forward policy
-      <Katex>
-        P_F(s_{"{t+1}"}|s_t)
-      </Katex>, it gives us the action which leads to the next state.
-      <br>
-      <br>So far, everything sounds very nice, but how do we achieve this?
-      <br>Thats where the Flows come into play.
-      <br>
-      <br>If you connect all possible states from the start state to the terminal states you get a directed graph.
-      If you want to use a GFlowNet for your task it is important that the graph is acyclic, i.e. it is not possible to reach a previous state.
-      We can now interpret this directed acyclic graph (DAG) as a flow network.
-      <br>Imagine water flowing from the start space through the intermediate states to the final states, following the edges of the DAG like pipes.
-      <br>
-    </p>
-      <div class="image-container-small">
-        <img src="/images/gflownet_anim.gif" class="image" alt="A visualization of the flow through the DAG">
+      <p class="section-text">
+        We trained a GFlowNet on this environment for 2000 Iterations.
+        Below you see the progress of the model during training. While it first samples randomly, it learns to match the true distribution of our environment.
+
+
+      </p>
+      <div class="image-container">
+        <img src="{run1}" class="image" alt="GFN samples from the underlying distribution">
       </div>
-    <p class="section-text">
-      <span class="mathexpl">Visualization from the GFlowNet Tutorial by MILA showing the flow from the start state to the terminal states as particles</span>
-
-      <br>This places an important constraint on our model: Preservation of Flow.
-      The pipes (edges) and states (nodes) must not be leaky, all of the water has to be preserved.
-      <br>This means:
-      <br>
-
-      <span class="li">The flow going into the DAG (Flow of the start state) is the same as the Flow going out of it (Sum of the flow of all terminal states).</span>
-      <span class="li">Same for the nodes: The sum of the flow going into a state is the same as the sum of the flow going out of it.</span>
-      <br>
-      We now can set the flow going out of a terminal state equal to it's reward.
-      Assuming all flow is stricly positive, we can express the Flow from one state s to its children s' as:
-
-
-      <Katex displayMode>
-        \sum_{"{s'}"} F(s,s') = \sum_{"{s'}"} R(s') + F(s')
-      </Katex>
-      <span class="mathexpl">The total Flow of a state is the Reward of its terminal children plus the Flow of its non-terminal children</span>
-
-
-      We now define our forward policy as the proportion of the Flow
-      <Katex>
-        s \to s'
-      </Katex> to the total Flow of s:
-      <Katex displayMode>
-      P_F(s'|s) = \frac{"{F(s,s')}{F(s)}"}
-      </Katex>
-      <span class="mathexpl"> The probability to sample an action to get to the next state s' is the flow going from s to s' divided by the total flow through s</span>
-      By using this policy we will sample finished objects x proportional to their reward.
-
-      <br>The only thing we miss for training is the loss. The easiest way would be to turn our flow matching constraint into a MSE:
-
-      <Katex displayMode>
-        \mathcal{"{L}"}_{"{FM}"} = \left( \log \frac{"{\\sum_{(s''\\to s)}F(s'',s)}"}{"{\\sum_{(s\\to s')}F(s,s')}"} \right)^2
-      </Katex>
-      <span class="mathexpl"> If the flow going into a state is equal to the flow going out of a state the loss goes to 0.</span>
-
-      This is actually what the authors did in the first paper (Benigo et al., 2021), however it does not perform so well as there are problems with credit assignment.
-      We will later use the Trajectory Balance Loss (Malkin et al., 2022) to calculate the loss for a whole trajectory instead of single states.
-      It converges better but is a bit more complicated, so let's ignore it for now and look at our environment.
-
-    </p>
-
-
-    <h2 class="section-title">Toy Environment</h2>
-    <p class="section-text">
-      As we want to train GFlowNets quickly to explore how they behave, we need a simple environment which allows for exploring without needing a lot of compute during training. Here we use a simple 2D grid with each variable in the range [-3,3]. We then calculate the reward according to the Mixture of Multivariate Gaussians (for now two of them).
-      <br>
-      <br>For each action, the GFlowNet takes a step along both the x and y direction, this is repeated until the defined length of a trajectory is reached.
-      Note that this is unusual: GFlowNets allow for variable trajectory lengths, so the action space usually contains an additional end of sequence action, where the current state becomes the final state.
-      However fixing the trajectory length keeps everything a lot simpler.
-      <br>
-      <br>Above we stated that GFlowNets build an Acyclic Graph, so each state can only be visited once. We currently violate this assumption: While it is unlikely that a state gets visited twice in our continuous environment, it is still possible. To mitigate this we simply include a counter in our state which represents the current step.
-      We also simplified the variance of the gaussians to one parameter, so the variance for x and y is the same and there is no covariance (<Katex>\Sigma = \sigma^2 I</Katex>).
-  </section>
-
-
-
-
-
-  <section class="section section-light">
-    <h2 class="section-title">Training</h2>
-    <p class="section-text">
-      Now, how do we train a GFlowNet?
-      <br>First we need our model to be able to act in the environment.
-      To do this we let it predict the parameters of a distribution from which we then sample the actions.
-      To move, we simply add the action to the current state to get the next state.
-      <br>That was the easy part.
-      We now want to train our GFlowNet using Trajectory Balance loss. Here it is again:
-      <Katex displayMode>
-      L(\tau) = \log\left(\frac{"{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t;\\theta)}"}{"{R(x)\\prod_t P_B(s_t|s_{t+1}; \\theta)}"} \right)^2
-      </Katex>
-      <span class="mathexpl">The trajectory balance loss. <br> If both parts of the fraction are equal our loss goes to 0.</span>
-      We want the two parts of the fraction to be equal again.
-      Simply put, the upper part tells us what fraction of the total flow goes through this trajectory and the lower part tells us what fraction of the reward of the final object x goes through this trajectory.
-      <br>Here <Katex>\theta</Katex> are the parameters of the model. They include the parameters of <Katex>P_F, P_B, Z</Katex> and we can update them using the loss above.
-      <br>Below you find more detailed background for the parts of the trajectory balance loss as well as the algorithm for training.
-    </p>
-    <div class="image-container">
-      <Accordion multiple>
-        <Panel color="secondary">
-          <Header>More Trajectory Balance</Header>
-          <Content>
-            Let's look at the parts of this loss function:
-            <ul>
-              <li>
-                <Katex>P_F(s_{"t+1"}|s_t;\theta)</Katex>
-                The forward policy. It represents the distribution over the next states (the children) of the current state.
-              </li>
-              <li>
-                <Katex>P_B(s_t|s_{"t+1"};\theta)</Katex>
-                The backward policy. Similar to the definition of the forward policy, we can define the backward policy as a distribution over the previous states (the parents) of a state.
-                We can also estimate it using a NN (not the same as for the forward policy). The reason both policies are different is the DAG structure. In a tree these would be the same. But as there are different ways to traverse the DAG from one state to the other, these policies might differ.
-              </li>
-              <li>
-                <Katex>Z_{"\\theta"}</Katex>
-                The partition function. It is equal to the total flow of the system.
-                It is another parameter to be learned by our agent and should approach the true partition function given enough training.
-                In our case, the true partition function is 2 (the number of gaussians), however it is usually not known.
-                The partition function for a mixture of gaussians is the sum of its mixture weights, so always 1 (therefore logZ is 0).
-                However we do not compute a real mixture of gaussians here, as we do not use mixture weights but simply sum up over all gaussians.
-              </li>
-              <li>
-                <Katex>R(x)</Katex>
-                The reward for the final object x of the trajectory. Note that if we propagate the reward backward using our backward policy, only a small part of it goes through one trajectory, as there are usually many ways to sample x using different trajectories.
-              </li>
-            </ul>
-          </Content>
-        </Panel>
-        <Panel color="secondary"> <!--bind:open={panel_algo}>-->
-          <Header>
-            The algorithm
-            <!--
-            <IconButton toggle bind:pressed="{panel_algo}"on:click={panel_algo=!panel_algo} >
-              <Icon class="material-icons"  on>expand_less</Icon>
-              <Icon class="material-icons">expand_more</Icon>
-            </IconButton>
-            -->
-          </Header>
-
-          <Content style="white-space: pre;">
-              Input: Reward function (part of the environment), model, hyperparameters
-              <br>  1. Initialize model parameters for PF, PB, logZ
-              <br>  2. Repeat for a number of iterations or until convergence:
-              <br>  3.  -   Repeat for trajectory length:
-              <br>  4.  -     -   Sample action for current state from PF
-              <br>  5.  -     -   Take step according to action
-              <br>  6.  -     -   Add new state to trajectory
-              <br>  7.  -   Calculate reward of final state according to reward function
-              <br>  8.  -   Calculate the sum of the log probabilities of all actions of the trajectory for each PF and PB
-              <br>  9.  -   Calculate the TB-Loss: (logZ + log probabilities PF - log probabilities PB - log reward)^2
-              <br>  10. -  Update the parameters PF, PB, logZ
-              <br><br>
-            You can find the python code for this implementation on my <a href="https://github.com/florianholeczek/ugfn" target="_blank">github</a>.
-          </Content>
-        </Panel>
-      </Accordion>
-    </div>
-    <p class="section-text">
-      We trained a GFlowNet on this environment for 2000 Iterations.
-      Below you see the progress of the model during training. While it first samples randomly, it learns to match the true distribution of our environment.
-
-
-    </p>
-    <div class="image-container">
-      <img src="{run1}" class="image" alt="GFN samples from the underlying distribution">
-    </div>
-    <div style="width: 600px; margin: auto; text-align:center;">
-    <Slider
-        bind:value="{run1_value}"
-        min={0}
-        max={2048}
-        step={128}
-        discrete
-        input$aria-label="Discrete slider"
-      />
-      Show training Progress
-    </div>
-    <div style="height:50px"></div>
-    <p class="section-text">
-      Sampling according to the underlying distribution is one of the big advantages of GFlowNets: Other approaches usually learn to maximize the reward, so they would not sample from both of our modes (or everything in between), but they would find one of them and then just sample from it. This might be suboptimal e.g. in molecule discovery, where you might not want the most promising molecule, but many different of them might be interesting.
-    </p>
-
-
-    <h2 class="section-title">Mode Collapse</h2>
-    <p class="section-text">
-      So far, our distribution to match was very easy. Lets make it more challenging: If we lower the variance, we see the two modes are more seperated.
-    </p>
-    <div class="image-container">
-      <img src="{run2}" class="image" alt="The model samples only from one mode of the distribution">
-    </div>
-    <div style="width: 600px; margin: auto; text-align:center;">
-    <Slider
-        bind:value="{run2_value}"
-        min={0}
-        max={4096}
-        step={128}
-        discrete
-        input$aria-label="Discrete slider"
-      />
-    </div>
-    <p class="section-text">
-      Well, thats not what we want! Instead of sampling from the true distribution we only sample from one mode!
-      <br><br>
-      There are two main possibilities to fix this:
-      <span class="li">We could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:<Katex>R_{"{new}"}(x)=R(x)^\beta</Katex>. This would change the "peakyness" of the reward function and we would not sample proportional to the reward function but according to <Katex>\pi(x|\beta) \propto R(x)^\beta</Katex>. It is also possible to use <Katex>\beta</Katex> as a trainable parameter and condition the model on it.</span>
-      <span class="li">A similar but simpler way is to just train off-policy. By adding a fixed variance to the logits of the forward policy, we explore more during training. As this is a very easy implementation let's go with this one.</span>
-    </p>
-    <div class="image-container">
-      <Accordion multiple>
-        <Panel color="secondary">
-          <Header>Changes to the algorithm</Header>
-          <Content>
-            Training off-policy is even more helpful when we schedule it. We start with a higher variance and scale it down during training until we reach on-policy training.
-            <br>Our new hyperparameter is the initial value for off policy training, during each step we gradually decrease it until we reach 0.
-            <br>
-            <br>Important changes:
-            <ul>
-              <li>
-                Define schedule in the beginning: [start=initial value, stop=0, step=-initial value/number of iterations\]
-              </li>
-              <li>
-                When sampling the actions we compute the logits as usual.
-              </li>
-              <li>
-                Instead of just defining the policy distribution with them, we also define a exploratory distribution by adding the scheduled value to the variance.
-              </li>
-              <li>
-                We then sample our actions from the exploratory distribution. We need the policy distribution later to compute the log probabilities of our actions.
-              </li>
-              <li>
-                We do not use the scheduled values with the backward policy and during inference.
-              </li>
-            </ul>
-          </Content>
-        </Panel>
-      </Accordion>
-    </div>
-    <div class="image-container">
-      <img src="{run3}" class="image" alt="Training off policy helps to discover modes">
-    </div>
-    <div style="width: 600px; margin: auto; text-align:center;">
-    <Slider
-        bind:value="{run3_value}"
-        min={0}
-        max={4096}
-        step={128}
-        discrete
-        input$aria-label="Discrete slider"
-      />
-    </div>
-    <p class="section-text">
-      It took some iterations, but now we match the distribution again.
-    </p>
-
-  </section>
-
-  <section class="section" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);">
-    <h2 class="section-title">Flow</h2>
-    <p class="section-text">
-      Below you can see the flow the last training run.
-      <br>
-      Use the Step slider to adjust the current step. We fixed the number of steps for the agent at 6, so it collects the reward after 6 steps on the grid.
-      <br>
-      Use the Iteration Slider to compare the flow at the start of the training to the end.
-      <br>
-      <br>
-      You see that for the trained model (last iteration) the flow is different depending on the step. In the first step the agent takes, it tends to move to the center. Later on in the trajectory the points of convergence split up and move outwards to the modes of the distribution.
-    </p>
-
-    <div class="flow-container">
-      <div bind:this={tutorial_flowContainer}></div>
-    </div>
-    <div style="width: 600px; margin: auto; display: flex; align-items: center;">
-      <div style="text-align: left; margin-right: 10px;">
-        <span>Step: {t_flow_trajectory_step_value}</span>
-      </div>
-      <div style="width: 480px; margin-left: auto;">
-        <Slider
-          bind:value="{t_flow_trajectory_step_value}"
-          min={1}
-          max={6}
-          step={1}
-          discrete
-          input$aria-label="Discrete slider"
-        />
-      </div>
-    </div>
-    <div style="width: 600px; margin: auto; display: flex; align-items: center;">
-      <div style="text-align: left; margin-right: 10px;">
-        <span>Iteration: {t_flow_step_value*128}</span>
-      </div>
-      <div style="width: 480px; margin-left: auto;">
-        <Slider
-          bind:value="{t_flow_step_value}"
+      <div style="width: 600px; margin: auto; text-align:center;">
+      <Slider
+          bind:value="{run1_value}"
           min={0}
-          max={32}
-          step={1}
+          max={2048}
+          step={128}
+          discrete
+          input$aria-label="Discrete slider"
+        />
+        Show training Progress
+      </div>
+      <div style="height:50px"></div>
+      <p class="section-text">
+        Sampling according to the underlying distribution is one of the big advantages of GFlowNets: Other approaches usually learn to maximize the reward, so they would not sample from both of our modes (or everything in between), but they would find one of them and then just sample from it. This might be suboptimal e.g. in molecule discovery, where you might not want the most promising molecule, but many different of them might be interesting.
+      </p>
+
+
+      <h2 class="section-title">Mode Collapse</h2>
+      <p class="section-text">
+        So far, our distribution to match was very easy. Lets make it more challenging: If we lower the variance, we see the two modes are more seperated.
+      </p>
+      <div class="image-container">
+        <img src="{run2}" class="image" alt="The model samples only from one mode of the distribution">
+      </div>
+      <div style="width: 600px; margin: auto; text-align:center;">
+      <Slider
+          bind:value="{run2_value}"
+          min={0}
+          max={4096}
+          step={128}
           discrete
           input$aria-label="Discrete slider"
         />
       </div>
-    </div>
-    <h2 class="section-title">Flow - Is this what it looks like?</h2>
-    <p class="section-text">
-      Well, kind of. Imagine our grid would be discrete. If we are in one cell, we would have a certain Flow (a non-negative scalar) to each other cell (technically also to itself given our trick with adding the step to the state).
-      <br>Even in a discrete space, this is hard to visualize, as we would have to compute the flow from each state to every other state.
-      <br>In our continuous space this gets even more complicated, not only in terms of visualization but also mathematically - look into Lahlou et al. (2023) if you are interested.
-      <br>Instead of showing all the flows, the plot shows the <i>highest</i> flow for each state: This is a vector from it to another point on the grid.
-      If we do that for some evenly spaced points we get a vectorfield. The visualization above is just a nicer way to show it by letting particles move through the field.
-      Note that the path of the particels is not the path of the agents. The particles follow the most probable direction continuously, while the agent takes discrete steps not in the most probable direction but following the distribution of the policy.
-      Therefore the trajectories jump around more. This visualization however shows the converging points in the flowfield which direct the agents movement.
-    </p>
+      <p class="section-text">
+        Well, thats not what we want! Instead of sampling from the true distribution we only sample from one mode!
+        <br><br>
+        There are two main possibilities to fix this:
+        <span class="li">We could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:<Katex>R_{"{new}"}(x)=R(x)^\beta</Katex>. This would change the "peakyness" of the reward function and we would not sample proportional to the reward function but according to <Katex>\pi(x|\beta) \propto R(x)^\beta</Katex>. It is also possible to use <Katex>\beta</Katex> as a trainable parameter and condition the model on it.</span>
+        <span class="li">A similar but simpler way is to just train off-policy. By adding a fixed variance to the logits of the forward policy, we explore more during training. As this is a very easy implementation let's go with this one.</span>
+      </p>
+      <div class="image-container">
+        <Accordion multiple>
+          <Panel color="secondary">
+            <Header>Changes to the algorithm</Header>
+            <Content>
+              Training off-policy is even more helpful when we schedule it. We start with a higher variance and scale it down during training until we reach on-policy training.
+              <br>Our new hyperparameter is the initial value for off policy training, during each step we gradually decrease it until we reach 0.
+              <br>
+              <br>Important changes:
+              <ul>
+                <li>
+                  Define schedule in the beginning: [start=initial value, stop=0, step=-initial value/number of iterations\]
+                </li>
+                <li>
+                  When sampling the actions we compute the logits as usual.
+                </li>
+                <li>
+                  Instead of just defining the policy distribution with them, we also define a exploratory distribution by adding the scheduled value to the variance.
+                </li>
+                <li>
+                  We then sample our actions from the exploratory distribution. We need the policy distribution later to compute the log probabilities of our actions.
+                </li>
+                <li>
+                  We do not use the scheduled values with the backward policy and during inference.
+                </li>
+              </ul>
+            </Content>
+          </Panel>
+        </Accordion>
+      </div>
+      <div class="image-container">
+        <img src="{run3}" class="image" alt="Training off policy helps to discover modes">
+      </div>
+      <div style="width: 600px; margin: auto; text-align:center;">
+      <Slider
+          bind:value="{run3_value}"
+          min={0}
+          max={4096}
+          step={128}
+          discrete
+          input$aria-label="Discrete slider"
+        />
+      </div>
+      <p class="section-text">
+        It took some iterations, but now we match the distribution again.
+      </p>
 
-    <h2 class="section-title" style="position:relative">What next?</h2>
-    <div class="whatnext_t">
-      <div class="whatnext_b">Train your own GFlowNets? <br> Go to the top</div>
-      <div class="whatnext_b">Interested in the code? <br>Find it here</div>
-      <div class="whatnext_b">Learn more about GFlowNets?<br>Find other tutorials</div>
-    </div>
+    </section>
 
+    <section class="section" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);">
+      <h2 class="section-title">Flow</h2>
+      <p class="section-text">
+        Below you can see the flow the last training run.
+        <br>
+        Use the Step slider to adjust the current step. We fixed the number of steps for the agent at 6, so it collects the reward after 6 steps on the grid.
+        <br>
+        Use the Iteration Slider to compare the flow at the start of the training to the end.
+        <br>
+        <br>
+        You see that for the trained model (last iteration) the flow is different depending on the step. In the first step the agent takes, it tends to move to the center. Later on in the trajectory the points of convergence split up and move outwards to the modes of the distribution.
+      </p>
 
-
-    <div style="position:absolute; width:1000px; left: 50%;transform: translateX(-50%); ">
-      <div class="whatnext_t" >
-        <div class="whatnext_b">
-          <Fab
-          on:click={scrollTo(playgroundstart)}
-          disabled="{isRunning}"
-        >
-          <Icon class="material-icons">keyboard_arrow_up</Icon></Fab>
+      <div class="flow-container">
+        <div bind:this={tutorial_flowContainer}></div>
+      </div>
+      <div style="width: 600px; margin: auto; display: flex; align-items: center;">
+        <div style="text-align: left; margin-right: 10px;">
+          <span>Step: {t_flow_trajectory_step_value}</span>
         </div>
-        <div class="whatnext_b">
-          <a href={"https://github.com/florianholeczek/ugfn"} target="_blank" rel="noopener noreferrer" class="github-button">
-            <Fab>
-              <Icon tag="svg">
-                <svg
-                  class="github-icon"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12 0.297C5.373 0.297 0 5.67 0 12.297c0 5.3 3.438 9.8 8.207 11.387.6.11.793-.26.793-.577v-2.17c-3.338.724-4.033-1.61-4.033-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.743.082-.727.082-.727 1.205.085 1.84 1.24 1.84 1.24 1.07 1.835 2.807 1.305 3.493.997.108-.776.418-1.305.76-1.605-2.667-.303-5.467-1.333-5.467-5.93 0-1.31.467-2.384 1.235-3.223-.123-.303-.535-1.524.117-3.176 0 0 1.007-.323 3.3 1.23a11.42 11.42 0 013.003-.404c1.018.005 2.042.137 3.003.404 2.29-1.553 3.296-1.23 3.296-1.23.654 1.652.242 2.873.12 3.176.77.839 1.233 1.913 1.233 3.223 0 4.607-2.805 5.624-5.478 5.92.43.373.814 1.102.814 2.22v3.293c0 .32.19.693.8.576C20.565 22.094 24 17.595 24 12.297 24 5.67 18.627.297 12 .297z"
-                  />
-                </svg>
-              </Icon>
-            </Fab>
-          </a>
-
-        </div>
-        <div class="whatnext_b">
-          <Fab
-          on:click={scrollTo(sourcesstart)}
-          disabled="{isRunning}"
-        >
-          <Icon class="material-icons">keyboard_arrow_down</Icon></Fab>
+        <div style="width: 480px; margin-left: auto;">
+          <Slider
+            bind:value="{t_flow_trajectory_step_value}"
+            min={1}
+            max={6}
+            step={1}
+            discrete
+            input$aria-label="Discrete slider"
+          />
         </div>
       </div>
-    </div>
-  </section>
+      <div style="width: 600px; margin: auto; display: flex; align-items: center;">
+        <div style="text-align: left; margin-right: 10px;">
+          <span>Iteration: {t_flow_step_value*128}</span>
+        </div>
+        <div style="width: 480px; margin-left: auto;">
+          <Slider
+            bind:value="{t_flow_step_value}"
+            min={0}
+            max={32}
+            step={1}
+            discrete
+            input$aria-label="Discrete slider"
+          />
+        </div>
+      </div>
+      <h2 class="section-title">Flow - Is this what it looks like?</h2>
+      <p class="section-text">
+        Well, kind of. Imagine our grid would be discrete. If we are in one cell, we would have a certain Flow (a non-negative scalar) to each other cell (technically also to itself given our trick with adding the step to the state).
+        <br>Even in a discrete space, this is hard to visualize, as we would have to compute the flow from each state to every other state.
+        <br>In our continuous space this gets even more complicated, not only in terms of visualization but also mathematically - look into Lahlou et al. (2023) if you are interested.
+        <br>Instead of showing all the flows, the plot shows the <i>highest</i> flow for each state: This is a vector from it to another point on the grid.
+        If we do that for some evenly spaced points we get a vectorfield. The visualization above is just a nicer way to show it by letting particles move through the field.
+        Note that the path of the particels is not the path of the agents. The particles follow the most probable direction continuously, while the agent takes discrete steps not in the most probable direction but following the distribution of the policy.
+        Therefore the trajectories jump around more. This visualization however shows the converging points in the flowfield which direct the agents movement.
+      </p>
 
-  <section class="section">
-  </section>
+      <h2 class="section-title" style="position:relative">What next?</h2>
+      <div class="whatnext_t">
+        <div class="whatnext_b">Train your own GFlowNets? <br> Go to the top</div>
+        <div class="whatnext_b">Interested in the code? <br>Find it here</div>
+        <div class="whatnext_b">Learn more about GFlowNets?<br>Find other tutorials</div>
+      </div>
 
-  <section class="section">
-    <h2 class="section-title">Acknowledgements</h2>
-    <p class="section-text">
-      Thanks to Christina Humer for the feedback and resources.
-      <br>Some implementations and ideas are based on other great work:
+
+
+      <div style="position:absolute; width:1000px; left: 50%;transform: translateX(-50%); ">
+        <div class="whatnext_t" >
+          <div class="whatnext_b">
+            <Fab
+            on:click={scrollTo(playgroundstart)}
+            disabled="{isRunning}"
+          >
+            <Icon class="material-icons">keyboard_arrow_up</Icon></Fab>
+          </div>
+          <div class="whatnext_b">
+            <a href={"https://github.com/florianholeczek/ugfn"} target="_blank" rel="noopener noreferrer" class="github-button">
+              <Fab>
+                <Icon tag="svg">
+                  <svg
+                    class="github-icon"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12 0.297C5.373 0.297 0 5.67 0 12.297c0 5.3 3.438 9.8 8.207 11.387.6.11.793-.26.793-.577v-2.17c-3.338.724-4.033-1.61-4.033-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.743.082-.727.082-.727 1.205.085 1.84 1.24 1.84 1.24 1.07 1.835 2.807 1.305 3.493.997.108-.776.418-1.305.76-1.605-2.667-.303-5.467-1.333-5.467-5.93 0-1.31.467-2.384 1.235-3.223-.123-.303-.535-1.524.117-3.176 0 0 1.007-.323 3.3 1.23a11.42 11.42 0 013.003-.404c1.018.005 2.042.137 3.003.404 2.29-1.553 3.296-1.23 3.296-1.23.654 1.652.242 2.873.12 3.176.77.839 1.233 1.913 1.233 3.223 0 4.607-2.805 5.624-5.478 5.92.43.373.814 1.102.814 2.22v3.293c0 .32.19.693.8.576C20.565 22.094 24 17.595 24 12.297 24 5.67 18.627.297 12 .297z"
+                    />
+                  </svg>
+                </Icon>
+              </Fab>
+            </a>
+
+          </div>
+          <div class="whatnext_b">
+            <Fab
+            on:click={scrollTo(sourcesstart)}
+            disabled="{isRunning}"
+          >
+            <Icon class="material-icons">keyboard_arrow_down</Icon></Fab>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Acknowledgements</h2>
+      <p class="section-text">
+        Thanks to Christina Humer for the feedback and resources.
+        <br>Some implementations and ideas are based on other great work:
+        <span class="li">The
+          <a href="https://github.com/GFNOrg/torchgfn/blob/master/tutorials/notebooks/intro_gfn_continuous_line_simple.ipynb" target="_blank">continuous line</a>
+          example by Joseph Viviano & Kolya Malkin.
+          The idea for the environment is based on their notebook and much of the training code is adapted from theirs.
+      </span>
       <span class="li">The
-        <a href="https://github.com/GFNOrg/torchgfn/blob/master/tutorials/notebooks/intro_gfn_continuous_line_simple.ipynb" target="_blank">continuous line</a>
-        example by Joseph Viviano & Kolya Malkin.
-        The idea for the environment is based on their notebook and much of the training code is adapted from theirs.
-    </span>
-    <span class="li">The
-        <a href="https://playground.tensorflow.org/" target="_blank">
-          neural network playgroud</a>
-         by Daniel Smilkov and Shan Carter was an inspiration on how to visualize machine learning and the training progress in the browser.
-      </span>
-      <span class="li">The code for the flow field visualization is mostly taken from
-        <a href="https://editor.p5js.org/Mathcurious/sketches/bdp6luRil" target="_blank">Mathcurious' implementation</a>
-      </span>
-      If you want to learn more about GFlowNets have a look into the literature and tutorials below.
-      <br><br><br><br>
-      Author: Florian Holeczek
-      <br>Created as seminar project in the MSc program Artificial Intelligence at JKU Linz
-    </p>
-
-  </section>
-
-
-  <section class="section" id="Sources" bind:this={sourcesstart}>
-    <h2 class="section-title">Sources</h2>
-    <h3 class="section-title3">Literature</h3>
-      <p class="section-text">
-        Malkin, N., Jain, M., Bengio, E., Sun, C., & Bengio, Y. (2022). Trajectory balance: Improved credit
-        assignment in gflownets. Advances in Neural Information Processing Systems, 35, 5955-5967.
-        <br><br>
-        Shen, M. W., Bengio, E., Hajiramezanali, E., Loukas, A., Cho, K., & Biancalani, T. (2023, July).
-        Towards understanding and improving gflownet training. In International Conference on Machine
-        Learning (pp. 30956-30975). PMLR.
-        <br><br>
-        Bengio, Y., Lahlou, S., Deleu, T., Hu, E. J., Tiwari, M., & Bengio, E. (2023). Gflownet foundations. The
-        Journal of Machine Learning Research, 24(1), 10006-10060.
-        <br><br>
-        Bengio, E., Jain, M., Korablyov, M., Precup, D., & Bengio, Y. (2021). Flow network based generative
-        models for non-iterative diverse candidate generation. Advances in Neural Information Processing
-        Systems, 34, 27381-27394.
-        <br><br>
-        Nica, A. C., Jain, M., Bengio, E., Liu, C. H., Korablyov, M., Bronstein, M. M., & Bengio, Y. (2022). Evaluating generalization in gflownets for molecule design. In ICLR2022 Machine Learning for Drug Discovery.
-        <br><br>
-        Lahlou, S., Deleu, T., Lemos, P., Zhang, D., Volokhova, A., Hernández-Garcıa, A., ... & Malkin, N. (2023, July). A theory of continuous generative flow networks. In International Conference on Machine Learning (pp. 18269-18300). PMLR.
+          <a href="https://playground.tensorflow.org/" target="_blank">
+            neural network playgroud</a>
+           by Daniel Smilkov and Shan Carter was an inspiration on how to visualize machine learning and the training progress in the browser.
+        </span>
+        <span class="li">The code for the flow field visualization is mostly taken from
+          <a href="https://editor.p5js.org/Mathcurious/sketches/bdp6luRil" target="_blank">Mathcurious' implementation</a>
+        </span>
+        If you want to learn more about GFlowNets have a look into the literature and tutorials below.
+        <br><br><br><br>
+        Author: Florian Holeczek
+        <br>Created as seminar project in the MSc program Artificial Intelligence at JKU Linz
       </p>
-    <h3 class="section-title3">Tutorials</h3>
-      <p class="section-text">
-        <a href="https://milayb.notion.site/The-GFlowNet-Tutorial-95434ef0e2d94c24aab90e69b30be9b3" target="_blank">MILA Tutorial (Theory)</a>
-        <br><br>
-        <a href="https://colab.research.google.com/drive/1fUMwgu2OhYpQagpzU5mhe9_Esib3Q2VR" target="_blank">MILA Tutorial (Code)</a>
 
-        <br><br>
-        <a href="https://github.com/GFNOrg/torchgfn/blob/master/tutorials/notebooks/intro_gfn_continuous_line_simple.ipynb" target="_blank">Continuous Line Tutorial</a>
+    </section>
 
-      </p>
-    <h3 class="section-title3">GFlowNet Libraries</h3>
-      <p class="section-text">
-        <a href="https://github.com/alexhernandezgarcia/gflownet" target="_blank">https://github.com/alexhernandezgarcia/gflownet</a>
-        <br><br>
-        <a href="https://github.com/GFNOrg/torchgfn" target="_blank">https://github.com/GFNOrg/torchgfn</a>
-        <br><br>
-        <a href="https://github.com/augustwester/gflownet" target="_blank">https://github.com/augustwester/gflownet</a>
-      </p>
-  </section>
+
+    <section class="section" id="Sources" bind:this={sourcesstart}>
+      <h2 class="section-title">Sources</h2>
+      <h3 class="section-title3">Literature</h3>
+        <p class="section-text">
+          Malkin, N., Jain, M., Bengio, E., Sun, C., & Bengio, Y. (2022). Trajectory balance: Improved credit
+          assignment in gflownets. Advances in Neural Information Processing Systems, 35, 5955-5967.
+          <br><br>
+          Shen, M. W., Bengio, E., Hajiramezanali, E., Loukas, A., Cho, K., & Biancalani, T. (2023, July).
+          Towards understanding and improving gflownet training. In International Conference on Machine
+          Learning (pp. 30956-30975). PMLR.
+          <br><br>
+          Bengio, Y., Lahlou, S., Deleu, T., Hu, E. J., Tiwari, M., & Bengio, E. (2023). Gflownet foundations. The
+          Journal of Machine Learning Research, 24(1), 10006-10060.
+          <br><br>
+          Bengio, E., Jain, M., Korablyov, M., Precup, D., & Bengio, Y. (2021). Flow network based generative
+          models for non-iterative diverse candidate generation. Advances in Neural Information Processing
+          Systems, 34, 27381-27394.
+          <br><br>
+          Nica, A. C., Jain, M., Bengio, E., Liu, C. H., Korablyov, M., Bronstein, M. M., & Bengio, Y. (2022). Evaluating generalization in gflownets for molecule design. In ICLR2022 Machine Learning for Drug Discovery.
+          <br><br>
+          Lahlou, S., Deleu, T., Lemos, P., Zhang, D., Volokhova, A., Hernández-Garcıa, A., ... & Malkin, N. (2023, July). A theory of continuous generative flow networks. In International Conference on Machine Learning (pp. 18269-18300). PMLR.
+        </p>
+      <h3 class="section-title3">Tutorials</h3>
+        <p class="section-text">
+          <a href="https://milayb.notion.site/The-GFlowNet-Tutorial-95434ef0e2d94c24aab90e69b30be9b3" target="_blank">MILA Tutorial (Theory)</a>
+          <br><br>
+          <a href="https://colab.research.google.com/drive/1fUMwgu2OhYpQagpzU5mhe9_Esib3Q2VR" target="_blank">MILA Tutorial (Code)</a>
+
+          <br><br>
+          <a href="https://github.com/GFNOrg/torchgfn/blob/master/tutorials/notebooks/intro_gfn_continuous_line_simple.ipynb" target="_blank">Continuous Line Tutorial</a>
+
+        </p>
+      <h3 class="section-title3">GFlowNet Libraries</h3>
+        <p class="section-text">
+          <a href="https://github.com/alexhernandezgarcia/gflownet" target="_blank">https://github.com/alexhernandezgarcia/gflownet</a>
+          <br><br>
+          <a href="https://github.com/GFNOrg/torchgfn" target="_blank">https://github.com/GFNOrg/torchgfn</a>
+          <br><br>
+          <a href="https://github.com/augustwester/gflownet" target="_blank">https://github.com/augustwester/gflownet</a>
+        </p>
+    </section>
+  {/if}
 </main>
 
 

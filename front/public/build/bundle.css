@@ -18782,6 +18782,35 @@ Yes.
     margin: 0 auto;
     max-width: 1200px;
   }
+  
+  .mobile-disclaimer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(to bottom right, #222, #444);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .disclaimer-box {
+    max-width: 500px;
+    background-color: #333;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+
+  .disclaimer-box h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .disclaimer-box p {
+    font-size: 1.2rem;
+    line-height: 1.5;
+  }
 
   .header-top {
     background: linear-gradient(90deg, #26132d, #2d3a45);
