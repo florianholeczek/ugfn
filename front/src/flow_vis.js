@@ -5,7 +5,7 @@ let flow_n_particles_value;
 let flow_vectorfield_value;
 let flow_vectors_value;
 let flow_changed_value;
-const flow_steer_value = 0.2;
+const flow_steer_value = 0.8;
 
 flow_velocity.subscribe(value => {
     flow_velocity_value = value;
@@ -160,10 +160,35 @@ export function plot_flow(p, vectorgrid_size) {
       }
 
       follow(f) {
-        let x = Math.floor(p.map(this.pos.x, -p.width / 2, p.width / 2, 0, vectorgrid_size - 1, true));
-        let y = Math.floor(p.map(this.pos.y, -p.height / 2, p.height / 2, 0, vectorgrid_size - 1, true));
-        let index = y * vectorgrid_size + x;
-        let force = f[index].copy();
+        let gridX = p.map(this.pos.x, -p.width / 2, p.width / 2, 0, vectorgrid_size - 1);
+        let gridY = p.map(this.pos.y, -p.height / 2, p.height / 2, 0, vectorgrid_size - 1);
+
+        let x0 = Math.floor(gridX);
+        let x1 = Math.min(x0 + 1, vectorgrid_size - 1);
+        let y0 = Math.floor(gridY);
+        let y1 = Math.min(y0 + 1, vectorgrid_size - 1);
+
+        let sx = gridX - x0;
+        let sy = gridY - y0;
+
+        let i00 = y0 * vectorgrid_size + x0;
+        let i10 = y0 * vectorgrid_size + x1;
+        let i01 = y1 * vectorgrid_size + x0;
+        let i11 = y1 * vectorgrid_size + x1;
+
+        let v00 = f[i00].copy();
+        let v10 = f[i10].copy();
+        let v01 = f[i01].copy();
+        let v11 = f[i11].copy();
+
+        // Interpolate in x direction
+        let vx0 = p5.Vector.lerp(v00, v10, sx);
+        let vx1 = p5.Vector.lerp(v01, v11, sx);
+
+        // Interpolate in y direction
+        let force = p5.Vector.lerp(vx0, vx1, sy);
+
+
         force.mult(flow_steer_value);
         this.applyForce(force);
       }
