@@ -340,6 +340,7 @@ export function plotStatesHistory(
     Plotly.react('trainplothist', baseTraces, layout);
 
     const plotDiv = document.getElementById('trainplothist');
+    plotDiv.removeAllListeners?.('plotly_hover');
 
     plotDiv.on('plotly_hover', function (data) {
         const point = data.points[0];
@@ -365,6 +366,7 @@ export function plotStatesHistory(
         Plotly.react('trainplothist', [contourTrace, fadedSamples, trajTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot], layout);
     });
 
+    plotDiv.removeAllListeners?.('plotly_unhover');
     plotDiv.on('plotly_unhover', function () {
         Plotly.react('trainplothist', baseTraces, layout);
     });
