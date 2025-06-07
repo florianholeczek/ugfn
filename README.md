@@ -2,6 +2,8 @@
 
 This is a basic implementation of a [GFlowNet](https://dl.acm.org/doi/abs/10.5555/3648699.3648909) architecture to get an intuition of how they work and behave.
 
+The interactive Playground, a GFlowNet Tutorial and more information can be found [here](https://gfn-explorer.caleydoapp.org)
+
 Training happens in a very simple 2d environment where the reward is given proportional to the mixture of n multivariate Gaussians.
 
 ![](https://github.com/florianholeczek/ugfn/blob/master/front/public/images/env1.png)
@@ -11,7 +13,7 @@ When the training is successfull we can see that the GFN learned the true underl
 ![](https://github.com/florianholeczek/ugfn/blob/master/front/public/images/run3.png)
 
 ## How to run
-The "python" folder contains all python files which are used for training gflownets.
+The "python" folder contains all python files which are used for training.
 The folder "front" has the data for building the website with svelte.
 Dockerimages for the website are here:
 https://hub.docker.com/repositories/florianholeczek
@@ -24,7 +26,7 @@ cd yourworkingdirectory
 git clone https://github.com/florianholeczek/ugfn
 ```
 
-To set up the environment you will need a python version >3.8 and <3.11.
+To set up the environment you will need python version >3.8 and <3.11.
 
 It is tested with version [3.10.11](https://www.python.org/downloads/release/python-31011/).
 
@@ -92,26 +94,12 @@ npm install
 
 
 
-assuming you are already in the front folder, you can start the backend with 
+From the root folder, you can start the page with 
 ```shell
 uvicorn back:app --host 0.0.0.0 --port 8000
 ```
 
-in a new terminal you can then build the page and run the frontend via
-```shell
-cd yourworkingdirectory
-cd front
-
-npm run build
-npm run dev
-```
-Your frontend should now run on port 8080:
-http://localhost:8080
+You can find it on port 8000:
+http://0.0.0.0:8000
 
 
-## TODOs
-This is still work in progress, ToDos are:
-* integrating the Texts in the website
-* webpage design
-* Visualization for Flow
-* Sources
