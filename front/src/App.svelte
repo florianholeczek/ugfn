@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import {writable} from 'svelte/store';
   import Katex from 'svelte-katex'
   import 'katex/dist/katex.min.css';
@@ -95,8 +95,6 @@
   //others
   let plotlyready=false;
   let display_trainhistory=false;
-  let frames = []; //saves all frames for plotting them after training
-  let training_frame = 0;
   let training_progress = 0; //for progressbar
   let current_states;
   let current_losses;
@@ -134,20 +132,8 @@
       plotEnv();
     }
   }
-  $: plot_trainingframe(training_frame);
-  function plot_trainingframe(frame) {
-    if (!isRunning && display_trainhistory){
-      plotStates(
-        Plotly,
-        frames[frame]['gaussians'],
-        frames[frame]['states'],
-        frames[frame]['losses'],
-        current_plotting_density
-      );
-    }
-  }
-  $: plot_trainingframe2(training_step_value);
-  function plot_trainingframe2(step) {
+  $: plot_traininghist(training_step_value);
+  function plot_traininghist(step) {
     if (!isRunning && display_trainhistory){
       let trajectory_temp = slice_trajectories(step,current_parameters["trajectory_length_value"],current_trajectories);
       let iter = Math.min(step*current_parameters["n_iterations_value"]/32,
@@ -163,8 +149,6 @@
           );
     }
   }
-
-
   $: run1 = `./images/run1/run1_${run1_value}.png`
   $: run2 = `./images/run2/run2_${run2_value}.png`
   $: run3 = `./images/run3/run3_${run3_value}.png`
@@ -186,8 +170,7 @@
             flowvis_instance.remove();
             flowvis_instance = null;
           }
-          plot_trainingframe(training_frame);
-          plot_trainingframe2(training_step_value)
+          plot_traininghist(training_step_value)
         } else {
           if(display_trainhistory){
             updateflows=false;
@@ -324,7 +307,6 @@
   function slice_trajectories(s, t_length, data){
     const size = 2048*(t_length+1)*2
     const index = s*size
-    console.log(index, index+size)
     return data.slice(index, index+size)
   }
 
@@ -390,7 +372,6 @@
       const data = await response.json();
       session_id = data.session_id;
       console.log("Training started. Session ID:", session_id);
-      frames = [];
 
       // Start polling for trainings
       pollTraining();
@@ -411,12 +392,6 @@
       if (!response.ok) {
         throw new Error('Failed to stop training.');
       }
-
-      // Stop polling and reset button state
-      //clearInterval(pollingTimer);
-      //training_frame=0;
-      //await get_final_data();
-      //isRunning = false;
     } catch (error) {
       console.error(error);
     }
@@ -444,33 +419,15 @@
         if (data.states) {
           current_states = data.states;
           plotStates(Plotly, $gaussians, current_states,current_losses, current_plotting_density);
-          frames.push({
-            'gaussians': JSON.parse(JSON.stringify($gaussians)),
-            'states': current_states,
-            'losses': current_losses
-          })
         }
 
         if (data.completed && !completed) {
           completed = true;
           clearInterval(pollingTimer); //stop polling
           await get_final_data();
-          training_frame = frames.length-2;
-          training_step_value = current_nSteps-1;
           isRunning = false;
-          plotStates(Plotly, $gaussians, current_states,current_losses, current_plotting_density);
-          let trajectory_temp = slice_trajectories(1,current_parameters["trajectory_length_value"],current_trajectories);
-          let iter = Math.min(training_step_value*current_parameters["n_iterations_value"]/32,
-                      current_losses['losses'].length)
-          plotStatesHistory(
-                  Plotly,
-                  $gaussians,
-                  trajectory_temp,
-                  current_losses,
-                  current_plotting_density,
-                  current_parameters["trajectory_length_value"]+1,
-                  iter
-          );
+          await tick();
+          training_step_value = current_nSteps-1; //also triggers plot for trainhistory
         }
       } catch (error) {
         console.error(error);
@@ -499,7 +456,6 @@
         current_trajectories = floats.slice(0, cutoff);
         current_flows = floats.slice(cutoff);
         console.log("Final data recieved, training done.")
-        console.log(current_trajectories)
       }
 
     } catch (error) {
@@ -700,17 +656,7 @@
 
 
 <main class="main-content">
-  <div class = pg-background>
-    <div class="pg-vis" id="trainplothist"></div>
-    <Slider
-      bind:value="{training_step_value}"
-      min={0}
-      max={current_nSteps-1}
-      step={1}
-      disabled="{isRunning}"
-      input$aria-label="Set the step"
-    />
-  </div>
+
 
   {#if isMobile}
     <div class="mobile-disclaimer">
@@ -1165,18 +1111,21 @@
             <div class="pg-vis" style="text-align:center; padding:100px; color: #323232;">
               Press Play to start training a GFlowNet
             </div>
-          {:else}
+          {:else if display_trainhistory && isRunning}
             <div class="pg-vis" id="trainplot">
             </div>
+          {:else}
+            <div class="pg-vis" id="trainplothist"></div>
           {/if}
 
           <div class="pg-bottom">
             {#if !isRunning & display_trainhistory}
               <Slider
-                bind:value="{training_frame}"
+                bind:value="{training_step_value}"
                 min={0}
-                max={frames.length-2}
+                max={current_nSteps-1}
                 step={1}
+                disabled="{isRunning}"
                 input$aria-label="View the iterations"
               />
         {:else if isRunning}

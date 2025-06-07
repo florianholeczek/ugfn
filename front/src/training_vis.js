@@ -35,7 +35,6 @@ export function plotStates(Plotly, gaussians, states, losses, density, options =
     // Extract final states
     const x = states.map(s => s[0]);
     const y = states.map(s => s[1]);
-    console.log(states, x, y)
 
 
     // Prepare losses
@@ -206,7 +205,6 @@ export function plotStatesHistory(
             return [trajectoryData[baseIdx], trajectoryData[baseIdx + 1]];
         })
     );
-    console.log(trajectories)
 
     const finalStates = trajectories.map(traj => traj[trajectory_length - 1]);
     const x = finalStates.map(p => p[0]);
