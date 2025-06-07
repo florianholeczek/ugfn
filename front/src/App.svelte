@@ -150,6 +150,8 @@
   function plot_trainingframe2(step) {
     if (!isRunning && display_trainhistory){
       let trajectory_temp = slice_trajectories(step,current_parameters["trajectory_length_value"],current_trajectories);
+      let iter = Math.min(step*current_parameters["n_iterations_value"]/32,
+                      current_losses['losses'].length)
       plotStatesHistory(
                   Plotly,
                   $gaussians,
@@ -157,7 +159,7 @@
                   current_losses,
                   current_plotting_density,
                   current_parameters["trajectory_length_value"]+1,
-                  100*step
+                  iter
           );
     }
   }
@@ -454,9 +456,12 @@
           clearInterval(pollingTimer); //stop polling
           await get_final_data();
           training_frame = frames.length-2;
+          training_step_value = current_nSteps-1;
           isRunning = false;
           plotStates(Plotly, $gaussians, current_states,current_losses, current_plotting_density);
           let trajectory_temp = slice_trajectories(1,current_parameters["trajectory_length_value"],current_trajectories);
+          let iter = Math.min(training_step_value*current_parameters["n_iterations_value"]/32,
+                      current_losses['losses'].length)
           plotStatesHistory(
                   Plotly,
                   $gaussians,
@@ -464,7 +469,7 @@
                   current_losses,
                   current_plotting_density,
                   current_parameters["trajectory_length_value"]+1,
-                  450
+                  iter
           );
         }
       } catch (error) {
@@ -1258,7 +1263,7 @@
               <div style="position: absolute; bottom: 6px; right: 10px">
                 Iteration: {Math.min(
                       flow_step_value*current_parameters["n_iterations_value"]/32,
-                      frames[frames.length-1]['losses']['losses'].length
+                      current_losses['losses'].length
               )}
 
 

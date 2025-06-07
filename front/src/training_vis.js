@@ -184,7 +184,7 @@ export function plotStatesHistory(
     losses,
     density,
     trajectory_length,
-    step,
+    iter,
     options = {}) {
     const {
         levels = 10,
@@ -318,7 +318,7 @@ export function plotStatesHistory(
     };
 
     const layout = {
-        title: `Iteration ${losses['losses'].length}/${losses['n_iterations']} `,
+        title: `Iteration ${iter}/${losses['n_iterations']} `,
         showlegend: true,
         autosize: false,
         width: 775,
@@ -333,7 +333,7 @@ export function plotStatesHistory(
         yaxis3: { domain: [0, 0.75], showticklabels: false, title: 'Marginal of y', side: 'right', anchor: 'x3', scaleanchor: 'y', range: [-3, 3] },
         xaxis4: { domain: [0.8, 1], showticklabels: true, range: [0, losses['n_iterations']] },
         yaxis4: { domain: [0.8, 1], showticklabels: true, range: [-1, 3] },
-        shapes: [{type: 'line', x0: step, x1: step, y0: -1, y1: 3, xref: 'x4', yref: 'y4', line: {color: 'black', width: 1, dash: 'solid'}}]
+        shapes: [{type: 'line', x0: iter, x1: iter, y0: -1, y1: 3, xref: 'x4', yref: 'y4', line: {color: 'black', width: 1, dash: 'solid'}}]
     };
 
     const baseTraces = [contourTrace, samplesTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot];
