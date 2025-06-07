@@ -290,8 +290,7 @@ def prepare_final_dump(trajectories, flows):
     flows_temp = torch.zeros((s[0], s[2], vectorgrid_size**2, s[3]))
     flows_temp[:,1:,:,:] = flows
 
-    # To get shape (iteration, trajectory_step, vectorgrid_size**2, 2)
-    trajectories_temp = trajectories_temp.permute(0, 2, 1, 3)
+    #trajectories_temp = trajectories_temp.permute(0, 2, 1, 3)
 
     data = torch.concatenate((trajectories_temp.flatten(), flows_temp.flatten()), axis=0).cpu().numpy()
 

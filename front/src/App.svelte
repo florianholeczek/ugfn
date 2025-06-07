@@ -6,7 +6,7 @@
   import "./theme.css"
   import './styles.css';
   import {plotEnvironment, compute_density_plotting} from "./env.js";
-  import {plotStates} from "./training_vis.js"
+  import {plotStates, plotStatesHistory} from "./training_vis.js"
   import {plot_flow} from "./flow_vis.js";
   import Accordion, {Panel, Header, Content } from '@smui-extra/accordion';
   import Slider from '@smui/slider';
@@ -77,6 +77,7 @@
   let flow_trajectory_step_value = 1;
   let t_flow_step_value = 0;
   let t_flow_trajectory_step_value = 1;
+  let training_step_value = 0;
   let updateflows=true;
 
   //tutorial visualization data
@@ -145,6 +146,22 @@
       );
     }
   }
+  $: plot_trainingframe2(training_step_value);
+  function plot_trainingframe2(step) {
+    if (!isRunning && display_trainhistory){
+      let trajectory_temp = slice_trajectories(step,current_parameters["trajectory_length_value"],current_trajectories);
+      plotStatesHistory(
+                  Plotly,
+                  $gaussians,
+                  trajectory_temp,
+                  current_losses,
+                  current_plotting_density,
+                  current_parameters["trajectory_length_value"]+1,
+                  100*step
+          );
+    }
+  }
+
 
   $: run1 = `./images/run1/run1_${run1_value}.png`
   $: run2 = `./images/run2/run2_${run2_value}.png`
@@ -168,6 +185,7 @@
             flowvis_instance = null;
           }
           plot_trainingframe(training_frame);
+          plot_trainingframe2(training_step_value)
         } else {
           if(display_trainhistory){
             updateflows=false;
@@ -261,6 +279,7 @@
       hidden_dim_value = 64;
       seed_value = 42;
       batch_size_exponent = 6;
+      display_trainhistory = false;
   }
 
   async function loadPlotly() {
@@ -297,6 +316,13 @@
   function slice_flows(s, t, t_length, data){
     const size = vectorgrid_size**2 * 2
     const index = (s*(t_length+1)*size) + (t*size)
+    return data.slice(index, index+size)
+  }
+
+  function slice_trajectories(s, t_length, data){
+    const size = 2048*(t_length+1)*2
+    const index = s*size
+    console.log(index, index+size)
     return data.slice(index, index+size)
   }
 
@@ -430,7 +456,16 @@
           training_frame = frames.length-2;
           isRunning = false;
           plotStates(Plotly, $gaussians, current_states,current_losses, current_plotting_density);
-
+          let trajectory_temp = slice_trajectories(1,current_parameters["trajectory_length_value"],current_trajectories);
+          plotStatesHistory(
+                  Plotly,
+                  $gaussians,
+                  trajectory_temp,
+                  current_losses,
+                  current_plotting_density,
+                  current_parameters["trajectory_length_value"]+1,
+                  450
+          );
         }
       } catch (error) {
         console.error(error);
@@ -459,6 +494,7 @@
         current_trajectories = floats.slice(0, cutoff);
         current_flows = floats.slice(cutoff);
         console.log("Final data recieved, training done.")
+        console.log(current_trajectories)
       }
 
     } catch (error) {
@@ -629,6 +665,7 @@
   document.title = "GFlowNet Playground"
 
 
+
 </script>
 
 
@@ -658,6 +695,18 @@
 
 
 <main class="main-content">
+  <div class = pg-background>
+    <div class="pg-vis" id="trainplothist"></div>
+    <Slider
+      bind:value="{training_step_value}"
+      min={0}
+      max={current_nSteps-1}
+      step={1}
+      disabled="{isRunning}"
+      input$aria-label="Set the step"
+    />
+  </div>
+
   {#if isMobile}
     <div class="mobile-disclaimer">
       <div class="disclaimer-box">

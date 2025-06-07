@@ -35,6 +35,7 @@ export function plotStates(Plotly, gaussians, states, losses, density, options =
     // Extract final states
     const x = states.map(s => s[0]);
     const y = states.map(s => s[1]);
+    console.log(states, x, y)
 
 
     // Prepare losses
@@ -173,4 +174,198 @@ export function plotStates(Plotly, gaussians, states, losses, density, options =
     const allplots = [contourTrace, samplesTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot]
     Plotly.react('trainplot', allplots, layout)
 
+}
+
+
+export function plotStatesHistory(
+    Plotly,
+    gaussians,
+    trajectoryData,
+    losses,
+    density,
+    trajectory_length,
+    step,
+    options = {}) {
+    const {
+        levels = 10,
+        alpha = 1.0,
+        gridSize = 100,
+        colormap = 'Viridis',
+    } = options;
+
+    let sec_col = 'rgb(51, 51, 51)'
+    let f_col = "rgb(120, 208, 78)"
+
+
+    const numTrajectories = trajectoryData.length / (trajectory_length * 2);
+
+    // Reshape flat array into [numTrajectories][trajectory_length][2]
+    const trajectories = Array.from({ length: numTrajectories }, (_, i) =>
+        Array.from({ length: trajectory_length }, (_, t) => {
+            const baseIdx = (i * trajectory_length + t) * 2;
+            return [trajectoryData[baseIdx], trajectoryData[baseIdx + 1]];
+        })
+    );
+    console.log(trajectories)
+
+    const finalStates = trajectories.map(traj => traj[trajectory_length - 1]);
+    const x = finalStates.map(p => p[0]);
+    const y = finalStates.map(p => p[1]);
+
+    // Loss data prep
+    const iters = Array.from({ length: losses['n_iterations'] + 1 }, (_, i) => i);
+    const truelogz_array = new Array(losses['n_iterations'] + 1).fill(losses['truelogz']);
+
+    // Plot traces
+    const contourTrace = {
+        x: density["linspace"],
+        y: density["linspace"],
+        z: density["densityEnv"],
+        type: 'contour',
+        colorscale: colormap,
+        showscale: false,
+        contours: { coloring: 'lines' },
+        line: { width: 2 },
+        showlegend: false,
+    };
+
+    const samplesTrace = {
+        x: x,
+        y: y,
+        mode: 'markers',
+        type: 'scatter',
+        marker: { color: sec_col, symbol: 137, opacity: alpha },
+        showlegend: true,
+        name: 'Samples',
+        hoverinfo: 'x+y',
+        customdata: Array.from({ length: numTrajectories }, (_, i) => i),
+    };
+
+    // Histograms and marginals (unchanged)
+    const histX = {
+        x: x,
+        type: 'histogram',
+        histnorm: 'probability density',
+        marker: { color: sec_col },
+        xaxis: 'x2',
+        yaxis: 'y2',
+        xbins: { size: 0.2 },
+        showlegend: false,
+    };
+    const histY = {
+        y: y,
+        type: 'histogram',
+        histnorm: 'probability density',
+        marker: { color: sec_col },
+        xaxis: 'x3',
+        yaxis: 'y3',
+        orientation: 'h',
+        ybins: { size: 0.2 },
+        showlegend: false,
+    };
+    const densX = {
+        x: density["linspace"],
+        y: density["densityX"],
+        type: 'scatter',
+        xaxis: 'x2',
+        yaxis: 'y2',
+        mode: 'lines',
+        marker: { color: f_col },
+        showlegend: true,
+        name: 'Reward function',
+    };
+    const densY = {
+        y: density["linspace"],
+        x: density["densityY"],
+        type: 'scatter',
+        xaxis: 'x3',
+        yaxis: 'y3',
+        orientation: 'h',
+        mode: 'lines',
+        marker: { color: f_col },
+        showlegend: false,
+    };
+
+    const lossplot = {
+        x: iters,
+        y: losses['losses'],
+        name: 'Loss',
+        type: 'scatter',
+        mode: 'lines',
+        xaxis: 'x4',
+        yaxis: 'y4',
+        line: { color: '#1f77b4', width: 1 },
+    };
+    const logzplot = {
+        x: iters,
+        y: losses['logzs'],
+        name: 'logZ',
+        type: 'scatter',
+        mode: 'lines',
+        xaxis: 'x4',
+        yaxis: 'y4',
+        line: { color: '#ff7f0e', width: 1 },
+    };
+    const truelogzplot = {
+        x: iters,
+        y: truelogz_array,
+        name: 'True logZ',
+        type: 'scatter',
+        mode: 'lines',
+        xaxis: 'x4',
+        yaxis: 'y4',
+        line: { color: '#d62728', width: 1 },
+    };
+
+    const layout = {
+        title: `Iteration ${losses['losses'].length}/${losses['n_iterations']} `,
+        showlegend: true,
+        autosize: false,
+        width: 775,
+        height: 775,
+        grid: { rows: 2, columns: 2, subplots: [['xy', 'x2y2'], ['x3y3', 'x4y4']] },
+        legend: { x: 1, y: 1.2, xanchor: 'right', yanchor: 'top' },
+        xaxis: { domain: [0, 0.75], title: "x", range: [-3, 3] },
+        yaxis: { domain: [0, 0.75], title: "y", range: [-3, 3] },
+        xaxis2: { domain: [0, 0.75], showticklabels: false, title: 'Marginal of x', side: 'top', anchor: 'y2', scaleanchor: 'x', range: [-3, 3] },
+        yaxis2: { domain: [0.8, 1], showticklabels: true, range: [0, 0.61] },
+        xaxis3: { domain: [0.8, 1], showticklabels: true, range: [0, 0.61] },
+        yaxis3: { domain: [0, 0.75], showticklabels: false, title: 'Marginal of y', side: 'right', anchor: 'x3', scaleanchor: 'y', range: [-3, 3] },
+        xaxis4: { domain: [0.8, 1], showticklabels: true, range: [0, losses['n_iterations']] },
+        yaxis4: { domain: [0.8, 1], showticklabels: true, range: [-1, 3] },
+        shapes: [{type: 'line', x0: step, x1: step, y0: -1, y1: 3, xref: 'x4', yref: 'y4', line: {color: 'black', width: 1, dash: 'solid'}}]
+    };
+
+    const baseTraces = [contourTrace, samplesTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot];
+    Plotly.react('trainplothist', baseTraces, layout);
+
+    const plotDiv = document.getElementById('trainplothist');
+
+    plotDiv.on('plotly_hover', function (data) {
+        const point = data.points[0];
+        if (point.data.name !== 'Samples') return;
+        const pointIndex = point.pointIndex;
+        const traj = trajectories[pointIndex];
+        if (!traj) return;
+        const [x_traj, y_traj] = [traj.map(p => p[0]), traj.map(p => p[1])];
+
+        const trajTrace = {
+            x: x_traj,
+            y: y_traj,
+            mode: 'lines+markers',
+            type: 'scatter',
+            marker: { color: 'black', size: 4 },
+            line: { color: 'black', width: 2 },
+            name: 'Trajectory',
+            hoverinfo: 'skip',
+        };
+
+        const fadedSamples = { ...samplesTrace, marker: { ...samplesTrace.marker, opacity: 0.1 } };
+
+        Plotly.react('trainplothist', [contourTrace, fadedSamples, trajTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot], layout);
+    });
+
+    plotDiv.on('plotly_unhover', function () {
+        Plotly.react('trainplothist', baseTraces, layout);
+    });
 }
