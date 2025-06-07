@@ -23,6 +23,7 @@
   import Fab from '@smui/fab';
   import { flow_velocity, flow_n_particles,flow_vectorfield, flow_vectors, flow_changed} from './store.js';
 
+  const BACKEND_URL = ""//process.env.BACKEND_URL ?? ""; //"https://back:8000";
 
 
   // default values
@@ -113,7 +114,7 @@
 
 
   //polling every n ms
-  const POLLING_INTERVAL = 30;
+  const POLLING_INTERVAL = 100;
   let isRunning = false;
   let pollingTimer;
 
@@ -347,7 +348,7 @@
       }
       const send_params = JSON.stringify(current_parameters)
       // Start training
-      const response = await fetch('http://localhost:8000/start_training', {
+      const response = await fetch(`${BACKEND_URL}/start_training`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: send_params
@@ -374,7 +375,7 @@
     try {
       if (!session_id) throw new Error("No session in progress.");
       // Stop training on backend
-      const response = await fetch(`http://localhost:8000/stop_training/${session_id}`,{
+      const response = await fetch(`${BACKEND_URL}/stop_training/${session_id}`,{
         method: 'POST',
       });
 
@@ -401,7 +402,7 @@
     let completed = false;
     pollingTimer = setInterval(async () => {
       try {
-        const response = await fetch(`http://localhost:8000/get_training_update/${session_id}`);
+        const response = await fetch(`${BACKEND_URL}/get_training_update/${session_id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch training.');
         }
@@ -440,7 +441,7 @@
     try {
       if (!session_id) throw new Error("No session in progress.");
 
-      const response = await fetch(`http://localhost:8000/get_final_data/${session_id}`, {
+      const response = await fetch(`${BACKEND_URL}/get_final_data/${session_id}`, {
         method: 'POST',
       });
 

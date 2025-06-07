@@ -4,8 +4,8 @@ Not neccessary if you use just the python scripts.
 """
 import time
 
-from arch import GFlowNet
-from env import Env
+from python.arch import GFlowNet
+from python.env import Env
 
 from uuid import uuid4
 from threading import Lock
@@ -18,6 +18,7 @@ from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 torch.set_printoptions(precision=2, sci_mode=False)
 
 vectorgrid_size = 31
@@ -299,3 +300,4 @@ def prepare_final_dump(trajectories, flows):
     buffer.seek(0)
     return buffer
 
+app.mount("/", StaticFiles(directory="./front/public", html=True), name="frontend")

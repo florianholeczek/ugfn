@@ -1,6 +1,6 @@
-from arch import GFlowNet
-from env import Env
-import plot_utils as plot
+from .arch import GFlowNet
+from .env import Env
+from . import plot_utils as plot
 
 import torch
 import matplotlib.pyplot as plt
