@@ -6,7 +6,7 @@
   import "./theme.css"
   import './styles.css';
   import {plotEnvironment, compute_density_plotting} from "./env.js";
-  import {plotStates, plotStatesHistory} from "./training_vis.js"
+  import {plotStates, plotStatesHistory, create_env_image} from "./training_vis.js"
   import {plot_flow} from "./flow_vis.js";
   import Accordion, {Panel, Header, Content } from '@smui-extra/accordion';
   import Slider from '@smui/slider';
@@ -106,9 +106,16 @@
   let current_flows;
   let current_trajectories;
   let current_plotting_density;
+  let current_env_image;
   let run1_value = 2048;
   let run2_value = 4096;
   let run3_value = 4096;
+  let tutorial_gaussians =  [
+    { mean: { x: -1, y: -1 }, variance: 0.2 },
+    { mean: { x: 1, y: 1 }, variance: 0.2 }
+  ]
+  let tutorial_plotting_density;
+  let tutorial_env_image;
   let session_id = null; // for identifying training sessions of multiple users
   let isMobile = false;
 
@@ -183,7 +190,8 @@
                     current_parameters["trajectory_length_value"],
                     current_flows,
                     flow_step_value,
-                    flow_trajectory_step_value
+                    flow_trajectory_step_value,
+                    current_env_image
             );
           }
           console.log("Flow View")
@@ -194,7 +202,7 @@
 
   }
 
-  function createVectorfield(instance, container, trajectory_length, data, s, t) {
+  function createVectorfield(instance, container, trajectory_length, data, s, t, img) {
     if (!instance){
       flow_vectors.set(slice_flows(
               s,
@@ -203,7 +211,7 @@
               data
       ));
       flow_changed.set(true);
-      instance = new p5((p) => plot_flow(p, vectorgrid_size), container);
+      instance = new p5((p) => plot_flow(p, vectorgrid_size, img), container);
       return instance
     }
   }
@@ -344,6 +352,7 @@
       training_progress = 0;
       const curr_gaussians = $gaussians;
       current_plotting_density = compute_density_plotting(curr_gaussians, 100)
+      current_env_image = await create_env_image(Plotly, current_plotting_density)
       current_parameters = {
         off_policy_value,
           loss_choice,
@@ -575,6 +584,8 @@
     //await load_array("/Data/run1_flow.json", "run1_flow");
     //await load_array("/Data/run2_flow.json", "run2_flow");
     await load_array("/Data/run3_flow.json", "run3_flow");
+    tutorial_plotting_density = compute_density_plotting(tutorial_gaussians, 100);
+    tutorial_env_image = await create_env_image(Plotly, tutorial_plotting_density);
 
     // add listeners for changing the Environment
     window.addEventListener('mousemove', handleMouseMove);
@@ -600,7 +611,8 @@
                   6,
                   run_data["run3_flow"],
                   t_flow_step_value,
-                  t_flow_trajectory_step_value
+                  t_flow_trajectory_step_value,
+                  tutorial_env_image
           );
         } else {
           if (tutorial_flowvis_instance) {

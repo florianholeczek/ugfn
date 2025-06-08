@@ -369,3 +369,75 @@ export function plotStatesHistory(
         Plotly.react('trainplothist', baseTraces, layout);
     });
 }
+
+export async function create_env_image(Plotly, density, colormap = 'Viridis') {
+  // Create hidden div for Plotly plot
+  const hiddenDiv = document.createElement('div');
+  hiddenDiv.style.position = 'fixed';
+  hiddenDiv.style.top = '-10000px';
+  hiddenDiv.style.left = '-10000px';
+  hiddenDiv.style.width = '256px';
+  hiddenDiv.style.height = '256px';
+  document.body.appendChild(hiddenDiv);
+
+  const zmin = Math.min(...density.densityEnv.flat());
+  const zmax = Math.max(...density.densityEnv.flat());
+  const levels = 40;
+  const size = (zmax - zmin) / levels;
+
+  const contourTrace = {
+    x: density.linspace,
+    y: density.linspace,
+    z: density.densityEnv,
+    type: 'contour',
+    colorscale: colormap,
+    showscale: false,
+    contours: {
+        coloring: 'fill', // 'heatmap' or 'fill', or 'lines'
+        showlabels: false,
+        start: zmin,
+        end: zmax,
+        size: size,
+    },
+      line: {
+    width: 0
+    },
+    showlegend: false,
+  };
+  const r = 3
+
+  const layout = {
+      width: 256,
+      height: 256,
+      margin: {l: 0, r: 0, t: 0, b: 0},
+      paper_bgcolor: 'white', // or transparent if you prefer
+      plot_bgcolor: 'white',
+      xaxis: {
+        visible: false,
+        showgrid: false,
+        zeroline: false,
+        showticklabels: false,
+        range: [-r, r],
+      },
+      yaxis: {
+        visible: false,
+        showgrid: false,
+        zeroline: false,
+        showticklabels: false,
+        range: [-r, r],
+        scaleanchor: 'x',
+        scaleratio: 1,
+      },
+    };
+
+
+  await Plotly.newPlot(hiddenDiv, [contourTrace], layout, {staticPlot: true, displayModeBar: false});
+
+  // Export to PNG base64
+  const base64png = await Plotly.toImage(hiddenDiv, {format: 'png', width: 256, height: 256, scale: 1});
+
+  // Clean up hidden div
+  hiddenDiv.remove();
+
+  return base64png; // this is the data URL string you can pass to p5.loadImage()
+}

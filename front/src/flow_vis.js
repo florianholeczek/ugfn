@@ -24,10 +24,15 @@ flow_changed.subscribe(value => {
 });
 
 
-export function plot_flow(p, vectorgrid_size) {
+export function plot_flow(p, vectorgrid_size, img_path) {
     const scl = 25;
     let particles = [];
     let flowfield;
+    let backgroundImage;
+
+    p.preload = () => {
+      backgroundImage = p.loadImage(img_path);//("images/run1.png");
+    };
 
     const lifespan_min = 100;
     const lifespan_max = 200;
@@ -48,11 +53,10 @@ export function plot_flow(p, vectorgrid_size) {
         p.clear()
       }*/
       p.translate(p.height / 2, p.height / 2);
+
+      p.tint(255,10)
+      p.image(backgroundImage, -p.width/2, -p.height/2, p.width, p.height);
       p.scale(1, -1);
-      //p.fill(68, 1, 84, 10);
-      p.fill(35, 0, 44, 10);
-      //p.fill(0, 10);
-      p.rect(-p.width, -p.height, 2 * p.width, 2 * p.height);
 
       //update flowfield
       if(flow_changed_value){
@@ -148,7 +152,7 @@ export function plot_flow(p, vectorgrid_size) {
         //draw particle
         p.noStroke();
         //p.fill(253, 231, 37, alpha);
-        p.fill(0, alpha);
+        p.fill(255, alpha);
         p.circle(this.pos.x, this.pos.y, this.size);
 
         this.lifespan--;
