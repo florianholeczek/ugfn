@@ -174,7 +174,7 @@ def train_and_sample(session: TrainingSession):
     # To mitigate this, we always keep the last n samples, set via trajectory_max.
     # This is the number of states to send to frontend for visualization,basically batch size for sampling
     trajectory_max = 2048
-    train_interval =4 # number of iterations to train before updating states for visualization
+    train_interval = 4 # number of iterations to train before updating states for visualization
     current_states = None
     torch.manual_seed(params['seed'])
 
@@ -203,7 +203,8 @@ def train_and_sample(session: TrainingSession):
     with torch.no_grad():
         session.final_flows = [session.model.forward_model(vectorgrid)[:,:-1], ]
 
-    # set up off policy schedule beforehand, as training is interrupted for trainings
+
+    # set up off policy schedule beforehand, as training is interrupted for visualizations
     if params['off_policy']:
         off_policy = torch.linspace(params['off_policy'], 0, params['n_iterations'])
     else:
@@ -249,7 +250,8 @@ def train_and_sample(session: TrainingSession):
             with torch.no_grad():
                 session.final_flows.append(session.model.forward_model(vectorgrid)[:,:-1])
 
-
+        print(session.final_trajectories[0].shape)
+        print(trajectory.shape)
 
         # update training state so frontend can fetch new data
         session.training_state["states"] = current_states.tolist()

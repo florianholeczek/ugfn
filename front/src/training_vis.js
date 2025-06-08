@@ -404,7 +404,7 @@ export async function create_env_image(Plotly, density, colormap = 'Viridis') {
     },
     showlegend: false,
   };
-  const r = 3
+  const r = 3;
 
   const layout = {
       width: 256,
