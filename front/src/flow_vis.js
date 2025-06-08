@@ -148,7 +148,7 @@ export function plot_flow(p, vectorgrid_size) {
         //draw particle
         p.noStroke();
         //p.fill(253, 231, 37, alpha);
-        p.fill(255, alpha);
+        p.fill(0, alpha);
         p.circle(this.pos.x, this.pos.y, this.size);
 
         this.lifespan--;

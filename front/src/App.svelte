@@ -55,7 +55,7 @@
   let n_iterations_str = "2048";
   $: n_iterations_value = parseInt(n_iterations_str, 10);
   let losses_select = ["Trajectory Balance", "Flow Matching"];
-  let view = "Environment";
+  let view = "1. Environment";
   let Plotly;
   let p5;
   let flowContainer;
@@ -157,14 +157,14 @@
   function viewChange (view){
     if (plotlyready) {
       setTimeout(() => {
-        if (view === "Environment"){
+        if (view === "1. Environment"){
           console.log("Env View")
           if (flowvis_instance) {
             flowvis_instance.remove();
             flowvis_instance = null;
           }
           plotEnv();
-        } else if (view ==="Training"){
+        } else if (view ==="2. Training"){
           console.log("Train View");
           if (flowvis_instance) {
             flowvis_instance.remove();
@@ -226,7 +226,7 @@
           t_flow_step_value,
           t_flow_trajectory_step_value
   ) {
-    if(((view === "Flow" && flowvis_instance) || (tutorial_flowvis_instance)) && updateflows){
+    if(((view === "3. Flow" && flowvis_instance) || (tutorial_flowvis_instance)) && updateflows){
       flow_velocity.set(velocity);
       flow_n_particles.set(nParticles);
       flow_vectorfield.set(vectorfield);
@@ -583,7 +583,7 @@
       ([entry]) => {
         if (entry.isIntersecting) {
 
-          view = "Training"
+          view = "2. Training"
           if (flowvis_instance) {
             flowvis_instance.remove();
             flowvis_instance = null;
@@ -686,7 +686,7 @@
 
     <div class="pg-views">
       <TabBar
-              tabs={["Environment", "Training", "Flow"]}
+              tabs={["1. Environment", "2. Training", "3. Flow"]}
               let:tab
               bind:active={view}
       >
@@ -694,7 +694,7 @@
           <Label>{tab}</Label>
         </Tab>
       </TabBar>
-      {#if view === 'Environment'}
+      {#if view === '1. Environment'}
 
 
         <!-- Environment View -->
@@ -708,7 +708,7 @@
               ><Icon class="material-icons" style="font-size: 22px">replay</Icon>
               </Fab>
               <Fab
-                on:click={() => view="Training"}
+                on:click={() => view="2. Training"}
                 disabled="{isRunning}"
               >
                   <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
@@ -822,7 +822,7 @@
         </div>
 
 
-      {:else if view === "Training"}
+      {:else if view === "2. Training"}
 
 
         <!-- Training View -->
@@ -1136,7 +1136,7 @@
       </div>
     </div>
 
-      {:else if view === "Flow"}
+      {:else if view === "3. Flow"}
         <!-- FlowView -->
         <div class="pg-container">
           <div class="pg-top">
@@ -1153,30 +1153,6 @@
                   <Icon class="material-icons" style="font-size: 40px">arrow_outward</Icon>
                 {/if}
               </Fab>
-            </div>
-            <div style="margin-left: 275px">Velocity: </div>
-            <div class="pg-top-slider">
-              <Slider
-                bind:value="{flow_velocity_value}"
-                disabled="{flow_vectorfield_value}"
-                min={0.1}
-                max={1}
-                step={0.1}
-                discrete
-                input$aria-label="Discrete slider"
-              />
-            </div>
-            <div>Number of particles: </div>
-            <div class="pg-top-slider">
-              <Slider
-                bind:value="{flow_n_particles_value}"
-                disabled="{flow_vectorfield_value}"
-                min={500}
-                max={2000}
-                step={100}
-                discrete
-                input$aria-label="Discrete slider"
-              />
             </div>
           </div>
           {#if display_trainhistory}
@@ -1209,6 +1185,60 @@
                 disabled="{isRunning}"
                 input$aria-label="Set the trajectory step"
               />
+
+              Velocity
+              <div class="hyperparameters">
+                {flow_velocity_value}
+                <Wrapper rich>
+                  <IconButton size="button">
+                    <Icon class="material-icons">info</Icon>
+                  </IconButton>
+                  <Tooltip persistent>
+                    <Title style="text-align: center">Particle Velocity</Title>
+                    <Content style="color: black; font-size: 12px; text-align: left">
+                      <br>
+                      Adjust the velocity of the particles.
+                      This is only an effect for the visualization and does not affect the actual flows.
+                    </Content>
+                  </Tooltip>
+                </Wrapper>
+              </div>
+                <Slider
+                  bind:value="{flow_velocity_value}"
+                  disabled="{flow_vectorfield_value}"
+                  min={0.1}
+                  max={1}
+                  step={0.1}
+                  discrete
+                  input$aria-label="Discrete slider"
+                />
+              Number of particles
+              <div class="hyperparameters">
+                {flow_n_particles_value}
+                <Wrapper rich>
+                  <IconButton size="button">
+                    <Icon class="material-icons">info</Icon>
+                  </IconButton>
+                  <Tooltip persistent>
+                    <Title style="text-align: center">Number of particles</Title>
+                    <Content style="color: black; font-size: 12px; text-align: left">
+                      <br>
+                      Adjust the number of particles.
+                      This is only an effect for the visualization and does not affect the actual flows.
+                    </Content>
+                  </Tooltip>
+                </Wrapper>
+              </div>
+                <Slider
+                  bind:value="{flow_n_particles_value}"
+                  disabled="{flow_vectorfield_value}"
+                  min={500}
+                  max={2000}
+                  step={100}
+                  discrete
+                  input$aria-label="Discrete slider"
+                />
+
               <div style="position: absolute; bottom: 6px; right: 10px">
                 Iteration: {Math.min(
                       flow_step_value*current_parameters["n_iterations_value"]/32,
@@ -1234,7 +1264,7 @@
             </div>
           {:else}
             <div class="pg-vis" style="text-align:center; padding:100px; color: #323232;">
-              Train a model first to visualize its flows
+              Train a model first to visualize its Flow
             </div>
           {/if}
         </div>
