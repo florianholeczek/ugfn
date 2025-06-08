@@ -719,26 +719,52 @@
                 disabled="{isRunning}"
               ><Icon class="material-icons" style="font-size: 22px">replay</Icon>
               </Fab>
-              <Fab
-                on:click={() => view="2. Training"}
-                disabled="{isRunning}"
-              >
-                  <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
-              </Fab>
-
             </div>
-            <div class="pg-ngaussians">
-              <div class="columns margins" style="justify-content: flex-start;">
-                <Select bind:value="{n_gaussians}" label="N Gaussians" disabled="{isRunning}">
-                  {#each ["1","2","3","4"] as select}
-                    <Option value={select}>{select}</Option>
-                  {/each}
-                </Select>
-              </div>
-            </div>
-
-
           </div>
+
+          <div class="pg-ngaussians">
+            <div class="columns margins" style="justify-content: flex-start;">
+              <Select bind:value="{n_gaussians}" label="N Gaussians" disabled="{isRunning}">
+                {#each ["1","2","3","4"] as select}
+                  <Option value={select}>{select}</Option>
+                {/each}
+              </Select>
+            </div>
+          </div>
+          <div style="top: 130px; left: 250px; position: absolute;">
+            <Wrapper rich>
+              <IconButton size="button">
+                <Icon class="material-icons">info</Icon>
+              </IconButton>
+              <Tooltip persistent>
+                <Title style="text-align: center">Number of Gaussians</Title>
+                <Content style="color: black; font-size: 12px; text-align: left">
+                  <br>
+                  The reward function is a mixture of Gaussians. Adjust the number of Gaussians for the mixture here.
+                </Content>
+              </Tooltip>
+            </Wrapper>
+          </div>
+
+          <div style="top: 230px; left: 30px; position: absolute;">
+            Adjust the parameters
+          </div>
+          <div style="top: 220px; left: 250px; position: absolute;">
+            <Wrapper rich>
+              <IconButton size="button">
+                <Icon class="material-icons">info</Icon>
+              </IconButton>
+              <Tooltip persistent>
+                <Title style="text-align: center">Parameters of the Gaussians</Title>
+                <Content style="color: black; font-size: 12px; text-align: left">
+                  <br>
+                  Here you can adjust the reward function by dragging the grey circles and dots in the plot.
+                  The dots represent the means and the circles around them the variances of the Gaussians.
+                </Content>
+              </Tooltip>
+            </Wrapper>
+          </div>
+
           <div id={plotContainerEnv2d} class = "pg-2dplot">
             <div class="pg-circles-container">
               {#each $gaussians as g, i}
@@ -779,8 +805,26 @@
             </div>
           </div>
 
-          <div id={plotContainerEnv3d} class = "pg-3dplot">
+          <div style="top: 610px; left: 30px; position: absolute;">
+            Parameters
           </div>
+          <div style="top: 600px; left: 250px; position: absolute;">
+            <Wrapper rich>
+              <IconButton size="button">
+                <Icon class="material-icons">info</Icon>
+              </IconButton>
+              <Tooltip persistent>
+                <Title style="text-align: center">Parameters of the Gaussians</Title>
+                <Content style="color: black; font-size: 12px; text-align: left">
+                  <br>
+                  The Table shows the parameters of the Gaussians.
+                  Each row represents one Gaussian with its mean in x- and y direction as well as its variance.
+                  You can also set the values if you want them to be precise.
+                </Content>
+              </Tooltip>
+            </Wrapper>
+          </div>
+
           <div class= "pg-gauss-table">
             <DataTable table$aria-label="Parameters of Gaussians" style="width: 100%;border-radius: 1px">
               <Head>
@@ -826,10 +870,8 @@
               </Body>
             </DataTable>
           </div>
-          <div class="pg-env-help">
-            Adjust the reward function by dragging the circles and dots in the left plot or by setting the parameters in the table.
-            <br>By setting the mean and variance of multiple 2D Multivariate Gaussians we get the reward function on the right as a mixture.
-            <br>Then switch to the "Training" tab to start training.
+
+          <div id={plotContainerEnv3d} class = "pg-3dplot">
           </div>
         </div>
 

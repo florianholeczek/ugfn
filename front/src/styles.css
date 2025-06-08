@@ -326,16 +326,18 @@ input[type="range"] {
   }
 
   .pg-ngaussians {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    margin-left: 580px;
+    width: 264px;
+    height: 450px;
+    top: 120px;
+    left: 30px;
+    position: absolute;
+    /*border: 1px solid #ccc;*/
   }
 
   .pg-2dplot {
     /*border: 1px solid #ccc;*/
     width: 300px;
-    top: 100px;
+    top: 260px;
     left: 5px;
     position: absolute;
     z-index: 1;
@@ -371,7 +373,7 @@ input[type="range"] {
   .pg-gauss-table {
     width: 264px;
     height: 450px;
-    top: 500px;
+    top: 650px;
     left: 30px;
     position: absolute;
     /*border: 1px solid #ccc;*/
