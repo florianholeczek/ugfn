@@ -245,9 +245,18 @@ def train_and_sample(session: TrainingSession):
         current_states = current_trajectories[:,-1,:]
 
         # To get final data with 32 timesteps
-        # if training gets interrupted add last state as well
+        # if training gets interrupted add last state
         if (v+1) % (n_updates // 32) == 0 or session.training_state["stop_requested"]:
-            session.final_trajectories.append(current_trajectories)
+            # to ensure consistent batch sizes and always new trajectories
+            if len(current_trajectories) != trajectory_max:
+                session.final_trajectories.append(session.model.inference(
+                    session.env,
+                    batch_size=trajectory_max,
+                    trajectory_length=params['trajectory_length']
+                )[:, :, 1:])
+            else:
+                # to save unneccesary computations
+                session.final_trajectories.append(current_trajectories)
             with torch.no_grad():
                 session.final_flows.append(session.model.forward_model(vectorgrid)[:,:-1])
 

@@ -1193,7 +1193,12 @@
                 </Paper>
               {/if}
               {#if display_trainhistory && !isRunning}
-                <div style="position: absolute; bottom: 6px; right: 10px">Iteration:</div>
+                <div style="position: absolute; bottom: 6px; right: 10px">
+                  Iteration: {Math.min(
+                        training_step_value*current_parameters["n_iterations_value"]/32,
+                        current_losses['losses'].length
+                )}
+              </div>
               {/if}
             </div>
           </div>
