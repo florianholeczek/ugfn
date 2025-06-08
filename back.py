@@ -176,6 +176,7 @@ def train_and_sample(session: TrainingSession):
     trajectory_max = 2048
     train_interval = 4 # number of iterations to train before updating states for visualization
     current_states = None
+    current_trajectories = None
     torch.manual_seed(params['seed'])
 
     # set up the environment and model
@@ -229,29 +230,26 @@ def train_and_sample(session: TrainingSession):
         )
 
         # keep only x and y of last state of trajectory
-        states = trajectory[:, -1, 1:]
+        #states = trajectory[:, -1, 1:]
 
-        # update current states
-        if current_states is not None:
-            current_states = torch.cat((current_states, states), dim=0)
-            if len(current_states) > trajectory_max:
-                current_states = current_states[-trajectory_max:]
+        # update current trajectories (for showing in traininghistory) and current states (for live updates)
+        # trajectory shape: (batch, trajectory_length+1, 3)
+        # current trajectories shape (trajectory_max, trajectory_length+1, 2)
+        if current_trajectories is not None:
+            current_trajectories = torch.cat((current_trajectories, trajectory[:,:,1:]), dim=0)
+            if len(current_trajectories) > trajectory_max:
+                current_trajectories = current_trajectories[-trajectory_max:,:,:]
         else:
-            current_states = states
+            current_trajectories = trajectory[:,:,1:]
+
+        current_states = current_trajectories[:,-1,:]
 
         # To get final data with 32 timesteps
         # if training gets interrupted add last state as well
         if (v+1) % (n_updates // 32) == 0 or session.training_state["stop_requested"]:
-            session.final_trajectories.append(session.model.inference(
-                session.env,
-                batch_size=trajectory_max,
-                trajectory_length=params['trajectory_length']
-            )[:,:,1:])
+            session.final_trajectories.append(current_trajectories)
             with torch.no_grad():
                 session.final_flows.append(session.model.forward_model(vectorgrid)[:,:-1])
-
-        print(session.final_trajectories[0].shape)
-        print(trajectory.shape)
 
         # update training state so frontend can fetch new data
         session.training_state["states"] = current_states.tolist()
