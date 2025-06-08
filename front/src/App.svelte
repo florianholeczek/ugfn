@@ -73,6 +73,7 @@
   let flow_velocity_value = 0.5;
   let flow_n_particles_value = 1000;
   let flow_vectorfield_value = false;
+  let flow_vis_type = "Particles"
   let flow_step_value = 0;
   let flow_trajectory_step_value = 1;
   let t_flow_step_value = 0;
@@ -127,6 +128,18 @@
 
 
   // reactive
+  $:change_flow_vis_value(flow_vis_type);
+  function change_flow_vis_value(f) {
+    if (f==="Particles") {
+      flow_vectorfield_value = false;
+    } else if (f==="Vectors") {
+      flow_vectorfield_value = true;
+    } else{
+      console.log("error with flow visualization type")
+    }
+
+  }
+
   $:changeNGaussians(n_gaussians);
   function changeNGaussians(n) {
     while ($gaussians.length < parseInt(n)) {
@@ -728,7 +741,7 @@
                   <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
               </Fab>
               <Fab
-                on:click={() => view="2. Training"}
+                on:click={() => view="2. Training"} disabled="{isRunning}"
               >
                 <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_right</Icon>
               </Fab>
@@ -897,7 +910,7 @@
           <div class="pg-top">
             <div class="pg-play">
               <Fab
-                on:click={() => view="1. Environment"}
+                on:click={() => view="1. Environment"} disabled="{isRunning}"
               >
                 <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_left</Icon>
               </Fab>
@@ -917,7 +930,7 @@
                 {/if}
               </Fab>
               <Fab
-                on:click={() => view="3. Flow"}
+                on:click={() => view="3. Flow"} disabled="{isRunning}"
               >
                 <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_right</Icon>
               </Fab>
@@ -1219,7 +1232,7 @@
           <div class="pg-top">
             <div class="pg-play">
               <Fab
-                on:click={() => view="2. Training"}
+                on:click={() => view="2. Training"} disabled="{isRunning}"
               >
                 <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_left</Icon>
               </Fab>
@@ -1232,22 +1245,16 @@
               <Fab disabled="true">
                 <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_right</Icon>
               </Fab>
-
-
-              <Fab
-                on:click={() => flow_vectorfield_value = !flow_vectorfield_value}
-              >
-                {#if flow_vectorfield_value}
-                  <Icon class="material-icons" style="font-size: 40px">air</Icon>
-                {:else}
-                  <Icon class="material-icons" style="font-size: 40px">arrow_outward</Icon>
-                {/if}
-              </Fab>
-
             </div>
           </div>
           {#if display_trainhistory}
             <div class="pg-side">
+              <Select bind:value="{flow_vis_type}" label="Visualization" disabled="{isRunning}">
+                {#each ["Particles","Vectors"] as select}
+                  <Option value={select}>{select}</Option>
+                {/each}
+              </Select>
+              <div style="height:70px"></div>
               Step
               <div class="hyperparameters">
                 {flow_trajectory_step_value}
