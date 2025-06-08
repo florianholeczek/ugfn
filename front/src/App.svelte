@@ -714,10 +714,23 @@
           <div class="pg-top">
             <div class="pg-play">
               <Fab
+                on:click={() => view="2. Training"} disabled="true"
+              >
+                <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_left</Icon>
+              </Fab>
+              <Fab
                 on:click={resetGaussians}
                 mini
                 disabled="{isRunning}"
               ><Icon class="material-icons" style="font-size: 22px">replay</Icon>
+              </Fab>
+              <Fab disabled="true">
+                  <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
+              </Fab>
+              <Fab
+                on:click={() => view="2. Training"}
+              >
+                <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_right</Icon>
               </Fab>
             </div>
           </div>
@@ -884,6 +897,11 @@
           <div class="pg-top">
             <div class="pg-play">
               <Fab
+                on:click={() => view="1. Environment"}
+              >
+                <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_left</Icon>
+              </Fab>
+              <Fab
                 on:click={resetSliders}
                 mini
                 disabled="{isRunning}"
@@ -897,6 +915,11 @@
                 {:else}
                   <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
                 {/if}
+              </Fab>
+              <Fab
+                on:click={() => view="3. Flow"}
+              >
+                <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_right</Icon>
               </Fab>
 
             </div>
@@ -1195,9 +1218,22 @@
         <div class="pg-container">
           <div class="pg-top">
             <div class="pg-play">
-              <Fab mini disabled="true" style="visibility:hidden"
-              ><Icon class="material-icons" style="font-size: 22px; visibility:hidden">replay</Icon>
+              <Fab
+                on:click={() => view="2. Training"}
+              >
+                <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_left</Icon>
               </Fab>
+              <Fab mini disabled="true">
+                <Icon class="material-icons" style="font-size: 22px">replay</Icon>
+              </Fab>
+              <Fab disabled="true">
+                  <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
+              </Fab>
+              <Fab disabled="true">
+                <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_right</Icon>
+              </Fab>
+
+
               <Fab
                 on:click={() => flow_vectorfield_value = !flow_vectorfield_value}
               >
@@ -1207,6 +1243,7 @@
                   <Icon class="material-icons" style="font-size: 40px">arrow_outward</Icon>
                 {/if}
               </Fab>
+
             </div>
           </div>
           {#if display_trainhistory}
