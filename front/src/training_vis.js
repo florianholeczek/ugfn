@@ -22,7 +22,7 @@ function grid(between = [-3, 3], gridSize = 100) {
     return [xGrid, yGrid, gridPoints];
 }
 
-export function plotStates(Plotly, gaussians, states, losses, density, options = {}) {
+export function plotStates(Plotly, states, losses, density, options = {}) {
     const {
         levels = 10,
         alpha = 1.0,
@@ -178,12 +178,12 @@ export function plotStates(Plotly, gaussians, states, losses, density, options =
 
 export function plotStatesHistory(
     Plotly,
-    gaussians,
     trajectoryData,
     losses,
     density,
     trajectory_length,
     iter,
+    element,
     options = {}) {
     const {
         levels = 10,
@@ -335,9 +335,9 @@ export function plotStatesHistory(
     };
 
     const baseTraces = [contourTrace, samplesTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot];
-    Plotly.react('trainplothist', baseTraces, layout);
+    Plotly.react(element, baseTraces, layout);
 
-    const plotDiv = document.getElementById('trainplothist');
+    const plotDiv = document.getElementById(element);
     plotDiv.removeAllListeners?.('plotly_hover');
 
     plotDiv.on('plotly_hover', function (data) {
@@ -359,14 +359,14 @@ export function plotStatesHistory(
             hoverinfo: 'skip',
         };
 
-        const fadedSamples = { ...samplesTrace, marker: { ...samplesTrace.marker, opacity: 0.1 } };
+        const fadedSamples = { ...samplesTrace, marker: { ...samplesTrace.marker, opacity: 0.4 } };
 
-        Plotly.react('trainplothist', [contourTrace, fadedSamples, trajTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot], layout);
+        Plotly.react(element, [contourTrace, fadedSamples, trajTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot], layout);
     });
 
     plotDiv.removeAllListeners?.('plotly_unhover');
     plotDiv.on('plotly_unhover', function () {
-        Plotly.react('trainplothist', baseTraces, layout);
+        Plotly.react(element, baseTraces, layout);
     });
 }
 

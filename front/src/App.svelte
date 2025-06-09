@@ -108,9 +108,9 @@
   let current_trajectories;
   let current_plotting_density;
   let current_env_image;
-  let run1_value = 2048;
-  let run2_value = 4096;
-  let run3_value = 4096;
+  let run1_value = 0;
+  let run2_value = 0;
+  let run3_value = 0;
   let tutorial_gaussians =  [
     { mean: { x: -1, y: -1 }, variance: 0.2 },
     { mean: { x: 1, y: 1 }, variance: 0.2 }
@@ -128,6 +128,25 @@
 
 
   // reactive
+  $:run1_plot(run1_value);
+  function run1_plot(v) {
+    if (plotlyready){
+      plot_run(1, v);
+    }
+  }
+  $:run2_plot(run2_value);
+  function run2_plot(v) {
+    if (plotlyready){
+      plot_run(2, v);
+    }
+  }
+  $:run3_plot(run3_value);
+  function run3_plot(v) {
+    if (plotlyready){
+      plot_run(3, v);
+    }
+  }
+
   $:change_flow_vis_value(flow_vis_type);
   function change_flow_vis_value(f) {
     if (f==="Particles") {
@@ -160,18 +179,15 @@
                       current_losses['losses'].length)
       plotStatesHistory(
                   Plotly,
-                  $gaussians,
                   trajectory_temp,
                   current_losses,
                   current_plotting_density,
                   current_parameters["trajectory_length_value"]+1,
-                  iter
+                  iter,
+                  'trainplothist'
           );
     }
   }
-  $: run1 = `./images/run1/run1_${run1_value}.png`
-  $: run2 = `./images/run2/run2_${run2_value}.png`
-  $: run3 = `./images/run3/run3_${run3_value}.png`
 
   $: viewChange(view);
   function viewChange (view){
@@ -260,7 +276,7 @@
         ));
       } else {
         flow_vectors.set(slice_flows(
-              t_flow_step_value,
+              t_flow_step_value/32,
               t_flow_trajectory_step_value,
               6,
               run_data["run3_flow"]
@@ -348,12 +364,52 @@
 			if (!res.ok) throw new Error("File not found or fetch failed");
 			const data = await res.json();
 			run_data[name] = new Float32Array(data);
-            //current_flows = new Float32Array(data);
 			console.log(`Loaded ${name}:`, data);
 		} catch (err) {
 			console.error(`Failed to load ${name}.json`, err);
 		}
 	}
+
+  function saveJSON() {
+    const dataStr = JSON.stringify(current_losses, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "losses.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function loadJSON(path) {
+    const res = await fetch(path);
+    const json = await res.json();
+    console.log("Loaded JSON:", json);
+    return json;
+  }
+
+  async function load_rundata() {
+    await load_array("/Data/run3_flow_128.json", "run3_flow");
+    await load_array("/Data/run1_traj_128.json", "run1_traj");
+    await load_array("/Data/run2_traj_128.json", "run2_traj");
+    await load_array("/Data/run3_traj_128.json", "run3_traj");
+    run_data["run1_density"] = compute_density_plotting($gaussians, 100);
+    run_data["run2_density"] = compute_density_plotting(tutorial_gaussians, 100);
+    run_data["run3_density"] = compute_density_plotting(tutorial_gaussians, 100);
+    run_data["run1_losses"] = await loadJSON("/Data/run1_losses.json");
+    run_data["run2_losses"] = await loadJSON("/Data/run2_losses.json");
+    run_data["run3_losses"] = await loadJSON("/Data/run3_losses.json");
+    console.log("loading data completed")
+  }
+
+  function plot_run(run, step) {
+    let d = 16;
+    if (run>1) {
+      d = 32;
+    }
+    const t = slice_trajectories(step/d, 6, run_data[`run${run}_traj`]);
+    plotStatesHistory(Plotly, t, run_data[`run${run}_losses`], run_data[`run${run}_density`], 7, step, `runplot${run}`);
+  }
 
 
   // Functions used to start, stop and update the training process
@@ -440,7 +496,7 @@
         }
         if (data.states) {
           current_states = data.states;
-          plotStates(Plotly, $gaussians, current_states,current_losses, current_plotting_density);
+          plotStates(Plotly, current_states,current_losses, current_plotting_density);
         }
 
         if (data.completed && !completed) {
@@ -591,14 +647,15 @@
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
     isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
     await loadPlotly();
-    await loadp5();
     plotlyready = true;
     plotEnv();
-    //await load_array("/Data/run1_flow.json", "run1_flow");
-    //await load_array("/Data/run2_flow.json", "run2_flow");
-    await load_array("/Data/run3_flow.json", "run3_flow");
-    tutorial_plotting_density = compute_density_plotting(tutorial_gaussians, 100);
-    tutorial_env_image = await create_env_image(Plotly, tutorial_plotting_density);
+    await load_rundata();
+    run1_value = 2048; //triggers drawing the plot for the tutorial runs
+    run2_value = 4096;
+    run3_value = 4096;
+    tutorial_env_image = await create_env_image(Plotly, run_data["run3_density"]);
+    await loadp5();
+
 
     // add listeners for changing the Environment
     window.addEventListener('mousemove', handleMouseMove);
@@ -615,7 +672,7 @@
 
           updateflows = false;
           t_flow_trajectory_step_value=6;
-          t_flow_step_value = 33;
+          t_flow_step_value = 4096;
           updateflows = true;
 
           tutorial_flowvis_instance = createVectorfield(
@@ -623,7 +680,7 @@
                   tutorial_flowContainer,
                   6,
                   run_data["run3_flow"],
-                  t_flow_step_value,
+                  t_flow_step_value/32,
                   t_flow_trajectory_step_value,
                   tutorial_env_image
           );
@@ -648,7 +705,9 @@
       tutorial_flow_observer.disconnect();
     };
   });
+
   document.title = "GFlowNet Playground"
+
 
 
 
@@ -676,11 +735,13 @@
 >
   <Icon class="material-icons" style="font-size: 22px">replay</Icon>
 </Fab>
-
 -->
 
 
+
 <main class="main-content">
+
+
 
 
   {#if isMobile}
@@ -1600,9 +1661,7 @@
 
 
       </p>
-      <div class="image-container">
-        <img src="{run1}" class="image" alt="GFN samples from the underlying distribution">
-      </div>
+      <div id="runplot1" style="display: flex; justify-content: center;"></div>
       <div style="width: 600px; margin: auto; text-align:center;">
       <Slider
           bind:value="{run1_value}"
@@ -1624,9 +1683,7 @@
       <p class="section-text">
         So far, our distribution to match was very easy. Lets make it more challenging: If we lower the variance, we see the two modes are more seperated.
       </p>
-      <div class="image-container">
-        <img src="{run2}" class="image" alt="The model samples only from one mode of the distribution">
-      </div>
+      <div id="runplot2" style="display: flex; justify-content: center;"></div>
       <div style="width: 600px; margin: auto; text-align:center;">
       <Slider
           bind:value="{run2_value}"
@@ -1674,9 +1731,7 @@
           </Panel>
         </Accordion>
       </div>
-      <div class="image-container">
-        <img src="{run3}" class="image" alt="Training off policy helps to discover modes">
-      </div>
+      <div id="runplot3" style="display: flex; justify-content: center;"></div>
       <div style="width: 600px; margin: auto; text-align:center;">
       <Slider
           bind:value="{run3_value}"
@@ -1726,14 +1781,14 @@
       </div>
       <div style="width: 600px; margin: auto; display: flex; align-items: center;">
         <div style="text-align: left; margin-right: 10px;">
-          <span>Iteration: {t_flow_step_value*128}</span>
+          <span>Iteration: {t_flow_step_value}</span>
         </div>
         <div style="width: 480px; margin-left: auto;">
           <Slider
             bind:value="{t_flow_step_value}"
             min={0}
-            max={32}
-            step={1}
+            max={4096}
+            step={128}
             discrete
             input$aria-label="Discrete slider"
           />
