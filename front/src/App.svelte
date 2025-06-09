@@ -276,7 +276,7 @@
         ));
       } else {
         flow_vectors.set(slice_flows(
-              t_flow_step_value/32,
+              t_flow_step_value/128,
               t_flow_trajectory_step_value,
               6,
               run_data["run3_flow"]
@@ -389,10 +389,10 @@
   }
 
   async function load_rundata() {
-    await load_array("/Data/run3_flow_128.json", "run3_flow");
-    await load_array("/Data/run1_traj_128.json", "run1_traj");
-    await load_array("/Data/run2_traj_128.json", "run2_traj");
-    await load_array("/Data/run3_traj_128.json", "run3_traj");
+    await load_array("/Data/run3_flow.json", "run3_flow");
+    await load_array("/Data/run1_traj.json", "run1_traj");
+    await load_array("/Data/run2_traj.json", "run2_traj");
+    await load_array("/Data/run3_traj.json", "run3_traj");
     run_data["run1_density"] = compute_density_plotting($gaussians, 100);
     run_data["run2_density"] = compute_density_plotting(tutorial_gaussians, 100);
     run_data["run3_density"] = compute_density_plotting(tutorial_gaussians, 100);
@@ -403,9 +403,9 @@
   }
 
   function plot_run(run, step) {
-    let d = 16;
+    let d = 64;
     if (run>1) {
-      d = 32;
+      d = 128;
     }
     const t = slice_trajectories(step/d, 6, run_data[`run${run}_traj`]);
     plotStatesHistory(Plotly, t, run_data[`run${run}_losses`], run_data[`run${run}_density`], 7, step, `runplot${run}`);
@@ -680,7 +680,7 @@
                   tutorial_flowContainer,
                   6,
                   run_data["run3_flow"],
-                  t_flow_step_value/32,
+                  t_flow_step_value/128,
                   t_flow_trajectory_step_value,
                   tutorial_env_image
           );
@@ -720,10 +720,10 @@
   rel="stylesheet"
 />
 
-<!-- Save /Load buttons for saving flow and trajectory data
+<!-- Save /Load buttons for saving flow and trajectory data-->
 
 <Fab
-  on:click={save_array(current_flows)}
+  on:click={save_array(current_trajectories)}
   mini
   disabled="{isRunning}"
 ><Icon class="material-icons" style="font-size: 22px">save</Icon>
@@ -735,7 +735,7 @@
 >
   <Icon class="material-icons" style="font-size: 22px">replay</Icon>
 </Fab>
--->
+
 
 
 
@@ -1667,7 +1667,7 @@
           bind:value="{run1_value}"
           min={0}
           max={2048}
-          step={128}
+          step={64}
           discrete
           input$aria-label="Discrete slider"
         />
