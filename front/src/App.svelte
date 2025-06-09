@@ -23,10 +23,9 @@
   import Fab from '@smui/fab';
   import { flow_velocity, flow_n_particles,flow_vectorfield, flow_vectors, flow_changed} from './store.js';
 
-  const BACKEND_URL = ""//process.env.BACKEND_URL ?? ""; //"https://back:8000";
 
 
-  // default values
+  // default values for training
   let off_policy_value = 0;
   let n_iterations_value;
   let lr_model_value = 0.001;
@@ -50,12 +49,6 @@
   let tutorialstart;
   let sourcesstart;
   let playgroundstart;
-  let active_tab = 'Basic';
-  let n_iterations_select = ["128", "1024", "2048", "4096", "8192", "10240"];
-  let n_iterations_str = "2048";
-  $: n_iterations_value = parseInt(n_iterations_str, 10);
-  let losses_select = ["Trajectory Balance", "Flow Matching"];
-  let view = "1. Environment";
   let Plotly;
   let p5;
   let flowContainer;
@@ -63,6 +56,16 @@
   let flowvis_instance;
   let tutorial_flowvis_instance;
   let tutorial_flow_observer;
+  let pollingTimer;
+
+  // UI Elements
+  let active_tab = 'Basic';
+  let n_iterations_select = ["128", "1024", "2048", "4096", "8192", "10240"];
+  let n_iterations_str = "2048";
+  $: n_iterations_value = parseInt(n_iterations_str, 10);
+  let losses_select = ["Trajectory Balance", "Flow Matching"];
+  let view = "1. Environment";
+
   let vectorgrid_size=31;
 
   // ranges for means and variances
@@ -72,14 +75,19 @@
   // flow visualization
   let flow_velocity_value = 0.5;
   let flow_n_particles_value = 1000;
-  let flow_vectorfield_value = false;
-  let flow_vis_type = "Particles"
-  let flow_step_value = 0;
-  let flow_trajectory_step_value = 1;
-  let t_flow_step_value = 0;
+  let flow_vectorfield_value = false; //for toggling between vector and flow vis
+  let flow_vis_type = "Particles" //for UI of vectorfield_value
+  let flow_step_value = 0; //Iteration slider
+  let flow_trajectory_step_value = 1; //Trajectory slider
+  let t_flow_step_value = 0; //as above for the Tutorial Flow vis
   let t_flow_trajectory_step_value = 1;
   let training_step_value = 0;
+
+  //disabling UI, preventing too early rendering
   let updateflows=true;
+  let plotlyready=false;
+  let display_trainhistory=false;
+  let isRunning = false;
 
   //tutorial visualization data
   let run_data = {};
@@ -93,13 +101,10 @@
   let isDraggingVariance = false;
   let initialMouse = { x: 0, y: 0 };
 
-  //others
-  let plotlyready=false;
-  let display_trainhistory=false;
+  // parameters of last or active training run
   let training_progress = 0; //for progressbar
   let current_states;
   let current_losses;
-  let current_vectorfield;
   let current_parameters = {};
   current_parameters["trajectory_length_value"] = 6
   current_parameters["n_iterations_value"] = 2048
@@ -108,6 +113,8 @@
   let current_trajectories;
   let current_plotting_density;
   let current_env_image;
+
+  // Tutorial parameters
   let run1_value = 0;
   let run2_value = 0;
   let run3_value = 0;
@@ -115,16 +122,15 @@
     { mean: { x: -1, y: -1 }, variance: 0.2 },
     { mean: { x: 1, y: 1 }, variance: 0.2 }
   ]
-  let tutorial_plotting_density;
   let tutorial_env_image;
-  let session_id = null; // for identifying training sessions of multiple users
-  let isMobile = false;
+
+  //other
+  let session_id = null; // for handling multiple training sessions of multiple users
+  let isMobile = false; // to display mobile disclaimer
+  const BACKEND_URL = ""//process.env.BACKEND_URL ?? ""; //"https://back:8000";
+  const POLLING_INTERVAL = 100; //polling every n ms
 
 
-  //polling every n ms
-  const POLLING_INTERVAL = 100;
-  let isRunning = false;
-  let pollingTimer;
 
 
   // reactive
@@ -288,6 +294,8 @@
 
   }
 
+
+
   // Utility functions
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
@@ -410,6 +418,7 @@
     const t = slice_trajectories(step/d, 6, run_data[`run${run}_traj`]);
     plotStatesHistory(Plotly, t, run_data[`run${run}_losses`], run_data[`run${run}_density`], 7, step, `runplot${run}`);
   }
+
 
 
   // Functions used to start, stop and update the training process
@@ -540,6 +549,7 @@
       console.error(error);
     }
   }
+
 
 
   // Functions for setting the environment
@@ -706,6 +716,7 @@
     };
   });
 
+  //Title to display in tab
   document.title = "GFlowNet Playground"
 
 
@@ -720,7 +731,7 @@
   rel="stylesheet"
 />
 
-<!-- Save /Load buttons for saving flow and trajectory data-->
+<!-- Save /Load buttons for saving flow and trajectory data
 
 <Fab
   on:click={save_array(current_trajectories)}
@@ -735,14 +746,11 @@
 >
   <Icon class="material-icons" style="font-size: 22px">replay</Icon>
 </Fab>
-
+-->
 
 
 
 <main class="main-content">
-
-
-
 
   {#if isMobile}
     <div class="mobile-disclaimer">
@@ -752,6 +760,7 @@
       </div>
     </div>
   {:else}
+
 
     <header class="header-top">
       <div class="container">
