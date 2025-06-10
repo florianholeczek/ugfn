@@ -81,11 +81,18 @@
   let flow_n_particles_value = 1000;
   let flow_vectorfield_value = false; //for toggling between vector and flow vis
   let flow_vis_type = "Particles" //for UI of vectorfield_value
-  let flow_step_value = 0; //Iteration slider
   let flow_trajectory_step_value = 1; //Trajectory slider
   let t_flow_step_value = 0; //as above for the Tutorial Flow vis
   let t_flow_trajectory_step_value = 1;
-  let training_step_value = 0;
+
+  // PG iteration slider and textfield for flow and training view.
+  // complicated as steps may not be regular if training is stopped early
+  let training_step_value_slider = 0;
+  let training_step_value_text = 0;
+  let training_step_value_update = false;
+  let flow_step_value_slider = 0;
+  let flow_step_value_text = 0;
+  let flow_step_value_update = false;
 
   //disabling UI, preventing too early rendering
   let updateflows=true;
@@ -119,6 +126,7 @@
   let current_trajectories;
   let current_plotting_density;
   let current_env_image;
+  let train_history_iter = 0;
 
   // Tutorial parameters
   let run1_value = 0;
@@ -184,12 +192,18 @@
       plotEnv();
     }
   }
-  $: plot_traininghist(training_step_value);
+  $: plot_traininghist(training_step_value_slider);
   function plot_traininghist(step) {
     if (!isRunning && display_trainhistory){
-      let trajectory_temp = slice_trajectories(step,current_parameters["trajectory_length_value"],current_trajectories);
       let iter = Math.min(step*current_parameters["n_iterations_value"]/32,
                       current_losses['losses'].length)
+      if (!training_step_value_update) {
+        training_step_value_update = true;
+        training_step_value_text = iter;
+        training_step_value_update = false;
+      }
+      let trajectory_temp = slice_trajectories(step,current_parameters["trajectory_length_value"],current_trajectories);
+
       plotStatesHistory(
                   Plotly,
                   trajectory_temp,
@@ -219,11 +233,11 @@
             flowvis_instance.remove();
             flowvis_instance = null;
           }
-          plot_traininghist(training_step_value)
+          plot_traininghist(training_step_value_slider)
         } else {
           if(display_trainhistory){
             updateflows=false;
-            flow_step_value=current_nSteps-1
+            flow_step_value_slider=current_nSteps-1
             flow_trajectory_step_value=current_parameters["trajectory_length_value"]
             updateflows=true;
             flowvis_instance = createVectorfield(
@@ -231,7 +245,7 @@
                     flowContainer,
                     current_parameters["trajectory_length_value"],
                     current_flows,
-                    flow_step_value,
+                    flow_step_value_slider,
                     flow_trajectory_step_value,
                     current_env_image
             );
@@ -262,7 +276,7 @@
           flow_velocity_value,
           flow_n_particles_value,
           flow_vectorfield_value,
-          flow_step_value,
+          flow_step_value_slider,
           flow_trajectory_step_value,
           t_flow_step_value,
           t_flow_trajectory_step_value
@@ -271,7 +285,7 @@
           velocity,
           nParticles,
           vectorfield,
-          flow_step_value,
+          flow_step_value_slider,
           flow_trajectory_step_value,
           t_flow_step_value,
           t_flow_trajectory_step_value
@@ -281,8 +295,15 @@
       flow_n_particles.set(nParticles);
       flow_vectorfield.set(vectorfield);
       if (flowvis_instance) {
+        if (!flow_step_value_update) {
+          flow_step_value_update = true;
+          flow_step_value_text = Math.min(flow_step_value_slider*current_parameters["n_iterations_value"]/32,
+                      current_losses['losses'].length);
+          flow_step_value_update = false;
+        }
+
         flow_vectors.set(slice_flows(
-              flow_step_value,
+              flow_step_value_slider,
               flow_trajectory_step_value,
               current_parameters["trajectory_length_value"],
               current_flows
@@ -446,6 +467,33 @@
     value = Math.min(d*32, Math.max(0, value));
   }
 
+  function training_step_textinput(e){
+    let value = parseInt(e.target.value);
+    let d = current_parameters["n_iterations_value"]/32;
+    if (isNaN(value)) value=0;
+    value = Math.min(current_losses['losses'].length, Math.max(0, value));
+    if (value<current_losses['losses'].length) value = Math.floor(value / d);
+    console.log(value)
+    if (!training_step_value_update) {
+        training_step_value_update = true;
+        training_step_value_slider = value;
+        training_step_value_update = false;
+      }
+  }
+  function flow_step_textinput(e){
+    let value = parseInt(e.target.value);
+    let d = current_parameters["n_iterations_value"]/32;
+    if (isNaN(value)) value=0;
+    value = Math.min(current_losses['losses'].length, Math.max(0, value));
+    if (value<current_losses['losses'].length) value = Math.floor(value / d);
+    console.log(value)
+    if (!flow_step_value_update) {
+        flow_step_value_update = true;
+        flow_step_value_slider = value;
+        flow_step_value_update = false;
+      }
+  }
+
 
 
   // Functions used to start, stop and update the training process
@@ -543,7 +591,7 @@
           isRunning = false;
           await tick();
           snackbar_training_done.open();
-          training_step_value = current_nSteps-1; //also triggers plot for trainhistory
+          training_step_value_slider = current_nSteps-1; //also triggers plot for trainhistory
         }
       } catch (error) {
         console.error(error);
@@ -1370,14 +1418,6 @@
                   </Content>
                 </Paper>
               {/if}
-              {#if display_trainhistory && !isRunning}
-                <div style="position: absolute; bottom: 6px; right: 10px">
-                  Iteration: {Math.min(
-                        training_step_value*current_parameters["n_iterations_value"]/32,
-                        current_losses['losses'].length
-                )}
-              </div>
-              {/if}
             </div>
           </div>
           {#if !display_trainhistory && !isRunning}
@@ -1391,22 +1431,44 @@
             <div class="pg-vis" id="trainplothist"></div>
           {/if}
 
-          <div class="pg-bottom">
-            {#if !isRunning & display_trainhistory}
+
+          {#if !isRunning & display_trainhistory}
+            <div class="pg-iter">
+              <Textfield
+                bind:value={training_step_value_text}
+                on:change={(e) => training_step_textinput(e)}
+                disabled={isRunning}
+                label="Iteration"
+                type="number"
+                input$step="64"
+
+              ></Textfield>
+            </div>
+            <div class="pg-bottom-slider">
               <Slider
-                bind:value="{training_step_value}"
+                bind:value="{training_step_value_slider}"
                 min={0}
                 max={current_nSteps-1}
                 step={1}
                 disabled="{isRunning}"
                 input$aria-label="View the iterations"
               />
-        {:else if isRunning}
-          <div class = "pg-progress">
-            <LinearProgress progress="{ training_progress / n_iterations_value}" />
-          </div>
-        {/if}
-      </div>
+            </div>
+          {:else if isRunning}
+            <div class="pg-iter">
+              <Textfield
+                bind:value={training_progress}
+                label="Iteration"
+                disabled={isRunning}
+                type="number"
+                input$step="64"
+
+              ></Textfield>
+            </div>
+            <div class = "pg-progress">
+              <LinearProgress progress="{ training_progress / n_iterations_value}" />
+            </div>
+          {/if}
     </div>
 
       {:else if view === "3. Flow"}
@@ -1528,7 +1590,7 @@
 
               <div style="position: absolute; bottom: 6px; right: 10px">
                 Iteration: {Math.min(
-                      flow_step_value*current_parameters["n_iterations_value"]/32,
+                      flow_step_value_slider*current_parameters["n_iterations_value"]/32,
                       current_losses['losses'].length
               )}
 
@@ -1541,7 +1603,7 @@
             </div>
             <div class="pg-bottom">
               <Slider
-                bind:value="{flow_step_value}"
+                bind:value="{flow_step_value_slider}"
                 min={0}
                 max={current_nSteps-1}
                 step={1}

@@ -294,12 +294,32 @@ input[type="range"] {
     width: 775px;
     height:50px;
   }
+  .pg-iter {
+    position: absolute;
+    top: 860px;
+    left: 300px;
+    width: 75px;
+    height:50px;
+  }
 
   .pg-progress{
+    position: absolute;
+    top: 850px;
+    left: 455px;
     padding: 22px;
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 500px;
+    margin-top: 20px;
+  }
+  .pg-bottom-slider{
+    position: absolute;
+    top: 850px;
+    left: 455px;
+    width: 500px;
+    height: 50px;
+    margin-top: 20px;
   }
 
   .pg-play{
