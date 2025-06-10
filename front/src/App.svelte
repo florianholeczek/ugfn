@@ -923,7 +923,7 @@
               </IconButton>
               <Tooltip persistent>
                 <Title style="text-align: center; color: white">Number of Gaussians</Title>
-                <Content style="text-align: left; color: white; font-size: 12">
+                <Content style="text-align: left; color: white; font-size: 12px">
                   <br>
                   The reward function is a mixture of Gaussians. Adjust the number of Gaussians for the mixture here.
                 </Content>
@@ -941,7 +941,7 @@
               </IconButton>
               <Tooltip persistent>
                 <Title style="text-align: center; color: white">Parameters of the Gaussians</Title>
-                <Content style="text-align: left; color: white; font-size: 12">
+                <Content style="text-align: left; color: white; font-size: 12px">
                   <br>
                   Here you can adjust the reward function by dragging the grey circles and dots in the plot.
                   The dots represent the means and the circles around them the variances of the Gaussians.
@@ -1000,7 +1000,7 @@
               </IconButton>
               <Tooltip persistent>
                 <Title style="text-align: center; color: white">Parameters of the Gaussians</Title>
-                <Content style="text-align: left; color: white; font-size: 12">
+                <Content style="text-align: left; color: white; font-size: 12px">
                   <br>
                   The Table shows the parameters of the Gaussians.
                   Each row represents one Gaussian with its mean in x- and y direction as well as its variance.
@@ -1100,11 +1100,7 @@
                   {/if}
                 </Fab>
                 <Tooltip>
-                  {#if isRunning}
-                    Stop training the model
-                  {:else}
-                    Start training the model
-                  {/if}
+                    Start / Stop training the model
                 </Tooltip>
               </Wrapper>
               <Wrapper rich>
@@ -1162,7 +1158,7 @@
                         </IconButton>
                         <Tooltip persistent>
                           <Title style="text-align: center; color: white">How many samples to train with</Title>
-                          <Content style="text-align: left; color: white; font-size: 12">
+                          <Content style="text-align: left !important; color: white; font-size: 12px !important">
                             <br>
                             Change the batch size to adjust how many samples are created in one iteration during training.
                             Note that a higher batch size leads to longer training time.
@@ -1189,7 +1185,7 @@
                         </IconButton>
                         <Tooltip persistent>
                           <Title style="text-align: center; color: white">Fixed number of steps the agent takes</Title>
-                          <Content style="text-align: left; color: white; font-size: 12">
+                          <Content style="text-align: left !important; color: white; font-size: 12px !important">
                             <br>
                             Change the trajectory length to adjust how many steps the agent takes.
                             Starting from (0,0), the agent collects the reward after this fixed number of steps.
@@ -1217,7 +1213,7 @@
                         </IconButton>
                         <Tooltip persistent>
                           <Title style="text-align: center; color: white">The learning rate of the forward and backward policies</Title>
-                          <Content style="text-align: left; color: white; font-size: 12">
+                          <Content style="text-align: left !important; color: white; font-size: 12px !important">
                             <br>
                             Change the learning rate of the neural nets that represent the forward and backward policy.
                           </Content>
@@ -1243,7 +1239,7 @@
                         </IconButton>
                         <Tooltip persistent>
                           <Title style="text-align: center; color: white">The learning rate of the partition function</Title>
-                          <Content style="text-align: left; color: white; font-size: 12">
+                          <Content style="text-align: left !important; color: white; font-size: 12px !important">
                             <br>
                             Change the larning rate of the parameter log(Z) which represents the partition function.
                             Malkin et al. (2022) claim that setting this learning rate higher than that of the policies helps in training.
@@ -1273,7 +1269,7 @@
                         </IconButton>
                         <Tooltip persistent>
                           <Title style="text-align: center; color: white">Amount of off-policy training</Title>
-                          <Content style="text-align: left; color: white; font-size: 12">
+                          <Content style="text-align: left !important; color: white; font-size: 12px !important">
                             <br>
                             Change to adjust if and to what amount the model trains off-policy.
                             Setting the parameter to 0 is equal to on-policy training.
@@ -1303,7 +1299,7 @@
                         </IconButton>
                         <Tooltip persistent>
                           <Title style="text-align: center; color: white">Number of hidden layers in the forward and backward policies</Title>
-                          <Content style="text-align: left; color: white; font-size: 12">
+                          <Content style="text-align: left !important; color: white; font-size: 12px !important">
                             <br>
                             Change to adjust the number of hidden layers in the neural nets which represent the policies.
                             Usually shallow networks work fine here and avoid the problems which arise with deeper architectures.
@@ -1330,7 +1326,7 @@
                         </IconButton>
                         <Tooltip persistent>
                           <Title style="text-align: center; color: white">Dimensions of the hidden layers in the forward and backward policies</Title>
-                          <Content style="text-align: left; color: white; font-size: 12">
+                          <Content style="text-align: left !important; color: white; font-size: 12px !important">
                             <br>
                             Change to adjust the size of the hidden layers in the neural nets which represent the policies.
                           </Content>
@@ -1356,9 +1352,9 @@
                         </IconButton>
                         <Tooltip persistent>
                           <Title style="text-align: center; color: white">Value to seed random number generators with</Title>
-                          <Content style="text-align: left; color: white; font-size: 12">
+                          <Content style="text-align: left !important; color: white; font-size: 12px !important">
                             <br>
-                            The random number generators will be seeded with this value to allow for reproducible results.
+                            The RNGs will be seeded with this value to allow for reproducible results.
                           </Content>
                         </Tooltip>
                       </Wrapper>
@@ -1457,7 +1453,7 @@
                   </IconButton>
                   <Tooltip persistent>
                     <Title style="text-align: center; color: white">The current step of the agent</Title>
-                    <Content style="text-align: left; color: white; font-size: 12">
+                    <Content style="text-align: left; color: white; font-size: 12px">
                       <br>
                       The policy is learned based on the position (x, y) and the current step. Therefore the flow changes as the agent takes more steps.
                       The number of steps the agent takes is determined by the hyperparameter "Trajectory length".
@@ -1486,7 +1482,7 @@
                   </IconButton>
                   <Tooltip persistent>
                     <Title style="text-align: center; color: white">Particle Velocity</Title>
-                    <Content style="text-align: left; color: white; font-size: 12">
+                    <Content style="text-align: left; color: white; font-size: 12px">
                       <br>
                       Adjust the velocity of the particles.
                       This is only an effect for the visualization and does not affect the actual flows.
@@ -1512,7 +1508,7 @@
                   </IconButton>
                   <Tooltip persistent>
                     <Title style="text-align: center; color: white">Number of particles</Title>
-                    <Content style="text-align: left; color: white; font-size: 12">
+                    <Content style="text-align: left; color: white; font-size: 12px">
                       <br>
                       Adjust the number of particles.
                       This is only an effect for the visualization and does not affect the actual flows.
