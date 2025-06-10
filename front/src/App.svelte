@@ -1587,28 +1587,30 @@
                   discrete
                   input$aria-label="Discrete slider"
                 />
-
-              <div style="position: absolute; bottom: 6px; right: 10px">
-                Iteration: {Math.min(
-                      flow_step_value_slider*current_parameters["n_iterations_value"]/32,
-                      current_losses['losses'].length
-              )}
-
-
-              </div>
             </div>
 
             <div class="pg-vis">
               <div bind:this={flowContainer}></div>
             </div>
-            <div class="pg-bottom">
+            <div class="pg-iter">
+              <Textfield
+                bind:value={flow_step_value_text}
+                on:change={(e) => flow_step_textinput(e)}
+                disabled={isRunning}
+                label="Iteration"
+                type="number"
+                input$step="64"
+
+              ></Textfield>
+            </div>
+            <div class="pg-bottom-slider">
               <Slider
                 bind:value="{flow_step_value_slider}"
                 min={0}
                 max={current_nSteps-1}
                 step={1}
                 disabled="{isRunning}"
-                input$aria-label="Set the step"
+                input$aria-label="View the iterations"
               />
             </div>
           {:else}

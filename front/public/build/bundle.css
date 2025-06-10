@@ -19067,7 +19067,7 @@ input[type="range"] {
   }
   .pg-iter {
     position: absolute;
-    top: 860px;
+    top: 870px;
     left: 300px;
     width: 75px;
     height:50px;
@@ -19075,7 +19075,7 @@ input[type="range"] {
 
   .pg-progress{
     position: absolute;
-    top: 850px;
+    top: 860px;
     left: 455px;
     padding: 22px;
     display: flex;
@@ -19086,7 +19086,7 @@ input[type="range"] {
   }
   .pg-bottom-slider{
     position: absolute;
-    top: 850px;
+    top: 860px;
     left: 455px;
     width: 500px;
     height: 50px;
