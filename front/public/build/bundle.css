@@ -17183,7 +17183,7 @@ a.smui-fab--color-primary, a.smui-fab--color-primary:not(:disabled) .mdc-fab__ic
   display: none;
 }
 .mdc-tooltip.mdc-tooltip--rich .mdc-tooltip__surface {
-  background-color: #fffbfe;
+  background-color: #363636;
 }
 .mdc-tooltip.mdc-tooltip--rich .mdc-tooltip__caret-surface-top,
 .mdc-tooltip.mdc-tooltip--rich .mdc-tooltip__caret-surface-bottom {

@@ -807,6 +807,8 @@
 </Fab>
 -->
 
+
+
 <Snackbar bind:this={snackbar_load} leading>
   <Label>Settings of this training run have been loaded into the playground</Label>
   <Actions>
@@ -870,24 +872,38 @@
           <div class="pg-top">
             <div class="pg-play">
               <Fab
-                on:click={() => view="2. Training"} disabled="true"
+                disabled="true"
               >
                 <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_left</Icon>
               </Fab>
-              <Fab
+              <Wrapper rich>
+                <Fab
                 on:click={resetGaussians}
                 mini
                 disabled="{isRunning}"
               ><Icon class="material-icons" style="font-size: 22px">replay</Icon>
               </Fab>
+                <Tooltip>
+                  Reset the environment
+                </Tooltip>
+              </Wrapper>
+
               <Fab disabled="true">
                   <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
               </Fab>
-              <Fab
-                on:click={() => view="2. Training"} disabled="{isRunning}"
-              >
-                <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_right</Icon>
-              </Fab>
+              <Wrapper rich>
+                <Fab
+                  on:click={() => view="2. Training"} disabled="{isRunning}"
+                >
+                  <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_right</Icon>
+                </Fab>
+                  <Tooltip>
+                    Environment ready? Start training the model
+                  </Tooltip>
+              </Wrapper>
+
+
+
             </div>
           </div>
 
@@ -906,8 +922,8 @@
                 <Icon class="material-icons">info</Icon>
               </IconButton>
               <Tooltip persistent>
-                <Title style="text-align: center">Number of Gaussians</Title>
-                <Content style="color: black; font-size: 12px; text-align: left">
+                <Title style="text-align: center; color: white">Number of Gaussians</Title>
+                <Content style="text-align: left; color: white; font-size: 12">
                   <br>
                   The reward function is a mixture of Gaussians. Adjust the number of Gaussians for the mixture here.
                 </Content>
@@ -924,8 +940,8 @@
                 <Icon class="material-icons">info</Icon>
               </IconButton>
               <Tooltip persistent>
-                <Title style="text-align: center">Parameters of the Gaussians</Title>
-                <Content style="color: black; font-size: 12px; text-align: left">
+                <Title style="text-align: center; color: white">Parameters of the Gaussians</Title>
+                <Content style="text-align: left; color: white; font-size: 12">
                   <br>
                   Here you can adjust the reward function by dragging the grey circles and dots in the plot.
                   The dots represent the means and the circles around them the variances of the Gaussians.
@@ -983,8 +999,8 @@
                 <Icon class="material-icons">info</Icon>
               </IconButton>
               <Tooltip persistent>
-                <Title style="text-align: center">Parameters of the Gaussians</Title>
-                <Content style="color: black; font-size: 12px; text-align: left">
+                <Title style="text-align: center; color: white">Parameters of the Gaussians</Title>
+                <Content style="text-align: left; color: white; font-size: 12">
                   <br>
                   The Table shows the parameters of the Gaussians.
                   Each row represents one Gaussian with its mean in x- and y direction as well as its variance.
@@ -1052,32 +1068,55 @@
         <div class="pg-container">
           <div class="pg-top">
             <div class="pg-play">
-              <Fab
-                on:click={() => view="1. Environment"} disabled="{isRunning}"
-              >
-                <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_left</Icon>
-              </Fab>
-              <Fab
-                on:click={resetSliders}
-                mini
-                disabled="{isRunning}"
-              ><Icon class="material-icons" style="font-size: 22px">replay</Icon>
-              </Fab>
-              <Fab
-                on:click={isRunning ? stopTraining : startTraining}
-              >
-                {#if isRunning}
-                  <Icon class="material-icons" style="font-size: 50px">stop</Icon>
-                {:else}
-                  <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
-                {/if}
-              </Fab>
-              <Fab
-                on:click={() => view="3. Flow"} disabled="{isRunning}"
-              >
-                <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_right</Icon>
-              </Fab>
-
+              <Wrapper rich>
+                <Fab
+                  on:click={() => view="1. Environment"} disabled="{isRunning}"
+                >
+                  <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_left</Icon>
+                </Fab>
+                <Tooltip>
+                  Change the environment
+                </Tooltip>
+              </Wrapper>
+              <Wrapper rich>
+                <Fab
+                  on:click={resetSliders}
+                  mini
+                  disabled="{isRunning}"
+                ><Icon class="material-icons" style="font-size: 22px">replay</Icon>
+                </Fab>
+                <Tooltip>
+                  Reset all hyperparameters
+                </Tooltip>
+              </Wrapper>
+              <Wrapper rich>
+                <Fab
+                  on:click={isRunning ? stopTraining : startTraining}
+                >
+                  {#if isRunning}
+                    <Icon class="material-icons" style="font-size: 50px">stop</Icon>
+                  {:else}
+                    <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
+                  {/if}
+                </Fab>
+                <Tooltip>
+                  {#if isRunning}
+                    Stop training the model
+                  {:else}
+                    Start training the model
+                  {/if}
+                </Tooltip>
+              </Wrapper>
+              <Wrapper rich>
+                <Fab
+                  on:click={() => view="3. Flow"} disabled="{isRunning}"
+                >
+                  <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_right</Icon>
+                </Fab>
+                <Tooltip>
+                  Training done? Take a look at the flows
+                </Tooltip>
+              </Wrapper>
             </div>
             <div class="pg-loss">
               <div class="columns margins" style="justify-content: flex-start; visibility:hidden;">
@@ -1122,8 +1161,8 @@
                           <Icon class="material-icons">info</Icon>
                         </IconButton>
                         <Tooltip persistent>
-                          <Title style="text-align: center">How many samples to train with</Title>
-                          <Content style="color: black; font-size: 12px; text-align: left">
+                          <Title style="text-align: center; color: white">How many samples to train with</Title>
+                          <Content style="text-align: left; color: white; font-size: 12">
                             <br>
                             Change the batch size to adjust how many samples are created in one iteration during training.
                             Note that a higher batch size leads to longer training time.
@@ -1149,8 +1188,8 @@
                           <Icon class="material-icons">info</Icon>
                         </IconButton>
                         <Tooltip persistent>
-                          <Title style="text-align: center">Fixed number of steps the agent takes</Title>
-                          <Content style="color: black; font-size: 12px; text-align: left">
+                          <Title style="text-align: center; color: white">Fixed number of steps the agent takes</Title>
+                          <Content style="text-align: left; color: white; font-size: 12">
                             <br>
                             Change the trajectory length to adjust how many steps the agent takes.
                             Starting from (0,0), the agent collects the reward after this fixed number of steps.
@@ -1177,8 +1216,8 @@
                           <Icon class="material-icons">info</Icon>
                         </IconButton>
                         <Tooltip persistent>
-                          <Title style="text-align: center">The learning rate of the forward and backward policies</Title>
-                          <Content style="color: black; font-size: 12px; text-align: left">
+                          <Title style="text-align: center; color: white">The learning rate of the forward and backward policies</Title>
+                          <Content style="text-align: left; color: white; font-size: 12">
                             <br>
                             Change the learning rate of the neural nets that represent the forward and backward policy.
                           </Content>
@@ -1203,8 +1242,8 @@
                           <Icon class="material-icons">info</Icon>
                         </IconButton>
                         <Tooltip persistent>
-                          <Title style="text-align: center">The learning rate of the partition function</Title>
-                          <Content style="color: black; font-size: 12px; text-align: left">
+                          <Title style="text-align: center; color: white">The learning rate of the partition function</Title>
+                          <Content style="text-align: left; color: white; font-size: 12">
                             <br>
                             Change the larning rate of the parameter log(Z) which represents the partition function.
                             Malkin et al. (2022) claim that setting this learning rate higher than that of the policies helps in training.
@@ -1233,8 +1272,8 @@
                           <Icon class="material-icons">info</Icon>
                         </IconButton>
                         <Tooltip persistent>
-                          <Title style="text-align: center">Amount of off-policy training</Title>
-                          <Content style="color: black; font-size: 12px; text-align: left">
+                          <Title style="text-align: center; color: white">Amount of off-policy training</Title>
+                          <Content style="text-align: left; color: white; font-size: 12">
                             <br>
                             Change to adjust if and to what amount the model trains off-policy.
                             Setting the parameter to 0 is equal to on-policy training.
@@ -1263,8 +1302,8 @@
                           <Icon class="material-icons">info</Icon>
                         </IconButton>
                         <Tooltip persistent>
-                          <Title style="text-align: center">Number of hidden layers in the forward and backward policies</Title>
-                          <Content style="color: black; font-size: 12px; text-align: left">
+                          <Title style="text-align: center; color: white">Number of hidden layers in the forward and backward policies</Title>
+                          <Content style="text-align: left; color: white; font-size: 12">
                             <br>
                             Change to adjust the number of hidden layers in the neural nets which represent the policies.
                             Usually shallow networks work fine here and avoid the problems which arise with deeper architectures.
@@ -1290,8 +1329,8 @@
                           <Icon class="material-icons">info</Icon>
                         </IconButton>
                         <Tooltip persistent>
-                          <Title style="text-align: center">Dimensions of the hidden layers in the forward and backward policies</Title>
-                          <Content style="color: black; font-size: 12px; text-align: left">
+                          <Title style="text-align: center; color: white">Dimensions of the hidden layers in the forward and backward policies</Title>
+                          <Content style="text-align: left; color: white; font-size: 12">
                             <br>
                             Change to adjust the size of the hidden layers in the neural nets which represent the policies.
                           </Content>
@@ -1316,8 +1355,8 @@
                           <Icon class="material-icons">info</Icon>
                         </IconButton>
                         <Tooltip persistent>
-                          <Title style="text-align: center">Value to seed random number generators with</Title>
-                          <Content style="color: black; font-size: 12px; text-align: left">
+                          <Title style="text-align: center; color: white">Value to seed random number generators with</Title>
+                          <Content style="text-align: left; color: white; font-size: 12">
                             <br>
                             The random number generators will be seeded with this value to allow for reproducible results.
                           </Content>
@@ -1379,11 +1418,17 @@
         <div class="pg-container">
           <div class="pg-top">
             <div class="pg-play">
-              <Fab
-                on:click={() => view="2. Training"} disabled="{isRunning}"
-              >
-                <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_left</Icon>
-              </Fab>
+              <Wrapper rich>
+                <Fab
+                  on:click={() => view="2. Training"} disabled="{isRunning}"
+                >
+                  <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_left</Icon>
+                </Fab>
+                <Tooltip>
+                  Retrain the model
+                </Tooltip>
+              </Wrapper>
+
               <Fab mini disabled="true">
                 <Icon class="material-icons" style="font-size: 22px">replay</Icon>
               </Fab>
@@ -1411,8 +1456,8 @@
                     <Icon class="material-icons">info</Icon>
                   </IconButton>
                   <Tooltip persistent>
-                    <Title style="text-align: center">The current step of the agent</Title>
-                    <Content style="color: black; font-size: 12px; text-align: left">
+                    <Title style="text-align: center; color: white">The current step of the agent</Title>
+                    <Content style="text-align: left; color: white; font-size: 12">
                       <br>
                       The policy is learned based on the position (x, y) and the current step. Therefore the flow changes as the agent takes more steps.
                       The number of steps the agent takes is determined by the hyperparameter "Trajectory length".
@@ -1440,8 +1485,8 @@
                     <Icon class="material-icons">info</Icon>
                   </IconButton>
                   <Tooltip persistent>
-                    <Title style="text-align: center">Particle Velocity</Title>
-                    <Content style="color: black; font-size: 12px; text-align: left">
+                    <Title style="text-align: center; color: white">Particle Velocity</Title>
+                    <Content style="text-align: left; color: white; font-size: 12">
                       <br>
                       Adjust the velocity of the particles.
                       This is only an effect for the visualization and does not affect the actual flows.
@@ -1466,8 +1511,8 @@
                     <Icon class="material-icons">info</Icon>
                   </IconButton>
                   <Tooltip persistent>
-                    <Title style="text-align: center">Number of particles</Title>
-                    <Content style="color: black; font-size: 12px; text-align: left">
+                    <Title style="text-align: center; color: white">Number of particles</Title>
+                    <Content style="text-align: left; color: white; font-size: 12">
                       <br>
                       Adjust the number of particles.
                       This is only an effect for the visualization and does not affect the actual flows.
@@ -1517,11 +1562,18 @@
       {/if}
     </div>
       <div class="pg-scrollbutton">
-        <Fab
-          on:click={scrollTo(tutorialstart)}
-          disabled="{isRunning}"
-        >
-          <Icon class="material-icons">keyboard_arrow_down</Icon></Fab>
+        <Wrapper rich>
+          <Fab
+            on:click={scrollTo(tutorialstart)}
+            disabled="{isRunning}"
+          >
+          <Icon class="material-icons">keyboard_arrow_down</Icon>
+          </Fab>
+          <Tooltip>
+            Go to the tutorial
+          </Tooltip>
+        </Wrapper>
+
       </div>
     </div>
 
@@ -1746,16 +1798,21 @@
       <div id="runplot1" style="display: flex; justify-content: center;"></div>
       <div style="width: 700px; margin: auto; text-align:center;display:flex; margin-top: 10px">
         <div style="width:56px; margin-right:20px">
-          <Fab
-            on:click={isRunningAnim ? stop_animation_run() : animate_run(1)}
-            disabled={isRunning}
-          >
-            {#if isRunningAnim}
-              <Icon class="material-icons" style="font-size: 50px">stop</Icon>
-            {:else}
-              <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
-            {/if}
-          </Fab>
+          <Wrapper rich>
+            <Fab
+              on:click={isRunningAnim ? stop_animation_run() : animate_run(1)}
+              disabled={isRunning}
+            >
+              {#if isRunningAnim}
+                <Icon class="material-icons" style="font-size: 50px">stop</Icon>
+              {:else}
+                <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
+              {/if}
+            </Fab>
+            <Tooltip>
+              Animate this training run
+            </Tooltip>
+          </Wrapper>
         </div>
         <Textfield
           bind:value={run1_value}
@@ -1766,7 +1823,7 @@
           input$step="64"
 
         ></Textfield>
-        <div style="width: 550px; margin-top:10px">
+        <div style="width: 500px; margin-top:10px">
           <Slider
             bind:value="{run1_value}"
             min={0}
@@ -1776,13 +1833,17 @@
             input$aria-label="Discrete slider"
           />
         </div>
+        <Wrapper rich style="margin-top:10px">
+          <Fab
+            on:click={() =>load_pg_settings(1)} disabled={isRunning}
+            mini
+          ><Icon class="material-icons" style="font-size: 22px">sync</Icon>
+          </Fab>
+          <Tooltip>
+            Load the settings of this training run for the Playground
+          </Tooltip>
+        </Wrapper>
       </div>
-      <div style="width: 600px; margin: auto; text-align:center">
-        <Button on:click={() =>load_pg_settings(1)} disabled={isRunning}>
-          <Label>Use these Settings</Label>
-        </Button>
-      </div>
-
 
       <div style="height:50px"></div>
       <p class="section-text">
@@ -1795,18 +1856,53 @@
         So far, our distribution to match was very easy. Lets make it more challenging: If we lower the variance, we see the two modes are more seperated.
       </p>
       <div id="runplot2" style="display: flex; justify-content: center;"></div>
-      <div style="width: 600px; margin: auto; text-align:center;">
-      <Slider
-          bind:value="{run2_value}"
-          min={0}
-          max={4096}
-          step={128}
-          discrete
-          input$aria-label="Discrete slider"
-        />
-        <Button on:click={() =>load_pg_settings(2)} disabled={isRunning}>
-          <Label>Use these Settings</Label>
-        </Button>
+      <div style="width: 700px; margin: auto; text-align:center;display:flex; margin-top: 10px">
+        <div style="width:56px; margin-right:20px">
+          <Wrapper rich>
+            <Fab
+              on:click={isRunningAnim ? stop_animation_run() : animate_run(2)}
+              disabled={isRunning}
+            >
+              {#if isRunningAnim}
+                <Icon class="material-icons" style="font-size: 50px">stop</Icon>
+              {:else}
+                <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
+              {/if}
+            </Fab>
+            <Tooltip>
+              Animate this training run
+            </Tooltip>
+          </Wrapper>
+        </div>
+        <Textfield
+          bind:value={run2_value}
+          on:change={(e) => runs_textinput(e,2)}
+          label="Iteration"
+          disabled={isRunningAnim}
+          type="number"
+          input$step="128"
+
+        ></Textfield>
+        <div style="width: 500px; margin-top:10px">
+          <Slider
+            bind:value="{run2_value}"
+            min={0}
+            max={4096}
+            step={128}
+            discrete
+            input$aria-label="Discrete slider"
+          />
+        </div>
+        <Wrapper rich style="margin-top:10px">
+          <Fab
+            on:click={() =>load_pg_settings(2)} disabled={isRunning}
+            mini
+          ><Icon class="material-icons" style="font-size: 22px">sync</Icon>
+          </Fab>
+          <Tooltip>
+            Load the settings of this training run for the Playground
+          </Tooltip>
+        </Wrapper>
       </div>
       <p class="section-text">
         Well, thats not what we want! Instead of sampling from the true distribution we only sample from one mode!
@@ -1846,18 +1942,53 @@
         </Accordion>
       </div>
       <div id="runplot3" style="display: flex; justify-content: center;"></div>
-      <div style="width: 600px; margin: auto; text-align:center;">
-      <Slider
-          bind:value="{run3_value}"
-          min={0}
-          max={4096}
-          step={128}
-          discrete
-          input$aria-label="Discrete slider"
-        />
-        <Button on:click={() =>load_pg_settings(3)} disabled={isRunning}>
-          <Label>Use these Settings</Label>
-        </Button>
+      <div style="width: 700px; margin: auto; text-align:center;display:flex; margin-top: 10px">
+        <div style="width:56px; margin-right:20px">
+          <Wrapper rich>
+            <Fab
+              on:click={isRunningAnim ? stop_animation_run() : animate_run(3)}
+              disabled={isRunning}
+            >
+              {#if isRunningAnim}
+                <Icon class="material-icons" style="font-size: 50px">stop</Icon>
+              {:else}
+                <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
+              {/if}
+            </Fab>
+            <Tooltip>
+              Animate this training run
+            </Tooltip>
+          </Wrapper>
+        </div>
+        <Textfield
+          bind:value={run3_value}
+          on:change={(e) => runs_textinput(e,3)}
+          label="Iteration"
+          disabled={isRunningAnim}
+          type="number"
+          input$step="128"
+
+        ></Textfield>
+        <div style="width: 500px; margin-top:10px">
+          <Slider
+            bind:value="{run3_value}"
+            min={0}
+            max={4096}
+            step={128}
+            discrete
+            input$aria-label="Discrete slider"
+          />
+        </div>
+        <Wrapper rich style="margin-top:10px">
+          <Fab
+            on:click={() =>load_pg_settings(3)} disabled={isRunning}
+            mini
+          ><Icon class="material-icons" style="font-size: 22px">sync</Icon>
+          </Fab>
+          <Tooltip>
+            Load the settings of this training run for the Playground
+          </Tooltip>
+        </Wrapper>
       </div>
       <p class="section-text">
         It took some iterations, but now we match the distribution again.
