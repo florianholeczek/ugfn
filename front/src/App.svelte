@@ -58,6 +58,9 @@
   let tutorial_flowvis_instance;
   let tutorial_flow_observer;
   let pollingTimer;
+  let snackbar_load;
+  let snackbar_training_done;
+  let AnimInterval;
 
   // UI Elements
   let active_tab = 'Basic';
@@ -89,6 +92,8 @@
   let plotlyready=false;
   let display_trainhistory=false;
   let isRunning = false;
+  let isRunningAnim = false;
+
 
   //tutorial visualization data
   let run_data = {};
@@ -439,8 +444,6 @@
     if (isNaN(value)) value=0;
     value = value - (value % d)
     value = Math.min(d*32, Math.max(0, value));
-    console.log(value);
-    run1_value = value;
   }
 
 
@@ -661,6 +664,42 @@
     }
   }
 
+  //animation of tutorial runs and loading settings
+  function animate_run(run) {
+    isRunningAnim = true;
+    if (run===1 && run1_value===2048) run1_value = 0;
+    if (run===2 && run2_value===4096) run2_value = 0;
+    if (run===3 && run3_value===4096) run3_value = 0;
+    AnimInterval = setInterval(() => increase_run(run), 500)
+  }
+  function increase_run(run) {
+    if (run===1) run1_value += 64;
+    if (run===2) run2_value += 128;
+    if (run===3) run3_value += 128;
+    console.log("running")
+    if (run===1 && run1_value >= 2048) stop_animation_run();
+    if (run===2 && run2_value >= 4096) stop_animation_run();
+    if (run===3 && run3_value >= 4096) stop_animation_run();
+  }
+  function stop_animation_run() {
+    clearInterval(AnimInterval);
+    console.log("stopping")
+    isRunningAnim = false;
+  }
+
+  function load_pg_settings(run) {
+    snackbar_load.open();
+    resetSliders();
+    resetGaussians();
+    if (run>1) {
+      gaussians.set(tutorial_gaussians);
+      n_iterations_str = "4096";
+    }
+    if (run>2) {
+      off_policy_value = 2.5;
+    }
+  }
+
 
 
 
@@ -735,45 +774,11 @@
   document.title = "GFlowNet Playground"
 
 
-  let snackbar_load;
-  let snackbar_training_done;
-  let isRunningAnim;
-  let AnimInterval
 
-  function load_pg_settings(run) {
-    snackbar_load.open();
-    resetSliders();
-    resetGaussians();
-    if (run>1) {
-      gaussians.set(tutorial_gaussians);
-      n_iterations_str = "4096";
-    }
-    if (run>2) {
-      off_policy_value = 2.5;
-    }
-  }
 
-  function animate_run(run) {
-    isRunningAnim = true;
-    if (run===1 && run1_value===2048) run1_value = 0;
-    if (run===2 && run2_value===4096) run2_value = 0;
-    if (run===3 && run3_value===4096) run3_value = 0;
-    AnimInterval = setInterval(() => increase_run(run), 500)
-  }
-  function increase_run(run) {
-    if (run===1) run1_value += 64;
-    if (run===2) run2_value += 128;
-    if (run===3) run3_value += 128;
-    console.log("running")
-    if (run===1 && run1_value >= 2048) stop_animation_run();
-    if (run===2 && run2_value >= 4096) stop_animation_run();
-    if (run===3 && run3_value >= 4096) stop_animation_run();
-  }
-  function stop_animation_run() {
-    clearInterval(AnimInterval);
-    console.log("stopping")
-    isRunningAnim = false;
-  }
+
+
+
 
 
 </script>
@@ -1739,37 +1744,46 @@
 
       </p>
       <div id="runplot1" style="display: flex; justify-content: center;"></div>
-      <div style="width: 600px; margin: auto; text-align:center;">
-      <Slider
-          bind:value="{run1_value}"
-          min={0}
-          max={2048}
-          step={64}
-          discrete
-          input$aria-label="Discrete slider"
-        />
-        <Fab
-          on:click={isRunningAnim ? stop_animation_run() : animate_run(1)}
-          disabled={isRunning}
-        >
-          {#if isRunningAnim}
-            <Icon class="material-icons" style="font-size: 50px">stop</Icon>
-          {:else}
-            <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
-          {/if}
-        </Fab>
+      <div style="width: 700px; margin: auto; text-align:center;display:flex; margin-top: 10px">
+        <div style="width:56px; margin-right:20px">
+          <Fab
+            on:click={isRunningAnim ? stop_animation_run() : animate_run(1)}
+            disabled={isRunning}
+          >
+            {#if isRunningAnim}
+              <Icon class="material-icons" style="font-size: 50px">stop</Icon>
+            {:else}
+              <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
+            {/if}
+          </Fab>
+        </div>
         <Textfield
           bind:value={run1_value}
           on:change={(e) => runs_textinput(e,1)}
+          label="Iteration"
           disabled={isRunningAnim}
           type="number"
           input$step="64"
-          style="width:100%" helperLine$style="width: 100%;"
+
         ></Textfield>
+        <div style="width: 550px; margin-top:10px">
+          <Slider
+            bind:value="{run1_value}"
+            min={0}
+            max={2048}
+            step={64}
+            discrete
+            input$aria-label="Discrete slider"
+          />
+        </div>
+      </div>
+      <div style="width: 600px; margin: auto; text-align:center">
         <Button on:click={() =>load_pg_settings(1)} disabled={isRunning}>
           <Label>Use these Settings</Label>
         </Button>
       </div>
+
+
       <div style="height:50px"></div>
       <p class="section-text">
         Sampling according to the underlying distribution is one of the big advantages of GFlowNets: Other approaches usually learn to maximize the reward, so they would not sample from both of our modes (or everything in between), but they would find one of them and then just sample from it. This might be suboptimal e.g. in molecule discovery, where you might not want the most promising molecule, but many different of them might be interesting.
