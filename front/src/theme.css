@@ -14025,12 +14025,12 @@ a.smui-fab--color-primary, a.smui-fab--color-primary:not(:disabled) .mdc-fab__ic
 }
 
 .mdc-snackbar__action:not(:disabled) {
-  color: #440154;
+  color: #21918c;
 }
 .mdc-snackbar__action .mdc-button__ripple::before, .mdc-snackbar__action .mdc-button__ripple::after {
-  background-color: #440154;
+  background-color: #21918c;
   /* @alternate */
-  background-color: var(--mdc-ripple-color, #440154);
+  background-color: var(--mdc-ripple-color, #21918c);
 }
 .mdc-snackbar__action:hover .mdc-button__ripple::before, .mdc-snackbar__action.mdc-ripple-surface--hover .mdc-button__ripple::before {
   opacity: 0.04;

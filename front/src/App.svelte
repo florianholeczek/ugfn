@@ -21,6 +21,7 @@
   import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
   import Textfield from '@smui/textfield';
   import Fab from '@smui/fab';
+  import Snackbar, { Actions } from '@smui/snackbar';
   import { flow_velocity, flow_n_particles,flow_vectorfield, flow_vectors, flow_changed} from './store.js';
 
 
@@ -372,7 +373,6 @@
 			if (!res.ok) throw new Error("File not found or fetch failed");
 			const data = await res.json();
 			run_data[name] = new Float32Array(data);
-			console.log(`Loaded ${name}:`, data);
 		} catch (err) {
 			console.error(`Failed to load ${name}.json`, err);
 		}
@@ -392,7 +392,6 @@
   async function loadJSON(path) {
     const res = await fetch(path);
     const json = await res.json();
-    console.log("Loaded JSON:", json);
     return json;
   }
 
@@ -514,6 +513,7 @@
           await get_final_data();
           isRunning = false;
           await tick();
+          snackbar_training_done.open();
           training_step_value = current_nSteps-1; //also triggers plot for trainhistory
         }
       } catch (error) {
@@ -533,7 +533,6 @@
       if (!response.ok) {
         throw new Error('Failed to stop training.');
       } else {
-        console.log("Getting final data")
         const arrayBuffer = await response.arrayBuffer();
         const floats = new Float32Array(arrayBuffer);
         const t1 = vectorgrid_size*vectorgrid_size*2*(current_parameters["trajectory_length_value"]+1);
@@ -622,7 +621,6 @@
 
   const stopDrag = () => {
     if(isDraggingMean || isDraggingVariance){
-      console.log($gaussians);
       plotEnv();
     }
 
@@ -631,8 +629,10 @@
     selectedGaussian = null;
   };
   function plotEnv(){
-    plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
-    plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
+    if (view === "1. Environment"){
+      plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
+      plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
+    }
   }
   function gaussians_textinput(e,i,param) {
     let value = parseFloat(e.target.value);
@@ -720,6 +720,21 @@
   document.title = "GFlowNet Playground"
 
 
+  let snackbar_load;
+  let snackbar_training_done;
+
+  function load_pg_settings(run) {
+    snackbar_load.open();
+    resetSliders();
+    resetGaussians();
+    if (run>1) {
+      gaussians.set(tutorial_gaussians);
+      n_iterations_str = "4096";
+    }
+    if (run>2) {
+      off_policy_value = 2.5;
+    }
+  }
 
 
 </script>
@@ -747,6 +762,20 @@
   <Icon class="material-icons" style="font-size: 22px">replay</Icon>
 </Fab>
 -->
+
+<Snackbar bind:this={snackbar_load} leading>
+  <Label>Settings of this training run have been loaded into the playground</Label>
+  <Actions>
+    <Button on:click={scrollTo(playgroundstart)}>Go to Playground</Button>
+  </Actions>
+</Snackbar>
+
+<Snackbar bind:this={snackbar_training_done} leading>
+  <Label>Training completed</Label>
+  <Actions>
+    <Button on:click={scrollTo(playgroundstart)}>Go to Playground</Button>
+  </Actions>
+</Snackbar>
 
 
 
@@ -1681,6 +1710,9 @@
           input$aria-label="Discrete slider"
         />
         Show training Progress
+        <Button on:click={() =>load_pg_settings(1)} disabled={isRunning}>
+          <Label>Use these Settings</Label>
+        </Button>
       </div>
       <div style="height:50px"></div>
       <p class="section-text">
@@ -1702,6 +1734,9 @@
           discrete
           input$aria-label="Discrete slider"
         />
+        <Button on:click={() =>load_pg_settings(2)} disabled={isRunning}>
+          <Label>Use these Settings</Label>
+        </Button>
       </div>
       <p class="section-text">
         Well, thats not what we want! Instead of sampling from the true distribution we only sample from one mode!
@@ -1750,6 +1785,9 @@
           discrete
           input$aria-label="Discrete slider"
         />
+        <Button on:click={() =>load_pg_settings(3)} disabled={isRunning}>
+          <Label>Use these Settings</Label>
+        </Button>
       </div>
       <p class="section-text">
         It took some iterations, but now we match the distribution again.
@@ -1786,6 +1824,7 @@
             discrete
             input$aria-label="Discrete slider"
           />
+
         </div>
       </div>
       <div style="width: 600px; margin: auto; display: flex; align-items: center;">
