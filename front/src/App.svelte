@@ -137,7 +137,8 @@
   // reactive
   $:run1_plot(run1_value);
   function run1_plot(v) {
-    if (plotlyready){
+    const check = (v % 64 === 0) && v>=0 && v <=2048
+    if (plotlyready && check){
       plot_run(1, v);
     }
   }
@@ -418,6 +419,30 @@
     plotStatesHistory(Plotly, t, run_data[`run${run}_losses`], run_data[`run${run}_density`], 7, step, `runplot${run}`);
   }
 
+  function gaussians_textinput(e,i,param) {
+    let value = parseFloat(e.target.value);
+    if (isNaN(value)) value=0;
+    if (param==="variance"){
+      value = Math.min(1, Math.max(0.1, value));
+      $gaussians[i][param] = value;
+    } else {
+      value = Math.min(3, Math.max(-3, value));
+      $gaussians[i]["mean"][param] = value;
+    }
+    plotEnv();
+  }
+
+  function runs_textinput(e, run){
+    let d = 64;
+    if (run>1) d=128;
+    let value = parseInt(e.target.value);
+    if (isNaN(value)) value=0;
+    value = value - (value % d)
+    value = Math.min(d*32, Math.max(0, value));
+    console.log(value);
+    run1_value = value;
+  }
+
 
 
   // Functions used to start, stop and update the training process
@@ -427,6 +452,7 @@
       isRunning = true;
       display_trainhistory = true;
       training_progress = 0;
+      if (isRunningAnim) stop_animation_run();
       const curr_gaussians = $gaussians;
       current_plotting_density = compute_density_plotting(curr_gaussians, 100)
       current_env_image = await create_env_image(Plotly, current_plotting_density)
@@ -444,7 +470,7 @@
           curr_gaussians,
       }
       const send_params = JSON.stringify(current_parameters)
-      // Start training
+
       const response = await fetch(`${BACKEND_URL}/start_training`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -634,18 +660,7 @@
       plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
     }
   }
-  function gaussians_textinput(e,i,param) {
-    let value = parseFloat(e.target.value);
-    if (isNaN(value)) value=0;
-    if (param==="variance"){
-      value = Math.min(1, Math.max(0.1, value));
-      $gaussians[i][param] = value;
-    } else {
-      value = Math.min(3, Math.max(-3, value));
-      $gaussians[i]["mean"][param] = value;
-    }
-    plotEnv();
-  }
+
 
 
 
@@ -722,6 +737,8 @@
 
   let snackbar_load;
   let snackbar_training_done;
+  let isRunningAnim;
+  let AnimInterval
 
   function load_pg_settings(run) {
     snackbar_load.open();
@@ -734,6 +751,28 @@
     if (run>2) {
       off_policy_value = 2.5;
     }
+  }
+
+  function animate_run(run) {
+    isRunningAnim = true;
+    if (run===1 && run1_value===2048) run1_value = 0;
+    if (run===2 && run2_value===4096) run2_value = 0;
+    if (run===3 && run3_value===4096) run3_value = 0;
+    AnimInterval = setInterval(() => increase_run(run), 500)
+  }
+  function increase_run(run) {
+    if (run===1) run1_value += 64;
+    if (run===2) run2_value += 128;
+    if (run===3) run3_value += 128;
+    console.log("running")
+    if (run===1 && run1_value >= 2048) stop_animation_run();
+    if (run===2 && run2_value >= 4096) stop_animation_run();
+    if (run===3 && run3_value >= 4096) stop_animation_run();
+  }
+  function stop_animation_run() {
+    clearInterval(AnimInterval);
+    console.log("stopping")
+    isRunningAnim = false;
   }
 
 
@@ -1709,7 +1748,24 @@
           discrete
           input$aria-label="Discrete slider"
         />
-        Show training Progress
+        <Fab
+          on:click={isRunningAnim ? stop_animation_run() : animate_run(1)}
+          disabled={isRunning}
+        >
+          {#if isRunningAnim}
+            <Icon class="material-icons" style="font-size: 50px">stop</Icon>
+          {:else}
+            <Icon class="material-icons" style="font-size: 50px">play_arrow</Icon>
+          {/if}
+        </Fab>
+        <Textfield
+          bind:value={run1_value}
+          on:change={(e) => runs_textinput(e,1)}
+          disabled={isRunningAnim}
+          type="number"
+          input$step="64"
+          style="width:100%" helperLine$style="width: 100%;"
+        ></Textfield>
         <Button on:click={() =>load_pg_settings(1)} disabled={isRunning}>
           <Label>Use these Settings</Label>
         </Button>
