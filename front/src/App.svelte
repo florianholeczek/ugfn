@@ -1701,7 +1701,7 @@
 
       </p>
         <div class="image-container">
-          <Accordion multiple>
+          <Accordion>
             <Panel color="secondary">
               <Header>Too fast? Expand for an example and more introduction</Header>
               <Content>
@@ -2006,7 +2006,7 @@
         <span class="li">A simpler way is to just train off-policy. By adding a fixed variance to variance of the forward policy, we explore more during training. As this is a very easy implementation let's go with this one.</span>
       </p>
       <div class="image-container">
-        <Accordion multiple>
+        <Accordion>
           <Panel color="secondary">
             <Header>Changes to the algorithm</Header>
             <Content>
@@ -2088,6 +2088,25 @@
       <p class="section-text">
         It took some iterations, but now we match the distribution again.
       </p>
+      <div class="image-container">
+        <Accordion>
+          <Panel color="secondary">
+            <Header>Interpreting logZ</Header>
+            <Content>
+              If you look at the curve of logZ from the last training runs, you can see the connection between the partition function Z and the discovered modes.
+              Recall that, since we have two Gaussians, the partition function Z is 2 and logZ is approximately 0.69.
+              In the first training run, the model approaches this true value, sampling from both modes.
+              During mode collapse, you can see that the learned logZ drops to log(1) = 0 and stays there, indicating that the reward function the model samples from consists of only one Gaussian.
+              In the last run (off-policy training), you can see that forcing the model to explore leads to the discovery of the second mode around iteration 1500, when logZ approaches its true value.
+              However, due to the high rate of exploration, the loss remains high.
+              As the model continues to learn, the loss decreases, and it recovers even after logZ diverges again.
+              <br>
+              Note that while this might help illustrate the regulatory role of the partition function, we usually do not know the true value of logZ.
+              We often do not even know the type of the underlying distribution, which is likely far more complex — making the interpretation of logZ even more challenging.
+            </Content>
+          </Panel>
+        </Accordion>
+      </div>
 
     </section>
 
