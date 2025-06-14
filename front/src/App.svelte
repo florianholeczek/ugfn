@@ -69,6 +69,7 @@
   $: n_iterations_value = parseInt(n_iterations_str, 10);
   let losses_select = ["Trajectory Balance", "Flow Matching"];
   let view = "1. Environment";
+  let showTooltip = false;
 
   let vectorgrid_size=31;
 
@@ -229,6 +230,12 @@
           plotEnv();
         } else if (view ==="2. Training"){
           console.log("Train View");
+          //to prevent loading the tooltip too early as mouse hovers over next/prev buttons
+          showTooltip = false;
+            setTimeout(() => {
+              showTooltip = true;
+            }, 100);
+
           if (flowvis_instance) {
             flowvis_instance.remove();
             flowvis_instance = null;
@@ -1122,9 +1129,11 @@
                 >
                   <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_left</Icon>
                 </Fab>
-                <Tooltip>
-                  Change the environment
-                </Tooltip>
+                {#if showTooltip}
+                  <Tooltip>
+                    Change the environment
+                  </Tooltip>
+                {/if}
               </Wrapper>
               <Wrapper rich>
                 <Fab
@@ -1157,9 +1166,11 @@
                 >
                   <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_right</Icon>
                 </Fab>
-                <Tooltip>
-                  Training done? Take a look at the flows
-                </Tooltip>
+                {#if showTooltip}
+                  <Tooltip>
+                    Training done? Take a look at the flows
+                  </Tooltip>
+                {/if}
               </Wrapper>
             </div>
             <div class="pg-loss">
@@ -1172,21 +1183,22 @@
               </div>
               <div class="pg-iterations">
                 <div class="columns margins" style="justify-content: flex-start;">
-                  <Select
-                    bind:value="{n_iterations_str}"
-                    label="Iterations"
-                    disabled="{isRunning}"
-                  >
-                    {#each n_iterations_select as select}
-                      <Option value={select}>{select}</Option>
-                    {/each}
-                  </Select>
+
                 </div>
               </div>
             </div>
           </div>
 
           <div class="pg-side">
+            <Select style="margin-bottom: 20px"
+              bind:value="{n_iterations_str}"
+              label="Iterations"
+              disabled="{isRunning}"
+            >
+              {#each n_iterations_select as select}
+                <Option value={select}>{select}</Option>
+              {/each}
+            </Select>
             <div>
               <TabBar tabs={['Basic', 'Advanced']} let:tab bind:active={active_tab}>
                 <Tab {tab}>
@@ -1223,7 +1235,6 @@
                       input$aria-label="Set the batch size: 2 to the power of n"
                     />
                     <br>
-                    <br>
                     Trajectory length
                     <div class="hyperparameters">
                       {trajectory_length_value}
@@ -1251,7 +1262,6 @@
                       input$aria-label="Set the length of the trajectory"
                     />
                     <br>
-                    <br>
                     Learning rate model
                     <div class="hyperparameters">
                       {lr_model_value.toFixed(4)}
@@ -1276,7 +1286,6 @@
                       disabled="{isRunning}"
                       input$aria-label="Set the learning rate of the model"
                     />
-                    <br>
                     <br>
                     Learning rate logZ
                     <div class="hyperparameters">
@@ -1337,7 +1346,6 @@
                       input$aria-label="Set the Off-policy training"
                     />
                     <br>
-                    <br>
                     Hidden layers:
                     <div class="hyperparameters">
                       {hidden_layer_value}
@@ -1364,7 +1372,6 @@
                       input$aria-label="Set the number of hidden layers"
                     />
                     <br>
-                    <br>
                     Hidden layer size
                     <div class="hyperparameters">
                       {hidden_dim_value}
@@ -1389,7 +1396,6 @@
                       disabled="{isRunning}"
                       input$aria-label="Set the dimension of the hidden layers"
                     />
-                    <br>
                     <br>
                     Seed
                     <div class="hyperparameters">
