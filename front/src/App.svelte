@@ -1691,8 +1691,9 @@
     <section class="section" id="Tutorial" bind:this={tutorialstart}>
       <h2 class="section-title">What is a GFlowNet?</h2>
       <p class="section-text">
-
-        In short, a generative flow network is a model class which allows sampling from an arbitrary probability distribution (similar to MCMC). GFlowNets allow for generating objects with sequentially built compositional structure like trees or graphs.
+        In short, a generative flow network is a model class which allows sampling proportional to an unknown distribution.
+        In this it is similar to Markov Chain Monte Carlo, but offers some advantages regarding compute and sparse environments.
+        GFlowNets allow for generating objects with sequentially built compositional structure like trees or graphs - They construct the final object stepwise.
 
         <br>We train a model to learn a distribution <Katex>\pi(x)</Katex> (our policy), so we can sample from it. For this, we need a reward function R(x) which assigns value to each final object x and we want <Katex>\pi(x)</Katex> to sample proportional to it:  <Katex>\pi(x) \propto R(x)</Katex>. This allows us later on to sample a diversity of solutions instead of just the reward-maximizing one.
 
@@ -1705,17 +1706,18 @@
               <Header>Too fast? Expand for an example and more introduction</Header>
               <Content>
                 Imagine building a Lego Pyramid. There are different blocks, and you can place them rotated and at different places.
-                <br>You might start with an empty plane,add a 2x4 block and so on. After some steps you might end up with an object which is more or less pyramid-shaped.
+                <br>You might start with an empty plane, add a 2x4 block and so on. After some steps you might end up with an object which is more or less pyramid-shaped.
                 <br>
-                <br>The different possibilities of states of the object form a graph: While in the beginning (state 0) you can only place something in the first level, later on you might have different options, and they depend on your first choices. One option is always to choose to be finished instead of continuing building.
+                <br>The different possibilities of states of the object form a graph: While in the beginning (state 0) you can only place something in the first level, later on you might have different options and they depend on your first choices. One option is always to choose to be finished instead of continuing building.
                 <br>
                 <br>If you want to use a GFlowNet for your task, it is important that the resulting graph is acyclic, i.e. it is not possible to reach a previous state. In terms of our pyramid this means taking away blocks is not possible.
                 <br>If we built a pyramid, in the end we have a trajectory (a sequence of states <Katex>s_0 \to s_1 \to ... \to s_{"T"}</Katex>). As we can choose to stop anytime, our trajectories can have different lengts, e.g. we can build a pyramid from 1 piece or from 100.
                 <br>
                 <br>As you might have guessed from the vocabulary, GFlowNets are very similar to Reinforcement learning methods, we sample trajectories and assign a reward R(x) to them (or to the states). The main difference is that usual RL methods try to find solutions which maximize the reward, whereas GFlowNets learn the underlying distribution p(x). So we want to train a model such that p(x) is proportional to the reward function R(x). This allows us to sample not only from the mode which has the highest reward, but also all other modes which might be almost as good.
-                Imagine a pyramid which contains 2x4 blocks, we could just replace them with 2 2x2 blocks. Both options are valid and we might be interested in finding many possible ways to build pyramids.
+
+                Imagine a pyramid which contains  a 2x4 block, we could just replace it with two 2x2 blocks. Both options are valid and we might be interested in finding many possible ways to build pyramids.
                 <br>
-                <br>Building Lego Pyramids is maybe not usecase number one for GFlowNets, but they are used for is drug discovery (Nica et al., 2022), where sampling from multiple modes is really what you want in order to discover not only the most promising molecule.
+                <br>Building Lego Pyramids is maybe not usecase number one for GFlowNets, but they are used for drug discovery (Nica et al., 2022), where sampling from multiple modes is really what you want in order to discover not only the most promising molecule.
 
               </Content>
             </Panel>
@@ -1795,7 +1797,7 @@
         However fixing the trajectory length keeps everything a lot simpler.
         <br>
         <br>Above we stated that GFlowNets build an Acyclic Graph, so each state can only be visited once. We currently violate this assumption: While it is unlikely that a state gets visited twice in our continuous environment, it is still possible. To mitigate this we simply include a counter in our state which represents the current step.
-        We also simplified the variance of the gaussians to one parameter, so the variance for x and y is the same and there is no covariance (<Katex>\Sigma = \sigma^2 I</Katex>).
+        We also simplified the variance of the gaussians to one parameter, so the variance for x and y is the same and there is no covariance <Katex>(\Sigma = \sigma^2 I)</Katex>.
     </section>
 
 
@@ -1883,8 +1885,7 @@
       <p class="section-text">
         We trained a GFlowNet on this environment for 2000 Iterations.
         Below you see the progress of the model during training. While it first samples randomly, it learns to match the true distribution of our environment.
-
-
+        You can hover over a sample to see its trajectory.
       </p>
       <div id="runplot1" style="display: flex; justify-content: center;"></div>
       <div style="width: 700px; margin: auto; text-align:center;display:flex; margin-top: 10px">
@@ -1938,7 +1939,7 @@
 
       <div style="height:50px"></div>
       <p class="section-text">
-        Sampling according to the underlying distribution is one of the big advantages of GFlowNets: Other approaches usually learn to maximize the reward, so they would not sample from both of our modes (or everything in between), but they would find one of them and then just sample from it. This might be suboptimal e.g. in molecule discovery, where you might not want the most promising molecule, but many different of them might be interesting.
+        Sampling according to the underlying distribution is one of the big advantages of GFlowNets: Other approaches usually learn to maximize the reward, so they would not sample from both of our modes (or everything in between), but they would find one of them and then just sample from it.
       </p>
 
 
@@ -1995,12 +1996,14 @@
           </Tooltip>
         </Wrapper>
       </div>
+      <div style="height:50px"></div>
       <p class="section-text">
-        Well, thats not what we want! Instead of sampling from the true distribution we only sample from one mode!
-        <br><br>
+        Now this is a huge problem. The model quickly discovered one mode and only sampled from it.
+        This happens as we do not encourage exploration enough, so the model acts greedy.
+        <br>
         There are two main possibilities to fix this:
         <span class="li">We could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:<Katex>R_{"{new}"}(x)=R(x)^\beta</Katex>. This would change the "peakyness" of the reward function and we would not sample proportional to the reward function but according to <Katex>\pi(x|\beta) \propto R(x)^\beta</Katex>. It is also possible to use <Katex>\beta</Katex> as a trainable parameter and condition the model on it.</span>
-        <span class="li">A similar but simpler way is to just train off-policy. By adding a fixed variance to the logits of the forward policy, we explore more during training. As this is a very easy implementation let's go with this one.</span>
+        <span class="li">A simpler way is to just train off-policy. By adding a fixed variance to variance of the forward policy, we explore more during training. As this is a very easy implementation let's go with this one.</span>
       </p>
       <div class="image-container">
         <Accordion multiple>
@@ -2081,6 +2084,7 @@
           </Tooltip>
         </Wrapper>
       </div>
+      <div style="height:50px"></div>
       <p class="section-text">
         It took some iterations, but now we match the distribution again.
       </p>
@@ -2091,13 +2095,14 @@
       <h2 class="section-title">Flow</h2>
       <p class="section-text">
         Below you can see the flow the last training run.
-        <br>
-        Use the Step slider to adjust the current step. We fixed the number of steps for the agent at 6, so it collects the reward after 6 steps on the grid.
-        <br>
+        Use the Step slider to adjust the current step.
+        We fixed the number of steps for the agent at 6, so it collects the reward after 6 steps on the grid.
         Use the Iteration Slider to compare the flow at the start of the training to the end.
         <br>
-        <br>
-        You see that for the trained model (last iteration) the flow is different depending on the step. In the first step the agent takes, it tends to move to the center. Later on in the trajectory the points of convergence split up and move outwards to the modes of the distribution.
+        You see that for the trained model (last iteration) the flow is different depending on the step.
+        In the first step the agent takes, it tends to move to the center.
+        Later on in the trajectory the points of convergence split up and move outwards to the modes of the distribution.
+        In the last two steps they even move past them, probably to achive the seperation of the modes.
       </p>
 
       <div class="flow-container">
@@ -2134,6 +2139,7 @@
           />
         </div>
       </div>
+      <div style="height:50px"></div>
       <h2 class="section-title">Flow - Is this what it looks like?</h2>
       <p class="section-text">
         Well, kind of. Imagine our grid would be discrete. If we are in one cell, we would have a certain Flow (a non-negative scalar) to each other cell (technically also to itself given our trick with adding the step to the state).
@@ -2142,7 +2148,7 @@
         <br>Instead of showing all the flows, the plot shows the <i>highest</i> flow for each state: This is a vector from it to another point on the grid.
         If we do that for some evenly spaced points we get a vectorfield. The visualization above is just a nicer way to show it by letting particles move through the field.
         Note that the path of the particels is not the path of the agents. The particles follow the most probable direction continuously, while the agent takes discrete steps not in the most probable direction but following the distribution of the policy.
-        Therefore the trajectories jump around more. This visualization however shows the converging points in the flowfield which direct the agents movement.
+        Therefore the trajectories "jump around" more. This visualization however shows the converging points in the flowfield which direct the agents movement.
       </p>
 
       <h2 class="section-title" style="position:relative">What next?</h2>
@@ -2154,7 +2160,7 @@
 
 
 
-      <div style="position:absolute; width:1000px; left: 50%;transform: translateX(-50%); ">
+      <div style="position:absolute; width:1000px; left: 50%;transform: translateX(-50%); margin-top:15px">
         <div class="whatnext_t" >
           <div class="whatnext_b">
             <Fab
@@ -2199,25 +2205,21 @@
     <section class="section">
       <h2 class="section-title">Acknowledgements</h2>
       <p class="section-text">
-        Thanks to Christina Humer for the feedback and resources.
-        <br>Some implementations and ideas are based on other great work:
+        <br>Some implementations and ideas are based on great work of others:
         <span class="li">The
           <a href="https://github.com/GFNOrg/torchgfn/blob/master/tutorials/notebooks/intro_gfn_continuous_line_simple.ipynb" target="_blank">continuous line</a>
           example by Joseph Viviano & Kolya Malkin.
-          The idea for the environment is based on their notebook and much of the training code is adapted from theirs.
+          The idea for the environment is based on their notebook and much of the training code is adapted from their tutorial.
       </span>
       <span class="li">The
           <a href="https://playground.tensorflow.org/" target="_blank">
             neural network playgroud</a>
            by Daniel Smilkov and Shan Carter was an inspiration on how to visualize machine learning and the training progress in the browser.
         </span>
-        <span class="li">The code for the flow field visualization is mostly taken from
+        <span class="li">The code for the flow field visualization is adapted from
           <a href="https://editor.p5js.org/Mathcurious/sketches/bdp6luRil" target="_blank">Mathcurious' implementation</a>
         </span>
         If you want to learn more about GFlowNets have a look into the literature and tutorials below.
-        <br><br><br><br>
-        Author: Florian Holeczek
-        <br>Created as seminar project in the MSc program Artificial Intelligence at JKU Linz
       </p>
 
     </section>
