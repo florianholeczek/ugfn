@@ -127,7 +127,6 @@
   let current_trajectories;
   let current_plotting_density;
   let current_env_image;
-  let train_history_iter = 0;
 
   // Tutorial parameters
   let run1_value = 0;
@@ -898,13 +897,54 @@
         <p class="subtitle">Building an intuitive understanding of GFlowNet training</p>
       </div>
     </header>
+    <div class="authors-section">
+      <hr class="line" />
+
+      <div class="authors-grid">
+        <div class="hd">AUTHOR</div>
+        <div class="hd">AFFILIATION</div>
+
+        <div class="cell1">Florian Holeczek</div>
+        <div class="cell2">Johannes Kepler University Linz</div>
+
+        <div class="cell1" style>Christina Humer</div>
+        <div class="cell2">Johannes Kepler University Linz</div>
+      </div>
+
+      <hr class="line" />
+    </div>
+    <section class="section">
+      <p class="section-text">
+        Imagine you want to discover new molecules for a life-saving drug.
+        The space of possible molecular structures is vast, with promising candidates potentially sparse and difficult to find.
+        Traditional methods might guide you to a single best guess, but what if you need many diverse, high-quality candidates to test?
+        This is where Generative Flow Networks (GFlowNets) come in.
+        They are a class of generative models that don't just aim for a single optimal solution—they aim to diversely sample from a space of possibilities, with a preference for high-reward outcomes.
+        <br>
+        Here, we present a Playground for experimenting with GFlowNet training.
+        It provides an interactive environment to explore how GFlowNets adapt to changes in both reward functions and training hyperparameters.
+        Training occurs in a continuous space, where an agent takes a fixed number of steps before receiving a reward defined by a configurable reward function.
+        This function can be adjusted in the <b>Environment</b> view.
+        In the <b>Training</b> view, you can modify hyperparameters and initiate training.
+        The resulting visualization shows the agent’s final positions.
+        When training is successful, the distribution of these positions should approximate the target reward distribution.
+        The <b>Flow</b> view provides a visualization of the learned flow.
+        <br>
+        We also provide a Tutorial that introduces the core concepts behind GFlowNets, their theoretical foundations, and common pitfalls during training.
+        It also explains how to interpret metrics and visualizations throughout the Playground.
+      </p>
+    </section>
 
 
 
 
 
     <!-- Playground -->
-
+    <header class="header-pg">
+      <div class="container">
+        <h1 class="title">Playground</h1>
+      </div>
+    </header>
     <div class="pg-background" id="Playground" bind:this={playgroundstart}>
     <div class = "pg-top-background">
     </div>
@@ -1647,22 +1687,7 @@
 
 
 
-    <section class="section-light" >
-      <h2 class="section-title">What is this about?</h2>
-      <p class="section-text">
-        Here you can explore how GFlowNets learn.
-        If you have no idea what a GFlowNet actually is you might want to look into this basic tutorial first to learn more.
-        <br>Of course you can always just start exploring!
-        <br>
-        <br>If you want to start right away, you can adjust the reward function directly in the Environment view. Enter the parameters or drag the circles in the left plot however you wish.
-        <br>
-        <br>You can then start training in the Training view. Adjust the hyperparameters and press Play to start training a GFlowNet.
-        An agent will take a fixed number of steps on the grid and then collect reward according to the previously fixed reward function.
-        The visualization shows the final position of an agent. If the training is successful, the distribution of the final samples should match the reward function.
-        <br>
-        <br>You can view the flow of the trained model in the Flow view. If you want to know more about what the flow shows just continue reading!
-      </p>
-    </section>
+
     <section class="section" id="Tutorial" bind:this={tutorialstart}>
       <h2 class="section-title">What is a GFlowNet?</h2>
       <p class="section-text">

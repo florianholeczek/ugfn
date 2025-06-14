@@ -18771,10 +18771,15 @@ Yes.
 }
 
 
-    body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f7fafc;
-    color: #333;
+  .main-content {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
   }
 
   .container {
@@ -18813,6 +18818,11 @@ Yes.
   }
 
   .header-top {
+    color: black;
+    padding: 3rem 0;
+    text-align: center;
+  }
+  .header-pg {
     background: linear-gradient(90deg, #26132d, #2d3a45);
     color: white;
     padding: 3rem 0;
@@ -19209,7 +19219,42 @@ input[type="range"] {
     margin: 1rem auto;
   }
 
+  .authors-section {
+    text-align: center;
+    padding: 20px 0;
+  }
 
+  .line {
+    border: none;
+    border-top: 1px solid #ccc;
+    margin: 10px auto;
+    width: 80%;
+  }
+
+  .authors-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 8px 200px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  .hd {
+    text-transform: uppercase;
+    font-size: 11px;
+  }
+
+  .cell2 {
+    font-size: 13px;
+    color: #333;
+  }
+
+  .cell1 {
+    font-size: 13px;
+    font-weight: bold;
+    color: #333;
+  }
 
 
 
