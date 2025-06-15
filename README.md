@@ -15,10 +15,13 @@ When the training is successfull we can see that the GFN learned the true underl
 ## How to run
 The "python" folder contains all python files which are used for training.
 The folder "front" has the data for building the website with svelte.
-Dockerimages for the website are here:
-https://hub.docker.com/repositories/florianholeczek
+If you want to run the webpage locally you can use the docker image:
+```shell
+docker pull florianholeczek/ugfn:latest 
+```
 
-To work locally with everything clone the repository first or download and extract the .zip manually
+As an alternative you can build it: 
+Clone the repository first or download and extract the .zip manually
 
 ```shell
 cd yourworkingdirectory
@@ -41,7 +44,7 @@ venv\Scripts\activate.bat
 # Or In PowerShell
 venv\Scripts\Activate.ps1
 
-pip install -r python\requirements.txt
+pip install -r requirements.txt
 ```
 
 
@@ -49,7 +52,7 @@ Linux:
 ```shell
 python3 -m venv venv
 source venv/bin/activate
-pip install -r python/requirements.txt
+pip install -r requirements.txt
 ```
 
 

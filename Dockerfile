@@ -5,6 +5,8 @@ WORKDIR /app
 COPY ./back.py .
 COPY ./python ./python
 COPY ./front/public ./front/public
+COPY ./requirements.txt .
+
 
 RUN apt update
 RUN apt -y install uvicorn
