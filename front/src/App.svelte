@@ -2238,7 +2238,6 @@
         <span class="li">The code for the flow field visualization is adapted from
           <a href="https://editor.p5js.org/Mathcurious/sketches/bdp6luRil" target="_blank">Mathcurious' implementation</a>
         </span>
-        If you want to learn more about GFlowNets have a look into the literature and tutorials below.
       </p>
 
     </section>
