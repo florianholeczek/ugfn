@@ -354,29 +354,67 @@ export function plotStatesHistory(
 
             const [x_traj, y_traj] = [traj.map(p => p[0]), traj.map(p => p[1])];
 
-            const trajTrace = {
-                x: x_traj,
-                y: y_traj,
-                mode: 'lines+markers',
-                type: 'scatter',
-                marker: { color: 'black', size: 4 },
-                line: { color: 'black', width: 2 },
-                name: 'Trajectory',
-                hoverinfo: 'skip',
+            const annotations = [];
+
+            // Create an arrow annotation for each segment
+            for (let i = 0; i < traj.length - 1; i++) {
+                const [x0, y0] = traj[i];
+                const [x1, y1] = traj[i + 1];
+
+                annotations.push({
+                    x: x1,
+                    y: y1,
+                    ax: x0,
+                    ay: y0,
+                    xref: 'x',
+                    yref: 'y',
+                    axref: 'x',
+                    ayref: 'y',
+                    showarrow: true,
+                    arrowhead: 3,
+                    arrowsize: 1,
+                    arrowwidth: 2,
+                    arrowcolor: 'black',
+                    opacity: 1,
+                });
+            }
+
+            const fadedSamples = {
+                ...samplesTrace,
+                marker: { ...samplesTrace.marker, opacity: 0.4 }
             };
 
-            const fadedSamples = { ...samplesTrace, marker: { ...samplesTrace.marker, opacity: 0.4 } };
+            const layoutWithArrows = {
+                ...layout,
+                annotations: annotations
+            };
 
-            Plotly.react(element, [contourTrace, fadedSamples, trajTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot], layout);
-        }, 100); // Adjust delay (ms) as needed
+            const trajPointsTrace = {
+                x: x_traj,
+                y: y_traj,
+                mode: 'markers',
+                type: 'scatter',
+                marker: { color: 'black', size: 5 },
+                name: 'Trajectory Points',
+                hoverinfo: 'skip',
+                showlegend: false,
+            };
+
+            Plotly.react(
+                element,
+                [contourTrace, fadedSamples, trajPointsTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot],
+                layoutWithArrows
+            );
+        }, 100);
     });
+
 
     plotDiv.removeAllListeners?.('plotly_unhover');
     plotDiv.on('plotly_unhover', function () {
-        clearTimeout(hoverTimeout); // Cancel pending hover
+        clearTimeout(hoverTimeout);
         Plotly.react(element, baseTraces, layout);
     });
-    }
+}
 
 export async function create_env_image(Plotly, density, colormap = 'Viridis') {
   // Create hidden div for Plotly plot

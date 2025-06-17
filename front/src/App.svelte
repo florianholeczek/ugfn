@@ -2116,7 +2116,7 @@
     <section class="section" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);">
       <h2 class="section-title">Flow</h2>
       <p class="section-text">
-        Below you can see the flow the last training run.
+        Below you can see the flow of the last training run.
         Use the Step slider to adjust the current step.
         We fixed the number of steps for the agent at 6, so it collects the reward after 6 steps on the grid.
         Use the Iteration Slider to compare the flow at the start of the training to the end.
