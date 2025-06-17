@@ -906,9 +906,12 @@
 
         <div class="cell1">Florian Holeczek</div>
         <div class="cell2">Johannes Kepler University Linz</div>
-
-        <div class="cell1" style>Christina Humer</div>
+        <div class="cell1">Andreas Hinterreiter</div>
         <div class="cell2">Johannes Kepler University Linz</div>
+        <div class="cell1">Marc Streit</div>
+        <div class="cell2">Johannes Kepler University Linz</div>
+        <div class="cell1">Christina Humer</div>
+        <div class="cell2">ETH Zürich / Johannes Kepler University Linz</div>
       </div>
 
       <hr class="line" />
@@ -1202,7 +1205,7 @@
               </Wrapper>
               <Wrapper rich>
                 <Fab
-                  on:click={() => view="3. Flow"} disabled="{isRunning}"
+                  on:click={() => view="3. Flow"} disabled="{isRunning || !display_trainhistory}"
                 >
                   <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_right</Icon>
                 </Fab>

@@ -10,3 +10,4 @@ front/README.md
 python/model.pth
 python/model_test.pth
 /front/public/Data/params.txt
+/dockercmds.txt

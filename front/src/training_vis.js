@@ -192,8 +192,9 @@ export function plotStatesHistory(
         colormap = 'Viridis',
     } = options;
 
-    let sec_col = 'rgb(51, 51, 51)'
-    let f_col = "rgb(120, 208, 78)"
+    let sec_col = 'rgb(51, 51, 51)';
+    let f_col = "rgb(120, 208, 78)";
+    let hoverTimeout = null;
 
 
     const numTrajectories = trajectoryData.length / (trajectory_length * 2);
@@ -341,34 +342,41 @@ export function plotStatesHistory(
     plotDiv.removeAllListeners?.('plotly_hover');
 
     plotDiv.on('plotly_hover', function (data) {
-        const point = data.points[0];
-        if (point.data.name !== 'Samples') return;
-        const pointIndex = point.pointIndex;
-        const traj = trajectories[pointIndex];
-        if (!traj) return;
-        const [x_traj, y_traj] = [traj.map(p => p[0]), traj.map(p => p[1])];
+        clearTimeout(hoverTimeout);
 
-        const trajTrace = {
-            x: x_traj,
-            y: y_traj,
-            mode: 'lines+markers',
-            type: 'scatter',
-            marker: { color: 'black', size: 4 },
-            line: { color: 'black', width: 2 },
-            name: 'Trajectory',
-            hoverinfo: 'skip',
-        };
+        hoverTimeout = setTimeout(() => {
+            const point = data.points[0];
+            if (point.data.name !== 'Samples') return;
 
-        const fadedSamples = { ...samplesTrace, marker: { ...samplesTrace.marker, opacity: 0.4 } };
+            const pointIndex = point.pointIndex;
+            const traj = trajectories[pointIndex];
+            if (!traj) return;
 
-        Plotly.react(element, [contourTrace, fadedSamples, trajTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot], layout);
+            const [x_traj, y_traj] = [traj.map(p => p[0]), traj.map(p => p[1])];
+
+            const trajTrace = {
+                x: x_traj,
+                y: y_traj,
+                mode: 'lines+markers',
+                type: 'scatter',
+                marker: { color: 'black', size: 4 },
+                line: { color: 'black', width: 2 },
+                name: 'Trajectory',
+                hoverinfo: 'skip',
+            };
+
+            const fadedSamples = { ...samplesTrace, marker: { ...samplesTrace.marker, opacity: 0.4 } };
+
+            Plotly.react(element, [contourTrace, fadedSamples, trajTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot], layout);
+        }, 100); // Adjust delay (ms) as needed
     });
 
     plotDiv.removeAllListeners?.('plotly_unhover');
     plotDiv.on('plotly_unhover', function () {
+        clearTimeout(hoverTimeout); // Cancel pending hover
         Plotly.react(element, baseTraces, layout);
     });
-}
+    }
 
 export async function create_env_image(Plotly, density, colormap = 'Viridis') {
   // Create hidden div for Plotly plot

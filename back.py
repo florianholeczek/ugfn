@@ -25,15 +25,6 @@ vectorgrid_size = 31
 
 app = FastAPI()
 
-# Allow CORS for development purposes
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"]
-)
-
 # Training session class for handling multiple users
 class TrainingSession:
     def __init__(self, params):
