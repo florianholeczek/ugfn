@@ -1700,7 +1700,7 @@
 
         <br>We train a model to learn a distribution <Katex>\pi(x)</Katex> (our policy), so we can sample from it. For this, we need a reward function R(x) which assigns value to each final object x and we want <Katex>\pi(x)</Katex> to sample proportional to it:  <Katex>\pi(x) \propto R(x)</Katex>. This allows us later on to sample a diversity of solutions instead of just the reward-maximizing one.
 
-        <br>As we do not rely on a external dataset but only on our internal reward function we are only limited by compute - we can generate objects and query the reward function as often as we like.
+        <br>As we do not rely on an external dataset but only on our internal reward function we are only limited by compute - we can generate objects and query the reward function as often as we like.
 
       </p>
         <div class="image-container">
@@ -1714,7 +1714,7 @@
                 <br>The different possibilities of states of the object form a graph: While in the beginning (state 0) you can only place something in the first level, later on you might have different options and they depend on your first choices. One option is always to choose to be finished instead of continuing building.
                 <br>
                 <br>If you want to use a GFlowNet for your task, it is important that the resulting graph is acyclic, i.e. it is not possible to reach a previous state. In terms of our pyramid this means taking away blocks is not possible.
-                <br>If we built a pyramid, in the end we have a trajectory (a sequence of states <Katex>s_0 \to s_1 \to ... \to s_{"T"}</Katex>). As we can choose to stop anytime, our trajectories can have different lengts, e.g. we can build a pyramid from 1 piece or from 100.
+                <br>If we built a pyramid, in the end we have a trajectory (a sequence of states <Katex>s_0 \to s_1 \to ... \to s_{"T"}</Katex>). As we can choose to stop anytime, our trajectories can have different lengths, e.g. we can build a pyramid from 1 piece or from 100.
                 <br>
                 <br>As you might have guessed from the vocabulary, GFlowNets are very similar to Reinforcement learning methods, we sample trajectories and assign a reward R(x) to them (or to the states). The main difference is that usual RL methods try to find solutions which maximize the reward, whereas GFlowNets learn the underlying distribution p(x). So we want to train a model such that p(x) is proportional to the reward function R(x). This allows us to sample not only from the mode which has the highest reward, but also all other modes which might be almost as good.
 
@@ -1735,7 +1735,7 @@
         </Katex>, it gives us the action which leads to the next state.
         <br>
         <br>So far, everything sounds very nice, but how do we achieve this?
-        <br>Thats where the Flows come into play.
+        <br>That's where the Flows come into play.
         <br>
         <br>If you connect all possible states from the start state to the terminal states you get a directed graph.
         If you want to use a GFlowNet for your task it is important that the graph is acyclic, i.e. it is not possible to reach a previous state.
@@ -1757,8 +1757,8 @@
         <span class="li">The flow going into the DAG (Flow of the start state) is the same as the Flow going out of it (Sum of the flow of all terminal states).</span>
         <span class="li">Same for the nodes: The sum of the flow going into a state is the same as the sum of the flow going out of it.</span>
         <br>
-        We now can set the flow going out of a terminal state equal to it's reward.
-        Assuming all flow is stricly positive, we can express the Flow from one state s to its children s' as:
+        We now can set the flow going out of a terminal state equal to its reward.
+        Assuming all flow is strictly positive, we can express the Flow from one state s to its children s' as:
 
 
         <Katex displayMode>
@@ -1948,7 +1948,8 @@
 
       <h2 class="section-title">Mode Collapse</h2>
       <p class="section-text">
-        So far, our distribution to match was very easy. Lets make it more challenging: If we lower the variance, we see the two modes are more seperated.
+        So far, our distribution to match was very easy.
+        Let's make it more challenging: If we lower the variance, we see the two modes are more separated.
       </p>
       <div id="runplot2" style="display: flex; justify-content: center;"></div>
       <div style="width: 700px; margin: auto; text-align:center;display:flex; margin-top: 10px">
@@ -2006,7 +2007,11 @@
         <br>
         There are two main possibilities to fix this:
         <span class="li">We could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:<Katex>R_{"{new}"}(x)=R(x)^\beta</Katex>. This would change the "peakyness" of the reward function and we would not sample proportional to the reward function but according to <Katex>\pi(x|\beta) \propto R(x)^\beta</Katex>. It is also possible to use <Katex>\beta</Katex> as a trainable parameter and condition the model on it.</span>
-        <span class="li">A simpler way is to just train off-policy. By adding a fixed variance to variance of the forward policy, we explore more during training. As this is a very easy implementation let's go with this one.</span>
+        <span class="li">
+          A simpler way is to just train off-policy.
+          By adding a fixed variance to the variance of the forward policy, we explore more during training.
+          As this is a very easy implementation let's go with this one.
+        </span>
       </p>
       <div class="image-container">
         <Accordion>
@@ -2124,7 +2129,7 @@
         You see that for the trained model (last iteration) the flow is different depending on the step.
         In the first step the agent takes, it tends to move to the center.
         Later on in the trajectory the points of convergence split up and move outwards to the modes of the distribution.
-        In the last two steps they even move past them, probably to achive the seperation of the modes.
+        In the last two steps they even move past them, probably to achieve the separation of the modes.
       </p>
 
       <div class="flow-container">
@@ -2169,7 +2174,7 @@
         <br>In our continuous space this gets even more complicated, not only in terms of visualization but also mathematically - look into Lahlou et al. (2023) if you are interested.
         <br>Instead of showing all the flows, the plot shows the <i>highest</i> flow for each state: This is a vector from it to another point on the grid.
         If we do that for some evenly spaced points we get a vectorfield. The visualization above is just a nicer way to show it by letting particles move through the field.
-        Note that the path of the particels is not the path of the agents. The particles follow the most probable direction continuously, while the agent takes discrete steps not in the most probable direction but following the distribution of the policy.
+        Note that the path of the particles is not the path of the agents. The particles follow the most probable direction continuously, while the agent takes discrete steps not in the most probable direction but following the distribution of the policy.
         Therefore the trajectories "jump around" more. This visualization however shows the converging points in the flowfield which direct the agents movement.
       </p>
 
@@ -2235,7 +2240,7 @@
       </span>
       <span class="li">The
           <a href="https://playground.tensorflow.org/" target="_blank">
-            neural network playgroud</a>
+            neural network playground</a>
            by Daniel Smilkov and Shan Carter was an inspiration on how to visualize machine learning and the training progress in the browser.
         </span>
         <span class="li">The code for the flow field visualization is adapted from
