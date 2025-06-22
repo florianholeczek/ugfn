@@ -828,6 +828,121 @@
   document.title = "GFlowNet Playground"
 
 
+  const nodes = [
+    { id: 's0', x: 50, y: 100 },
+    { id: 's1', x: 200, y: 50 },
+    { id: 's2', x: 200, y: 150 },
+    { id: 's3', x: 350, y: 50 },
+    { id: 's4', x: 350, y: 150 },
+    { id: 's5', x: 400, y: 250 },
+    { id: 's6', x: 500, y: 50 },
+    { id: 's7', x: 500, y: 150 },
+    { id: 's8', x: 650, y: 50 },
+    { id: 's9', x: 650, y: 150 },
+    { id: 'x5', x: 500, y: 300, final: true },
+    { id: 'x7', x: 600, y: 250, final: true },
+    { id: 'x8', x: 750, y: 100, final: true },
+    { id: 'x9', x: 750, y: 200, final: true },
+  ];
+
+  const edges = [
+    { from: 's0', to: 's1', flow: 2 },
+    { from: 's0', to: 's2', flow: 8 },
+    { from: 's1', to: 's3', flow: 2 },
+    { from: 's2', to: 's3', flow: 1 },
+    { from: 's2', to: 's4', flow: 5 },
+    { from: 's2', to: 's5', flow: 2 },
+    { from: 's3', to: 's6', flow: 3 },
+    { from: 's4', to: 's5', flow: 1 },
+    { from: 's4', to: 's7', flow: 4 },
+    { from: 's5', to: 'x5', flow: 3 },
+    { from: 's6', to: 's9', flow: 2 },
+    { from: 's6', to: 's8', flow: 1 },
+    { from: 's7', to: 's9', flow: 3 },
+    { from: 's7', to: 'x7', flow: 1 },
+    { from: 's9', to: 'x9', flow: 5 },
+    { from: 's8', to: 'x8', flow: 1 }
+  ];
+
+  let hoveredNode= null;
+  let hoveredEdge = null;
+
+  $: nodeColors = {};
+  $: {
+    for (const node of nodes) {
+      if (!hoveredNode) {
+        nodeColors[node.id] = 'black';
+      } else if (node.id === hoveredNode) {
+        nodeColors[node.id] = '#31688e';
+      } else if (edges.some(e => e.to === hoveredNode&& e.from === node.id)) {
+        nodeColors[node.id] = '#35b779';
+      } else if (edges.some(e => e.from === hoveredNode&& e.to === node.id)) {
+        nodeColors[node.id] = '#440154';
+      } else {
+        nodeColors[node.id] = 'black';
+      }
+    }
+  }
+  $: edgeColors = {};
+  $: {
+    for (const edge of edges) {
+      const key = edge.from + '-' + edge.to;
+
+      if (hoveredEdge) {
+        if (edge.from === hoveredEdge.from && edge.to === hoveredEdge.to) {
+          edgeColors[key] = '#31688e'; // the edge being hovered
+        } else if (edge.from === hoveredEdge.from) {
+          edgeColors[key] = '#35b779'; // same source node
+        } else {
+          edgeColors[key] = 'gray';
+        }
+      } else if (hoveredNode) {
+        if (edge.to === hoveredNode) {
+          edgeColors[key] = '#35b779';
+        } else if (edge.from === hoveredNode) {
+          edgeColors[key] = '#440154';
+        } else {
+          edgeColors[key] = 'gray';
+        }
+      } else {
+        edgeColors[key] = 'gray';
+      }
+    }
+  }
+
+  $: hoverType = hoveredNode
+    ? {
+        self: true,
+        prev: edges.find(e => e.to === hoveredNode),
+        next: edges.find(e => e.from === hoveredNode),
+      }
+    : {};
+
+  function nodeById(id) {
+    return nodes.find(n => n.id === id);
+  }
+  // Given a node id, return all previous states (nodes with edges leading to it)
+  function previousStates(nodeId) {
+    return edges
+      .filter(e => e.to === nodeId)
+      .map(e => e.from);
+  }
+
+  // Given a node id, return all next states (nodes with edges from it)
+  function nextStates(nodeId) {
+    return edges
+      .filter(e => e.from === nodeId)
+      .map(e => e.to);
+  }
+
+  // Given a node id, return all end states starting from this node (i.e. edges from this node's target)
+  function endStates(nodeId) {
+    return edges
+      .filter(e => e.from === nodeId)
+      .map(e => e.to);
+  }
+
+
 
 
 
@@ -880,6 +995,205 @@
 
 
 <main class="main-content">
+
+
+<svg width="800" height="400">
+  <!-- Marker for arrows -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
+      markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="gray" />
+    </marker>
+  </defs>
+
+  <!-- Edges (arrows and flow info) -->
+  {#each edges as edge (edge.from + '-' + edge.to)}
+    {#if nodeById(edge.from) && nodeById(edge.to)}
+
+
+      <!-- Visible edge -->
+      <line
+        x1="{nodeById(edge.from).x}"
+        y1="{nodeById(edge.from).y}"
+        x2="{nodeById(edge.to).x}"
+        y2="{nodeById(edge.to).y}"
+        stroke="{edgeColors[edge.from + '-' + edge.to]}"
+        stroke-width="2"
+        marker-end="url(#arrow-{edgeColors[edge.from + '-' + edge.to]})"
+      />
+
+      <!-- Invisible hover hitbox -->
+      <line
+        x1="{nodeById(edge.from).x}"
+        y1="{nodeById(edge.from).y}"
+        x2="{nodeById(edge.to).x}"
+        y2="{nodeById(edge.to).y}"
+        stroke="transparent"
+        stroke-width="32"
+        on:mouseenter={() => hoveredEdge = edge}
+        on:mouseleave={() => hoveredEdge = null}
+        role="presentation"
+      />
+
+      <!-- Flow label
+      <text
+        x="{(nodeById(edge.from).x + nodeById(edge.to).x) / 2}"
+        y="{(nodeById(edge.from).y + nodeById(edge.to).y) / 2 - 10}"
+        text-anchor="middle"
+        font-size="12"
+        fill="black"
+      >
+        F = {edge.flow}
+      </text> -->
+
+      <!-- Particles -->
+      <path
+        id="path-{edge.from}-{edge.to}"
+        d="M {nodeById(edge.from).x} {nodeById(edge.from).y}
+           L {nodeById(edge.to).x} {nodeById(edge.to).y}"
+        fill="none"
+        stroke="transparent"
+      />
+
+      {#each Array(edge.flow) as _, i}
+        <circle r="3" fill="black">
+          <animateMotion
+            dur="{3 - i * 0.3}s"
+            repeatCount="indefinite"
+          >
+            <mpath href="#path-{edge.from}-{edge.to}" />
+          </animateMotion>
+        </circle>
+      {/each}
+    {/if}
+  {/each}
+
+  <!-- Nodes (with labels inside shapes) -->
+  {#each nodes as node}
+  <g
+    role="presentation"
+    on:mouseenter={() => hoveredNode= node.id}
+    on:mouseleave={() => hoveredNode= null}
+  >
+    {#if node.id === 's0'}
+      <!-- Triangle for start state -->
+      <polygon
+        points="{node.x - 10},{node.y + 20} {node.x - 10},{node.y - 20} {node.x + 30},{node.y}"
+        fill="{nodeColors[node.id]}"
+        stroke="black"
+        stroke-width="2"
+      />
+    {:else if node.final}
+      <!-- Square for final state -->
+      <rect
+        x="{node.x - 20}"
+        y="{node.y - 20}"
+        width="40"
+        height="40"
+        rx="4"
+        ry="4"
+        fill="{nodeColors[node.id]}"
+        stroke="black"
+        stroke-width="2"
+      />
+    {:else}
+      <!-- Circle for normal state -->
+      <circle
+        cx="{node.x}"
+        cy="{node.y}"
+        r="20"
+        fill="{nodeColors[node.id]}"
+        stroke="black"
+        stroke-width="2"
+      />
+    {/if}
+
+    <!-- Node label -->
+    <text
+      x="{node.x}"
+      y="{node.y + 5}"
+      text-anchor="middle"
+      font-size="14"
+      fill="white"
+    >
+      {node.id}
+    </text>
+  </g>
+{/each}
+
+</svg>
+
+  <table style="width: 800px; border-collapse: collapse; margin-top: 20px;">
+    <tr>
+      <td style="width: 100px; font-weight: bold; border: 1px solid #ddd; padding: 8px;">Flow</td>
+      <td style="border: 1px solid #ddd; padding: 8px;">
+        {#if hoveredEdge}
+          {hoveredEdge.flow}
+        {:else if hoveredNode}
+          Previous states: {previousStates(hoveredNode).join(', ')}; Next states: {nextStates(hoveredNode).join(', ')}
+        {:else}
+          <Katex displayMode>
+            F(s') = \sum_{"{s: (s,s')\\in\\mathcal{E}}"} F(s \to s') =R(s') + \sum_{"{s'':(s',s'')\\in\\mathcal{E}}"} F(s' \to s'')
+          </Katex>
+        {/if}
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; border: 1px solid #ddd; padding: 8px;">Policy</td>
+      <td style="border: 1px solid #ddd; padding: 8px;">
+        {#if hoveredEdge}
+          Start-state: {hoveredEdge.from}, End-states: {endStates(hoveredEdge.to).join(', ')}
+        {:else if hoveredNode}
+          The policy is calculated for each action(edge)
+        {:else}
+          <Katex displayMode>
+            P_F(s''|s') = \frac{"{F(s'\\to s'')}{F(s')}"}
+          </Katex>
+        {/if}
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; border: 1px solid #ddd; padding: 8px;">Loss</td>
+      <td style="border: 1px solid #ddd; padding: 8px;">
+        {#if hoveredEdge}
+          Loss is calculated state-wise
+        {:else if hoveredNode}
+          Previous states: {previousStates(hoveredNode).join(', ')}; Next states: {nextStates(hoveredNode).join(', ')}
+        {:else}
+          <Katex displayMode>
+            \mathcal{"{L}"}_{"{FM}"} = \left( \log \frac{"{\\sum_{(s''\\to s)}F(s'',s)}"}{"{\\sum_{(s\\to s')}F(s,s')}"} \right)^2
+          </Katex>
+        {/if}
+      </td>
+    </tr>
+  </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   {#if isMobile}
     <div class="mobile-disclaimer">
@@ -2321,6 +2635,14 @@
     color: grey;
     width: 500px;
     margin: 5px auto 1rem;
+  }
+
+  .highlight-red { color: red; }
+  .highlight-green { color: green; }
+  .highlight-blue { color: blue; }
+  svg text {
+    font-size: 14px;
+    font-family: sans-serif;
   }
 
 
