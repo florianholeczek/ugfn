@@ -1159,7 +1159,7 @@
           </Katex>
         {:else if hoveredNode}
           <Katex displayMode>
-            F_{"{in}"}(s_{hoveredNode[1]}) = {previousStatesFormula(hoveredNode)}
+            F_{"{in}"}({hoveredNode[0]}_{hoveredNode[1]}) = {previousStatesFormula(hoveredNode)}
           </Katex>
           {#if nodeById(hoveredNode).final}
             <Katex displayMode>
@@ -1200,9 +1200,11 @@
       <td style="font-weight: bold; border: 1px solid #ddd; padding: 8px;">Loss</td>
       <td style="border: 1px solid #ddd; padding: 8px;">
         {#if hoveredEdge}
-          Loss is calculated state-wise
+          Loss is calculated state-wise.
         {:else if hoveredNode}
-          Previous states: {previousStates(hoveredNode).join(', ')}; Next states: {nextStates(hoveredNode).join(', ')}
+          <Katex displayMode>
+            {`\\mathcal{L}_{FM}(${hoveredNode[0]}_${hoveredNode[1]}) = \\left( \\log \\frac{${previousStatesFormula(hoveredNode)}}{${nextStatesFormula(hoveredNode)}} \\right)^2`}
+          </Katex>
         {:else}
           <Katex displayMode>
             \mathcal{"{L}"}_{"{FM}"}(s) = \left( \log \frac{"{\\sum_{s'}F(s' \\to s)}"}{"{\\sum_{s''}F(s \\to s'')}"} \right)^2
