@@ -913,26 +913,6 @@
   function nodeById(id) {
     return nodes.find(n => n.id === id);
   }
-  // Given a node id, return all previous states (nodes with edges leading to it)
-  function previousStates(nodeId) {
-    return edges
-      .filter(e => e.to === nodeId)
-      .map(e => e.from);
-  }
-
-  // Given a node id, return all next states (nodes with edges from it)
-  function nextStates(nodeId) {
-    return edges
-      .filter(e => e.from === nodeId)
-      .map(e => e.to);
-  }
-
-  // Given a node id, return all end states starting from this node (i.e. edges from this node's target)
-  function endStates(nodeId) {
-    return edges
-      .filter(e => e.from === nodeId)
-      .map(e => e.to);
-  }
 
   function previousStatesFormula(nodeId) {
     let out = edges
@@ -961,6 +941,61 @@
       out = "+" + out;
     }
     return out;
+  }
+
+  function previousStatesValues(nodeId) {
+    let out = edges
+      .filter(e => e.to === nodeId)
+      .map(e => `${e.flow}`)
+      .join(' + ');
+    if (out === ""){
+      out = "10";
+    } else if (out.includes("+")){
+      out = out + `= ${edges.filter(e => e.to === nodeId).reduce((sum, e) => sum + e.flow, 0)}`}
+    return out;
+  }
+
+  function nextStatesValues(nodeId) {
+    let out = edges
+      .filter(e => e.from === nodeId)
+      .map(e => `${e.flow}`)
+      .join(' + ');
+    if(out === "") {
+      out = previousStatesValues(nodeId);
+    } else if (out.includes("+")){
+      out = out + `= ${edges.filter(e => e.from === nodeId).reduce((sum, e) => sum + e.flow, 0)}`}
+    return out;
+  }
+
+  function policyValue(edge) {
+    let prob = (edge.flow / edges
+    .filter(e => e.from === edge.from)
+    .reduce((sum, e) => sum + e.flow, 0))
+    .toFixed(2);
+    let out = edges
+      .filter(e => e.from === edge.from).filter(e => e.to !== edge.to)
+      .map(e => `${e.flow}`)
+      .join(' + ');
+    if(out === "") {
+      out = `\\frac{${edge.flow}}{${edge.flow}} = ${prob} `
+    } else{
+      out = `\\frac{${edge.flow}}{${edge.flow} + ${out}} = ${prob} `
+    }
+    return out;
+  }
+
+  function lossValue(nodeId){
+    let numerator = edges
+      .filter(e => e.to === nodeId)
+      .map(e => `${e.flow}`)
+      .join(' + ');
+    let denominator = edges
+      .filter(e => e.from === nodeId)
+      .map(e => `${e.flow}`)
+      .join(' + ');
+    if (denominator ==="") denominator = numerator;
+    if (numerator === "") numerator = "10";
+    return `\\left( \\log \\frac{${numerator}}{${denominator}} \\right)^2 = 0`
   }
 
 
@@ -1155,15 +1190,15 @@
           </Katex>
         {:else if hoveredNode}
           <Katex displayMode>
-            {`F_{in}(\\textcolor{#31688e}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\textcolor{#35b779}{${previousStatesFormula(hoveredNode)}}`}
+            {`F_{in}(\\textcolor{#31688e}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\textcolor{#35b779}{${previousStatesFormula(hoveredNode)}} = ${previousStatesValues(hoveredNode)}`}
           </Katex>
           {#if nodeById(hoveredNode).final}
             <Katex displayMode>
-              {`F_{out}(\\textcolor{#31688e}{x_${hoveredNode[1]}}) = \\textcolor{#440154}{R(x_${hoveredNode[1]}) + 0}`}
+              {`F_{out}(\\textcolor{#31688e}{x_${hoveredNode[1]}}) = \\textcolor{#440154}{R(x_${hoveredNode[1]}) + 0} = ${nextStatesValues(hoveredNode)}`}
             </Katex>
           {:else}
             <Katex displayMode>
-              {`F_{out}(\\textcolor{#31688e}{s_${hoveredNode[1]}}) = \\textcolor{#440154}{0 + ${nextStatesFormula(hoveredNode)}}`}
+              {`F_{out}(\\textcolor{#31688e}{s_${hoveredNode[1]}}) = \\textcolor{#440154}{0 + ${nextStatesFormula(hoveredNode)}} = ${nextStatesValues(hoveredNode)}`}
             </Katex>
           {/if}
         {:else}
@@ -1181,7 +1216,7 @@
       <td style="border: 1px solid #ddd; padding: 8px;">
         {#if hoveredEdge}
           <Katex displayMode>
-            {`P_F(\\textcolor{#31688e}{${hoveredEdge.to[0]}_${hoveredEdge.to[1]}|s_${hoveredEdge.from[1]}}) = \\frac{\\textcolor{#31688e}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})}}{\\textcolor{#31688e}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})} \\textcolor{#35b779}{${policyFormula(hoveredEdge)}}}`}
+            {`P_F(\\textcolor{#31688e}{${hoveredEdge.to[0]}_${hoveredEdge.to[1]}|s_${hoveredEdge.from[1]}}) = \\frac{\\textcolor{#31688e}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})}}{\\textcolor{#31688e}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})} \\textcolor{#35b779}{${policyFormula(hoveredEdge)}}} = ${policyValue(hoveredEdge)}`}
           </Katex>
         {:else if hoveredNode}
           The policy is calculated for each action (edge).
@@ -1199,7 +1234,7 @@
           The Loss is calculated for each state.
         {:else if hoveredNode}
           <Katex displayMode>
-            {`\\mathcal{L}_{FM}(\\textcolor{#31688e}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\left( \\log \\frac{\\textcolor{#35b779}{${previousStatesFormula(hoveredNode)}}}{\\textcolor{#440154}{${nextStatesFormula(hoveredNode)}}} \\right)^2`}
+            {`\\mathcal{L}_{FM}(\\textcolor{#31688e}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\left( \\log \\frac{\\textcolor{#35b779}{${previousStatesFormula(hoveredNode)}}}{\\textcolor{#440154}{${nextStatesFormula(hoveredNode)}}} \\right)^2 = ${lossValue(hoveredNode)}`}
           </Katex>
         {:else}
           <Katex displayMode>
