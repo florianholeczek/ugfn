@@ -919,7 +919,7 @@
       .filter(e => e.to === nodeId)
       .map(e => `F(s_${e.from[1]} \\to ${e.to[0]}_${e.to[1]})`)
       .join(' + ');
-    if (out === "") out = "F_{total}";
+    if (out === "") out = "Z";
     return out;
   }
 
@@ -1051,226 +1051,6 @@
 
 
 <main class="main-content">
-
-
-
-<svg width="800" height="400">
-  <!-- Marker for arrows -->
-  <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
-      markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="gray" />
-    </marker>
-  </defs>
-
-  <!-- Edges (arrows and flow info) -->
-  {#each edges as edge (edge.from + '-' + edge.to)}
-    {#if nodeById(edge.from) && nodeById(edge.to)}
-
-
-      <!-- Visible edge -->
-      <line
-        x1="{nodeById(edge.from).x}"
-        y1="{nodeById(edge.from).y}"
-        x2="{nodeById(edge.to).x}"
-        y2="{nodeById(edge.to).y}"
-        stroke="{edgeColors[edge.from + '-' + edge.to]}"
-        stroke-width="2"
-        marker-end="url(#arrow-{edgeColors[edge.from + '-' + edge.to]})"
-      />
-
-      <!-- Flow label
-      <text
-        x="{(nodeById(edge.from).x + nodeById(edge.to).x) / 2}"
-        y="{(nodeById(edge.from).y + nodeById(edge.to).y) / 2 - 10}"
-        text-anchor="middle"
-        font-size="12"
-        fill="black"
-      >
-        F = {edge.flow}
-      </text> -->
-
-      <!-- Particles -->
-      <path
-        id="path-{edge.from}-{edge.to}"
-        d="M {nodeById(edge.from).x} {nodeById(edge.from).y}
-           L {nodeById(edge.to).x} {nodeById(edge.to).y}"
-        fill="none"
-        stroke="transparent"
-      />
-
-      {#each Array(edge.flow) as _, i}
-        <circle r="3" fill="black">
-          <animateMotion
-            dur="{3 - i * 0.3}s"
-            repeatCount="indefinite"
-          >
-            <mpath href="#path-{edge.from}-{edge.to}" />
-          </animateMotion>
-        </circle>
-      {/each}
-
-      <!-- Invisible hover hitbox -->
-      <line
-        x1="{nodeById(edge.from).x}"
-        y1="{nodeById(edge.from).y}"
-        x2="{nodeById(edge.to).x}"
-        y2="{nodeById(edge.to).y}"
-        stroke="transparent"
-        stroke-width="32"
-        on:mouseenter={() => hoveredEdge = edge}
-        on:mouseleave={() => hoveredEdge = null}
-        role="presentation"
-      />
-    {/if}
-  {/each}
-
-  <!-- Nodes (with labels inside shapes) -->
-  {#each nodes as node}
-  <g
-    role="presentation"
-    on:mouseenter={() => hoveredNode= node.id}
-    on:mouseleave={() => hoveredNode= null}
-  >
-    {#if node.id === 's0'}
-      <!-- Triangle for start state -->
-      <polygon
-        points="{node.x - 10},{node.y + 20} {node.x - 10},{node.y - 20} {node.x + 30},{node.y}"
-        fill="{nodeColors[node.id]}"
-        stroke="black"
-        stroke-width="2"
-      />
-    {:else if node.final}
-      <!-- Square for final state -->
-      <rect
-        x="{node.x - 20}"
-        y="{node.y - 20}"
-        width="40"
-        height="40"
-        rx="4"
-        ry="4"
-        fill="{nodeColors[node.id]}"
-        stroke="black"
-        stroke-width="2"
-      />
-    {:else}
-      <!-- Circle for normal state -->
-      <circle
-        cx="{node.x}"
-        cy="{node.y}"
-        r="20"
-        fill="{nodeColors[node.id]}"
-        stroke="black"
-        stroke-width="2"
-      />
-    {/if}
-
-    <!-- Node label -->
-    <text
-      x="{node.x}"
-      y="{node.y + 5}"
-      text-anchor="middle"
-      font-size="14"
-      fill="white"
-    >
-      {node.id}
-    </text>
-  </g>
-{/each}
-
-</svg>
-
-  <table style="width: 800px; border-collapse: collapse; margin-top: 20px;">
-    <tr>
-      <td style="width: 100px; font-weight: bold; border: 1px solid #ddd; padding: 8px;">Flow</td>
-      <td style="border: 1px solid #ddd; padding: 8px;">
-        {#if hoveredEdge}
-          <Katex displayMode>
-            {`F(\\textcolor{#31688e}{s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]}}) = ${hoveredEdge.flow}`}
-          </Katex>
-        {:else if hoveredNode}
-          <Katex displayMode>
-            {`F_{in}(\\textcolor{#31688e}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\textcolor{#35b779}{${previousStatesFormula(hoveredNode)}} = ${previousStatesValues(hoveredNode)}`}
-          </Katex>
-          {#if nodeById(hoveredNode).final}
-            <Katex displayMode>
-              {`F_{out}(\\textcolor{#31688e}{x_${hoveredNode[1]}}) = \\textcolor{#440154}{R(x_${hoveredNode[1]}) + 0} = ${nextStatesValues(hoveredNode)}`}
-            </Katex>
-          {:else}
-            <Katex displayMode>
-              {`F_{out}(\\textcolor{#31688e}{s_${hoveredNode[1]}}) = \\textcolor{#440154}{0 + ${nextStatesFormula(hoveredNode)}} = ${nextStatesValues(hoveredNode)}`}
-            </Katex>
-          {/if}
-        {:else}
-          <Katex displayMode>
-            F_{"{in}"}(s) = \sum_{"{s'}"} F(s' \to s)
-          </Katex>
-          <Katex displayMode>
-            F_{"{out}"}(s) =R(s) + \sum_{"{s''}"} F(s \to s'')
-          </Katex>
-        {/if}
-      </td>
-    </tr>
-    <tr>
-      <td style="font-weight: bold; border: 1px solid #ddd; padding: 8px;">Policy</td>
-      <td style="border: 1px solid #ddd; padding: 8px;">
-        {#if hoveredEdge}
-          <Katex displayMode>
-            {`P_F(\\textcolor{#31688e}{${hoveredEdge.to[0]}_${hoveredEdge.to[1]}|s_${hoveredEdge.from[1]}}) = \\frac{\\textcolor{#31688e}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})}}{\\textcolor{#31688e}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})} \\textcolor{#35b779}{${policyFormula(hoveredEdge)}}} = ${policyValue(hoveredEdge)}`}
-          </Katex>
-        {:else if hoveredNode}
-          The policy is calculated for each action (edge).
-        {:else}
-          <Katex displayMode>
-            {`P_F(s''_n|s) = \\frac{F(s \\to s''_n)}{\\sum_{s''} F(s \\to s'')}`}
-          </Katex>
-        {/if}
-      </td>
-    </tr>
-    <tr>
-      <td style="font-weight: bold; border: 1px solid #ddd; padding: 8px;">Loss</td>
-      <td style="border: 1px solid #ddd; padding: 8px;">
-        {#if hoveredEdge}
-          The Loss is calculated for each state.
-        {:else if hoveredNode}
-          <Katex displayMode>
-            {`\\mathcal{L}_{FM}(\\textcolor{#31688e}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\left( \\log \\frac{\\textcolor{#35b779}{${previousStatesFormula(hoveredNode)}}}{\\textcolor{#440154}{${nextStatesFormula(hoveredNode)}}} \\right)^2 = ${lossValue(hoveredNode)}`}
-          </Katex>
-        {:else}
-          <Katex displayMode>
-            {`\\mathcal{L}_{FM}(s) = \\left( \\log \\frac{ \\sum_{s'}F(s' \\to s)}{\\sum_{s''}F(s \\to s'')} \\right)^2`}
-          </Katex>
-        {/if}
-      </td>
-    </tr>
-  </table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   {#if isMobile}
     <div class="mobile-disclaimer">
@@ -2089,9 +1869,12 @@
         In this it is similar to Markov Chain Monte Carlo, but offers some advantages regarding compute and sparse environments.
         GFlowNets allow for generating objects with sequentially built compositional structure like trees or graphs - They construct the final object stepwise.
 
-        <br>We train a model to learn a distribution <Katex>\pi(x)</Katex> (our policy), so we can sample from it. For this, we need a reward function R(x) which assigns value to each final object x and we want <Katex>\pi(x)</Katex> to sample proportional to it:  <Katex>\pi(x) \propto R(x)</Katex>. This allows us later on to sample a diversity of solutions instead of just the reward-maximizing one.
-
-        <br>As we do not rely on an external dataset but only on our internal reward function we are only limited by compute - we can generate objects and query the reward function as often as we like.
+        <br>
+        If we have a reward function <Katex>R(x)</Katex> which assigns value to each final object <Katex>x</Katex>
+        we can train a model, which learns to sample proportional to the reward.
+        This allows us later on to sample a diversity of solutions instead of just the reward-maximizing one.
+        As we do not rely on an external dataset but only on our internal reward function we are only limited by compute
+        - we can generate objects and query the reward function as often as we like.
 
       </p>
         <div class="image-container">
@@ -2121,64 +1904,268 @@
         When sequentially generating an object, we need to take actions which give us the next state:
         We could add one of the possible components or decide we are done.
         For this we use a neural net which represents our forward policy
-        <Katex>
-          P_F(s_{"{t+1}"}|s_t)
-        </Katex>, it gives us the action which leads to the next state.
+        <Katex>P_F(s''_s|s)</Katex>, it gives us the action which leads to the next state.
         <br>
         <br>So far, everything sounds very nice, but how do we achieve this?
-        <br>That's where the Flows come into play.
-        <br>
-        <br>If you connect all possible states from the start state to the terminal states you get a directed graph.
-        If you want to use a GFlowNet for your task it is important that the graph is acyclic, i.e. it is not possible to reach a previous state.
+        <br>That's where Flow comes into play.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Flow, Policies and Training Objective </h2>
+      <p class="section-text">
+        <br>If you connect all possible states from the start state to the terminal states you obtain a directed graph.
+        If you want to use a GFlowNet for your task it is important that the graph is acyclic, meaning it's not possible to revisit a previous state.
         We can now interpret this directed acyclic graph (DAG) as a flow network.
-        <br>Imagine water flowing from the start space through the intermediate states to the final states, following the edges of the DAG like pipes.
+        <br>
+        You can compare it to water flowing from the start state through the intermediate states to the final states, following the edges of the DAG like pipes.
         <br>
       </p>
-        <div class="image-container-small">
-          <img src="/images/gflownet_anim.gif" class="image" alt="A visualization of the flow through the DAG">
-        </div>
-      <p class="section-text">
-        <span class="mathexpl">Visualization from the GFlowNet Tutorial by MILA showing the flow from the start state to the terminal states as particles</span>
 
-        <br>This places an important constraint on our model: Preservation of Flow.
-        The pipes (edges) and states (nodes) must not be leaky, all of the water has to be preserved.
+      <svg width="800" height="400" style="display: block; margin: 20px auto;">
+        <!-- Marker for arrows -->
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
+            markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="gray" />
+          </marker>
+        </defs>
+
+        <!-- Edges (arrows and flow info) -->
+        {#each edges as edge (edge.from + '-' + edge.to)}
+          {#if nodeById(edge.from) && nodeById(edge.to)}
+
+
+            <!-- Visible edge -->
+            <line
+              x1="{nodeById(edge.from).x}"
+              y1="{nodeById(edge.from).y}"
+              x2="{nodeById(edge.to).x}"
+              y2="{nodeById(edge.to).y}"
+              stroke="{edgeColors[edge.from + '-' + edge.to]}"
+              stroke-width="2"
+              marker-end="url(#arrow-{edgeColors[edge.from + '-' + edge.to]})"
+            />
+
+            <!-- Flow label
+            <text
+              x="{(nodeById(edge.from).x + nodeById(edge.to).x) / 2}"
+              y="{(nodeById(edge.from).y + nodeById(edge.to).y) / 2 - 10}"
+              text-anchor="middle"
+              font-size="12"
+              fill="black"
+            >
+              F = {edge.flow}
+            </text> -->
+
+            <!-- Particles -->
+            <path
+              id="path-{edge.from}-{edge.to}"
+              d="M {nodeById(edge.from).x} {nodeById(edge.from).y}
+                 L {nodeById(edge.to).x} {nodeById(edge.to).y}"
+              fill="none"
+              stroke="transparent"
+            />
+
+            {#each Array(edge.flow) as _, i}
+              <circle r="3" fill="black">
+                <animateMotion
+                  dur="{3 - i * 0.3}s"
+                  repeatCount="indefinite"
+                >
+                  <mpath href="#path-{edge.from}-{edge.to}" />
+                </animateMotion>
+              </circle>
+            {/each}
+
+            <!-- Invisible hover hitbox -->
+            <line
+              x1="{nodeById(edge.from).x}"
+              y1="{nodeById(edge.from).y}"
+              x2="{nodeById(edge.to).x}"
+              y2="{nodeById(edge.to).y}"
+              stroke="transparent"
+              stroke-width="32"
+              on:mouseenter={() => hoveredEdge = edge}
+              on:mouseleave={() => hoveredEdge = null}
+              role="presentation"
+            />
+          {/if}
+        {/each}
+
+        <!-- Nodes (with labels inside shapes) -->
+        {#each nodes as node}
+        <g
+          role="presentation"
+          on:mouseenter={() => hoveredNode= node.id}
+          on:mouseleave={() => hoveredNode= null}
+        >
+          {#if node.id === 's0'}
+            <!-- Triangle for start state -->
+            <polygon
+              points="{node.x - 10},{node.y + 20} {node.x - 10},{node.y - 20} {node.x + 30},{node.y}"
+              fill="{nodeColors[node.id]}"
+              stroke="black"
+              stroke-width="2"
+            />
+          {:else if node.final}
+            <!-- Square for final state -->
+            <rect
+              x="{node.x - 20}"
+              y="{node.y - 20}"
+              width="40"
+              height="40"
+              rx="4"
+              ry="4"
+              fill="{nodeColors[node.id]}"
+              stroke="black"
+              stroke-width="2"
+            />
+          {:else}
+            <!-- Circle for normal state -->
+            <circle
+              cx="{node.x}"
+              cy="{node.y}"
+              r="20"
+              fill="{nodeColors[node.id]}"
+              stroke="black"
+              stroke-width="2"
+            />
+          {/if}
+
+          <!-- Node label -->
+          <text
+            x="{node.x}"
+            y="{node.y + 5}"
+            text-anchor="middle"
+            font-size="14"
+            fill="white"
+          >
+            {node.id}
+          </text>
+        </g>
+      {/each}
+
+      </svg>
+
+      <table style="width: 800px; border-collapse: collapse; margin: 20px auto;">
+        <tr>
+          <td style="width: 100px; height:170px;  font-weight: bold; border: 1px solid #ddd; padding: 8px;">Flow</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">
+            {#if hoveredEdge}
+              <Katex displayMode>
+                {`F(\\textcolor{#31688e}{s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]}}) = ${hoveredEdge.flow}`}
+              </Katex>
+            {:else if hoveredNode}
+              <Katex displayMode>
+                {`F_{in}(\\textcolor{#31688e}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\textcolor{#35b779}{${previousStatesFormula(hoveredNode)}} = ${previousStatesValues(hoveredNode)}`}
+              </Katex>
+              {#if nodeById(hoveredNode).final}
+                <Katex displayMode>
+                  {`F_{out}(\\textcolor{#31688e}{x_${hoveredNode[1]}}) = \\textcolor{#440154}{R(x_${hoveredNode[1]}) + 0} = ${nextStatesValues(hoveredNode)}`}
+                </Katex>
+              {:else}
+                <Katex displayMode>
+                  {`F_{out}(\\textcolor{#31688e}{s_${hoveredNode[1]}}) = \\textcolor{#440154}{0 + ${nextStatesFormula(hoveredNode)}} = ${nextStatesValues(hoveredNode)}`}
+                </Katex>
+              {/if}
+            {:else}
+              <Katex displayMode>
+                F_{"{in}"}(s) = \sum_{"{s'}"} F(s' \to s)
+              </Katex>
+              <Katex displayMode>
+                F_{"{out}"}(s) =R(s) + \sum_{"{s''}"} F(s \to s'')
+              </Katex>
+            {/if}
+          </td>
+        </tr>
+        <tr>
+          <td style="font-weight: bold; height:100px;  border: 1px solid #ddd; padding: 8px;">Policy</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">
+            {#if hoveredEdge}
+              <Katex displayMode>
+                {`P_F(\\textcolor{#31688e}{${hoveredEdge.to[0]}_${hoveredEdge.to[1]}|s_${hoveredEdge.from[1]}}) = \\frac{\\textcolor{#31688e}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})}}{\\textcolor{#31688e}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})} \\textcolor{#35b779}{${policyFormula(hoveredEdge)}}} = ${policyValue(hoveredEdge)}`}
+              </Katex>
+            {:else if hoveredNode}
+              The policy is calculated for each action (edge).
+            {:else}
+              <Katex displayMode>
+                {`P_F(s''_s|s) = \\frac{F(s \\to s''_s)}{\\sum_{s''} F(s \\to s'')}`}
+              </Katex>
+            {/if}
+          </td>
+        </tr>
+        <tr>
+          <td style="font-weight: bold; height:100px;  border: 1px solid #ddd; padding: 8px;">Loss</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">
+            {#if hoveredEdge}
+              The Loss is calculated for each state.
+            {:else if hoveredNode}
+              <Katex displayMode>
+                {`\\mathcal{L}_{FM}(\\textcolor{#31688e}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\left( \\log \\frac{\\textcolor{#35b779}{${previousStatesFormula(hoveredNode)}}}{\\textcolor{#440154}{${nextStatesFormula(hoveredNode)}}} \\right)^2 = ${lossValue(hoveredNode)}`}
+              </Katex>
+            {:else}
+              <Katex displayMode>
+                {`\\mathcal{L}_{FM}(s) = \\left( \\log \\frac{ \\sum_{s'}F(s' \\to s)}{\\sum_{s''}F(s \\to s'')} \\right)^2`}
+              </Katex>
+            {/if}
+          </td>
+        </tr>
+      </table>
+      <div class="image-container">
+          <Accordion>
+            <Panel color="secondary">
+              <Header>A note on notation</Header>
+              <Content>
+                When describing the state space we often look at a specific state <Katex>s</Katex>.
+                We will use <Katex>s'</Katex>for all parent states of <Katex>s</Katex> and <Katex>s''</Katex> for its children.
+                We often need to sum over the edges from the parents to <Katex>s</Katex> (or from <Katex>s</Katex> to its children).
+                Precisely written this would be <Katex>\sum_{"{s:(s,s') \\in \\mathcal{E}}"}</Katex>,
+                but to ease notation we will write <Katex>\sum_{"{s'}"}</Katex> for this (or <Katex>\sum_{"{s''}"}</Katex>respectively).
+                To denote a specific child of <Katex>s</Katex> we use <Katex>s_s</Katex>.
+                This keeps everything concise and should help following the formulas when looking at the DAG,
+                as the structure <Katex>s' \to s \to s''</Katex> stays consistent.
+              </Content>
+            </Panel>
+          </Accordion>
+        </div>
+
+
+
+
+
+
+
+      <p class="section-text">
+        Hover over the states to see the <b>Flow</b> going in and out of them.
+        You can also hover over an edge to see its value directly.
+        If you look at individual states you see that the incoming flow is always equal to the outgoing flow.
+        This shows an important constraint: Flow consistency.
+
+        In the water pipe analogy this corresponds to watertightness.
+        The pipes (edges) and states (nodes) must not leak, all of the water has to be preserved.
         <br>This means:
         <br>
-
-        <span class="li">The flow going into the DAG (Flow of the start state) is the same as the Flow going out of it (Sum of the flow of all terminal states).</span>
-        <span class="li">Same for the nodes: The sum of the flow going into a state is the same as the sum of the flow going out of it.</span>
+        <span class="li">The flow entering the DAG (at the start state) equals the total flow exiting it (i.e., the sum of flows at all terminal states).</span>
+        <span class="li">For any intermediate state, the sum of incoming flows equals the sum of outgoing flows.</span>
+        The GFlowNet will estimate the flow functions to achieve the desired flow
+        of the terminal states <Katex>x</Katex> which is equal to their reward <Katex>F(x)=R(x)</Katex>.
         <br>
-        We now can set the flow going out of a terminal state equal to its reward.
-        Assuming all flow is strictly positive, we can express the Flow from one state s to its children s' as:
-
-
-        <Katex displayMode>
-          \sum_{"{s'}"} F(s,s') = \sum_{"{s'}"} R(s') + F(s')
-        </Katex>
-        <span class="mathexpl">The total Flow of a state is the Reward of its terminal children plus the Flow of its non-terminal children</span>
-
-
-        We now define our forward policy as the proportion of the Flow
-        <Katex>
-          s \to s'
-        </Katex> to the total Flow of s:
-        <Katex displayMode>
-        P_F(s'|s) = \frac{"{F(s,s')}{F(s)}"}
-        </Katex>
-        <span class="mathexpl"> The probability to sample an action to get to the next state s' is the flow going from s to s' divided by the total flow through s</span>
-        By using this policy we will sample finished objects x proportional to their reward.
-
-        <br>The only thing we miss for training is the loss. The easiest way would be to turn our flow matching constraint into a MSE:
-
-        <Katex displayMode>
-          \mathcal{"{L}"}_{"{FM}"} = \left( \log \frac{"{\\sum_{(s''\\to s)}F(s'',s)}"}{"{\\sum_{(s\\to s')}F(s,s')}"} \right)^2
-        </Katex>
-        <span class="mathexpl"> If the flow going into a state is equal to the flow going out of a state the loss goes to 0.</span>
-
-        This is actually what the authors did in the first paper (Benigo et al., 2021), however it does not perform so well as there are problems with credit assignment.
+        <br>
+        We can now use the flow to define our Forward <b>Policy</b> <Katex>P_F(s''_s|s)</Katex>, visible by hovering over the edges.
+        The policy gives us a transition probability from one state <Katex>s</Katex> to one of its children <Katex>s''_s</Katex>.
+        It is simply the flow going to <Katex>s''_s</Katex> divided by the total outgoing flow of <Katex>s</Katex>.
+        The policy is learned by a (small) neural network and the agent can use it to sample their next action.
+        <br>
+        <br>
+        Deriving a training objective is actually quite simple: We turn the Flow consistency into a mean squared error.
+        This gives us <b>Loss</b> for each state, again you can see the calculation by hovering over the states.
+        In the DAG shown above, the flow is perfectly matched:
+        the incoming flow at each state equals the outgoing flow, so the loss is always zero.
+        <br>
+        In the first GFlowNet paper (Benigo et al., 2021) the authors used this loss, however it does not perform so well as there are problems with credit assignment.
         We will later use the Trajectory Balance Loss (Malkin et al., 2022) to calculate the loss for a whole trajectory instead of single states.
         It converges better but is a bit more complicated, so let's ignore it for now and look at our environment.
-
       </p>
 
 
@@ -2190,7 +2177,7 @@
         Note that this is unusual: GFlowNets allow for variable trajectory lengths, so the action space usually contains an additional end of sequence action, where the current state becomes the final state.
         However fixing the trajectory length keeps everything a lot simpler.
         <br>
-        <br>Above we stated that GFlowNets build an Acyclic Graph, so each state can only be visited once. We currently violate this assumption: While it is unlikely that a state gets visited twice in our continuous environment, it is still possible. To mitigate this we simply include a counter in our state which represents the current step.
+        <br>Above we stated that GFlowNets build a DAG, so each state can be visited only once. We currently violate this assumption: While it is unlikely that a state gets visited twice in our continuous environment, it is still possible. To mitigate this we simply include a counter in our state which represents the current step.
         We also simplified the variance of the gaussians to one parameter, so the variance for x and y is the same and there is no covariance <Katex>(\Sigma = \sigma^2 I)</Katex>.
     </section>
 
