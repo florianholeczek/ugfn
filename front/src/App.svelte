@@ -1044,19 +1044,6 @@
         marker-end="url(#arrow-{edgeColors[edge.from + '-' + edge.to]})"
       />
 
-      <!-- Invisible hover hitbox -->
-      <line
-        x1="{nodeById(edge.from).x}"
-        y1="{nodeById(edge.from).y}"
-        x2="{nodeById(edge.to).x}"
-        y2="{nodeById(edge.to).y}"
-        stroke="transparent"
-        stroke-width="32"
-        on:mouseenter={() => hoveredEdge = edge}
-        on:mouseleave={() => hoveredEdge = null}
-        role="presentation"
-      />
-
       <!-- Flow label
       <text
         x="{(nodeById(edge.from).x + nodeById(edge.to).x) / 2}"
@@ -1087,6 +1074,19 @@
           </animateMotion>
         </circle>
       {/each}
+
+      <!-- Invisible hover hitbox -->
+      <line
+        x1="{nodeById(edge.from).x}"
+        y1="{nodeById(edge.from).y}"
+        x2="{nodeById(edge.to).x}"
+        y2="{nodeById(edge.to).y}"
+        stroke="transparent"
+        stroke-width="32"
+        on:mouseenter={() => hoveredEdge = edge}
+        on:mouseleave={() => hoveredEdge = null}
+        role="presentation"
+      />
     {/if}
   {/each}
 
