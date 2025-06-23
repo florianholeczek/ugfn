@@ -942,6 +942,28 @@
       .map(e => e.to);
   }
 
+  function previousStatesFormula(nodeId) {
+    return edges
+      .filter(e => e.to === nodeId)
+      .map(e => `F(s_${e.from[1]} \\to ${e.to[0]}_${e.to[1]})`)
+      .join(' + ');
+  }
+
+  function nextStatesFormula(nodeId) {
+    return edges
+      .filter(e => e.from === nodeId)
+      .map(e => `F(s_${e.from[1]} \\to ${e.to[0]}_${e.to[1]})`)
+      .join(' + ');
+  }
+
+  function policyFormula(edge) {
+    return edges
+      .filter(e => e.from === edge.from)
+      .map(e => `F(s_${e.from[1]} \\to ${e.to[0]}_${e.to[1]})`)
+      .join(' + ');
+  }
+
+
 
 
 
@@ -977,7 +999,6 @@
 -->
 
 
-
 <Snackbar bind:this={snackbar_load} leading>
   <Label>Settings of this training run have been loaded into the playground</Label>
   <Actions>
@@ -995,6 +1016,11 @@
 
 
 <main class="main-content">
+
+  <Katex>
+  \textcolor{"{#31688e}"}{"{Test}"}
+</Katex>
+
 
 
 <svg width="800" height="400">
@@ -1128,12 +1154,28 @@
       <td style="width: 100px; font-weight: bold; border: 1px solid #ddd; padding: 8px;">Flow</td>
       <td style="border: 1px solid #ddd; padding: 8px;">
         {#if hoveredEdge}
-          {hoveredEdge.flow}
+          <Katex displayMode>
+            F(s_{hoveredEdge.from[1]} \to {hoveredEdge.to[0]}_{hoveredEdge.to[1]}) = {hoveredEdge.flow}
+          </Katex>
         {:else if hoveredNode}
-          Previous states: {previousStates(hoveredNode).join(', ')}; Next states: {nextStates(hoveredNode).join(', ')}
+          <Katex displayMode>
+            F_{"{in}"}(s_{hoveredNode[1]}) = {previousStatesFormula(hoveredNode)}
+          </Katex>
+          {#if nodeById(hoveredNode).final}
+            <Katex displayMode>
+              F_{"{out}"}(x_{hoveredNode[1]}) = R(x_{hoveredNode[1]}) + 0
+            </Katex>
+          {:else}
+            <Katex displayMode>
+              F_{"{out}"}(s_{hoveredNode[1]}) = 0 + {nextStatesFormula(hoveredNode)}
+            </Katex>
+          {/if}
         {:else}
           <Katex displayMode>
-            F(s') = \sum_{"{s: (s,s')\\in\\mathcal{E}}"} F(s \to s') =R(s') + \sum_{"{s'':(s',s'')\\in\\mathcal{E}}"} F(s' \to s'')
+            F_{"{in}"}(s) = \sum_{"{s'}"} F(s' \to s)
+          </Katex>
+          <Katex displayMode>
+            F_{"{out}"}(s) =R(s) + \sum_{"{s''}"} F(s \to s'')
           </Katex>
         {/if}
       </td>
@@ -1142,12 +1184,14 @@
       <td style="font-weight: bold; border: 1px solid #ddd; padding: 8px;">Policy</td>
       <td style="border: 1px solid #ddd; padding: 8px;">
         {#if hoveredEdge}
-          Start-state: {hoveredEdge.from}, End-states: {endStates(hoveredEdge.to).join(', ')}
+          <Katex displayMode>
+            {`P_F(${hoveredEdge.to[0]}_${hoveredEdge.to[1]}|s_${hoveredEdge.from[1]}) = \\frac{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})}{${policyFormula(hoveredEdge)}}`}
+          </Katex>
         {:else if hoveredNode}
-          The policy is calculated for each action(edge)
+          The policy is calculated for each action (edge).
         {:else}
           <Katex displayMode>
-            P_F(s''|s') = \frac{"{F(s'\\to s'')}{F(s')}"}
+            P_F(s''_n|s) = \frac{"{F(s\\to s''_n)}{\\sum_{s''} F(s \\to s'')}"}
           </Katex>
         {/if}
       </td>
@@ -1161,7 +1205,7 @@
           Previous states: {previousStates(hoveredNode).join(', ')}; Next states: {nextStates(hoveredNode).join(', ')}
         {:else}
           <Katex displayMode>
-            \mathcal{"{L}"}_{"{FM}"} = \left( \log \frac{"{\\sum_{(s''\\to s)}F(s'',s)}"}{"{\\sum_{(s\\to s')}F(s,s')}"} \right)^2
+            \mathcal{"{L}"}_{"{FM}"}(s) = \left( \log \frac{"{\\sum_{s'}F(s' \\to s)}"}{"{\\sum_{s''}F(s \\to s'')}"} \right)^2
           </Katex>
         {/if}
       </td>
@@ -2644,6 +2688,14 @@
     font-size: 14px;
     font-family: sans-serif;
   }
+  .red-underline {
+  text-decoration: underline;
+  text-decoration-color: red;
+  text-decoration-thickness: 2px;
+}
+  .red-underline .katex {
+  border-bottom: 2px solid red;
+}
 
 
 </style>
