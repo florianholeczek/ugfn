@@ -910,14 +910,6 @@
     }
   }
 
-  $: hoverType = hoveredNode
-    ? {
-        self: true,
-        prev: edges.find(e => e.to === hoveredNode),
-        next: edges.find(e => e.from === hoveredNode),
-      }
-    : {};
-
   function nodeById(id) {
     return nodes.find(n => n.id === id);
   }
@@ -943,24 +935,32 @@
   }
 
   function previousStatesFormula(nodeId) {
-    return edges
+    let out = edges
       .filter(e => e.to === nodeId)
       .map(e => `F(s_${e.from[1]} \\to ${e.to[0]}_${e.to[1]})`)
       .join(' + ');
+    if (out === "") out = "F_{total}";
+    return out;
   }
 
   function nextStatesFormula(nodeId) {
-    return edges
+    let out = edges
       .filter(e => e.from === nodeId)
       .map(e => `F(s_${e.from[1]} \\to ${e.to[0]}_${e.to[1]})`)
       .join(' + ');
+    if(out === "") out = `R(x_${nodeId[1]})`;
+    return out;
   }
 
   function policyFormula(edge) {
-    return edges
-      .filter(e => e.from === edge.from)
+    let out = edges
+      .filter(e => e.from === edge.from).filter(e => e.to !== edge.to)
       .map(e => `F(s_${e.from[1]} \\to ${e.to[0]}_${e.to[1]})`)
       .join(' + ');
+    if (out !== "") {
+      out = "+" + out;
+    }
+    return out;
   }
 
 
@@ -1016,10 +1016,6 @@
 
 
 <main class="main-content">
-
-  <Katex>
-  \textcolor{"{#31688e}"}{"{Test}"}
-</Katex>
 
 
 
@@ -1155,19 +1151,19 @@
       <td style="border: 1px solid #ddd; padding: 8px;">
         {#if hoveredEdge}
           <Katex displayMode>
-            F(s_{hoveredEdge.from[1]} \to {hoveredEdge.to[0]}_{hoveredEdge.to[1]}) = {hoveredEdge.flow}
+            {`F(\\textcolor{#31688e}{s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]}}) = ${hoveredEdge.flow}`}
           </Katex>
         {:else if hoveredNode}
           <Katex displayMode>
-            F_{"{in}"}({hoveredNode[0]}_{hoveredNode[1]}) = {previousStatesFormula(hoveredNode)}
+            {`F_{in}(\\textcolor{#31688e}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\textcolor{#35b779}{${previousStatesFormula(hoveredNode)}}`}
           </Katex>
           {#if nodeById(hoveredNode).final}
             <Katex displayMode>
-              F_{"{out}"}(x_{hoveredNode[1]}) = R(x_{hoveredNode[1]}) + 0
+              {`F_{out}(\\textcolor{#31688e}{x_${hoveredNode[1]}}) = \\textcolor{#440154}{R(x_${hoveredNode[1]}) + 0}`}
             </Katex>
           {:else}
             <Katex displayMode>
-              F_{"{out}"}(s_{hoveredNode[1]}) = 0 + {nextStatesFormula(hoveredNode)}
+              {`F_{out}(\\textcolor{#31688e}{s_${hoveredNode[1]}}) = \\textcolor{#440154}{0 + ${nextStatesFormula(hoveredNode)}}`}
             </Katex>
           {/if}
         {:else}
@@ -1185,13 +1181,13 @@
       <td style="border: 1px solid #ddd; padding: 8px;">
         {#if hoveredEdge}
           <Katex displayMode>
-            {`P_F(${hoveredEdge.to[0]}_${hoveredEdge.to[1]}|s_${hoveredEdge.from[1]}) = \\frac{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})}{${policyFormula(hoveredEdge)}}`}
+            {`P_F(\\textcolor{#31688e}{${hoveredEdge.to[0]}_${hoveredEdge.to[1]}|s_${hoveredEdge.from[1]}}) = \\frac{\\textcolor{#31688e}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})}}{\\textcolor{#31688e}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})} \\textcolor{#35b779}{${policyFormula(hoveredEdge)}}}`}
           </Katex>
         {:else if hoveredNode}
           The policy is calculated for each action (edge).
         {:else}
           <Katex displayMode>
-            P_F(s''_n|s) = \frac{"{F(s\\to s''_n)}{\\sum_{s''} F(s \\to s'')}"}
+            {`P_F(s''_n|s) = \\frac{F(s \\to s''_n)}{\\sum_{s''} F(s \\to s'')}`}
           </Katex>
         {/if}
       </td>
@@ -1200,14 +1196,14 @@
       <td style="font-weight: bold; border: 1px solid #ddd; padding: 8px;">Loss</td>
       <td style="border: 1px solid #ddd; padding: 8px;">
         {#if hoveredEdge}
-          Loss is calculated state-wise.
+          The Loss is calculated for each state.
         {:else if hoveredNode}
           <Katex displayMode>
-            {`\\mathcal{L}_{FM}(${hoveredNode[0]}_${hoveredNode[1]}) = \\left( \\log \\frac{${previousStatesFormula(hoveredNode)}}{${nextStatesFormula(hoveredNode)}} \\right)^2`}
+            {`\\mathcal{L}_{FM}(\\textcolor{#31688e}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\left( \\log \\frac{\\textcolor{#35b779}{${previousStatesFormula(hoveredNode)}}}{\\textcolor{#440154}{${nextStatesFormula(hoveredNode)}}} \\right)^2`}
           </Katex>
         {:else}
           <Katex displayMode>
-            \mathcal{"{L}"}_{"{FM}"}(s) = \left( \log \frac{"{\\sum_{s'}F(s' \\to s)}"}{"{\\sum_{s''}F(s \\to s'')}"} \right)^2
+            {`\\mathcal{L}_{FM}(s) = \\left( \\log \\frac{ \\sum_{s'}F(s' \\to s)}{\\sum_{s''}F(s \\to s'')} \\right)^2`}
           </Katex>
         {/if}
       </td>
