@@ -1079,6 +1079,8 @@
         <div class="cell2">Johannes Kepler University Linz</div>
         <div class="cell1">Andreas Hinterreiter</div>
         <div class="cell2">Johannes Kepler University Linz</div>
+        <div class="cell1">Alex Hernandez-Garcia</div>
+        <div class="cell2">Université de Montréal</div>
         <div class="cell1">Marc Streit</div>
         <div class="cell2">Johannes Kepler University Linz</div>
         <div class="cell1">Christina Humer</div>
@@ -1090,21 +1092,22 @@
     <section class="section">
       <p class="section-text">
         Imagine you want to discover new molecules for a life-saving drug.
-        The space of possible molecular structures is vast, with promising candidates potentially sparse and difficult to find.
-        Traditional methods might guide you to a single best guess, but what if you need many diverse, high-quality candidates to test?
+        The space of possible molecular structures is vast, with promising candidates often being potentially sparse and difficult to find.
+        Traditional methods might guide you to a single best guess, but what if this guess has side effects, or fails in a later stage of testing?
+        What if you need many diverse, high-quality candidates to test?
         This is where Generative Flow Networks (GFlowNets) come in.
         They are a class of generative models that don't just aim for a single optimal solution—they aim to diversely sample from a space of possibilities, with a preference for high-reward outcomes.
         <br>
-        Here, we present a Playground for experimenting with GFlowNet training.
+        Below, we present a <b>Playground</b> for experimenting with GFlowNet training.
         It provides an interactive environment to explore how GFlowNets adapt to changes in both reward functions and training hyperparameters.
         Training occurs in a continuous space, where an agent takes a fixed number of steps before receiving a reward defined by a configurable reward function.
-        This function can be adjusted in the <b>Environment</b> view.
+        This function can be adjusted in the first of the three playground views: The <b>Environment</b> view.
         In the <b>Training</b> view, you can modify hyperparameters and initiate training.
         The resulting visualization shows the agent’s final positions.
         When training is successful, the distribution of these positions should approximate the target reward distribution.
-        The <b>Flow</b> view provides a visualization of the learned flow.
+        The <b>Flow</b> view visualizes the learned flow.
         <br>
-        We also provide a Tutorial that introduces the core concepts behind GFlowNets, their theoretical foundations, and common pitfalls during training.
+        We also provide a <b>Tutorial</b> that introduces the core concepts behind GFlowNets, their theoretical foundations, and common pitfalls during training.
         It also explains how to interpret metrics and visualizations throughout the Playground.
       </p>
     </section>
@@ -1865,34 +1868,42 @@
     <section class="section" id="Tutorial" bind:this={tutorialstart}>
       <h2 class="section-title">What is a GFlowNet?</h2>
       <p class="section-text">
-        In short, a generative flow network is a model class which allows sampling proportional to an unknown distribution.
-        In this it is similar to Markov Chain Monte Carlo, but offers some advantages regarding compute and sparse environments.
-        GFlowNets allow for generating objects with sequentially built compositional structure like trees or graphs - They construct the final object stepwise.
+        In short, a generative flow network is a model class that allows sampling proportional to an unknown distribution.
+        In this, it is similar to Markov Chain Monte Carlo, but offers some advantages regarding compute and sparse environments.
+        GFlowNets enable the generation of objects with sequentially built compositional structures, such as trees or graphs. They construct the final object stepwise.
 
         <br>
-        If we have a reward function <Katex>R(x)</Katex> which assigns value to each final object <Katex>x</Katex>
-        we can train a model, which learns to sample proportional to the reward.
-        This allows us later on to sample a diversity of solutions instead of just the reward-maximizing one.
-        As we do not rely on an external dataset but only on our internal reward function we are only limited by compute
-        - we can generate objects and query the reward function as often as we like.
+        If we have a reward function <Katex>R(x)</Katex>, which assigns value to each final object <Katex>x</Katex>,
+        we can train a model that learns to sample proportional to the reward.
+        This allows us to sample a diversity of solutions later on, instead of just the reward-maximizing one.
+        As we do not rely on an external dataset but only on our internal reward function, we are only limited by compute.
+        Thus we can generate objects and query the reward function as often as we like.
 
       </p>
         <div class="image-container">
           <Accordion>
             <Panel color="secondary">
-              <Header>Too fast? Expand for an example and more introduction</Header>
+              <Header>Too fast? Expand for an example and a more detailed introduction</Header>
               <Content>
-                Imagine building a Lego Pyramid. There are different blocks, and you can place them rotated and at different places.
-                <br>You might start with an empty plane, add a 2x4 block and so on. After some steps you might end up with an object which is more or less pyramid-shaped.
+                Imagine building a Lego Pyramid. There are different blocks, and you can place them at various angles and locations.
+                <br>You might start with an empty plane, add a 2x4 block, and so on.
+                After some steps, you might end up with an object that is more or less pyramid-shaped.
                 <br>
-                <br>The different possibilities of states of the object form a graph: While in the beginning (state 0) you can only place something in the first level, later on you might have different options and they depend on your first choices. One option is always to choose to be finished instead of continuing building.
+                <br>The different possibilities of states of the object form a graph:
+                While in the beginning (state 0) you can only place something in the first level,
+                later on, you might have different options, and they depend on your first choices.
+                One option is always to choose to be finished instead of continuing to build.
                 <br>
-                <br>If you want to use a GFlowNet for your task, it is important that the resulting graph is acyclic, i.e. it is not possible to reach a previous state. In terms of our pyramid this means taking away blocks is not possible.
+                <br>If you want to use a GFlowNet for your task, it is important that the resulting graph is acyclic,
+                i.e., it is not possible to reach a previous state.
+                In terms of our pyramid, this means that taking away blocks is not possible.
                 <br>If we built a pyramid, in the end we have a trajectory (a sequence of states <Katex>s_0 \to s_1 \to ... \to s_{"T"}</Katex>). As we can choose to stop anytime, our trajectories can have different lengths, e.g. we can build a pyramid from 1 piece or from 100.
                 <br>
-                <br>As you might have guessed from the vocabulary, GFlowNets are very similar to Reinforcement learning methods, we sample trajectories and assign a reward R(x) to them (or to the states). The main difference is that usual RL methods try to find solutions which maximize the reward, whereas GFlowNets learn the underlying distribution p(x). So we want to train a model such that p(x) is proportional to the reward function R(x). This allows us to sample not only from the mode which has the highest reward, but also all other modes which might be almost as good.
+                <br>As you might have guessed from the vocabulary, GFlowNets are very similar to Reinforcement learning methods, we sample trajectories and assign a reward R(x) to them (or to the states).
+                The main difference is that usual RL methods try to find solutions which maximize the reward,
+                whereas GFlowNets learn the underlying distribution p(x). So we want to train a model such that p(x) is proportional to the reward function R(x). This allows us to sample not only from the mode which has the highest reward, but also all other modes which might be almost as good.
 
-                Imagine a pyramid which contains  a 2x4 block, we could just replace it with two 2x2 blocks. Both options are valid and we might be interested in finding many possible ways to build pyramids.
+                Imagine a pyramid that contains  a 2x4 block, we could just replace it with two 2x2 blocks. Both options are valid and we might be interested in finding many possible ways to build pyramids.
                 <br>
                 <br>Building Lego Pyramids is maybe not usecase number one for GFlowNets, but they are used for drug discovery (Nica et al., 2022), where sampling from multiple modes is really what you want in order to discover not only the most promising molecule.
 
@@ -1902,9 +1913,13 @@
         </div>
       <p class="section-text">
         When sequentially generating an object, we need to take actions which give us the next state:
-        We could add one of the possible components or decide we are done.
-        For this we use a neural net which represents our forward policy
-        <Katex>P_F(s''_s|s)</Katex>, it gives us the action which leads to the next state.
+        We could add one of the possible components (e.g. adding an atom when generating a molecule)
+        or decide we are done by making this state a final state.
+        For this we use a neural net which represents our forward policy.
+        It gives us the action which leads to the next state.
+        Changing the policy leads to changes in the transition probabilities between states and in consequence to different probabilities for the final states.
+        During training the network adjusts in a way that the probabilities for sampling the final states is proportional to their reward.
+
         <br>
         <br>So far, everything sounds very nice, but how do we achieve this?
         <br>That's where Flow comes into play.
@@ -2071,10 +2086,10 @@
               {/if}
             {:else}
               <Katex displayMode>
-                F_{"{in}"}(s) = \sum_{"{s'}"} F(s' \to s)
+                F_{"{in}"}(s) = \sum_{"{s' \\in \\{children(s)\\}}"} F(s' \to s)
               </Katex>
               <Katex displayMode>
-                F_{"{out}"}(s) =R(s) + \sum_{"{s''}"} F(s \to s'')
+                F_{"{out}"}(s) =R(s) + \sum_{"{s' \\in \\{parents(s)\\}}"} F(s \to s')
               </Katex>
             {/if}
           </td>
@@ -2090,7 +2105,7 @@
               The policy is calculated for each action (edge).
             {:else}
               <Katex displayMode>
-                {`P_F(s''_s|s) = \\frac{F(s \\to s''_s)}{\\sum_{s''} F(s \\to s'')}`}
+                {`P_F(s'|s) = \\frac{F(s \\to s'_s)}{\\sum_{s' \\in \\{parents(s)\\}} F(s \\to s')}`}
               </Katex>
             {/if}
           </td>
@@ -2106,29 +2121,12 @@
               </Katex>
             {:else}
               <Katex displayMode>
-                {`\\mathcal{L}_{FM}(s) = \\left( \\log \\frac{ \\sum_{s'}F(s' \\to s)}{\\sum_{s''}F(s \\to s'')} \\right)^2`}
+                {`\\mathcal{L}_{FM}(s) = \\left( \\log \\frac{ \\sum_{s'\\in \\{children(s)\\}}F(s' \\to s)}{\\sum_{s' \\in \\{parents(s)\\}}F(s \\to s')} \\right)^2`}
               </Katex>
             {/if}
           </td>
         </tr>
       </table>
-      <div class="image-container">
-          <Accordion>
-            <Panel color="secondary">
-              <Header>A note on notation</Header>
-              <Content>
-                When describing the state space we often look at a specific state <Katex>s</Katex>.
-                We will use <Katex>s'</Katex>for all parent states of <Katex>s</Katex> and <Katex>s''</Katex> for its children.
-                We often need to sum over the edges from the parents to <Katex>s</Katex> (or from <Katex>s</Katex> to its children).
-                Precisely written this would be <Katex>\sum_{"{s:(s,s') \\in \\mathcal{E}}"}</Katex>,
-                but to ease notation we will write <Katex>\sum_{"{s'}"}</Katex> for this (or <Katex>\sum_{"{s''}"}</Katex>respectively).
-                To denote a specific child of <Katex>s</Katex> we use <Katex>s_s</Katex>.
-                This keeps everything concise and should help following the formulas when looking at the DAG,
-                as the structure <Katex>s' \to s \to s''</Katex> stays consistent.
-              </Content>
-            </Panel>
-          </Accordion>
-        </div>
 
 
 
@@ -2137,47 +2135,53 @@
 
 
       <p class="section-text">
-        Hover over the states to see the <b>Flow</b> going in and out of them.
-        You can also hover over an edge to see its value directly.
-        If you look at individual states you see that the incoming flow is always equal to the outgoing flow.
-        This shows an important constraint: Flow consistency.
+        Each edge of the network has an assigned <b>flow</b> value, you can see it by hovering over them.
+        You can understand it as the amount of water that flows through the edge.
 
-        In the water pipe analogy this corresponds to watertightness.
-        The pipes (edges) and states (nodes) must not leak, all of the water has to be preserved.
-        <br>This means:
+        Hovering also shows the Forward <b>Policy</b> <Katex>P_F(s'|s)</Katex>of an edge,
+        it gives us a transition probability from one state <Katex>s</Katex> to one of its children <Katex>s'</Katex>.
+        It is simply the flow going to <Katex>s'</Katex> divided by the sum of the outgoing flow of <Katex>s</Katex>.
+        Over all children it sums to 1.
+        The policy is learned by a small neural network and the agent can use it to sample their next action.
+        As the flow determines the transition probabilities it also determines the probabilities for sampling the final states <Katex>x</Katex>.
         <br>
-        <span class="li">The flow entering the DAG (at the start state) equals the total flow exiting it (i.e., the sum of flows at all terminal states).</span>
-        <span class="li">For any intermediate state, the sum of incoming flows equals the sum of outgoing flows.</span>
-        The GFlowNet will estimate the flow functions to achieve the desired flow
-        of the terminal states <Katex>x</Katex> which is equal to their reward <Katex>F(x)=R(x)</Katex>.
+        You can also hover over the states to see their incoming and outgoing flow.
+        The example above shows a perfectly trained model and you can see an important property of it:
+        For each state, the incoming flow is equal to the outgoing flow.
+        This is called Flow Consistency or Flow Matching and is the key to our goal: Sampling diverse candidates.
+        If we sample trajectories (a path from <Katex>s_0</Katex> to a final state <Katex>x</Katex>) using our policy and matched flows,
+        we will sample the final states proportional to their reward.
+        So a final state with half the reward of the best final state will get sampled half as often -
+        But in contrast to reward maximizing approaches it <i>will</i> get sampled eventually.
         <br>
         <br>
-        We can now use the flow to define our Forward <b>Policy</b> <Katex>P_F(s''_s|s)</Katex>, visible by hovering over the edges.
-        The policy gives us a transition probability from one state <Katex>s</Katex> to one of its children <Katex>s''_s</Katex>.
-        It is simply the flow going to <Katex>s''_s</Katex> divided by the total outgoing flow of <Katex>s</Katex>.
-        The policy is learned by a (small) neural network and the agent can use it to sample their next action.
+        If Flow Consistency holds for all states it also holds for the whole DAG.
+        In this case the incoming flow at the start state s0 is equal to the outgoing flow of the DAG.
+        The outgoing flow is the sum of all rewards and is called the partition function, denoted as <Katex>Z</Katex>.
+        While the sum of the reward function is fixed and usually not known,
+        the model implicitly learns it during training by adjusting the flow of <Katex>s_0</Katex>.
         <br>
-        <br>
-        Deriving a training objective is actually quite simple: We turn the Flow consistency into a mean squared error.
-        This gives us <b>Loss</b> for each state, again you can see the calculation by hovering over the states.
-        In the DAG shown above, the flow is perfectly matched:
-        the incoming flow at each state equals the outgoing flow, so the loss is always zero.
-        <br>
-        In the first GFlowNet paper (Benigo et al., 2021) the authors used this loss, however it does not perform so well as there are problems with credit assignment.
-        We will later use the Trajectory Balance Loss (Malkin et al., 2022) to calculate the loss for a whole trajectory instead of single states.
-        It converges better but is a bit more complicated, so let's ignore it for now and look at our environment.
+        We now know that the way to diverse candidates is to achieve Flow Matching.
+        Turning this into a training objective is actually quite simple, we just use a Mean Squared Error for each state.
+        The lower the difference between the incoming and the outgoing flow of a state is the lower its <b>loss</b>.
+        You can see its calculation by hovering over the states.
+        As there is perfect Flow Matching the result will always be 0.
+
+        In the first GFlowNet paper (Benigo et al., 2021) the authors used this loss, since then many improvements have been proposed.
+        In the playground we use Trajectory Balance loss, you can learn about it below if you want more detail.
       </p>
 
 
       <h2 class="section-title">Toy Environment</h2>
       <p class="section-text">
-        As we want to train GFlowNets quickly to explore how they behave, we need a simple environment which allows for exploring without needing a lot of compute during training. Here we use a simple 2D grid with each variable in the range [-3,3]. We then calculate the reward according to the Mixture of Multivariate Gaussians (for now two of them).
+        As we want to train GFlowNets quickly to explore how they behave, we need a simple environment which allows for exploring without needing a lot of compute during training. Here we use a continuous 2D space with each variable in the range [-3,3]. We then calculate the reward according to the Mixture of Multivariate Gaussians (for now two of them).
         <br>
         <br>For each action, the GFlowNet takes a step along both the x and y direction, this is repeated until the defined length of a trajectory is reached.
         Note that this is unusual: GFlowNets allow for variable trajectory lengths, so the action space usually contains an additional end of sequence action, where the current state becomes the final state.
         However fixing the trajectory length keeps everything a lot simpler.
         <br>
-        <br>Above we stated that GFlowNets build a DAG, so each state can be visited only once. We currently violate this assumption: While it is unlikely that a state gets visited twice in our continuous environment, it is still possible. To mitigate this we simply include a counter in our state which represents the current step.
+        <br>Above we stated that GFlowNets build a DAG, so each state can be visited only once. We currently violate this assumption: While it is unlikely that a state gets visited twice in our continuous environment, it is still possible.
+        To solve this we simply change the representation of our states to include a timestamp (the current step) in addition to the position.
         We also simplified the variance of the gaussians to one parameter, so the variance for x and y is the same and there is no covariance <Katex>(\Sigma = \sigma^2 I)</Katex>.
     </section>
 
@@ -2258,7 +2262,7 @@
                 <br>  9.  -   Calculate the TB-Loss: (logZ + log probabilities PF - log probabilities PB - log reward)^2
                 <br>  10. -  Update the parameters PF, PB, logZ
                 <br><br>
-              You can find the python code for this implementation on my <a href="https://github.com/florianholeczek/ugfn" target="_blank">github</a>.
+              You can find the python code for this implementation <a href="https://github.com/florianholeczek/ugfn" style="color:black" target="_blank">here</a>.
             </Content>
           </Panel>
         </Accordion>
@@ -2501,7 +2505,7 @@
       <p class="section-text">
         Below you can see the flow of the last training run.
         Use the Step slider to adjust the current step.
-        We fixed the number of steps for the agent at 6, so it collects the reward after 6 steps on the grid.
+        We fixed the number of steps for the agent at 6, so it collects the reward after taking 6 steps.
         Use the Iteration Slider to compare the flow at the start of the training to the end.
         <br>
         You see that for the trained model (last iteration) the flow is different depending on the step.
@@ -2547,13 +2551,16 @@
       <div style="height:50px"></div>
       <h2 class="section-title">Flow - Is this what it looks like?</h2>
       <p class="section-text">
-        Well, kind of. Imagine our grid would be discrete. If we are in one cell, we would have a certain Flow (a non-negative scalar) to each other cell (technically also to itself given our trick with adding the step to the state).
+        Well, kind of. Imagine our space would be discrete. If we are in one cell, we would have a certain Flow (a non-negative scalar) to each other cell (technically also to itself given our trick with adding the step to the state).
         <br>Even in a discrete space, this is hard to visualize, as we would have to compute the flow from each state to every other state.
         <br>In our continuous space this gets even more complicated, not only in terms of visualization but also mathematically - look into Lahlou et al. (2023) if you are interested.
-        <br>Instead of showing all the flows, the plot shows the <i>highest</i> flow for each state: This is a vector from it to another point on the grid.
-        If we do that for some evenly spaced points we get a vectorfield. The visualization above is just a nicer way to show it by letting particles move through the field.
-        Note that the path of the particles is not the path of the agents. The particles follow the most probable direction continuously, while the agent takes discrete steps not in the most probable direction but following the distribution of the policy.
-        Therefore the trajectories "jump around" more. This visualization however shows the converging points in the flowfield which direct the agents movement.
+        <br>Instead of showing all the flows, the plot shows the <i>highest</i> flow for each state: This is a vector from it to another point on the plane.
+        If we do that for some evenly spaced points we get a vector field. The visualization above is just a nicer way to show it by letting particles move through the field.
+        Note that the path of the particles is not the path of the agents.
+        The particles follow the most probable direction continuously, while the agent takes discrete steps.
+        Also the steps of the agent are probabilistic, they are sampled from the distribution of the policy.
+        As a result, the agent's trajectories can appear more erratic or scattered compared to the smooth flow of the particles.
+        This visualization however shows the converging points in the flow field which direct the agents' movement.
       </p>
 
       <h2 class="section-title" style="position:relative">What next?</h2>
