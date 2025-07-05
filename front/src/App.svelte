@@ -909,6 +909,10 @@
     return nodes.find(n => n.id === id);
   }
 
+  function edgeById(id_from, id_to) {
+    return edges.find(n => n.from === id_from && n.to === id_to);
+  }
+
   function previousStatesFormula(nodeId) {
     let out = edges
       .filter(e => e.to === nodeId)
@@ -963,6 +967,7 @@
   }
 
   function policyValue(edge) {
+    console.log(edge)
     let prob = (edge.flow / edges
     .filter(e => e.from === edge.from)
     .reduce((sum, e) => sum + e.flow, 0))
@@ -1050,7 +1055,7 @@
       } else if (TB_isActive(node.id)) {
         newNodeColors[node.id] = '#7570b3';
       } else {
-        newNodeColors[node.id] = 'gray';
+        newNodeColors[node.id] = '#b8b8b8';
       }
     }
 
@@ -1063,12 +1068,65 @@
       } else if (path.length && edge.from === path[path.length - 1]) {
         newEdgeColors[edge.from + '-' + edge.to] = '#7570b3';
       } else {
-        newEdgeColors[edge.from + '-' + edge.to] = 'gray';
+        newEdgeColors[edge.from + '-' + edge.to] = '#b8b8b8';
       }
     }
 
     TB_nodeColors = newNodeColors;
     TB_edgeColors = newEdgeColors;
+  }
+
+  let TB_current = {pf: 0, pb: 0, z:10};
+
+  function TB_calculate_PF () {
+    let form = "";
+    let calc = "";
+    let res = 1;
+    for (let i = 0; i < TB_path.length-1; i++) {
+      let edge = edgeById(TB_path[i],TB_path[i+1]);
+      let denom = edges
+        .filter(e => e.from === edge.from)
+        .map(e => `${e.flow}`)
+        .join(' + ');
+
+      form = form + `P_F(${TB_path[i+1][0]}_${TB_path[i+1][1]}|${TB_path[i][0]}_${TB_path[i][1]})`;
+      calc = calc + `\\frac{${edge.flow}}{${denom}}`
+      if (i !== TB_path.length-2) {
+        form = form + ` \\cdot `;
+        calc = calc + ` \\cdot `;
+      }
+      res = res * (edge.flow / edges
+        .filter(e => e.from === edge.from)
+        .reduce((sum, e) => sum + e.flow, 0));
+    }
+    TB_current.pf =res.toFixed(3);
+    return form + "=" + calc + "=" + TB_current.pf;
+  }
+
+  function TB_calculate_PB () {
+    let form = "";
+    let calc = "";
+    let res = 1;
+    for (let i = TB_path.length-1; i > 0; i--) {
+      let edge = edgeById(TB_path[i-1],TB_path[i]);
+      let denom = edges
+        .filter(e => e.to === edge.to)
+        .map(e => `${e.flow}`)
+        .join(' + ');
+
+      form = form + `P_B(${TB_path[i-1][0]}_${TB_path[i-1][1]}|${TB_path[i][0]}_${TB_path[i][1]})`;
+      calc = calc + `\\frac{${edge.flow}}{${denom}}`
+      if (i !== 1) {
+        form = form + ` \\cdot `;
+        calc = calc + ` \\cdot `;
+      }
+      res = res * (edge.flow / edges
+        .filter(e => e.to === edge.to)
+        .reduce((sum, e) => sum + e.flow, 0));
+
+    }
+    TB_current.pb =res.toFixed(3);
+    return form + "=" + calc + "=" + TB_current.pb;
   }
 
 
@@ -2096,7 +2154,7 @@
               points="{node.x - 10},{node.y + 20} {node.x - 10},{node.y - 20} {node.x + 30},{node.y}"
               fill="{nodeColors[node.id]}"
               stroke="black"
-              stroke-width="2"
+              stroke-width="1"
             />
           {:else if node.final}
             <!-- Square for final state -->
@@ -2109,7 +2167,7 @@
               ry="4"
               fill="{nodeColors[node.id]}"
               stroke="black"
-              stroke-width="2"
+              stroke-width="1"
             />
           {:else}
             <!-- Circle for normal state -->
@@ -2119,7 +2177,7 @@
               r="20"
               fill="{nodeColors[node.id]}"
               stroke="black"
-              stroke-width="2"
+              stroke-width="1"
             />
           {/if}
 
@@ -2188,7 +2246,7 @@
               The policy is calculated for each action (edge).
             {:else}
               <Katex>
-                {`P_F(s'|s) = \\frac{F(s \\to s')}{\\sum_{s' \\in \\{parents(s)\\}} F(s \\to s')}`}
+                {`P_F(s'|s) = \\frac{F(s \\to s')}{\\sum_{s' \\in \\{children(s)\\}} F(s \\to s')}`}
               </Katex>
             {/if}
           </td>
@@ -2278,40 +2336,27 @@
                       marker-end="url(#arrow)"
                     />
                     <!-- Particles -->
-                          <path
-                            id="path-{edge.from}-{edge.to}"
-                            d="M {nodeById(edge.from).x} {nodeById(edge.from).y}
-                               L {nodeById(edge.to).x} {nodeById(edge.to).y}"
-                            fill="none"
-                            stroke="transparent"
-                          />
+                    <path
+                      id="path-{edge.from}-{edge.to}"
+                      d="M {nodeById(edge.from).x} {nodeById(edge.from).y}
+                         L {nodeById(edge.to).x} {nodeById(edge.to).y}"
+                      fill="none"
+                      stroke="transparent"
+                    />
 
-                          {#each Array(edge.flow) as _, i}
-                            <circle
-                              r="3"
-                              fill="{TB_edgeColors[edge.from + '-' + edge.to]}"
-                            >
-                              <animateMotion
-                                dur="{3 - i * 0.3}s"
-                                repeatCount="indefinite"
-                              >
-                                <mpath href="#path-{edge.from}-{edge.to}" />
-                              </animateMotion>
-                            </circle>
-                          {/each}
-
-                          <!-- Invisible hover hitbox -->
-                          <line
-                            x1="{nodeById(edge.from).x}"
-                            y1="{nodeById(edge.from).y}"
-                            x2="{nodeById(edge.to).x}"
-                            y2="{nodeById(edge.to).y}"
-                            stroke="transparent"
-                            stroke-width="32"
-                            on:mouseenter={() => hoveredEdge = edge}
-                            on:mouseleave={() => hoveredEdge = null}
-                            role="presentation"
-                          />
+                    {#each Array(edge.flow) as _, i}
+                      <circle
+                        r="3"
+                        fill="{TB_edgeColors[edge.from + '-' + edge.to]}"
+                      >
+                        <animateMotion
+                          dur="{3 - i * 0.3}s"
+                          repeatCount="indefinite"
+                        >
+                          <mpath href="#path-{edge.from}-{edge.to}" />
+                        </animateMotion>
+                      </circle>
+                    {/each}
                   {/if}
                 {/each}
 
@@ -2322,7 +2367,7 @@
                         points="{node.x - 10},{node.y + 20} {node.x - 10},{node.y - 20} {node.x + 30},{node.y}"
                         fill="{TB_nodeColors[node.id]}"
                         stroke="black"
-                        stroke-width="2"
+                        stroke-width="1"
                       />
                     {:else if node.final}
                       <rect
@@ -2334,7 +2379,7 @@
                         ry="4"
                         fill="{TB_nodeColors[node.id]}"
                         stroke="black"
-                        stroke-width="2"
+                        stroke-width="1"
                       />
                     {:else}
                       <circle
@@ -2343,7 +2388,7 @@
                         r="20"
                         fill="{TB_nodeColors[node.id]}"
                         stroke="black"
-                        stroke-width="2"
+                        stroke-width="1"
                       />
                     {/if}
                     <text
@@ -2351,81 +2396,58 @@
                       y="{node.y + 5}"
                       text-anchor="middle"
                       font-size="14"
-                      fill="white"
+                      fill="black"
                     >
                       {node.id}
                     </text>
                   </g>
                 {/each}
               </svg>
-              <p class="mathexpl">
-                Hover over the edges (actions) to see the Flow and Policy calculations,
-                hover over the nodes (states) to see the Loss calculations.
+              <p class="mathexpl" style="color: white; width:600px;">
+                Choose a trajectory: Select on one of the purple states until you reach a final state.
+                Reset by selecting s0 or another orange state.
               </p>
 
               <table style="width: 900px; border-collapse: collapse; margin: 20px auto; font-family: 'Georgia', serif; font-size: 16px;">
                 <tr>
-                  <td style="width: 120px; height: 110px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid black;">Flow</td>
-                  <td style="padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid black;">
-                    {#if hoveredEdge}
+                  <td style="width: 130px; height: 110px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid white;">Forward- Policy</td>
+                  <td style="padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid white;">
+                    {#if TB_trajectory_complete}
                       <Katex>
-                        {`F(\\textcolor{#d95f02}{s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]}}) = ${hoveredEdge.flow}`}
+                        {`\\prod_t P_F(s_{t+1}|s_t) = ${TB_calculate_PF()}`}
                       </Katex>
-                    {:else if hoveredNode}
-                      <Katex>
-                        {`F_{in}(\\textcolor{#d95f02}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\textcolor{#1b9e77}{${previousStatesFormula(hoveredNode)}} = ${previousStatesValues(hoveredNode)}`}
-                      </Katex>
-                      <br>
-                      <br>
-                      {#if nodeById(hoveredNode).final}
-                        <Katex>
-                          {`F_{out}(\\textcolor{#d95f02}{x_${hoveredNode[1]}}) = \\textcolor{#7570b3}{R(x_${hoveredNode[1]}) + 0} = ${nextStatesValues(hoveredNode)}`}
-                        </Katex>
-                      {:else}
-                        <Katex>
-                          {`F_{out}(\\textcolor{#d95f02}{s_${hoveredNode[1]}}) = \\textcolor{#7570b3}{0 + ${nextStatesFormula(hoveredNode)}} = ${nextStatesValues(hoveredNode)}`}
-                        </Katex>
-                      {/if}
                     {:else}
                       <Katex>
-                        F_{"{in}"}(s) = \sum_{"{s' \\in \\{children(s)\\}}"} F(s' \to s)
-                      </Katex>
-                      <br>
-                      <br>
-                      <Katex>
-                        F_{"{out}"}(s) =R(s) + \sum_{"{s' \\in \\{parents(s)\\}}"} F(s \to s')
+                        {`P_F(s'|s) = \\frac{F(s \\to s')}{\\sum_{s' \\in \\{children(s)\\}} F(s \\to s')}`}
                       </Katex>
                     {/if}
                   </td>
                 </tr>
                 <tr>
-                  <td style="width: 120px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Policy</td>
+                  <td style="width: 130px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Backward- Policy</td>
                   <td style="padding: 8px 0; border-bottom: 1px solid #aaa;">
-                    {#if hoveredEdge}
+                    {#if TB_trajectory_complete}
                       <Katex>
-                        {`P_F(\\textcolor{#d95f02}{${hoveredEdge.to[0]}_${hoveredEdge.to[1]}|s_${hoveredEdge.from[1]}}) = \\frac{\\textcolor{#d95f02}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})}}{\\textcolor{#d95f02}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})} \\textcolor{#1b9e77}{${policyFormula(hoveredEdge)}}} = ${policyValue(hoveredEdge)}`}
+                        {`\\prod_t P_B(s_{t}|s_t+1) = ${TB_calculate_PB()}`}
                       </Katex>
-                    {:else if hoveredNode}
-                      The policy is calculated for each action (edge).
                     {:else}
                       <Katex>
-                        {`P_F(s'|s) = \\frac{F(s \\to s')}{\\sum_{s' \\in \\{parents(s)\\}} F(s \\to s')}`}
+                        {`P_F(s'|s) = \\frac{F(s \\to s')}{\\sum_{s' \\in \\{parents(s')\\}} F(s \\to s')}`}
                       </Katex>
                     {/if}
                   </td>
                 </tr>
                 <tr>
-                  <td style="width: 120px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Loss</td>
+                  <td style="width: 130px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Loss</td>
                   <td style="padding: 8px 0; border-bottom: 1px solid #aaa;">
-                    {#if hoveredEdge}
-                      The Loss is calculated for each state.
-                    {:else if hoveredNode}
+                    {#if TB_trajectory_complete}
                       <Katex>
-                        {`\\mathcal{L}_{FM}(\\textcolor{#d95f02}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\left( \\log \\frac{\\textcolor{#1b9e77}{${previousStatesFormula(hoveredNode)}}}{\\textcolor{#7570b3}{${nextStatesFormula(hoveredNode)}}} \\right)^2 = ${lossValue(hoveredNode)}`}
+                        {"\\mathcal{L}_{TB}(\\tau) = \\left(\\log\\frac{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t)}"}{"{R(x)\\prod_t P_B(s_t|s_{t+1})}\\right)^2"}
+                        {`= \\left(\\log\\frac{${TB_current.z} \\cdot ${TB_current.pf}}{${edges.filter(e => e.to === TB_path.at(-1))[0].flow} \\cdot ${TB_current.pb}}\\right)^2 = 0`}
                       </Katex>
                     {:else}
                       <Katex>
-                        {`\\mathcal{L}_{FM}(s) = \\left( \\log \\frac{ \\sum_{s'\\in \\{children(s)\\}}F(s' \\to s)}{\\sum_{s' \\in \\{parents(s)\\}}F(s \\to s')} \\right)^2`}
+                        {"\\mathcal{L}_{TB}(\\tau) = \\left(\\log\\frac{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t)}"}{"{R(x)\\prod_t P_B(s_t|s_{t+1})}"} \right)^2
                       </Katex>
                     {/if}
                   </td>
@@ -2457,7 +2479,7 @@
                   <br>  9.  -   Calculate the TB-Loss: (logZ + log probabilities PF - log probabilities PB - log reward)^2
                   <br>  10. -  Update the parameters PF, PB, logZ
                   <br><br>
-                You can find the python code for this implementation <a href="https://github.com/florianholeczek/ugfn" color="black" target="_blank">here</a>.
+                You can find the python code for this implementation <a href="https://github.com/florianholeczek/ugfn" style="color: black" target="_blank">here</a>.
               </Content>
             </Panel>
           </Accordion>
@@ -3000,21 +3022,6 @@
     margin: 5px auto 1rem;
   }
 
-  .highlight-red { color: red; }
-  .highlight-green { color: green; }
-  .highlight-blue { color: blue; }
-  svg text {
-    font-size: 14px;
-    font-family: sans-serif;
-  }
-  .red-underline {
-  text-decoration: underline;
-  text-decoration-color: red;
-  text-decoration-thickness: 2px;
-}
-  .red-underline .katex {
-  border-bottom: 2px solid red;
-}
 
 
 </style>
