@@ -221,14 +221,12 @@
     if (plotlyready) {
       setTimeout(() => {
         if (view === "1. Environment"){
-          console.log("Env View")
           if (flowvis_instance) {
             flowvis_instance.remove();
             flowvis_instance = null;
           }
           plotEnv();
         } else if (view ==="2. Training"){
-          console.log("Train View");
           //to prevent loading the tooltip too early as mouse hovers over next/prev buttons
           showTooltip = false;
             setTimeout(() => {
@@ -256,7 +254,6 @@
                     current_env_image
             );
           }
-          console.log("Flow View")
 
         }
       }, 5);
@@ -479,7 +476,6 @@
     if (isNaN(value)) value=0;
     value = Math.min(current_losses['losses'].length, Math.max(0, value));
     if (value<current_losses['losses'].length) value = Math.floor(value / d);
-    console.log(value)
     if (!training_step_value_update) {
         training_step_value_update = true;
         training_step_value_slider = value;
@@ -492,7 +488,6 @@
     if (isNaN(value)) value=0;
     value = Math.min(current_losses['losses'].length, Math.max(0, value));
     if (value<current_losses['losses'].length) value = Math.floor(value / d);
-    console.log(value)
     if (!flow_step_value_update) {
         flow_step_value_update = true;
         flow_step_value_slider = value;
@@ -594,6 +589,8 @@
           completed = true;
           clearInterval(pollingTimer); //stop polling
           await get_final_data();
+          training_step_value_slider = 0;
+          await tick();
           isRunning = false;
           await tick();
           snackbar_training_done.open();
@@ -730,14 +727,12 @@
     if (run===1) run1_value += 64;
     if (run===2) run2_value += 128;
     if (run===3) run3_value += 128;
-    console.log("running")
     if (run===1 && run1_value >= 2048) stop_animation_run();
     if (run===2 && run2_value >= 4096) stop_animation_run();
     if (run===3 && run3_value >= 4096) stop_animation_run();
   }
   function stop_animation_run() {
     clearInterval(AnimInterval);
-    console.log("stopping")
     isRunningAnim = false;
   }
 
@@ -1677,6 +1672,7 @@
                 input$aria-label="View the iterations"
               />
             </div>
+
           {:else if isRunning}
             <div class="pg-iter">
               <Textfield

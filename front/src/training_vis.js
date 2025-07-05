@@ -30,7 +30,7 @@ export function plotStates(Plotly, states, losses, density, options = {}) {
         colormap = 'Viridis',
     } = options;
 
-    let sec_col = 'rgb(51, 51, 51)'
+    let sec_col = 'rgb(0, 0, 0)'
     let f_col = "rgb(120, 208, 78)"
     // Extract final states
     const x = states.map(s => s[0]);
@@ -49,9 +49,12 @@ export function plotStates(Plotly, states, losses, density, options = {}) {
         type: 'contour',
         colorscale: colormap,
         showscale:false,
-        contours: { coloring: 'lines'},
-        line:{width: 2},
+        contours: { coloring: 'fill'},
+        line:{width: 0},
+        //contours: { coloring: 'lines'},
+        //line:{width: 2},
         showlegend:false,
+        opacity:0.8,
     };
 
     // Scatter plot for sampled states
@@ -223,9 +226,12 @@ export function plotStatesHistory(
         type: 'contour',
         colorscale: colormap,
         showscale: false,
-        contours: { coloring: 'lines' },
-        line: { width: 2 },
-        showlegend: false,
+        contours: { coloring: 'fill'},
+        line:{width: 0},
+        //contours: { coloring: 'lines'},
+        //line:{width: 2},
+        showlegend:false,
+        opacity:0.8,
     };
 
     const samplesTrace = {
