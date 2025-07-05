@@ -967,7 +967,6 @@
   }
 
   function policyValue(edge) {
-    console.log(edge)
     let prob = (edge.flow / edges
     .filter(e => e.from === edge.from)
     .reduce((sum, e) => sum + e.flow, 0))
@@ -2317,142 +2316,179 @@
               <Header>Trajectory Balance: Theory</Header>
               <Content>
                <svg width="800" height="350" style="display: block; margin: 20px auto;">
-                <defs>
-                  <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
-                    markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                    <path d="M 0 0 L 10 5 L 0 10 z" fill="gray" />
-                  </marker>
-                </defs>
+                  <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
+                      markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                      <path d="M 0 0 L 10 5 L 0 10 z" fill="gray" />
+                    </marker>
+                  </defs>
 
-                {#each edges as edge (edge.from + '-' + edge.to)}
-                  {#if TB_nodeById(edge.from) && TB_nodeById(edge.to)}
-                    <line
-                      x1="{TB_nodeById(edge.from).x}"
-                      y1="{TB_nodeById(edge.from).y}"
-                      x2="{TB_nodeById(edge.to).x}"
-                      y2="{TB_nodeById(edge.to).y}"
-                      stroke="{TB_edgeColors[edge.from + '-' + edge.to]}"
-                      stroke-width="2"
-                      marker-end="url(#arrow)"
-                    />
-                    <!-- Particles -->
-                    <path
-                      id="path-{edge.from}-{edge.to}"
-                      d="M {nodeById(edge.from).x} {nodeById(edge.from).y}
-                         L {nodeById(edge.to).x} {nodeById(edge.to).y}"
-                      fill="none"
-                      stroke="transparent"
-                    />
+                  {#each edges as edge (edge.from + '-' + edge.to)}
+                    {#if TB_nodeById(edge.from) && TB_nodeById(edge.to)}
+                      <line
+                        x1="{TB_nodeById(edge.from).x}"
+                        y1="{TB_nodeById(edge.from).y}"
+                        x2="{TB_nodeById(edge.to).x}"
+                        y2="{TB_nodeById(edge.to).y}"
+                        stroke="{TB_edgeColors[edge.from + '-' + edge.to]}"
+                        stroke-width="2"
+                        marker-end="url(#arrow)"
+                      />
+                      <!-- Particles -->
+                      <path
+                        id="path-{edge.from}-{edge.to}"
+                        d="M {nodeById(edge.from).x} {nodeById(edge.from).y}
+                           L {nodeById(edge.to).x} {nodeById(edge.to).y}"
+                        fill="none"
+                        stroke="transparent"
+                      />
 
-                    {#each Array(edge.flow) as _, i}
-                      <circle
-                        r="3"
-                        fill="{TB_edgeColors[edge.from + '-' + edge.to]}"
-                      >
-                        <animateMotion
-                          dur="{3 - i * 0.3}s"
-                          repeatCount="indefinite"
+                      {#each Array(edge.flow) as _, i}
+                        <circle
+                          r="3"
+                          fill="{TB_edgeColors[edge.from + '-' + edge.to]}"
                         >
-                          <mpath href="#path-{edge.from}-{edge.to}" />
-                        </animateMotion>
-                      </circle>
-                    {/each}
-                  {/if}
-                {/each}
+                          <animateMotion
+                            dur="{3 - i * 0.3}s"
+                            repeatCount="indefinite"
+                          >
+                            <mpath href="#path-{edge.from}-{edge.to}" />
+                          </animateMotion>
+                        </circle>
+                      {/each}
+                    {/if}
+                  {/each}
 
-                {#each nodes as node}
-                  <g on:click={() => TB_handleClick(node.id)} style="cursor: pointer;" role="presentation">
-                    {#if node.id === 's0'}
-                      <polygon
-                        points="{node.x - 10},{node.y + 20} {node.x - 10},{node.y - 20} {node.x + 30},{node.y}"
-                        fill="{TB_nodeColors[node.id]}"
-                        stroke="black"
-                        stroke-width="1"
-                      />
-                    {:else if node.final}
-                      <rect
-                        x="{node.x - 20}"
-                        y="{node.y - 20}"
-                        width="40"
-                        height="40"
-                        rx="4"
-                        ry="4"
-                        fill="{TB_nodeColors[node.id]}"
-                        stroke="black"
-                        stroke-width="1"
-                      />
-                    {:else}
-                      <circle
-                        cx="{node.x}"
-                        cy="{node.y}"
-                        r="20"
-                        fill="{TB_nodeColors[node.id]}"
-                        stroke="black"
-                        stroke-width="1"
-                      />
-                    {/if}
-                    <text
-                      x="{node.x}"
-                      y="{node.y + 5}"
-                      text-anchor="middle"
-                      font-size="14"
-                      fill="black"
-                    >
-                      {node.id}
-                    </text>
-                  </g>
-                {/each}
-              </svg>
-              <p class="mathexpl" style="color: white; width:600px;">
-                Choose a trajectory: Select on one of the purple states until you reach a final state.
-                Reset by selecting s0 or another orange state.
-              </p>
+                  {#each nodes as node}
+                    <g on:click={() => TB_handleClick(node.id)} style="cursor: pointer;" role="presentation">
+                      {#if node.id === 's0'}
+                        <polygon
+                          points="{node.x - 10},{node.y + 20} {node.x - 10},{node.y - 20} {node.x + 30},{node.y}"
+                          fill="{TB_nodeColors[node.id]}"
+                          stroke="black"
+                          stroke-width="1"
+                        />
+                      {:else if node.final}
+                        <rect
+                          x="{node.x - 20}"
+                          y="{node.y - 20}"
+                          width="40"
+                          height="40"
+                          rx="4"
+                          ry="4"
+                          fill="{TB_nodeColors[node.id]}"
+                          stroke="black"
+                          stroke-width="1"
+                        />
+                      {:else}
+                        <circle
+                          cx="{node.x}"
+                          cy="{node.y}"
+                          r="20"
+                          fill="{TB_nodeColors[node.id]}"
+                          stroke="black"
+                          stroke-width="1"
+                        />
+                      {/if}
+                      <text
+                        x="{node.x}"
+                        y="{node.y + 5}"
+                        text-anchor="middle"
+                        font-size="14"
+                        fill="black"
+                      >
+                        {node.id}
+                      </text>
+                    </g>
+                  {/each}
+                </svg>
+                <p class="mathexpl" style="color: white; width:550px;">
+                  Choose a trajectory: Select on one of the purple states until you reach a final state.
+                  Reset by selecting s0 or another orange state.
+                </p>
+                <table style="width: 900px; border-collapse: collapse; margin: 20px auto; font-family: 'Georgia', serif; font-size: 16px;">
+                  <tr>
+                    <td style="width: 130px; height: 110px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid white;">Forward- Policy</td>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid white;">
+                      {#if TB_trajectory_complete}
+                        <Katex>
+                          {`\\prod_t P_F(s_{t+1}|s_t) = ${TB_calculate_PF()}`}
+                        </Katex>
+                      {:else}
+                        <Katex>
+                          {`P_F(s'|s) = \\frac{F(s \\to s')}{\\sum_{s' \\in \\{children(s)\\}} F(s \\to s')}`}
+                        </Katex>
+                      {/if}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="width: 130px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Backward- Policy</td>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #aaa;">
+                      {#if TB_trajectory_complete}
+                        <Katex>
+                          {`\\prod_t P_B(s_{t}|s_{t+1}) = ${TB_calculate_PB()}`}
+                        </Katex>
+                      {:else}
+                        <Katex>
+                          {`P_B(s'|s) = \\frac{F(s \\to s')}{\\sum_{s' \\in \\{parents(s')\\}} F(s \\to s')}`}
+                        </Katex>
+                      {/if}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="width: 130px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Loss</td>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #aaa;">
+                      {#if TB_trajectory_complete}
+                        <Katex>
+                          {"\\mathcal{L}_{TB}(\\tau) = \\left(\\log\\frac{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t)}"}{"{R(x)\\prod_t P_B(s_t|s_{t+1})}\\right)^2"}
+                          {`= \\left(\\log\\frac{${TB_current.z} \\cdot ${TB_current.pf}}{${edges.filter(e => e.to === TB_path.at(-1))[0].flow} \\cdot ${TB_current.pb}}\\right)^2 = 0`}
+                        </Katex>
+                      {:else}
+                        <Katex>
+                          {"\\mathcal{L}_{TB}(\\tau) = \\left(\\log\\frac{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t)}"}{"{R(x)\\prod_t P_B(s_t|s_{t+1})}"} \right)^2
+                        </Katex>
+                      {/if}
+                    </td>
+                  </tr>
+                </table>
+                Since we calculate the FLow Matching Loss on a state level we might run into inefficiency with longer trajectories.
+                A flow mismatch occuring at the final state is propagated backwards only one state per iteration.
+                As a result it might take long to update the flows of the earlier states.
+                Trajectory Balance solves this by calculating the loss on a trajectory level.
+                So we get a gradient for a whole trajectory  <Katex>\tau</Katex>, allowing us to update all states within it simultaneously, which can lead to faster convergence.
+                <br><br>
+                To calculate the Trajectory Balance we need four things:
+                <ul>
+                  <li>
+                    The partition function <Katex>Z</Katex>: This represents the sum of all rewards (or the total flow entering the DAG).
+                    Since the true value is unknown, we estimate it using our model and denote the estimate as <Katex>Z_\theta</Katex> to distinguish it from the true value.
+                  </li>
+                  <li>
+                    The Forward Policy <Katex>P_F(s'|s)</Katex>:
+                        We already used it for Flow Matching to estimate the distribution over the children of a state.
+                  </li>
+                  <li>
+                    The Backward Policy <Katex>P_F(s'|s)</Katex>:
+                    Analogous to the forward policy, the backward policy defines a distribution over the parents of a state.
+                    It is computed as the flow from a specific parent divided by the total incoming flow to that state.
+                    We can estimate it using a Neural Network as well.
+                  </li>
+                  <li>
+                    The reward <Katex>R(X)</Katex>of the final state of the trajectory.
+                  </li>
+                </ul>
+                <br>
+                To calculate the probability of selecting a trajectory from all possible ones, we take the product of the forward policies along the trajectory.
+                Similarly, we compute the product of the backward policies to get the probability of selecting this trajectory among all those that end at the same final state.
+                We use this in the calculation of Trajectory Balance, you can see the formula above.
+                The numerator represents the fraction of the total flow <Katex>Z</Katex> that goes through this trajectory <Katex>\tau</Katex>.
+                The denominator represents the fraction of the reward <Katex>R(X)</Katex> that goes through <Katex>\tau</Katex>.
+                <br>
+                The DAG above shows the same trained model as before.
+                Select a trajectory to see the calculation of the policies and the loss.
+                The Trajectory Balance Loss adds a bit more model complexity:
+                In addition to the parameters of the forward policy we learn the backward policy and the scalar parameter <Katex>Z_\theta</Katex>.
 
-              <table style="width: 900px; border-collapse: collapse; margin: 20px auto; font-family: 'Georgia', serif; font-size: 16px;">
-                <tr>
-                  <td style="width: 130px; height: 110px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid white;">Forward- Policy</td>
-                  <td style="padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid white;">
-                    {#if TB_trajectory_complete}
-                      <Katex>
-                        {`\\prod_t P_F(s_{t+1}|s_t) = ${TB_calculate_PF()}`}
-                      </Katex>
-                    {:else}
-                      <Katex>
-                        {`P_F(s'|s) = \\frac{F(s \\to s')}{\\sum_{s' \\in \\{children(s)\\}} F(s \\to s')}`}
-                      </Katex>
-                    {/if}
-                  </td>
-                </tr>
-                <tr>
-                  <td style="width: 130px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Backward- Policy</td>
-                  <td style="padding: 8px 0; border-bottom: 1px solid #aaa;">
-                    {#if TB_trajectory_complete}
-                      <Katex>
-                        {`\\prod_t P_B(s_{t}|s_t+1) = ${TB_calculate_PB()}`}
-                      </Katex>
-                    {:else}
-                      <Katex>
-                        {`P_F(s'|s) = \\frac{F(s \\to s')}{\\sum_{s' \\in \\{parents(s')\\}} F(s \\to s')}`}
-                      </Katex>
-                    {/if}
-                  </td>
-                </tr>
-                <tr>
-                  <td style="width: 130px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Loss</td>
-                  <td style="padding: 8px 0; border-bottom: 1px solid #aaa;">
-                    {#if TB_trajectory_complete}
-                      <Katex>
-                        {"\\mathcal{L}_{TB}(\\tau) = \\left(\\log\\frac{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t)}"}{"{R(x)\\prod_t P_B(s_t|s_{t+1})}\\right)^2"}
-                        {`= \\left(\\log\\frac{${TB_current.z} \\cdot ${TB_current.pf}}{${edges.filter(e => e.to === TB_path.at(-1))[0].flow} \\cdot ${TB_current.pb}}\\right)^2 = 0`}
-                      </Katex>
-                    {:else}
-                      <Katex>
-                        {"\\mathcal{L}_{TB}(\\tau) = \\left(\\log\\frac{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t)}"}{"{R(x)\\prod_t P_B(s_t|s_{t+1})}"} \right)^2
-                      </Katex>
-                    {/if}
-                  </td>
-                </tr>
-              </table>
               </Content>
             </Panel>
             <Panel color="secondary"> <!--bind:open={panel_algo}>-->
@@ -2505,82 +2541,6 @@
 
     <section class="section section-light">
       <h2 class="section-title">Training</h2>
-      <p class="section-text">
-        Now, how do we train a GFlowNet?
-        <br>First we need our model to be able to act in the environment.
-        To do this we let it predict the parameters of a distribution from which we then sample the actions.
-        To move, we simply add the action to the current state to get the next state.
-        <br>That was the easy part.
-        We now want to train our GFlowNet using Trajectory Balance loss. Here it is again:
-        <Katex displayMode>
-        L(\tau) = \log\left(\frac{"{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t;\\theta)}"}{"{R(x)\\prod_t P_B(s_t|s_{t+1}; \\theta)}"} \right)^2
-        </Katex>
-        <span class="mathexpl">The trajectory balance loss. <br> If both parts of the fraction are equal our loss goes to 0.</span>
-        We want the two parts of the fraction to be equal again.
-        Simply put, the upper part tells us what fraction of the total flow goes through this trajectory and the lower part tells us what fraction of the reward of the final object x goes through this trajectory.
-        <br>Here <Katex>\theta</Katex> are the parameters of the model. They include the parameters of <Katex>P_F, P_B, Z</Katex> and we can update them using the loss above.
-        <br>Below you find more detailed background for the parts of the trajectory balance loss as well as the algorithm for training.
-      </p>
-      <div class="image-container">
-        <Accordion multiple>
-          <Panel color="secondary">
-            <Header>More Trajectory Balance</Header>
-            <Content>
-              Let's look at the parts of this loss function:
-              <ul>
-                <li>
-                  <Katex>P_F(s_{"t+1"}|s_t;\theta)</Katex>
-                  The forward policy. It represents the distribution over the next states (the children) of the current state.
-                </li>
-                <li>
-                  <Katex>P_B(s_t|s_{"t+1"};\theta)</Katex>
-                  The backward policy. Similar to the definition of the forward policy, we can define the backward policy as a distribution over the previous states (the parents) of a state.
-                  We can also estimate it using a NN (not the same as for the forward policy). The reason both policies are different is the DAG structure. In a tree these would be the same. But as there are different ways to traverse the DAG from one state to the other, these policies might differ.
-                </li>
-                <li>
-                  <Katex>Z_{"\\theta"}</Katex>
-                  The partition function. It is equal to the total flow of the system.
-                  It is another parameter to be learned by our agent and should approach the true partition function given enough training.
-                  In our case, the true partition function is 2 (the number of gaussians), however it is usually not known.
-                  The partition function for a mixture of gaussians is the sum of its mixture weights, so always 1 (therefore logZ is 0).
-                  However we do not compute a real mixture of gaussians here, as we do not use mixture weights but simply sum up over all gaussians.
-                </li>
-                <li>
-                  <Katex>R(x)</Katex>
-                  The reward for the final object x of the trajectory. Note that if we propagate the reward backward using our backward policy, only a small part of it goes through one trajectory, as there are usually many ways to sample x using different trajectories.
-                </li>
-              </ul>
-            </Content>
-          </Panel>
-          <Panel color="secondary"> <!--bind:open={panel_algo}>-->
-            <Header>
-              The algorithm
-              <!--
-              <IconButton toggle bind:pressed="{panel_algo}"on:click={panel_algo=!panel_algo} >
-                <Icon class="material-icons"  on>expand_less</Icon>
-                <Icon class="material-icons">expand_more</Icon>
-              </IconButton>
-              -->
-            </Header>
-
-            <Content style="white-space: pre;">
-                Input: Reward function (part of the environment), model, hyperparameters
-                <br>  1. Initialize model parameters for PF, PB, logZ
-                <br>  2. Repeat for a number of iterations or until convergence:
-                <br>  3.  -   Repeat for trajectory length:
-                <br>  4.  -     -   Sample action for current state from PF
-                <br>  5.  -     -   Take step according to action
-                <br>  6.  -     -   Add new state to trajectory
-                <br>  7.  -   Calculate reward of final state according to reward function
-                <br>  8.  -   Calculate the sum of the log probabilities of all actions of the trajectory for each PF and PB
-                <br>  9.  -   Calculate the TB-Loss: (logZ + log probabilities PF - log probabilities PB - log reward)^2
-                <br>  10. -  Update the parameters PF, PB, logZ
-                <br><br>
-              You can find the python code for this implementation <a href="https://github.com/florianholeczek/ugfn" style="color:black" target="_blank">here</a>.
-            </Content>
-          </Panel>
-        </Accordion>
-      </div>
       <p class="section-text">
         We trained a GFlowNet on this environment for 2000 Iterations.
         Below you see the progress of the model during training. While it first samples randomly, it learns to match the true distribution of our environment.

@@ -195,7 +195,7 @@ export function plotStatesHistory(
         colormap = 'Viridis',
     } = options;
 
-    let sec_col = 'rgb(51, 51, 51)';
+    let sec_col = 'rgb(1, 1, 1)';
     let f_col = "rgb(120, 208, 78)";
     let hoverTimeout = null;
 
