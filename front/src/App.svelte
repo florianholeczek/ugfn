@@ -997,6 +997,84 @@
 
 
 
+  let TB_path = ['s0'];
+  let TB_trajectory_complete = false;
+
+  function TB_nodeById(id) {
+    return nodes.find(n => n.id === id);
+  }
+
+  function TB_outgoingEdges(nodeId) {
+    return edges.filter(e => e.from === nodeId);
+  }
+
+  function TB_isActive(nodeId) {
+    if (TB_path.length === 0 && nodeId === 's0') return true;
+    const last = TB_path[TB_path.length - 1];
+    return TB_outgoingEdges(last).some(e => e.to === nodeId);
+  }
+
+  function TB_handleClick(nodeId) {
+    if (TB_trajectory_complete && !TB_path.includes(nodeId)) return;
+
+    const indexInPath = TB_path.indexOf(nodeId);
+
+    if (indexInPath !== -1) {
+      // Node already in path: trim back to this point
+      TB_path = TB_path.slice(0, indexInPath + 1);
+      TB_trajectory_complete = TB_nodeById(nodeId)?.final ?? false;
+      return;
+    }
+
+    const last = TB_path[TB_path.length - 1];
+    const validNext = TB_outgoingEdges(last).some(e => e.to === nodeId);
+
+    if (validNext) {
+      TB_path = [...TB_path, nodeId];
+      const node = TB_nodeById(nodeId);
+      if (node?.final) TB_trajectory_complete = true;
+    }
+  }
+
+
+  let TB_nodeColors = {};
+  let TB_edgeColors = {};
+  $: TB_set_colors(TB_path);
+  function TB_set_colors(path) {
+    const newNodeColors = {};
+    const newEdgeColors = {};
+
+    for (const node of nodes) {
+      if (path.includes(node.id)) {
+        newNodeColors[node.id] = '#d95f02';
+      } else if (TB_isActive(node.id)) {
+        newNodeColors[node.id] = '#7570b3';
+      } else {
+        newNodeColors[node.id] = 'gray';
+      }
+    }
+
+    for (const edge of edges) {
+      const fromIndex = path.indexOf(edge.from);
+      const toIndex = path.indexOf(edge.to);
+
+      if (fromIndex !== -1 && toIndex === fromIndex + 1) {
+        newEdgeColors[edge.from + '-' + edge.to] = '#d95f02';
+      } else if (path.length && edge.from === path[path.length - 1]) {
+        newEdgeColors[edge.from + '-' + edge.to] = '#7570b3';
+      } else {
+        newEdgeColors[edge.from + '-' + edge.to] = 'gray';
+      }
+    }
+
+    TB_nodeColors = newNodeColors;
+    TB_edgeColors = newEdgeColors;
+  }
+
+
+
+
+
 
 
 
@@ -2175,6 +2253,215 @@
         In the first GFlowNet paper (Benigo et al., 2021) the authors used this loss, since then many improvements have been proposed.
         In the playground we use Trajectory Balance loss, you can learn about it below if you want more detail.
       </p>
+      <div class="image-container">
+        <Accordion multiple>
+            <Panel color="secondary">
+              <Header>Trajectory Balance: Theory</Header>
+              <Content>
+               <svg width="800" height="350" style="display: block; margin: 20px auto;">
+                <defs>
+                  <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
+                    markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="gray" />
+                  </marker>
+                </defs>
+
+                {#each edges as edge (edge.from + '-' + edge.to)}
+                  {#if TB_nodeById(edge.from) && TB_nodeById(edge.to)}
+                    <line
+                      x1="{TB_nodeById(edge.from).x}"
+                      y1="{TB_nodeById(edge.from).y}"
+                      x2="{TB_nodeById(edge.to).x}"
+                      y2="{TB_nodeById(edge.to).y}"
+                      stroke="{TB_edgeColors[edge.from + '-' + edge.to]}"
+                      stroke-width="2"
+                      marker-end="url(#arrow)"
+                    />
+                    <!-- Particles -->
+                          <path
+                            id="path-{edge.from}-{edge.to}"
+                            d="M {nodeById(edge.from).x} {nodeById(edge.from).y}
+                               L {nodeById(edge.to).x} {nodeById(edge.to).y}"
+                            fill="none"
+                            stroke="transparent"
+                          />
+
+                          {#each Array(edge.flow) as _, i}
+                            <circle
+                              r="3"
+                              fill="{TB_edgeColors[edge.from + '-' + edge.to]}"
+                            >
+                              <animateMotion
+                                dur="{3 - i * 0.3}s"
+                                repeatCount="indefinite"
+                              >
+                                <mpath href="#path-{edge.from}-{edge.to}" />
+                              </animateMotion>
+                            </circle>
+                          {/each}
+
+                          <!-- Invisible hover hitbox -->
+                          <line
+                            x1="{nodeById(edge.from).x}"
+                            y1="{nodeById(edge.from).y}"
+                            x2="{nodeById(edge.to).x}"
+                            y2="{nodeById(edge.to).y}"
+                            stroke="transparent"
+                            stroke-width="32"
+                            on:mouseenter={() => hoveredEdge = edge}
+                            on:mouseleave={() => hoveredEdge = null}
+                            role="presentation"
+                          />
+                  {/if}
+                {/each}
+
+                {#each nodes as node}
+                  <g on:click={() => TB_handleClick(node.id)} style="cursor: pointer;" role="presentation">
+                    {#if node.id === 's0'}
+                      <polygon
+                        points="{node.x - 10},{node.y + 20} {node.x - 10},{node.y - 20} {node.x + 30},{node.y}"
+                        fill="{TB_nodeColors[node.id]}"
+                        stroke="black"
+                        stroke-width="2"
+                      />
+                    {:else if node.final}
+                      <rect
+                        x="{node.x - 20}"
+                        y="{node.y - 20}"
+                        width="40"
+                        height="40"
+                        rx="4"
+                        ry="4"
+                        fill="{TB_nodeColors[node.id]}"
+                        stroke="black"
+                        stroke-width="2"
+                      />
+                    {:else}
+                      <circle
+                        cx="{node.x}"
+                        cy="{node.y}"
+                        r="20"
+                        fill="{TB_nodeColors[node.id]}"
+                        stroke="black"
+                        stroke-width="2"
+                      />
+                    {/if}
+                    <text
+                      x="{node.x}"
+                      y="{node.y + 5}"
+                      text-anchor="middle"
+                      font-size="14"
+                      fill="white"
+                    >
+                      {node.id}
+                    </text>
+                  </g>
+                {/each}
+              </svg>
+              <p class="mathexpl">
+                Hover over the edges (actions) to see the Flow and Policy calculations,
+                hover over the nodes (states) to see the Loss calculations.
+              </p>
+
+              <table style="width: 900px; border-collapse: collapse; margin: 20px auto; font-family: 'Georgia', serif; font-size: 16px;">
+                <tr>
+                  <td style="width: 120px; height: 110px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid black;">Flow</td>
+                  <td style="padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid black;">
+                    {#if hoveredEdge}
+                      <Katex>
+                        {`F(\\textcolor{#d95f02}{s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]}}) = ${hoveredEdge.flow}`}
+                      </Katex>
+                    {:else if hoveredNode}
+                      <Katex>
+                        {`F_{in}(\\textcolor{#d95f02}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\textcolor{#1b9e77}{${previousStatesFormula(hoveredNode)}} = ${previousStatesValues(hoveredNode)}`}
+                      </Katex>
+                      <br>
+                      <br>
+                      {#if nodeById(hoveredNode).final}
+                        <Katex>
+                          {`F_{out}(\\textcolor{#d95f02}{x_${hoveredNode[1]}}) = \\textcolor{#7570b3}{R(x_${hoveredNode[1]}) + 0} = ${nextStatesValues(hoveredNode)}`}
+                        </Katex>
+                      {:else}
+                        <Katex>
+                          {`F_{out}(\\textcolor{#d95f02}{s_${hoveredNode[1]}}) = \\textcolor{#7570b3}{0 + ${nextStatesFormula(hoveredNode)}} = ${nextStatesValues(hoveredNode)}`}
+                        </Katex>
+                      {/if}
+                    {:else}
+                      <Katex>
+                        F_{"{in}"}(s) = \sum_{"{s' \\in \\{children(s)\\}}"} F(s' \to s)
+                      </Katex>
+                      <br>
+                      <br>
+                      <Katex>
+                        F_{"{out}"}(s) =R(s) + \sum_{"{s' \\in \\{parents(s)\\}}"} F(s \to s')
+                      </Katex>
+                    {/if}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width: 120px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Policy</td>
+                  <td style="padding: 8px 0; border-bottom: 1px solid #aaa;">
+                    {#if hoveredEdge}
+                      <Katex>
+                        {`P_F(\\textcolor{#d95f02}{${hoveredEdge.to[0]}_${hoveredEdge.to[1]}|s_${hoveredEdge.from[1]}}) = \\frac{\\textcolor{#d95f02}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})}}{\\textcolor{#d95f02}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})} \\textcolor{#1b9e77}{${policyFormula(hoveredEdge)}}} = ${policyValue(hoveredEdge)}`}
+                      </Katex>
+                    {:else if hoveredNode}
+                      The policy is calculated for each action (edge).
+                    {:else}
+                      <Katex>
+                        {`P_F(s'|s) = \\frac{F(s \\to s')}{\\sum_{s' \\in \\{parents(s)\\}} F(s \\to s')}`}
+                      </Katex>
+                    {/if}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width: 120px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Loss</td>
+                  <td style="padding: 8px 0; border-bottom: 1px solid #aaa;">
+                    {#if hoveredEdge}
+                      The Loss is calculated for each state.
+                    {:else if hoveredNode}
+                      <Katex>
+                        {`\\mathcal{L}_{FM}(\\textcolor{#d95f02}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\left( \\log \\frac{\\textcolor{#1b9e77}{${previousStatesFormula(hoveredNode)}}}{\\textcolor{#7570b3}{${nextStatesFormula(hoveredNode)}}} \\right)^2 = ${lossValue(hoveredNode)}`}
+                      </Katex>
+                    {:else}
+                      <Katex>
+                        {`\\mathcal{L}_{FM}(s) = \\left( \\log \\frac{ \\sum_{s'\\in \\{children(s)\\}}F(s' \\to s)}{\\sum_{s' \\in \\{parents(s)\\}}F(s \\to s')} \\right)^2`}
+                      </Katex>
+                    {/if}
+                  </td>
+                </tr>
+              </table>
+              </Content>
+            </Panel>
+            <Panel color="secondary"> <!--bind:open={panel_algo}>-->
+              <Header>
+                Trajectory Balance: Algorithm
+                <!--
+                <IconButton toggle bind:pressed="{panel_algo}"on:click={panel_algo=!panel_algo} >
+                  <Icon class="material-icons"  on>expand_less</Icon>
+                  <Icon class="material-icons">expand_more</Icon>
+                </IconButton>
+                -->
+              </Header>
+
+              <Content style="white-space: pre;">
+                  Input: Reward function (part of the environment), model, hyperparameters
+                  <br>  1. Initialize model parameters for PF, PB, logZ
+                  <br>  2. Repeat for a number of iterations or until convergence:
+                  <br>  3.  -   Repeat for trajectory length:
+                  <br>  4.  -     -   Sample action for current state from PF
+                  <br>  5.  -     -   Take step according to action
+                  <br>  6.  -     -   Add new state to trajectory
+                  <br>  7.  -   Calculate reward of final state according to reward function
+                  <br>  8.  -   Calculate the sum of the log probabilities of all actions of the trajectory for each PF and PB
+                  <br>  9.  -   Calculate the TB-Loss: (logZ + log probabilities PF - log probabilities PB - log reward)^2
+                  <br>  10. -  Update the parameters PF, PB, logZ
+                  <br><br>
+                You can find the python code for this implementation <a href="https://github.com/florianholeczek/ugfn" color="black" target="_blank">here</a>.
+              </Content>
+            </Panel>
+          </Accordion>
+        </div>
 
 
       <h2 class="section-title">Toy Environment</h2>
