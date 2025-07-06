@@ -1,6 +1,3 @@
-
-
-
 export function plot_discrete(Plotly, view = 0) {
   const gridSize = 7;
   const coordToIndex = coord => coord + 3;
@@ -78,6 +75,39 @@ export function plot_discrete(Plotly, view = 0) {
 
   if (view === 0) {
     Plotly.newPlot('DC_discrete_plot', [heatmap], { ...layoutBase, shapes: baseShapes, annotations: [] });
+    return;
+  }
+
+  if (view === 2) {
+    // Define your 10 tripod positions here — change these as you like
+    const tripodPositions = [
+      [1.25, 1.25],
+      [1.25, 0.75],
+      [0.75, 1.25],
+      [0.75, 0.75],
+      [-1.25, -1.25],
+      [-1.25, -0.75],
+      [-0.75, -1.25],
+      [-0.75, -0.75],
+      [-1, 0],
+      [2, 0],
+    ];
+
+    const tripods = {
+      type: 'scatter',
+      x: tripodPositions.map(p => p[0]),
+      y: tripodPositions.map(p => p[1]),
+      mode: 'markers',
+      marker: {
+        color: 'black',
+        size: 14,
+        symbol: 137 // tripod-down symbol
+      },
+      hoverinfo: 'skip',
+      showlegend: false
+    };
+
+    Plotly.newPlot('DC_discrete_plot', [heatmap, tripods], { ...layoutBase, shapes: baseShapes, annotations: [] });
     return;
   }
 
@@ -191,12 +221,14 @@ export function plot_continuous(Plotly, view = 0) {
 
   Plotly.purge(container);
 
+  // Gaussian function (unchanged)
   const gauss = (x, y, muX, muY) => {
     const dx = x - muX;
     const dy = y - muY;
     return Math.exp(-(dx * dx + dy * dy) / (2 * sigma2));
   };
 
+  // x and y grid values (unchanged)
   const xVals = Array.from({ length: resolution }, (_, i) =>
     range[0] + ((range[1] - range[0]) * i) / (resolution - 1)
   );
@@ -204,6 +236,7 @@ export function plot_continuous(Plotly, view = 0) {
     range[0] + ((range[1] - range[0]) * i) / (resolution - 1)
   );
 
+  // Heatmap z values (unchanged)
   const z = yVals.map(y =>
     xVals.map(x => gauss(x, y, 1, 1) + gauss(x, y, -1, -1))
   );
@@ -242,8 +275,45 @@ export function plot_continuous(Plotly, view = 0) {
     annotations: []
   };
 
+  // Define 10 tripod positions — you can manually edit these later:
+  const tripodPositions = [
+      [1.66, 1.1],
+      [1.05, 0.99],
+      [0.87, 1.21],
+      [0.66, 0.87],
+      [-1.43, -1.05],
+      [-1.66, -0.98],
+      [-0.86, -1.1],
+      [-0.86, -0.79],
+      [-0.5, 0.5],
+      [1.6, 0.2],
+    ];
+
+  const tripodMarkerTrace = (x, y) => ({
+    x: [x],
+    y: [y],
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      color: 'black',
+      size: 14,
+      symbol: 137 // tripod-down symbol
+    },
+    hoverinfo: 'none',
+    showlegend: false
+  });
+
+  if (view === 2) {
+    // For view 2: no animation, just heatmap + 10 tripod markers
+    const tripodTraces = tripodPositions.map(pos => tripodMarkerTrace(pos[0], pos[1]));
+    Plotly.newPlot(container, [heatmapTrace, ...tripodTraces], baseLayout);
+    return;
+  }
+
+  // Original animation logic (for view 0 or 1) below...
+
   Plotly.newPlot(container, [heatmapTrace], baseLayout).then(() => {
-    if (view < 1) return;
+    if (view === 0) return;
 
     let currentPos = { x: 0, y: 0 };
     let stepCounter = 0;
