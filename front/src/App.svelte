@@ -1137,7 +1137,9 @@
     if (plotlyready){
       console.log(v)
       Plotly.purge("DC_continuous_plot");
-      plot_continuous(Plotly, view);
+      plot_continuous(Plotly, v);
+      Plotly.purge("DC_discrete_plot");
+      plot_discrete(Plotly, v);
     }
   }
 

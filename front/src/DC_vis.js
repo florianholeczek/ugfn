@@ -1,96 +1,184 @@
-// Initialize 7x7 grid filled with zeros
-let grid = Array.from({length: 7}, () => Array(7).fill(0));
 
-// Coordinate to index conversion
-const coordToIndex = coord => coord + 3;
 
-// Peaks at (1,1) and (-1,-1)
-const peaks = [[1, 1], [-1, -1]];
 
-export function plot_discrete(Plotly){
-    peaks.forEach(([x, y]) => {
-      const xi = coordToIndex(x);
-      const yi = coordToIndex(y);
-      grid[yi][xi] = 1;
+export function plot_discrete(Plotly, view = 0) {
+  const gridSize = 7;
+  const coordToIndex = coord => coord + 3;
+  const axisLabels = [-3, -2, -1, 0, 1, 2, 3];
 
-      // Set neighbors to 4
-      for (let dx = -1; dx <= 1; dx++) {
-        for (let dy = -1; dy <= 1; dy++) {
-          if (dx === 0 && dy === 0) continue;
-          const nx = x + dx;
-          const ny = y + dy;
-          if (nx >= -3 && nx <= 3 && ny >= -3 && ny <= 3) {
-            const ni = coordToIndex(nx);
-            const nj = coordToIndex(ny);
-            if (grid[nj][ni] !== 1) grid[nj][ni] = 0.4;
-          }
+  // Grid setup
+  let grid = Array.from({ length: gridSize }, () => Array(gridSize).fill(0));
+  const peaks = [[1, 1], [-1, -1]];
+
+  peaks.forEach(([x, y]) => {
+    const xi = coordToIndex(x), yi = coordToIndex(y);
+    grid[yi][xi] = 1;
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        if (dx === 0 && dy === 0) continue;
+        let nx = x + dx, ny = y + dy;
+        if (nx >= -3 && nx <= 3 && ny >= -3 && ny <= 3) {
+          let ni = coordToIndex(nx), nj = coordToIndex(ny);
+          if (grid[nj][ni] !== 1) grid[nj][ni] = 0.4;
         }
       }
-    });
+    }
+  });
 
+  const heatmap = {
+    z: grid,
+    x: axisLabels,
+    y: axisLabels,
+    type: 'heatmap',
+    colorscale: 'Viridis',
+    zmin: 0,
+    zmax: 1,
+    showscale: false,
+    hoverongaps: false,
+    text: grid.map(row => row.map(val => `Reward ${val}`)),
+    hovertemplate: "%{text}<extra></extra>",
+    opacity: view === 0 ? 1 : 0.6
+  };
 
+  const baseShapes = [];
+  for (let i = 0; i < 7; i++) {
+    for (let j = 0; j < 7; j++) {
+      baseShapes.push({
+        type: 'rect',
+        x0: axisLabels[j] - 0.5,
+        x1: axisLabels[j] + 0.5,
+        y0: axisLabels[i] - 0.5,
+        y1: axisLabels[i] + 0.5,
+        line: { color: 'white', width: 1 },
+        fillcolor: 'rgba(0,0,0,0)'
+      });
+    }
+  }
 
+  const layoutBase = {
+    xaxis: {
+      showgrid: false,
+      tickmode: 'array',
+      tickvals: axisLabels,
+      ticktext: axisLabels,
+      scaleanchor: 'y',
+      zeroline: false
+    },
+    yaxis: {
+      showgrid: false,
+      tickmode: 'array',
+      tickvals: axisLabels,
+      ticktext: axisLabels,
+      zeroline: false
+    },
+    margin: { t: 50, l: 50, r: 20, b: 50 },
+    plot_bgcolor: 'white',
+    paper_bgcolor: 'white'
+  };
 
-    // Axis labels from -3 to 3
-    const axisLabels = [-3, -2, -1, 0, 1, 2, 3];
+  if (view === 0) {
+    Plotly.newPlot('DC_discrete_plot', [heatmap], { ...layoutBase, shapes: baseShapes, annotations: [] });
+    return;
+  }
 
-    const data = [{
-      z: grid,
-      x: axisLabels,
-      y: axisLabels,
-      type: 'heatmap',
-      colorscale: 'Viridis',
-      zmin: 0,
-      zmax: 1,
-      showscale: false,
-      hoverongaps: false,
-      text: grid.map(row => row.map(val => `Reward ${val}`)),
-      hovertemplate: "%{text}<extra></extra>"
-    }];
+  const makeArrowAnno = (x0, y0, x1, y1, color) => ({
+    ax: x0, ay: y0, x: x1, y: y1,
+    xref: 'x', yref: 'y', axref: 'x', ayref: 'y',
+    showarrow: true, arrowhead: 3, arrowsize: 1, arrowwidth: 1.5, arrowcolor: color
+  });
 
-    let shapes = [];
-    for (let i = 0; i < 7; i++) {
-      for (let j = 0; j < 7; j++) {
-        shapes.push({
-          type: 'rect',
-          x0: axisLabels[j] - 0.5,
-          x1: axisLabels[j] + 0.5,
-          y0: axisLabels[i] - 0.5,
-          y1: axisLabels[i] + 0.5,
-          line: {
-            color: 'white',
-            width: 1
-          },
-          fillcolor: 'rgba(0,0,0,0)' // transparent fill
-        });
+  const randomNext = () => [Math.floor(Math.random() * 7) - 3, Math.floor(Math.random() * 7) - 3];
+
+  const frames = [];
+  const blackPaths = [];
+  let current = [0, 0];
+  let tripodPosition = null;
+
+  for (let step = 0; step < 3; step++) {
+    const [cx, cy] = current;
+
+    // 1️⃣ Grey arrows
+    const greyAnnos = [];
+    for (let tx = -3; tx <= 3; tx++) {
+      for (let ty = -3; ty <= 3; ty++) {
+        if (tx === cx && ty === cy) continue;
+        greyAnnos.push(makeArrowAnno(cx, cy, tx, ty, 'grey'));
       }
     }
 
-    const layout = {
-      xaxis: {
-        showgrid: false,
-        tickmode: 'array',
-        tickvals: axisLabels,
-        ticktext: axisLabels,
-        scaleanchor: 'y',
-        gridcolor: 'rgba(0,0,0,0.3)',
-        zeroline: false
-      },
-      yaxis: {
-        showgrid: false,
-        tickmode: 'array',
-        tickvals: axisLabels,
-        ticktext: axisLabels,
-        gridcolor: 'rgba(0,0,0,0.3)',
-        zeroline: false
-      },
-      shapes: shapes,
-      margin: { t: 50, l: 50, r: 20, b: 50 },
-      plot_bgcolor: 'white',
-      paper_bgcolor: 'white'
-    };
+    frames.push({
+      data: [heatmap],
+      layout: {
+        ...layoutBase,
+        shapes: [...baseShapes, ...blackPaths.map(p => p.shape)],
+        annotations: greyAnnos
+      }
+    });
 
-    Plotly.newPlot('DC_discrete_plot', data, layout);
+    // 2️⃣ Black arrow sampled
+    const [nx, ny] = randomNext();
+    const blackShape = {
+      type: 'line',
+      x0: cx, y0: cy, x1: nx, y1: ny,
+      line: { color: 'black', width: 2 }
+    };
+    const blackAnno = makeArrowAnno(cx, cy, nx, ny, 'black');
+    blackPaths.push({ shape: blackShape, anno: blackAnno });
+
+    frames.push({
+      data: [heatmap],
+      layout: {
+        ...layoutBase,
+        shapes: [...baseShapes, ...blackPaths.map(p => p.shape)],
+        annotations: [...greyAnnos, blackAnno]
+      }
+    });
+
+    // 3️⃣ Only black arrows + tripod
+    const blackOnlyAnnos = blackPaths.map(p => p.anno);
+    const dataWithTripod = [heatmap];
+    if (step === 2) {
+      tripodPosition = [nx, ny];
+      dataWithTripod.push({
+        type: 'scatter',
+        x: [nx],
+        y: [ny],
+        mode: 'markers',
+        marker: {
+          color: 'black',
+          size: 14,
+          symbol: 137 // Plotly symbol: tripod-down
+        },
+        hoverinfo: 'skip',
+        showlegend: false
+      });
+    }
+
+    frames.push({
+      data: dataWithTripod,
+      layout: {
+        ...layoutBase,
+        shapes: [...baseShapes, ...blackPaths.map(p => p.shape)],
+        annotations: blackOnlyAnnos
+      }
+    });
+
+    current = [nx, ny];
+  }
+
+  // Initialize and play once
+  Plotly.newPlot('DC_discrete_plot', [heatmap], {
+    ...layoutBase,
+    shapes: baseShapes,
+    annotations: []
+  }).then(() => {
+    const stepOnce = (i = 0) => {
+      if (i >= frames.length) return;
+      Plotly.react('DC_discrete_plot', frames[i].data, frames[i].layout);
+      setTimeout(() => stepOnce(i + 1), 1200);
+    };
+    stepOnce();
+  });
 }
 
 
@@ -130,7 +218,8 @@ export function plot_continuous(Plotly, view = 0) {
     showscale: false,
     hoverongaps: false,
     text: z.map(row => row.map(val => `Reward ${val.toFixed(2)}`)),
-    hovertemplate: "%{text}<extra></extra>"
+    hovertemplate: "%{text}<extra></extra>",
+    opacity: view === 0 ? 1 : 0.6
   };
 
   const baseLayout = {
