@@ -1,3 +1,4 @@
+
 export function plot_discrete(Plotly, view = 0) {
   const container = 'DC_discrete_plot';
   const gridSize = 7;
@@ -6,10 +7,9 @@ export function plot_discrete(Plotly, view = 0) {
 
   Plotly.purge(container);
 
-  // Grid with peaks and surroundings
+  // Grid setup: peaks and surrounding influence
   let grid = Array.from({ length: gridSize }, () => Array(gridSize).fill(0));
   const peaks = [[1, 1], [-1, -1]];
-
   peaks.forEach(([x, y]) => {
     const xi = coordToIndex(x), yi = coordToIndex(y);
     grid[yi][xi] = 1;
@@ -81,21 +81,14 @@ export function plot_discrete(Plotly, view = 0) {
 
   if (view === 0) {
     Plotly.newPlot(container, [heatmap], layoutBase);
-    return () => {}; // no animation, no stop needed
+    return () => {};
   }
 
   if (view === 2) {
     const tripodPositions = [
-      [1.25, 1.25],
-      [1.25, 0.75],
-      [0.75, 1.25],
-      [0.75, 0.75],
-      [-1.25, -1.25],
-      [-1.25, -0.75],
-      [-0.75, -1.25],
-      [-0.75, -0.75],
-      [-1, 0],
-      [2, 0],
+      [1.25, 1.25], [1.25, 0.75], [0.75, 1.25], [0.75, 0.75],
+      [-1.25, -1.25], [-1.25, -0.75], [-0.75, -1.25], [-0.75, -0.75],
+      [-1, 0], [2, 0]
     ];
 
     const tripods = {
@@ -113,11 +106,78 @@ export function plot_discrete(Plotly, view = 0) {
     };
 
     Plotly.newPlot(container, [heatmap, tripods], layoutBase);
-    return () => {}; // no animation to stop here either
+    return () => {};
   }
 
-  // Animation for view 1 or other
+  if (view === 3) {
+    const directionGrid = [
+      ["dr", "d", "d", "d", "d", "d", "dl"],
+      ["r",  "dr", "d", "dr", "d", "dl", "l"],
+      ["r",  "r",  "", "r", "", "l", "l"],
+      ["r",  "dr",  "d",  "",  "u",  "ul", "l"],
+      ["r",  "r",  "", "l", "", "l", "l"],
+      ["r",  "ur", "u",  "ul", "u",  "ul", "l"],
+      ["ur", "u",  "u",  "u", "u",  "u",  "ul"]
+    ];
 
+    const dirToVec = {
+      "u":  [0, 1],
+      "d":  [0, -1],
+      "l":  [-1, 0],
+      "r":  [1, 0],
+      "ul": [-1, 1],
+      "ur": [1, 1],
+      "dl": [-1, -1],
+      "dr": [1, -1]
+    };
+
+    const annotations = [];
+    for (let yi = 0; yi < 7; yi++) {
+      for (let xi = 0; xi < 7; xi++) {
+        const x = axisLabels[xi];
+        const y = axisLabels[6 - yi]; // flip y
+        const dir = directionGrid[yi][xi];
+
+        if (dir && dirToVec[dir]) {
+          const [dx, dy] = dirToVec[dir];
+          const len = 0.35;
+          annotations.push({
+            ax: x,
+            ay: y,
+            x: x + dx * len,
+            y: y + dy * len,
+            xref: 'x',
+            yref: 'y',
+            axref: 'x',
+            ayref: 'y',
+            showarrow: true,
+            arrowhead: 2,
+            arrowsize: 1,
+            arrowwidth: 1.5,
+            arrowcolor: 'white'
+          });
+        } else {
+          annotations.push({
+            x, y,
+            xref: 'x',
+            yref: 'y',
+            text: '●',
+            showarrow: false,
+            font: { color: 'white', size: 12 }
+          });
+        }
+      }
+    }
+
+    Plotly.newPlot(container, [heatmap], {
+      ...layoutBase,
+      annotations
+    });
+
+    return () => {};
+  }
+
+  // View === 1 → Animated path exploration
   const makeArrowAnno = (x0, y0, x1, y1, color) => ({
     ax: x0, ay: y0, x: x1, y: y1,
     xref: 'x', yref: 'y', axref: 'x', ayref: 'y',
@@ -130,7 +190,6 @@ export function plot_discrete(Plotly, view = 0) {
   ];
 
   let isActive = true;
-
   let current = [0, 0];
   const blackPaths = [];
   const permanentAnnotations = [];
@@ -145,7 +204,6 @@ export function plot_discrete(Plotly, view = 0) {
     if (!isActive) return;
 
     if (step >= 3) {
-      // Reset animation state and loop after 1s pause
       current = [0, 0];
       blackPaths.length = 0;
       permanentAnnotations.length = 0;
@@ -154,10 +212,8 @@ export function plot_discrete(Plotly, view = 0) {
       return;
     }
 
-    const cx = current[0];
-    const cy = current[1];
+    const [cx, cy] = current;
 
-    // 1️⃣ Grey arrows (except current position)
     const greyAnnos = [];
     for (let tx = -3; tx <= 3; tx++) {
       for (let ty = -3; ty <= 3; ty++) {
@@ -171,7 +227,6 @@ export function plot_discrete(Plotly, view = 0) {
     setTimeout(() => {
       if (!isActive) return;
 
-      // 2️⃣ Black arrow sampled
       const [nx, ny] = randomNext();
       const blackShape = {
         type: 'line',
@@ -186,7 +241,6 @@ export function plot_discrete(Plotly, view = 0) {
       setTimeout(() => {
         if (!isActive) return;
 
-        // 3️⃣ Show only black arrows + tripod if last step of cycle
         permanentAnnotations.push(blackAnno);
         current = [nx, ny];
         updatePlot(permanentAnnotations);
@@ -206,7 +260,6 @@ export function plot_discrete(Plotly, view = 0) {
     isActive = false;
   };
 }
-
 
 
 
@@ -273,16 +326,9 @@ export function plot_continuous(Plotly, view = 0) {
   };
 
   const tripodPositions = [
-    [1.66, 1.1],
-    [1.05, 0.99],
-    [0.87, 1.21],
-    [0.66, 0.87],
-    [-1.43, -1.05],
-    [-1.66, -0.98],
-    [-0.86, -1.1],
-    [-0.86, -0.79],
-    [-0.5, 0.5],
-    [1.6, 0.2],
+    [1.66, 1.1], [1.05, 0.99], [0.87, 1.21], [0.66, 0.87],
+    [-1.43, -1.05], [-1.66, -0.98], [-0.86, -1.1], [-0.86, -0.79],
+    [-0.5, 0.5], [1.6, 0.2]
   ];
 
   const tripodMarkerTrace = (x, y) => ({
@@ -293,24 +339,71 @@ export function plot_continuous(Plotly, view = 0) {
     marker: {
       color: 'black',
       size: 14,
-      symbol: 137 // tripod-down symbol
+      symbol: 137
     },
     hoverinfo: 'none',
     showlegend: false
   });
 
   if (view === 2) {
-    const tripodTraces = tripodPositions.map(pos => tripodMarkerTrace(pos[0], pos[1]));
+    const tripodTraces = tripodPositions.map(([x, y]) => tripodMarkerTrace(x, y));
     Plotly.newPlot(container, [heatmapTrace, ...tripodTraces], baseLayout);
-    // No animation for view 2, so return a no-op stop function
     return () => {};
   }
 
-  // Animation logic for view 0 or 1 with looping and stoppable control
+  if (view === 3) {
+    const vectorSpacing = 0.5;
+    const vectorGrid = [];
+
+    for (let x = -3; x <= 3; x += vectorSpacing) {
+      for (let y = -3; y <= 3; y += vectorSpacing) {
+        vectorGrid.push({ x, y });
+      }
+    }
+
+    const getVector = (x, y) => {
+      const distToNeg = Math.hypot(x + 1, y + 1);
+      const distToPos = Math.hypot(x - 1, y - 1);
+      const [tx, ty] = distToNeg < distToPos ? [-1, -1] : [1, 1];
+      const dx = tx - x;
+      const dy = ty - y;
+      const len = Math.hypot(dx, dy);
+      const scale = 0.25 * Math.hypot(dx, dy);
+      return { dx: (dx / len) * scale, dy: (dy / len) * scale };
+    };
+
+    const vectorAnnotations = vectorGrid.map(({ x, y }) => {
+      const { dx, dy } = getVector(x, y);
+      return {
+        x: x + dx,
+        y: y + dy,
+        ax: x,
+        ay: y,
+        xref: 'x',
+        yref: 'y',
+        axref: 'x',
+        ayref: 'y',
+        showarrow: true,
+        arrowhead: 2,
+        arrowsize: 1,
+        arrowwidth: 1.5,
+        arrowcolor: '#ffffff'
+      };
+    });
+
+    Plotly.newPlot(container, [heatmapTrace], {
+      ...baseLayout,
+      annotations: vectorAnnotations
+    });
+
+    return () => {};
+  }
+
+  // view === 0 or 1
   let isActive = true;
 
   Plotly.newPlot(container, [heatmapTrace], baseLayout).then(() => {
-    if (view === 0) return; // No animation for view 0 as per original code
+    if (view === 0) return;
 
     let currentPos = { x: 0, y: 0 };
     let stepCounter = 0;
@@ -356,13 +449,12 @@ export function plot_continuous(Plotly, view = 0) {
     };
 
     const nextStep = () => {
-      if (!isActive) return;  // stop immediately if requested
+      if (!isActive) return;
 
       if (stepCounter >= 3) {
         permanentTraces.push(tripodMarkerTrace(currentPos.x, currentPos.y));
         updatePlot();
 
-        // reset to loop animation
         stepCounter = 0;
         currentPos = { x: 0, y: 0 };
         arrowAnnotations.length = 0;
@@ -408,8 +500,8 @@ export function plot_continuous(Plotly, view = 0) {
     setTimeout(nextStep, 1000);
   });
 
-  // Return stop function to stop the animation on view change
   return () => {
     isActive = false;
   };
 }
+
