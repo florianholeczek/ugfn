@@ -19256,6 +19256,61 @@ input[type="range"] {
     color: #333;
   }
 
+  .DC-container {
+    width: 1000px;
+    height: 850px;
+    margin: 10px auto; /* 10px top/bottom, centered horizontally */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .DC-side-button {
+    width: 50px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .DC-center-grid {
+    display: grid;
+    grid-template-columns: 420px 420px;
+    grid-template-rows: 420px 420px;
+    gap: 10px;
+    width: 900px; /* 400 + 400 + 50 gap */
+    height: 850px;
+    box-sizing: border-box;
+    padding: 0; /* No internal padding */
+  }
+
+  .DC-quadrant {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    font-size: 1.2rem;
+  }
+
+  .DC-visualization {
+    background-color: #f0f8ff;
+  }
+
+  .DC-text {
+    background-color: #fff0f5;
+  }
+
+  .DC-icon {
+  font-size: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
 
 
 

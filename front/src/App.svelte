@@ -8,6 +8,7 @@
   import {plotEnvironment, compute_density_plotting} from "./env.js";
   import {plotStates, plotStatesHistory, create_env_image} from "./training_vis.js"
   import {plot_flow} from "./flow_vis.js";
+  import {plot_discrete, plot_continuous} from "./DC_vis.js"
   import Accordion, {Panel, Header, Content } from '@smui-extra/accordion';
   import Slider from '@smui/slider';
   import Button, { Label } from '@smui/button';
@@ -762,6 +763,8 @@
     await loadPlotly();
     plotlyready = true;
     plotEnv();
+    plot_discrete(Plotly);
+    plot_continuous(Plotly, 0);
     await load_rundata();
     run1_value = 2048; //triggers drawing the plot for the tutorial runs
     run2_value = 4096;
@@ -1128,6 +1131,16 @@
     return form + "=" + calc + "=" + TB_current.pb;
   }
 
+  let DC_view=0;
+  $: DC_viewchange(DC_view);
+  function DC_viewchange(v){
+    if (plotlyready){
+      console.log(v)
+      Plotly.purge("DC_continuous_plot");
+      plot_continuous(Plotly, view);
+    }
+  }
+
 
 
 
@@ -1181,6 +1194,29 @@
 
 
 <main class="main-content">
+
+
+  <div class="DC-container">
+    <!-- Left Button -->
+    <Button class="DC-side-button" disabled={DC_view<=0} on:click={() => DC_view--} variant="raised" color="secondary">
+      <Icon class="material-icons" style="font-size: 50px; display: flex; align-items: center; justify-content: center;">keyboard_double_arrow_left </Icon>
+    </Button>
+
+    <!-- Center Grid -->
+    <div class="DC-center-grid">
+      <div class="DC-quadrant" id="DC_discrete_plot"></div>
+      <div class="DC-quadrant DC-text">Top Right Text</div>
+      <div class="DC-quadrant DC-text">Bottom Left Text {DC_view}</div>
+      <div class="DC-quadrant" id="DC_continuous_plot"></div>
+    </div>
+
+    <!-- Right Button -->
+    <Button class="DC-side-button" disabled={DC_view>=3} on:click={() => DC_view++} variant="raised" color="secondary">
+      <Icon class="material-icons" style="font-size: 50px; display: flex; align-items: center; justify-content: center;">keyboard_double_arrow_right</Icon>
+    </Button>
+  </div>
+
+
 
   {#if isMobile}
     <div class="mobile-disclaimer">
@@ -2334,6 +2370,15 @@
                         stroke-width="2"
                         marker-end="url(#arrow)"
                       />
+                      <text
+                        x="{(nodeById(edge.from).x + nodeById(edge.to).x) / 2}"
+                        y="{(nodeById(edge.from).y + nodeById(edge.to).y) / 2 - 10}"
+                        text-anchor="middle"
+                        font-size="12"
+                        fill="black"
+                      >
+                        {edge.flow}
+                      </text>
                       <!-- Particles -->
                       <path
                         id="path-{edge.from}-{edge.to}"
