@@ -1,9 +1,12 @@
 export function plot_discrete(Plotly, view = 0) {
+  const container = 'DC_discrete_plot';
   const gridSize = 7;
   const coordToIndex = coord => coord + 3;
   const axisLabels = [-3, -2, -1, 0, 1, 2, 3];
 
-  // Grid setup
+  Plotly.purge(container);
+
+  // Grid with peaks and surroundings
   let grid = Array.from({ length: gridSize }, () => Array(gridSize).fill(0));
   const peaks = [[1, 1], [-1, -1]];
 
@@ -13,9 +16,9 @@ export function plot_discrete(Plotly, view = 0) {
     for (let dx = -1; dx <= 1; dx++) {
       for (let dy = -1; dy <= 1; dy++) {
         if (dx === 0 && dy === 0) continue;
-        let nx = x + dx, ny = y + dy;
+        const nx = x + dx, ny = y + dy;
         if (nx >= -3 && nx <= 3 && ny >= -3 && ny <= 3) {
-          let ni = coordToIndex(nx), nj = coordToIndex(ny);
+          const ni = coordToIndex(nx), nj = coordToIndex(ny);
           if (grid[nj][ni] !== 1) grid[nj][ni] = 0.4;
         }
       }
@@ -37,9 +40,10 @@ export function plot_discrete(Plotly, view = 0) {
     opacity: view === 0 ? 1 : 0.6
   };
 
+  // Base grid rectangles
   const baseShapes = [];
-  for (let i = 0; i < 7; i++) {
-    for (let j = 0; j < 7; j++) {
+  for (let i = 0; i < gridSize; i++) {
+    for (let j = 0; j < gridSize; j++) {
       baseShapes.push({
         type: 'rect',
         x0: axisLabels[j] - 0.5,
@@ -70,16 +74,17 @@ export function plot_discrete(Plotly, view = 0) {
     },
     margin: { t: 50, l: 50, r: 20, b: 50 },
     plot_bgcolor: 'white',
-    paper_bgcolor: 'white'
+    paper_bgcolor: 'white',
+    shapes: baseShapes,
+    annotations: []
   };
 
   if (view === 0) {
-    Plotly.newPlot('DC_discrete_plot', [heatmap], { ...layoutBase, shapes: baseShapes, annotations: [] });
-    return;
+    Plotly.newPlot(container, [heatmap], layoutBase);
+    return () => {}; // no animation, no stop needed
   }
 
   if (view === 2) {
-    // Define your 10 tripod positions here — change these as you like
     const tripodPositions = [
       [1.25, 1.25],
       [1.25, 0.75],
@@ -101,15 +106,17 @@ export function plot_discrete(Plotly, view = 0) {
       marker: {
         color: 'black',
         size: 14,
-        symbol: 137 // tripod-down symbol
+        symbol: 137
       },
       hoverinfo: 'skip',
       showlegend: false
     };
 
-    Plotly.newPlot('DC_discrete_plot', [heatmap, tripods], { ...layoutBase, shapes: baseShapes, annotations: [] });
-    return;
+    Plotly.newPlot(container, [heatmap, tripods], layoutBase);
+    return () => {}; // no animation to stop here either
   }
+
+  // Animation for view 1 or other
 
   const makeArrowAnno = (x0, y0, x1, y1, color) => ({
     ax: x0, ay: y0, x: x1, y: y1,
@@ -117,99 +124,92 @@ export function plot_discrete(Plotly, view = 0) {
     showarrow: true, arrowhead: 3, arrowsize: 1, arrowwidth: 1.5, arrowcolor: color
   });
 
-  const randomNext = () => [Math.floor(Math.random() * 7) - 3, Math.floor(Math.random() * 7) - 3];
+  const randomNext = () => [
+    Math.floor(Math.random() * gridSize) - 3,
+    Math.floor(Math.random() * gridSize) - 3
+  ];
 
-  const frames = [];
-  const blackPaths = [];
+  let isActive = true;
+
   let current = [0, 0];
-  let tripodPosition = null;
+  const blackPaths = [];
+  const permanentAnnotations = [];
 
-  for (let step = 0; step < 3; step++) {
-    const [cx, cy] = current;
+  const updatePlot = (extraAnnotations = []) => {
+    const annotations = [...permanentAnnotations, ...extraAnnotations];
+    const shapes = [...baseShapes, ...blackPaths.map(p => p.shape)];
+    Plotly.react(container, [heatmap], { ...layoutBase, shapes, annotations });
+  };
 
-    // 1️⃣ Grey arrows
+  const stepAnimation = (step = 0) => {
+    if (!isActive) return;
+
+    if (step >= 3) {
+      // Reset animation state and loop after 1s pause
+      current = [0, 0];
+      blackPaths.length = 0;
+      permanentAnnotations.length = 0;
+      updatePlot();
+      setTimeout(() => { if (isActive) stepAnimation(0); }, 1000);
+      return;
+    }
+
+    const cx = current[0];
+    const cy = current[1];
+
+    // 1️⃣ Grey arrows (except current position)
     const greyAnnos = [];
     for (let tx = -3; tx <= 3; tx++) {
       for (let ty = -3; ty <= 3; ty++) {
         if (tx === cx && ty === cy) continue;
-        greyAnnos.push(makeArrowAnno(cx, cy, tx, ty, 'grey'));
+        greyAnnos.push(makeArrowAnno(cx, cy, tx, ty, '#444444'));
       }
     }
 
-    frames.push({
-      data: [heatmap],
-      layout: {
-        ...layoutBase,
-        shapes: [...baseShapes, ...blackPaths.map(p => p.shape)],
-        annotations: greyAnnos
-      }
-    });
+    updatePlot(greyAnnos);
 
-    // 2️⃣ Black arrow sampled
-    const [nx, ny] = randomNext();
-    const blackShape = {
-      type: 'line',
-      x0: cx, y0: cy, x1: nx, y1: ny,
-      line: { color: 'black', width: 2 }
-    };
-    const blackAnno = makeArrowAnno(cx, cy, nx, ny, 'black');
-    blackPaths.push({ shape: blackShape, anno: blackAnno });
+    setTimeout(() => {
+      if (!isActive) return;
 
-    frames.push({
-      data: [heatmap],
-      layout: {
-        ...layoutBase,
-        shapes: [...baseShapes, ...blackPaths.map(p => p.shape)],
-        annotations: [...greyAnnos, blackAnno]
-      }
-    });
+      // 2️⃣ Black arrow sampled
+      const [nx, ny] = randomNext();
+      const blackShape = {
+        type: 'line',
+        x0: cx, y0: cy, x1: nx, y1: ny,
+        line: { color: 'black', width: 2 }
+      };
+      const blackAnno = makeArrowAnno(cx, cy, nx, ny, 'black');
+      blackPaths.push({ shape: blackShape, anno: blackAnno });
 
-    // 3️⃣ Only black arrows + tripod
-    const blackOnlyAnnos = blackPaths.map(p => p.anno);
-    const dataWithTripod = [heatmap];
-    if (step === 2) {
-      tripodPosition = [nx, ny];
-      dataWithTripod.push({
-        type: 'scatter',
-        x: [nx],
-        y: [ny],
-        mode: 'markers',
-        marker: {
-          color: 'black',
-          size: 14,
-          symbol: 137 // Plotly symbol: tripod-down
-        },
-        hoverinfo: 'skip',
-        showlegend: false
-      });
-    }
+      updatePlot([...greyAnnos, blackAnno]);
 
-    frames.push({
-      data: dataWithTripod,
-      layout: {
-        ...layoutBase,
-        shapes: [...baseShapes, ...blackPaths.map(p => p.shape)],
-        annotations: blackOnlyAnnos
-      }
-    });
+      setTimeout(() => {
+        if (!isActive) return;
 
-    current = [nx, ny];
-  }
+        // 3️⃣ Show only black arrows + tripod if last step of cycle
+        permanentAnnotations.push(blackAnno);
+        current = [nx, ny];
+        updatePlot(permanentAnnotations);
 
-  // Initialize and play once
-  Plotly.newPlot('DC_discrete_plot', [heatmap], {
-    ...layoutBase,
-    shapes: baseShapes,
-    annotations: []
-  }).then(() => {
-    const stepOnce = (i = 0) => {
-      if (i >= frames.length) return;
-      Plotly.react('DC_discrete_plot', frames[i].data, frames[i].layout);
-      setTimeout(() => stepOnce(i + 1), 1200);
-    };
-    stepOnce();
+        setTimeout(() => {
+          stepAnimation(step + 1);
+        }, 1000);
+      }, 1200);
+    }, 1200);
+  };
+
+  Plotly.newPlot(container, [heatmap], layoutBase).then(() => {
+    stepAnimation();
   });
+
+  return () => {
+    isActive = false;
+  };
 }
+
+
+
+
 
 
 export function plot_continuous(Plotly, view = 0) {
@@ -221,14 +221,12 @@ export function plot_continuous(Plotly, view = 0) {
 
   Plotly.purge(container);
 
-  // Gaussian function (unchanged)
   const gauss = (x, y, muX, muY) => {
     const dx = x - muX;
     const dy = y - muY;
     return Math.exp(-(dx * dx + dy * dy) / (2 * sigma2));
   };
 
-  // x and y grid values (unchanged)
   const xVals = Array.from({ length: resolution }, (_, i) =>
     range[0] + ((range[1] - range[0]) * i) / (resolution - 1)
   );
@@ -236,7 +234,6 @@ export function plot_continuous(Plotly, view = 0) {
     range[0] + ((range[1] - range[0]) * i) / (resolution - 1)
   );
 
-  // Heatmap z values (unchanged)
   const z = yVals.map(y =>
     xVals.map(x => gauss(x, y, 1, 1) + gauss(x, y, -1, -1))
   );
@@ -275,19 +272,18 @@ export function plot_continuous(Plotly, view = 0) {
     annotations: []
   };
 
-  // Define 10 tripod positions — you can manually edit these later:
   const tripodPositions = [
-      [1.66, 1.1],
-      [1.05, 0.99],
-      [0.87, 1.21],
-      [0.66, 0.87],
-      [-1.43, -1.05],
-      [-1.66, -0.98],
-      [-0.86, -1.1],
-      [-0.86, -0.79],
-      [-0.5, 0.5],
-      [1.6, 0.2],
-    ];
+    [1.66, 1.1],
+    [1.05, 0.99],
+    [0.87, 1.21],
+    [0.66, 0.87],
+    [-1.43, -1.05],
+    [-1.66, -0.98],
+    [-0.86, -1.1],
+    [-0.86, -0.79],
+    [-0.5, 0.5],
+    [1.6, 0.2],
+  ];
 
   const tripodMarkerTrace = (x, y) => ({
     x: [x],
@@ -304,16 +300,17 @@ export function plot_continuous(Plotly, view = 0) {
   });
 
   if (view === 2) {
-    // For view 2: no animation, just heatmap + 10 tripod markers
     const tripodTraces = tripodPositions.map(pos => tripodMarkerTrace(pos[0], pos[1]));
     Plotly.newPlot(container, [heatmapTrace, ...tripodTraces], baseLayout);
-    return;
+    // No animation for view 2, so return a no-op stop function
+    return () => {};
   }
 
-  // Original animation logic (for view 0 or 1) below...
+  // Animation logic for view 0 or 1 with looping and stoppable control
+  let isActive = true;
 
   Plotly.newPlot(container, [heatmapTrace], baseLayout).then(() => {
-    if (view === 0) return;
+    if (view === 0) return; // No animation for view 0 as per original code
 
     let currentPos = { x: 0, y: 0 };
     let stepCounter = 0;
@@ -342,24 +339,10 @@ export function plot_continuous(Plotly, view = 0) {
       mode: 'markers',
       type: 'scatter',
       marker: {
-        color: 'gray',
+        color: '#444444',
         size: 100,
         symbol: 'circle',
         opacity: 0.5
-      },
-      hoverinfo: 'none',
-      showlegend: false
-    });
-
-    const tripodMarkerTrace = (x, y) => ({
-      x: [x],
-      y: [y],
-      mode: 'markers',
-      type: 'scatter',
-      marker: {
-        color: 'black',
-        size: 14,
-        symbol: 137 // tripod-down symbol
       },
       hoverinfo: 'none',
       showlegend: false
@@ -373,10 +356,21 @@ export function plot_continuous(Plotly, view = 0) {
     };
 
     const nextStep = () => {
+      if (!isActive) return;  // stop immediately if requested
+
       if (stepCounter >= 3) {
-        // Add tripod marker at final position
         permanentTraces.push(tripodMarkerTrace(currentPos.x, currentPos.y));
         updatePlot();
+
+        // reset to loop animation
+        stepCounter = 0;
+        currentPos = { x: 0, y: 0 };
+        arrowAnnotations.length = 0;
+
+        setTimeout(() => {
+          if (isActive) nextStep();
+        }, 1000);
+
         return;
       }
 
@@ -389,21 +383,23 @@ export function plot_continuous(Plotly, view = 0) {
       const sampleX = muX + (Math.random() * 2 - 1) * halfSide;
       const sampleY = muY + (Math.random() * 2 - 1) * halfSide;
 
-      // Step A: Gray arrow + planning circle
-      const planningArrow = addArrowAnnotation(currentPos.x, currentPos.y, muX, muY, 'gray');
+      const planningArrow = addArrowAnnotation(currentPos.x, currentPos.y, muX, muY, '#444444');
       const planningCircle = greyCircleTrace(muX, muY);
       updatePlot([planningCircle], [planningArrow]);
 
       setTimeout(() => {
-        // Step B: Show black sampling arrow
+        if (!isActive) return;
+
         const samplingArrow = addArrowAnnotation(currentPos.x, currentPos.y, sampleX, sampleY, 'black');
         updatePlot([planningCircle], [planningArrow, samplingArrow]);
 
         setTimeout(() => {
-          // Step C: Commit arrow and update current position
+          if (!isActive) return;
+
           arrowAnnotations.push(samplingArrow);
           currentPos = { x: sampleX, y: sampleY };
           updatePlot();
+
           setTimeout(nextStep, 1000);
         }, 1000);
       }, 1000);
@@ -411,8 +407,9 @@ export function plot_continuous(Plotly, view = 0) {
 
     setTimeout(nextStep, 1000);
   });
+
+  // Return stop function to stop the animation on view change
+  return () => {
+    isActive = false;
+  };
 }
-
-
-
-

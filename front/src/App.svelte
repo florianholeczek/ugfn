@@ -1132,14 +1132,19 @@
   }
 
   let DC_view=0;
+  let stopContinuousAnimation;
+  let stopDiscreteAnimation;
   $: DC_viewchange(DC_view);
   function DC_viewchange(v){
     if (plotlyready){
       console.log(v)
+      // Stop previous animations before purging
+      if (stopContinuousAnimation) stopContinuousAnimation();
+      if (stopDiscreteAnimation) stopDiscreteAnimation();
       Plotly.purge("DC_continuous_plot");
-      plot_continuous(Plotly, v);
+      stopContinuousAnimation = plot_continuous(Plotly, v);
       Plotly.purge("DC_discrete_plot");
-      plot_discrete(Plotly, v);
+      stopDiscreteAnimation = plot_discrete(Plotly, v);
     }
   }
 
