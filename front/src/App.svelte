@@ -9,6 +9,9 @@
   import {plotStates, plotStatesHistory, create_env_image} from "./training_vis.js"
   import {plot_flow} from "./flow_vis.js";
   import {plot_discrete, plot_continuous} from "./DC_vis.js"
+  import {nodeById, edgeById, previousStatesFormula, nextStatesFormula, previousStatesValues, nextStatesValues} from "./DAG.js"
+  import {policyFormula, policyValue, lossValue} from "./DAG.js"
+  import {nodes, edges} from "./DAG.js"
   import Accordion, {Panel, Header, Content } from '@smui-extra/accordion';
   import Slider from '@smui/slider';
   import Button, { Label } from '@smui/button';
@@ -139,6 +142,11 @@
   ]
   let tutorial_env_image;
 
+  //Discrete Continuous section
+  let DC_view=0;
+  let stopContinuousAnimation;
+  let stopDiscreteAnimation;
+
   //other
   let session_id = null; // for handling multiple training sessions of multiple users
   let isMobile = false; // to display mobile disclaimer
@@ -149,6 +157,19 @@
 
 
   // reactive
+  $: DC_viewchange(DC_view);
+  function DC_viewchange(v){
+    if (plotlyready){
+      console.log(v)
+      // Stop previous animations before purging
+      if (stopContinuousAnimation) stopContinuousAnimation();
+      if (stopDiscreteAnimation) stopDiscreteAnimation();
+      Plotly.purge("DC_continuous_plot");
+      stopContinuousAnimation = plot_continuous(Plotly, v);
+      Plotly.purge("DC_discrete_plot");
+      stopDiscreteAnimation = plot_discrete(Plotly, v);
+    }
+  }
   $:run1_plot(run1_value);
   function run1_plot(v) {
     const check = (v % 128 === 0) && v>=0 && v <=4096
@@ -822,41 +843,7 @@
   document.title = "GFlowNet Playground"
 
 
-  const nodes = [
-    { id: 's0', x: 50, y: 100 },
-    { id: 's1', x: 200, y: 50 },
-    { id: 's2', x: 200, y: 150 },
-    { id: 's3', x: 350, y: 50 },
-    { id: 's4', x: 350, y: 150 },
-    { id: 's5', x: 400, y: 250 },
-    { id: 's6', x: 500, y: 50 },
-    { id: 's7', x: 500, y: 150 },
-    { id: 's8', x: 650, y: 50 },
-    { id: 's9', x: 650, y: 150 },
-    { id: 'x5', x: 500, y: 300, final: true },
-    { id: 'x7', x: 600, y: 250, final: true },
-    { id: 'x8', x: 750, y: 100, final: true },
-    { id: 'x9', x: 750, y: 200, final: true },
-  ];
 
-  const edges = [
-    { from: 's0', to: 's1', flow: 2 },
-    { from: 's0', to: 's2', flow: 8 },
-    { from: 's1', to: 's3', flow: 2 },
-    { from: 's2', to: 's3', flow: 1 },
-    { from: 's2', to: 's4', flow: 5 },
-    { from: 's2', to: 's5', flow: 2 },
-    { from: 's3', to: 's6', flow: 3 },
-    { from: 's4', to: 's5', flow: 1 },
-    { from: 's4', to: 's7', flow: 4 },
-    { from: 's5', to: 'x5', flow: 3 },
-    { from: 's6', to: 's9', flow: 2 },
-    { from: 's6', to: 's8', flow: 1 },
-    { from: 's7', to: 's9', flow: 3 },
-    { from: 's7', to: 'x7', flow: 1 },
-    { from: 's9', to: 'x9', flow: 5 },
-    { from: 's8', to: 'x8', flow: 1 }
-  ];
 
   let hoveredNode= null;
   let hoveredEdge = null;
@@ -904,97 +891,7 @@
     }
   }
 
-  function nodeById(id) {
-    return nodes.find(n => n.id === id);
-  }
 
-  function edgeById(id_from, id_to) {
-    return edges.find(n => n.from === id_from && n.to === id_to);
-  }
-
-  function previousStatesFormula(nodeId) {
-    let out = edges
-      .filter(e => e.to === nodeId)
-      .map(e => `F(s_${e.from[1]} \\to ${e.to[0]}_${e.to[1]})`)
-      .join(' + ');
-    if (out === "") out = "Z";
-    return out;
-  }
-
-  function nextStatesFormula(nodeId) {
-    let out = edges
-      .filter(e => e.from === nodeId)
-      .map(e => `F(s_${e.from[1]} \\to ${e.to[0]}_${e.to[1]})`)
-      .join(' + ');
-    if(out === "") out = `R(x_${nodeId[1]})`;
-    return out;
-  }
-
-  function policyFormula(edge) {
-    let out = edges
-      .filter(e => e.from === edge.from).filter(e => e.to !== edge.to)
-      .map(e => `F(s_${e.from[1]} \\to ${e.to[0]}_${e.to[1]})`)
-      .join(' + ');
-    if (out !== "") {
-      out = "+" + out;
-    }
-    return out;
-  }
-
-  function previousStatesValues(nodeId) {
-    let out = edges
-      .filter(e => e.to === nodeId)
-      .map(e => `${e.flow}`)
-      .join(' + ');
-    if (out === ""){
-      out = "10";
-    } else if (out.includes("+")){
-      out = out + `= ${edges.filter(e => e.to === nodeId).reduce((sum, e) => sum + e.flow, 0)}`}
-    return out;
-  }
-
-  function nextStatesValues(nodeId) {
-    let out = edges
-      .filter(e => e.from === nodeId)
-      .map(e => `${e.flow}`)
-      .join(' + ');
-    if(out === "") {
-      out = previousStatesValues(nodeId);
-    } else if (out.includes("+")){
-      out = out + `= ${edges.filter(e => e.from === nodeId).reduce((sum, e) => sum + e.flow, 0)}`}
-    return out;
-  }
-
-  function policyValue(edge) {
-    let prob = (edge.flow / edges
-    .filter(e => e.from === edge.from)
-    .reduce((sum, e) => sum + e.flow, 0))
-    .toFixed(2);
-    let out = edges
-      .filter(e => e.from === edge.from).filter(e => e.to !== edge.to)
-      .map(e => `${e.flow}`)
-      .join(' + ');
-    if(out === "") {
-      out = `\\frac{${edge.flow}}{${edge.flow}} = ${prob} `
-    } else{
-      out = `\\frac{${edge.flow}}{${edge.flow} + ${out}} = ${prob} `
-    }
-    return out;
-  }
-
-  function lossValue(nodeId){
-    let numerator = edges
-      .filter(e => e.to === nodeId)
-      .map(e => `${e.flow}`)
-      .join(' + ');
-    let denominator = edges
-      .filter(e => e.from === nodeId)
-      .map(e => `${e.flow}`)
-      .join(' + ');
-    if (denominator ==="") denominator = numerator;
-    if (numerator === "") numerator = "10";
-    return `\\left( \\log \\frac{${numerator}}{${denominator}} \\right)^2 = 0`
-  }
 
 
 
@@ -1127,22 +1024,8 @@
     return form + "=" + calc + "=" + TB_current.pb;
   }
 
-  let DC_view=0;
-  let stopContinuousAnimation;
-  let stopDiscreteAnimation;
-  $: DC_viewchange(DC_view);
-  function DC_viewchange(v){
-    if (plotlyready){
-      console.log(v)
-      // Stop previous animations before purging
-      if (stopContinuousAnimation) stopContinuousAnimation();
-      if (stopDiscreteAnimation) stopDiscreteAnimation();
-      Plotly.purge("DC_continuous_plot");
-      stopContinuousAnimation = plot_continuous(Plotly, v);
-      Plotly.purge("DC_discrete_plot");
-      stopDiscreteAnimation = plot_discrete(Plotly, v);
-    }
-  }
+
+
 
 
 
@@ -1162,7 +1045,7 @@
   rel="stylesheet"
 />
 
-<!-- Save /Load buttons for saving flow and trajectory data-->
+<!-- Save /Load buttons for saving flow and trajectory data
 
 <Fab
   on:click={saveJSON}
@@ -1177,6 +1060,7 @@
 >
   <Icon class="material-icons" style="font-size: 22px">replay</Icon>
 </Fab>
+-->
 
 
 
@@ -1197,10 +1081,6 @@
 
 
 <main class="main-content">
-
-
-
-
 
   {#if isMobile}
     <div class="mobile-disclaimer">
