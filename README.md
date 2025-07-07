@@ -18,6 +18,7 @@ The folder "front" has the data for building the website with svelte.
 If you want to run the webpage locally you can use the docker image:
 ```shell
 docker pull florianholeczek/ugfn:latest 
+docker run -p 8000:8000 florianholeczek/ugfn:latest
 ```
 
 As an alternative you can build it: 
