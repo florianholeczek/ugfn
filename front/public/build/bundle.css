@@ -19308,7 +19308,6 @@ input[type="range"] {
   .A_centerwrap {
   display: grid;
   place-items: start center; /* vertical top, horizontal center */
-  min-height: 100vh;
 }
 
 .A_tetriscontainer {
@@ -19353,10 +19352,31 @@ input[type="range"] {
   display: flex;
   justify-content: space-evenly;
   padding: 10px 0;
-  height: 100px
+  height: 70px;
 }
 
+.candidate {
+  background: #e7e7e7;
+  border-radius: 6px;
+  height:120px;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.candidate:hover {
+  background: #d4d4d4;
+}
 
+.candidate h3 {
+  margin: 0;
+  font-size: 1.2em;
+}
+
+.candidate p {
+  margin: 0;
+  font-size: 1em;
+}
 
 
 

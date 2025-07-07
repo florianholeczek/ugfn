@@ -1776,6 +1776,7 @@ function updateCandidateListUI() {
     let div = document.createElement("div");
     div.className = "candidate";
     div.style.borderLeft = `10px solid ${c.color}`;
+    div.style.heigth = `100px`;
     div.innerHTML = `
       <h3>${c.action_key}</h3>
       <p>Flow: ${c.flow.toFixed(2)}</p>
