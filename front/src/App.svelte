@@ -1202,7 +1202,12 @@
 
 <main class="main-content">
 
-
+  <p class="section">
+    So far, we've only looked at discrete spaces;
+    however, this is not a limitation for GFlowNets.
+    In this section, we introduce some theory behind continuous GFlowNets and present the Playground environment,
+    where you can train your own models.
+  </p>
   <div class="DC-container">
     <!-- Left Button -->
     <Button class="DC-side-button" disabled={DC_view<=0} on:click={() => DC_view--} variant="raised" color="secondary">
@@ -1211,10 +1216,75 @@
 
     <!-- Center Grid -->
     <div class="DC-center-grid">
-      <div class="DC-quadrant" id="DC_discrete_plot"></div>
-      <div class="DC-quadrant DC-text">Top Right Text</div>
-      <div class="DC-quadrant DC-text">Bottom Left Text {DC_view}</div>
-      <div class="DC-quadrant" id="DC_continuous_plot"></div>
+      <div id="DC_discrete_plot"></div>
+      <div>
+        {#if DC_view === 0}
+          In a grid based environment, the reward function can be defined as a value assigned to each cell.
+          An agent moves across the grid and collects the reward of the cell it ends up in.
+          The agent is free to move in both the x and y directions, taking steps of size n.
+          For simplicity — and to help visualize the flow later on —
+          we fix the number of steps (i.e., the trajectory length).
+          <br>
+          Allowing movement like this violates an assumption of the DAG:
+          A state can be visited more than once, so the state-space might become acyclic.
+          To solve this we simply change the representation of our states to include a timestamp (the current step) in addition to the position.
+        {:else if DC_view ===1}
+          In the discrete case, sampling works the same way as in the previous examples.
+          One of the possible actions (shown as grey arrows) is sampled based on the transition probabilities
+          provided by the policy.
+          The agent then moves according to the chosen action (black arrow), and this becomes its new state.
+          After a fixed number of steps (in this case, three), the final state is reached (marked by the black tripod),
+          and the reward is calculated.
+          <br>
+          This example illustrates random sampling, representing an untrained GFlowNet.
+          <br><br>
+          To calculate the transition probabilities we need to sum the flow over all possible next states.
+          While this is feasible in the discrete case,
+          it becomes intractable in the continuous case due to the infinite number of possible next states.
+        {:else if DC_view ===2}
+          After training, sampling becomes proportional to the reward function: states with higher rewards are sampled more frequently.
+          In our example, the two high-reward states are visited most often, though the agent still occasionally samples lower-reward states.
+        {:else}
+          When visualizing the flow, we can aggreagte the flows for each  possible state.
+          Recall the grey arrows representing possible actions: Each of these has a associated flow value.
+          Treating them as vectors with their flow as the magnitude,
+          we can sum them up to show the direction of the highest flow.
+          Doing this for all states produces a vector field, which reveals the most probable directions the agent will take.
+          High-reward states appear as points of convergence in this field.
+        {/if}
+      </div>
+      <div>
+        {#if DC_view === 0}
+          On a continuous plane we have no cells, but we can specify the reward by a distribution.
+          In this case we use the mixture of multivariate gaussians (for now two components).
+          The agent moves similar to the discrete case for a fixed number of steps and then collects the reward based on the probability density function (PDF) of the distribution.
+          <br>
+          This will be the environment of the Playground,
+          where we simplified the variance of the gaussians to one parameter,
+          so the variance for x and y is the same and there is no covariance <Katex>(\Sigma = \sigma^2 I)</Katex>.
+        {:else if DC_view ===1}
+          Instead the neural network representing our policy outputs a <b>sampling distribution</b>.
+          This distribution is represented by a mean (grey arrow) and a variance (grey circle).
+          It represents the flow: for any given state, the network provides a probability distribution over actions.
+          We then sample an action from it (black arrow) and the agent moves accordingly.
+          As before, after a fixed number of steps, the final state (black tripod) is reached.
+          <br>
+          Note: Do not confuse the reward distribution with the sampling distribution:
+          The reward distribution is fixed for the whole training process and (usually) unknown.
+          The sampling distribution belongs to the policy and varies depending on the agent's current state.
+        {:else if DC_view ===2}
+          The same principle applies in the continuous case.
+          If we're interested in obtaining diverse high-reward solutions, we can, for instance, select the top five samples with the highest reward.
+          These are likely to come from different modes of the reward distribution, reflecting the GFlowNet’s ability to explore multiple promising regions.
+        {:else}
+          In the continuous case the flow is represented by the sampling distribution.
+          The mean of this distribution corresponds to the expected action, which we interpret as the highest flow.
+          By computing the predicted means of the sampling distribution at various points on the plane,
+          we can again construct a vector field that shows the dominant flow directions.
+          As in the discrete case, the modes of the reward function serve as attractors—clear convergence points in the vector field.
+        {/if}
+      </div>
+      <div id="DC_continuous_plot"></div>
     </div>
 
     <!-- Right Button -->

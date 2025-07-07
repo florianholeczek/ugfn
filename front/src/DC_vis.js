@@ -19,7 +19,7 @@ export function plot_discrete(Plotly, view = 0) {
         const nx = x + dx, ny = y + dy;
         if (nx >= -3 && nx <= 3 && ny >= -3 && ny <= 3) {
           const ni = coordToIndex(nx), nj = coordToIndex(ny);
-          if (grid[nj][ni] !== 1) grid[nj][ni] = 0.4;
+          if (grid[nj][ni] !== 1) grid[nj][ni] = 0.2;
         }
       }
     }
@@ -33,7 +33,7 @@ export function plot_discrete(Plotly, view = 0) {
     colorscale: 'Viridis',
     zmin: 0,
     zmax: 1,
-    showscale: false,
+    showscale: view === 0,
     hoverongaps: false,
     text: grid.map(row => row.map(val => `Reward ${val}`)),
     hovertemplate: "%{text}<extra></extra>",
@@ -86,9 +86,16 @@ export function plot_discrete(Plotly, view = 0) {
 
   if (view === 2) {
     const tripodPositions = [
-      [1.25, 1.25], [1.25, 0.75], [0.75, 1.25], [0.75, 0.75],
-      [-1.25, -1.25], [-1.25, -0.75], [-0.75, -1.25], [-0.75, -0.75],
-      [-1, 0], [2, 0]
+      [1.25, 1.25],
+      [0.75, 0.75],
+      [-1.25, -1.25],
+      [-0.75, -0.75],
+      [-1, 0],
+      [2, 0],
+      [0, 0],
+      [1, 2],
+      [0, 1],
+      [-2, -2],
     ];
 
     const tripods = {
@@ -176,7 +183,6 @@ export function plot_discrete(Plotly, view = 0) {
 
     return () => {};
   }
-
   // View === 1 → Animated path exploration
   const makeArrowAnno = (x0, y0, x1, y1, color) => ({
     ax: x0, ay: y0, x: x1, y: y1,
@@ -193,17 +199,34 @@ export function plot_discrete(Plotly, view = 0) {
   let current = [0, 0];
   const blackPaths = [];
   const permanentAnnotations = [];
+  const tripodFinals = [];
 
   const updatePlot = (extraAnnotations = []) => {
     const annotations = [...permanentAnnotations, ...extraAnnotations];
     const shapes = [...baseShapes, ...blackPaths.map(p => p.shape)];
-    Plotly.react(container, [heatmap], { ...layoutBase, shapes, annotations });
+
+    const tripodScatter = {
+      type: 'scatter',
+      x: tripodFinals.map(p => p[0]),
+      y: tripodFinals.map(p => p[1]),
+      mode: 'markers',
+      marker: {
+        color: 'black',
+        size: 14,
+        symbol: 137
+      },
+      hoverinfo: 'skip',
+      showlegend: false
+    };
+
+    Plotly.react(container, [heatmap, tripodScatter], { ...layoutBase, shapes, annotations });
   };
 
   const stepAnimation = (step = 0) => {
     if (!isActive) return;
 
     if (step >= 3) {
+      tripodFinals.push(current); // 💡 Save final position
       current = [0, 0];
       blackPaths.length = 0;
       permanentAnnotations.length = 0;
@@ -259,6 +282,7 @@ export function plot_discrete(Plotly, view = 0) {
   return () => {
     isActive = false;
   };
+
 }
 
 
@@ -298,7 +322,7 @@ export function plot_continuous(Plotly, view = 0) {
     type: 'heatmap',
     colorscale: 'Viridis',
     zsmooth: 'best',
-    showscale: false,
+    showscale: view === 0,
     hoverongaps: false,
     text: z.map(row => row.map(val => `Reward ${val.toFixed(2)}`)),
     hovertemplate: "%{text}<extra></extra>",
@@ -326,9 +350,16 @@ export function plot_continuous(Plotly, view = 0) {
   };
 
   const tripodPositions = [
-    [1.66, 1.1], [1.05, 0.99], [0.87, 1.21], [0.66, 0.87],
-    [-1.43, -1.05], [-1.66, -0.98], [-0.86, -1.1], [-0.86, -0.79],
-    [-0.5, 0.5], [1.6, 0.2]
+    [1.16, 1.1],
+    [1.05, 0.99],
+    [0.87, 1.21],
+    [0.66, 0.87],
+    [-1.43, -1.05],
+    [-1.66, -0.98],
+    [-0.86, -1.1],
+    [-0.86, -0.79],
+    [-0.5, 0.5],
+    [1.4, 0.6]
   ];
 
   const tripodMarkerTrace = (x, y) => ({
