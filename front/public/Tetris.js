@@ -1036,7 +1036,7 @@ async function getCandidateMoves() {
     c.probability = sumFlow > 0 ? c.flow / sumFlow : 1 / uniqueCands.length;
   }
 
-  console.log("[TB] ▶️ Flows & probs from ONNX:", uniqueCands);
+  //console.log("[TB] ▶️ Flows & probs from ONNX:", uniqueCands);
 
   return {
     game_state: {
