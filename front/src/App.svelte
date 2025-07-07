@@ -1202,96 +1202,7 @@
 
 <main class="main-content">
 
-  <p class="section">
-    So far, we've only looked at discrete spaces;
-    however, this is not a limitation for GFlowNets.
-    In this section, we introduce some theory behind continuous GFlowNets and present the Playground environment,
-    where you can train your own models.
-  </p>
-  <div class="DC-container">
-    <!-- Left Button -->
-    <Button class="DC-side-button" disabled={DC_view<=0} on:click={() => DC_view--} variant="raised" color="secondary">
-      <Icon class="material-icons" style="font-size: 50px; display: flex; align-items: center; justify-content: center;">keyboard_double_arrow_left </Icon>
-    </Button>
 
-    <!-- Center Grid -->
-    <div class="DC-center-grid">
-      <div id="DC_discrete_plot"></div>
-      <div>
-        {#if DC_view === 0}
-          In a grid based environment, the reward function can be defined as a value assigned to each cell.
-          An agent moves across the grid and collects the reward of the cell it ends up in.
-          The agent is free to move in both the x and y directions, taking steps of size n.
-          For simplicity — and to help visualize the flow later on —
-          we fix the number of steps (i.e., the trajectory length).
-          <br>
-          Allowing movement like this violates an assumption of the DAG:
-          A state can be visited more than once, so the state-space might become acyclic.
-          To solve this we simply change the representation of our states to include a timestamp (the current step) in addition to the position.
-        {:else if DC_view ===1}
-          In the discrete case, sampling works the same way as in the previous examples.
-          One of the possible actions (shown as grey arrows) is sampled based on the transition probabilities
-          provided by the policy.
-          The agent then moves according to the chosen action (black arrow), and this becomes its new state.
-          After a fixed number of steps (in this case, three), the final state is reached (marked by the black tripod),
-          and the reward is calculated.
-          <br>
-          This example illustrates random sampling, representing an untrained GFlowNet.
-          <br><br>
-          To calculate the transition probabilities we need to sum the flow over all possible next states.
-          While this is feasible in the discrete case,
-          it becomes intractable in the continuous case due to the infinite number of possible next states.
-        {:else if DC_view ===2}
-          After training, sampling becomes proportional to the reward function: states with higher rewards are sampled more frequently.
-          In our example, the two high-reward states are visited most often, though the agent still occasionally samples lower-reward states.
-        {:else}
-          When visualizing the flow, we can aggreagte the flows for each  possible state.
-          Recall the grey arrows representing possible actions: Each of these has a associated flow value.
-          Treating them as vectors with their flow as the magnitude,
-          we can sum them up to show the direction of the highest flow.
-          Doing this for all states produces a vector field, which reveals the most probable directions the agent will take.
-          High-reward states appear as points of convergence in this field.
-        {/if}
-      </div>
-      <div>
-        {#if DC_view === 0}
-          On a continuous plane we have no cells, but we can specify the reward by a distribution.
-          In this case we use the mixture of multivariate gaussians (for now two components).
-          The agent moves similar to the discrete case for a fixed number of steps and then collects the reward based on the probability density function (PDF) of the distribution.
-          <br>
-          This will be the environment of the Playground,
-          where we simplified the variance of the gaussians to one parameter,
-          so the variance for x and y is the same and there is no covariance <Katex>(\Sigma = \sigma^2 I)</Katex>.
-        {:else if DC_view ===1}
-          Instead the neural network representing our policy outputs a <b>sampling distribution</b>.
-          This distribution is represented by a mean (grey arrow) and a variance (grey circle).
-          It represents the flow: for any given state, the network provides a probability distribution over actions.
-          We then sample an action from it (black arrow) and the agent moves accordingly.
-          As before, after a fixed number of steps, the final state (black tripod) is reached.
-          <br>
-          Note: Do not confuse the reward distribution with the sampling distribution:
-          The reward distribution is fixed for the whole training process and (usually) unknown.
-          The sampling distribution belongs to the policy and varies depending on the agent's current state.
-        {:else if DC_view ===2}
-          The same principle applies in the continuous case.
-          If we're interested in obtaining diverse high-reward solutions, we can, for instance, select the top five samples with the highest reward.
-          These are likely to come from different modes of the reward distribution, reflecting the GFlowNet’s ability to explore multiple promising regions.
-        {:else}
-          In the continuous case the flow is represented by the sampling distribution.
-          The mean of this distribution corresponds to the expected action, which we interpret as the highest flow.
-          By computing the predicted means of the sampling distribution at various points on the plane,
-          we can again construct a vector field that shows the dominant flow directions.
-          As in the discrete case, the modes of the reward function serve as attractors—clear convergence points in the vector field.
-        {/if}
-      </div>
-      <div id="DC_continuous_plot"></div>
-    </div>
-
-    <!-- Right Button -->
-    <Button class="DC-side-button" disabled={DC_view>=3} on:click={() => DC_view++} variant="raised" color="secondary">
-      <Icon class="material-icons" style="font-size: 50px; display: flex; align-items: center; justify-content: center;">keyboard_double_arrow_right</Icon>
-    </Button>
-  </div>
 
 
 
@@ -1344,7 +1255,7 @@
         Below, we present a <b>Playground</b> for experimenting with GFlowNet training.
         It provides an interactive environment to explore how GFlowNets adapt to changes in both reward functions and training hyperparameters.
         Training occurs in a continuous space, where an agent takes a fixed number of steps before receiving a reward defined by a configurable reward function.
-        This function can be adjusted in the first of the three playground views: The <b>Environment</b> view.
+        This function can be adjusted in the first of the three Playground views: The <b>Environment</b> view.
         In the <b>Training</b> view, you can modify hyperparameters and initiate training.
         The resulting visualization shows the agent’s final positions.
         When training is successful, the distribution of these positions should approximate the target reward distribution.
@@ -2421,7 +2332,7 @@
         As there is perfect Flow Matching the result will always be 0.
 
         In the first GFlowNet paper (Benigo et al., 2021) the authors used this loss, since then many improvements have been proposed.
-        In the playground we use Trajectory Balance loss, you can learn about it below if you want more detail.
+        In the Playground we use Trajectory Balance loss, you can learn about it below if you want more detail.
       </p>
       <div class="image-container">
         <Accordion multiple>
@@ -2644,17 +2555,96 @@
         </div>
 
 
-      <h2 class="section-title">Toy Environment</h2>
+      <h2 class="section-title">Towards continuous GFlowNets</h2>
       <p class="section-text">
-        As we want to train GFlowNets quickly to explore how they behave, we need a simple environment which allows for exploring without needing a lot of compute during training. Here we use a continuous 2D space with each variable in the range [-3,3]. We then calculate the reward according to the Mixture of Multivariate Gaussians (for now two of them).
-        <br>
-        <br>For each action, the GFlowNet takes a step along both the x and y direction, this is repeated until the defined length of a trajectory is reached.
-        Note that this is unusual: GFlowNets allow for variable trajectory lengths, so the action space usually contains an additional end of sequence action, where the current state becomes the final state.
-        However fixing the trajectory length keeps everything a lot simpler.
-        <br>
-        <br>Above we stated that GFlowNets build a DAG, so each state can be visited only once. We currently violate this assumption: While it is unlikely that a state gets visited twice in our continuous environment, it is still possible.
-        To solve this we simply change the representation of our states to include a timestamp (the current step) in addition to the position.
-        We also simplified the variance of the gaussians to one parameter, so the variance for x and y is the same and there is no covariance <Katex>(\Sigma = \sigma^2 I)</Katex>.
+        So far, we've only looked at discrete spaces,
+        however, this is not a limitation for GFlowNets.
+        Use the button on the right to learn about continuous GFlowNets and the Playground environment.
+      </p>
+      <div class="DC-container">
+        <!-- Left Button -->
+        <Button class="DC-side-button" disabled={DC_view<=0} on:click={() => DC_view--} variant="raised" color="secondary">
+          <Icon class="material-icons" style="font-size: 50px; display: flex; align-items: center; justify-content: center;">keyboard_double_arrow_left </Icon>
+        </Button>
+
+        <!-- Center Grid -->
+        <div class="DC-center-grid">
+          <div id="DC_discrete_plot"></div>
+          <div>
+            {#if DC_view === 0}
+              In a grid based environment, the reward function can be defined as a value assigned to each cell.
+              An agent moves across the grid and collects the reward of the cell it ends up in.
+              The agent is free to move in both the x and y directions, taking steps of size n.
+              For simplicity — and to help visualize the flow later on —
+              we fix the number of steps (i.e., the trajectory length).
+              <br>
+              Allowing movement like this violates an assumption of the DAG:
+              A state can be visited more than once, so the state-space might become acyclic.
+              To solve this we simply change the representation of our states to include a timestamp (the current step) in addition to the position.
+            {:else if DC_view ===1}
+              In the discrete case, sampling works the same way as in the previous examples.
+              One of the possible actions (shown as grey arrows) is sampled based on the transition probabilities
+              provided by the policy.
+              The agent then moves according to the chosen action (black arrow), and this becomes its new state.
+              After a fixed number of steps (in this case, three), the final state is reached (marked by the black tripod),
+              and the reward is calculated.
+              <br>
+              This example illustrates random sampling, representing an untrained GFlowNet.
+              <br><br>
+              To calculate the transition probabilities we need to sum the flow over all possible next states.
+              While this is feasible in the discrete case,
+              it becomes intractable in the continuous case due to the infinite number of possible next states.
+            {:else if DC_view ===2}
+              After training, sampling becomes proportional to the reward function: states with higher rewards are sampled more frequently.
+              In our example, the two high-reward states are visited most often, though the agent still occasionally samples lower-reward states.
+            {:else}
+              When visualizing the flow, we can aggreagte the flows for each  possible state.
+              Recall the grey arrows representing possible actions: Each of these has a associated flow value.
+              Treating them as vectors with their flow as the magnitude,
+              we can sum them up to show the direction of the highest flow.
+              Doing this for all states produces a vector field, which reveals the most probable directions the agent will take.
+              High-reward states appear as points of convergence in this field.
+            {/if}
+          </div>
+          <div>
+            {#if DC_view === 0}
+              On a continuous plane we have no cells, but we can specify the reward by a distribution.
+              In this case we use the mixture of multivariate gaussians (for now two components).
+              The agent moves similar to the discrete case for a fixed number of steps and then collects the reward based on the probability density function (PDF) of the distribution.
+              <br>
+              This will be the environment of the Playground,
+              where we simplified the variance of the gaussians to one parameter,
+              so the variance for x and y is the same and there is no covariance <Katex>(\Sigma = \sigma^2 I)</Katex>.
+            {:else if DC_view ===1}
+              Instead the neural network representing our policy outputs a <b>sampling distribution</b>.
+              This distribution is represented by a mean (grey arrow) and a variance (grey circle).
+              It represents the flow: for any given state, the network provides a probability distribution over actions.
+              We then sample an action from it (black arrow) and the agent moves accordingly.
+              As before, after a fixed number of steps, the final state (black tripod) is reached.
+              <br>
+              Note: Do not confuse the reward distribution with the sampling distribution:
+              The reward distribution is fixed for the whole training process and (usually) unknown.
+              The sampling distribution belongs to the policy and varies depending on the agent's current state.
+            {:else if DC_view ===2}
+              The same principle applies in the continuous case.
+              If we're interested in obtaining diverse high-reward solutions, we can, for instance, select the top five samples with the highest reward.
+              These are likely to come from different modes of the reward distribution, reflecting the GFlowNet’s ability to explore multiple promising regions.
+            {:else}
+              In the continuous case the flow is represented by the sampling distribution.
+              The mean of this distribution corresponds to the expected action, which we interpret as the highest flow.
+              By computing the predicted means of the sampling distribution at various points on the plane,
+              we can again construct a vector field that shows the dominant flow directions.
+              As in the discrete case, the modes of the reward function serve as attractors—clear convergence points in the vector field.
+            {/if}
+          </div>
+          <div id="DC_continuous_plot"></div>
+        </div>
+
+        <!-- Right Button -->
+        <Button class="DC-side-button" disabled={DC_view>=3} on:click={() => DC_view++} variant="raised" color="secondary">
+          <Icon class="material-icons" style="font-size: 50px; display: flex; align-items: center; justify-content: center;">keyboard_double_arrow_right</Icon>
+        </Button>
+      </div>
     </section>
 
 
@@ -2664,8 +2654,10 @@
     <section class="section section-light">
       <h2 class="section-title">Training</h2>
       <p class="section-text">
-        We trained a GFlowNet on this environment for 2000 Iterations.
-        Below you see the progress of the model during training. While it first samples randomly, it learns to match the true distribution of our environment.
+        Using the environment above we trained a GFlowNet with Trajectory Balance Loss.
+        Below you see the progress of the model during training.
+        While it first samples randomly, it learns to match the true distribution of our environment.
+        Use the controls below to iterate through the training process and load these settings to the Playground.
         You can hover over a sample to see its trajectory.
       </p>
       <div id="runplot1" style="display: flex; justify-content: center;"></div>
@@ -2710,7 +2702,7 @@
           <Fab
             on:click={() =>load_pg_settings(1)} disabled={isRunning}
             mini
-          ><Icon class="material-icons" style="font-size: 22px">sync</Icon>
+          ><Icon class="material-icons" style="font-size: 22px">system_update_alt</Icon>
           </Fab>
           <Tooltip>
             Load the settings of this training run for the Playground
@@ -2719,12 +2711,6 @@
       </div>
 
       <div style="height:50px"></div>
-      <p class="section-text">
-        Sampling according to the underlying distribution is one of the big advantages of GFlowNets: Other approaches usually learn to maximize the reward, so they would not sample from both of our modes (or everything in between), but they would find one of them and then just sample from it.
-      </p>
-
-
-      <h2 class="section-title">Mode Collapse</h2>
       <p class="section-text">
         So far, our distribution to match was very easy.
         Let's make it more challenging: If we lower the variance, we see the two modes are more separated.
@@ -2771,7 +2757,7 @@
           <Fab
             on:click={() =>load_pg_settings(2)} disabled={isRunning}
             mini
-          ><Icon class="material-icons" style="font-size: 22px">sync</Icon>
+          ><Icon class="material-icons" style="font-size: 22px">system_update_alt</Icon>
           </Fab>
           <Tooltip>
             Load the settings of this training run for the Playground
@@ -2780,15 +2766,19 @@
       </div>
       <div style="height:50px"></div>
       <p class="section-text">
-        Now this is a huge problem. The model quickly discovered one mode and only sampled from it.
+        This is called mode collapse and a huge problem. The model quickly discovered one mode and only sampled from it.
         This happens as we do not encourage exploration enough, so the model acts greedy.
         <br>
         There are two main possibilities to fix this:
-        <span class="li">We could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:<Katex>R_{"{new}"}(x)=R(x)^\beta</Katex>. This would change the "peakyness" of the reward function and we would not sample proportional to the reward function but according to <Katex>\pi(x|\beta) \propto R(x)^\beta</Katex>. It is also possible to use <Katex>\beta</Katex> as a trainable parameter and condition the model on it.</span>
+        <span class="li">
+          We could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:
+          <Katex>R_{"{new}"}(x)=R(x)^\beta</Katex>.
+          This would change how "peaky" the reward function is: If the reward is not concentrated on a point but more spread out around the probability to discover it increases.
+          It is also possible to use <Katex>\beta</Katex> as a trainable parameter and condition the model on it.</span>
         <span class="li">
           A simpler way is to just train off-policy.
-          By adding a fixed variance to the variance of the forward policy, we explore more during training.
-          As this is a very easy implementation let's go with this one.
+          By adding a fixed variance to the variance of the sampling distribution provided by the forward policy, we explore more during training.
+          As this is a very easy implementation we will go with this one.
         </span>
       </p>
       <div class="image-container">
@@ -2863,7 +2853,7 @@
           <Fab
             on:click={() =>load_pg_settings(3)} disabled={isRunning}
             mini
-          ><Icon class="material-icons" style="font-size: 22px">sync</Icon>
+          ><Icon class="material-icons" style="font-size: 22px">system_update_alt</Icon>
           </Fab>
           <Tooltip>
             Load the settings of this training run for the Playground
@@ -2872,23 +2862,30 @@
       </div>
       <div style="height:50px"></div>
       <p class="section-text">
-        It took some iterations, but now we match the distribution again.
+        Off-policy training helped: We now sample proportional to the reward function again.
       </p>
       <div class="image-container">
         <Accordion>
           <Panel color="secondary">
-            <Header>Interpreting logZ</Header>
+            <Header>Interpreting Z</Header>
             <Content>
-              If you look at the curve of logZ from the last training runs, you can see the connection between the partition function Z and the discovered modes.
-              Recall that, since we have two Gaussians, the partition function Z is 2 and logZ is approximately 0.69.
-              In the first training run, the model approaches this true value, sampling from both modes.
-              During mode collapse, you can see that the learned logZ drops to log(1) = 0 and stays there, indicating that the reward function the model samples from consists of only one Gaussian.
-              In the last run (off-policy training), you can see that forcing the model to explore leads to the discovery of the second mode around iteration 1500, when logZ approaches its true value.
-              However, due to the high rate of exploration, the loss remains high.
+              Recall that the partition function <Katex>Z</Katex> is the sum of all rewards.
+              Since we defined a simple environment we actually know the true value:
+              The Integral of the PDF of a gaussian is 1,
+              and since our reward distribution is the sum of two gaussians,
+              we have <Katex>Z=2</Katex> and <Katex>\log Z \approx 0.69</Katex>.
+              The orange line in the plot shows <Katex>\log Z_\theta</Katex>,
+              the partition function estimated by the model when using Trajectory Balance Loss.
+              In the first training run, the model correctly approximates this true value, successfully sampling from both modes.
+              During mode collapse, you can see that the learned logZ drops to <Katex>\log(1)=0</Katex> and stays there,
+              indicating that the model is only capturing one mode of the reward function (a single Gaussian).
+              In the last run (off-policy training), we see that forcing exploration helps the model discover the second mode around iteration 1500,
+              when logZ approaches its true value.
+              However, due to the high exploration rate, the model continues to sample almost uniformly, keeping the loss high.
               As the model continues to learn, the loss decreases, and it recovers even after logZ diverges again.
-              <br>
-              Note that while this might help illustrate the regulatory role of the partition function, we usually do not know the true value of logZ.
-              We often do not even know the type of the underlying distribution, which is likely far more complex — making the interpretation of logZ even more challenging.
+              This behavior helps illustrate the regulatory role of the partition function in GFlowNet training.
+              However, in practice, the true reward distribution is usually unknown,
+              so the true value of <Katex>Z</Katex> is also unknown—making it more difficult to interpret the behavior of <Katex>\log Z_\theta</Katex> during training.
             </Content>
           </Panel>
         </Accordion>
@@ -2908,56 +2905,66 @@
         In the first step the agent takes, it tends to move to the center.
         Later on in the trajectory the points of convergence split up and move outwards to the modes of the distribution.
         In the last two steps they even move past them, probably to achieve the separation of the modes.
-      </p>
-
-      <div class="flow-container">
-        <div bind:this={tutorial_flowContainer}></div>
-      </div>
-      <div style="width: 600px; margin: auto; display: flex; align-items: center;">
-        <div style="text-align: left; margin-right: 10px;">
-          <span>Step: {t_flow_trajectory_step_value}</span>
-        </div>
-        <div style="width: 480px; margin-left: auto;">
-          <Slider
-            bind:value="{t_flow_trajectory_step_value}"
-            min={1}
-            max={6}
-            step={1}
-            discrete
-            input$aria-label="Discrete slider"
-          />
-
-        </div>
-      </div>
-      <div style="width: 600px; margin: auto; display: flex; align-items: center;">
-        <div style="text-align: left; margin-right: 10px;">
-          <span>Iteration: {t_flow_step_value}</span>
-        </div>
-        <div style="width: 480px; margin-left: auto;">
-          <Slider
-            bind:value="{t_flow_step_value}"
-            min={0}
-            max={4096}
-            step={128}
-            discrete
-            input$aria-label="Discrete slider"
-          />
-        </div>
-      </div>
-      <div style="height:50px"></div>
-      <h2 class="section-title">Flow - Is this what it looks like?</h2>
-      <p class="section-text">
-        Well, kind of. Imagine our space would be discrete. If we are in one cell, we would have a certain Flow (a non-negative scalar) to each other cell (technically also to itself given our trick with adding the step to the state).
-        <br>Even in a discrete space, this is hard to visualize, as we would have to compute the flow from each state to every other state.
-        <br>In our continuous space this gets even more complicated, not only in terms of visualization but also mathematically - look into Lahlou et al. (2023) if you are interested.
-        <br>Instead of showing all the flows, the plot shows the <i>highest</i> flow for each state: This is a vector from it to another point on the plane.
-        If we do that for some evenly spaced points we get a vector field. The visualization above is just a nicer way to show it by letting particles move through the field.
+        <br><br>
+        You can switch between two views: flow field and vector field.
+        Both rely on the same data, but the flow field shows particles moving across the vector field.
         Note that the path of the particles is not the path of the agents.
         The particles follow the most probable direction continuously, while the agent takes discrete steps.
         Also the steps of the agent are probabilistic, they are sampled from the distribution of the policy.
         As a result, the agent's trajectories can appear more erratic or scattered compared to the smooth flow of the particles.
         This visualization however shows the converging points in the flow field which direct the agents' movement.
       </p>
+
+      <div class="flow-container">
+        <div bind:this={tutorial_flowContainer}></div>
+      </div>
+      <div style="width: 750px; margin: auto; display: flex; align-items: flex-start;">
+        <!-- Left: Select component centered vertically -->
+        <div style="margin-right: 20px">
+          <Select bind:value="{flow_vis_type}" label="Visualization" disabled="{isRunning}">
+            {#each ["Particles", "Vectors"] as select}
+              <Option value={select}>{select}</Option>
+            {/each}
+          </Select>
+        </div>
+
+        <!-- Right: Sliders stacked vertically -->
+        <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; align-items: center;">
+            <div style="text-align: left; margin-right: 10px;">
+              Step <br> {t_flow_trajectory_step_value}
+            </div>
+            <div style="width: 480px; margin-left: auto;">
+              <Slider
+                bind:value="{t_flow_trajectory_step_value}"
+                min={1}
+                max={6}
+                step={1}
+                discrete
+                input$aria-label="Discrete slider"
+              />
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center;">
+            <div style="text-align: left; margin-right: 10px;">
+              Iteration <br> {t_flow_step_value}
+            </div>
+            <div style="width: 480px; margin-left: auto;">
+              <Slider
+                bind:value="{t_flow_step_value}"
+                min={0}
+                max={4096}
+                step={128}
+                discrete
+                input$aria-label="Discrete slider"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:50px"></div>
 
       <h2 class="section-title" style="position:relative">What next?</h2>
       <div class="whatnext_t">
