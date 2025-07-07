@@ -389,6 +389,18 @@
       };
     });
   }
+  async function loadONNX() {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js';
+    document.head.appendChild(script);
+
+    return new Promise((resolve) => {
+      script.onload = () => {
+        p5 = window.p5;
+        resolve();
+      };
+    });
+  }
 
   function scrollTo(id) {
     if (id) {
@@ -963,6 +975,7 @@
     run3_value = 4096;
     tutorial_env_image = await create_env_image(Plotly, run_data["run3_density"]);
     await loadp5();
+    await loadONNX();
 
 
     // add listeners for changing the Environment
@@ -1017,8 +1030,8 @@
   //Title to display in tab
   document.title = "GFlowNet Playground";
 
-</script>
 
+</script>
 
 
 
@@ -1069,6 +1082,45 @@
 
 
 <main class="main-content">
+
+
+  <!-- Alex -->
+  <div class="A_centerwrap">
+    <div class="A_tetriscontainer">
+      <div class="A_board">
+        <!-- 1) Background canvas (will be painted with Viridis) -->
+        <canvas
+          id="tetrisBgCanvas"
+          width="300"
+          height="600"
+          style="position: absolute; top: 0; left: 0; z-index: 0;"
+        ></canvas>
+
+        <!-- 2) The existing Tetris canvas on top -->
+        <canvas
+          id="tetrisCanvas"
+          width="180"
+          height="600"
+          style="position: absolute; top: 0; left: 0; z-index: 1;"
+        ></canvas>
+      </div>
+
+      <div class="A_sidebar">
+        <h2>Candidate Moves</h2>
+        <div id="candidateList" class="A_candidates"><!-- Populated by Tetris logic --></div>
+        <div class="A_controls">
+          <Button id="resetBtn" color="secondary" variant="raised" style="height:75px">Reset Game</Button>
+          <Button id="pauseBtn" color="secondary" variant="raised" style="height:75px">Pause Game</Button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
 
   {#if isMobile}
     <div class="mobile-disclaimer">
