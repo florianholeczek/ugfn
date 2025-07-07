@@ -66,7 +66,7 @@
   // UI Elements
   let active_tab = 'Basic';
   let n_iterations_select = ["128", "1024", "2048", "4096", "8192", "10240"];
-  let n_iterations_str = "2048";
+  let n_iterations_str = "4096";
   $: n_iterations_value = parseInt(n_iterations_str, 10);
   let losses_select = ["Trajectory Balance", "Flow Matching"];
   let view = "1. Environment";
@@ -122,7 +122,7 @@
   let current_losses;
   let current_parameters = {};
   current_parameters["trajectory_length_value"] = 6
-  current_parameters["n_iterations_value"] = 2048
+  current_parameters["n_iterations_value"] = 4096
   let current_nSteps = 33;
   let current_flows;
   let current_trajectories;
@@ -151,7 +151,7 @@
   // reactive
   $:run1_plot(run1_value);
   function run1_plot(v) {
-    const check = (v % 64 === 0) && v>=0 && v <=2048
+    const check = (v % 128 === 0) && v>=0 && v <=4096
     if (plotlyready && check){
       plot_run(1, v);
     }
@@ -333,7 +333,7 @@
 
   function resetSliders() {
       off_policy_value = 0;
-      n_iterations_str = "2048";
+      n_iterations_str = "4096";
       lr_model_value = 0.001;
       lr_logz_value = 0.1;
       trajectory_length_value = 6;
@@ -441,10 +441,7 @@
   }
 
   function plot_run(run, step) {
-    let d = 64;
-    if (run>1) {
-      d = 128;
-    }
+    let d = 128;
     const t = slice_trajectories(step/d, 6, run_data[`run${run}_traj`]);
     plotStatesHistory(Plotly, t, run_data[`run${run}_losses`], run_data[`run${run}_density`], 7, step, `runplot${run}`);
   }
@@ -463,8 +460,7 @@
   }
 
   function runs_textinput(e, run){
-    let d = 64;
-    if (run>1) d=128;
+    let d = 128;
     let value = parseInt(e.target.value);
     if (isNaN(value)) value=0;
     value = value - (value % d)
@@ -719,16 +715,16 @@
   //animation of tutorial runs and loading settings
   function animate_run(run) {
     isRunningAnim = true;
-    if (run===1 && run1_value===2048) run1_value = 0;
+    if (run===1 && run1_value===4096) run1_value = 0;
     if (run===2 && run2_value===4096) run2_value = 0;
     if (run===3 && run3_value===4096) run3_value = 0;
     AnimInterval = setInterval(() => increase_run(run), 500)
   }
   function increase_run(run) {
-    if (run===1) run1_value += 64;
+    if (run===1) run1_value += 128;
     if (run===2) run2_value += 128;
     if (run===3) run3_value += 128;
-    if (run===1 && run1_value >= 2048) stop_animation_run();
+    if (run===1 && run1_value >= 4096) stop_animation_run();
     if (run===2 && run2_value >= 4096) stop_animation_run();
     if (run===3 && run3_value >= 4096) stop_animation_run();
   }
@@ -766,7 +762,7 @@
     plot_discrete(Plotly);
     plot_continuous(Plotly, 0);
     await load_rundata();
-    run1_value = 2048; //triggers drawing the plot for the tutorial runs
+    run1_value = 4096; //triggers drawing the plot for the tutorial runs
     run2_value = 4096;
     run3_value = 4096;
     tutorial_env_image = await create_env_image(Plotly, run_data["run3_density"]);
@@ -1166,10 +1162,10 @@
   rel="stylesheet"
 />
 
-<!-- Save /Load buttons for saving flow and trajectory data
+<!-- Save /Load buttons for saving flow and trajectory data-->
 
 <Fab
-  on:click={save_array(current_trajectories)}
+  on:click={saveJSON}
   mini
   disabled="{isRunning}"
 ><Icon class="material-icons" style="font-size: 22px">save</Icon>
@@ -1181,7 +1177,7 @@
 >
   <Icon class="material-icons" style="font-size: 22px">replay</Icon>
 </Fab>
--->
+
 
 
 <Snackbar bind:this={snackbar_load} leading>
@@ -2685,15 +2681,15 @@
           label="Iteration"
           disabled={isRunningAnim}
           type="number"
-          input$step="64"
+          input$step="128"
 
         ></Textfield>
         <div style="width: 500px; margin-top:10px">
           <Slider
             bind:value="{run1_value}"
             min={0}
-            max={2048}
-            step={64}
+            max={4098}
+            step={128}
             discrete
             input$aria-label="Discrete slider"
           />
