@@ -767,80 +767,7 @@
     }
   }
 
-
-
-
-
-
-  // Mounting
-  onMount(async () => {
-    //visualize the environment
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
-    await loadPlotly();
-    plotlyready = true;
-    plotEnv();
-    plot_discrete(Plotly);
-    plot_continuous(Plotly, 0);
-    await load_rundata();
-    run1_value = 4096; //triggers drawing the plot for the tutorial runs
-    run2_value = 4096;
-    run3_value = 4096;
-    tutorial_env_image = await create_env_image(Plotly, run_data["run3_density"]);
-    await loadp5();
-
-
-    // add listeners for changing the Environment
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', stopDrag);
-    tutorial_flow_observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-
-          view = "2. Training"
-          if (flowvis_instance) {
-            flowvis_instance.remove();
-            flowvis_instance = null;
-          }
-
-          updateflows = false;
-          t_flow_trajectory_step_value=6;
-          t_flow_step_value = 4096;
-          updateflows = true;
-
-          tutorial_flowvis_instance = createVectorfield(
-                  tutorial_flowvis_instance,
-                  tutorial_flowContainer,
-                  6,
-                  run_data["run3_flow"],
-                  t_flow_step_value/128,
-                  t_flow_trajectory_step_value,
-                  tutorial_env_image
-          );
-        } else {
-          if (tutorial_flowvis_instance) {
-            tutorial_flowvis_instance.remove();
-            tutorial_flowvis_instance = null;
-          }
-        }
-      },
-      {
-        threshold: 0.1, // 10% visible
-        rootMargin: '400px 0px'
-      }
-    );
-    if (tutorial_flowContainer) {
-      tutorial_flow_observer.observe(tutorial_flowContainer);
-    }
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', stopDrag);
-      tutorial_flow_observer.disconnect();
-    };
-  });
-
-  //Title to display in tab
-  document.title = "GFlowNet Playground"
+  //DAG Handling
 
 
 
@@ -890,12 +817,6 @@
       }
     }
   }
-
-
-
-
-
-
 
   let TB_path = ['s0'];
   let TB_trajectory_complete = false;
@@ -1026,17 +947,84 @@
 
 
 
+  // Mounting
+  onMount(async () => {
+    //visualize the environment
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+    await loadPlotly();
+    plotlyready = true;
+    plotEnv();
+    plot_discrete(Plotly);
+    plot_continuous(Plotly, 0);
+    await load_rundata();
+    run1_value = 4096; //triggers drawing the plot for the tutorial runs
+    run2_value = 4096;
+    run3_value = 4096;
+    tutorial_env_image = await create_env_image(Plotly, run_data["run3_density"]);
+    await loadp5();
 
 
+    // add listeners for changing the Environment
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', stopDrag);
+    tutorial_flow_observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
 
+          view = "2. Training"
+          if (flowvis_instance) {
+            flowvis_instance.remove();
+            flowvis_instance = null;
+          }
 
+          updateflows = false;
+          t_flow_trajectory_step_value=6;
+          t_flow_step_value = 4096;
+          updateflows = true;
 
+          tutorial_flowvis_instance = createVectorfield(
+                  tutorial_flowvis_instance,
+                  tutorial_flowContainer,
+                  6,
+                  run_data["run3_flow"],
+                  t_flow_step_value/128,
+                  t_flow_trajectory_step_value,
+                  tutorial_env_image
+          );
+        } else {
+          if (tutorial_flowvis_instance) {
+            tutorial_flowvis_instance.remove();
+            tutorial_flowvis_instance = null;
+          }
+        }
+      },
+      {
+        threshold: 0.1, // 10% visible
+        rootMargin: '400px 0px'
+      }
+    );
+    if (tutorial_flowContainer) {
+      tutorial_flow_observer.observe(tutorial_flowContainer);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', stopDrag);
+      tutorial_flow_observer.disconnect();
+    };
+  });
 
-
-
-
+  //Title to display in tab
+  document.title = "GFlowNet Playground";
 
 </script>
+
+
+
+
+
+
+
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
