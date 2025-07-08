@@ -19398,10 +19398,11 @@ input[type="range"] {
   grid-template-columns: repeat(4, 1fr); /* 4 columns */
   grid-template-rows: repeat(2, auto);   /* 2 rows */
   gap: 16px; /* Optional spacing between sliders */
-  width: 800px;
+  width: 1000px;
   margin: 0 auto;
 }
 .A_molecule-slider {
+  text-align: center;
   width: 200px;
   margin-top: 10px;
 }

@@ -1037,9 +1037,21 @@
   document.title = "GFlowNet Playground";
 
 
-  // subscribe store as a local reactive variable
-  let weights = {};
-  $: weights = $A_molecule_prop;
+  function A_maximizeMw() {
+    A_molecule_prop.update((weights) => {
+      const newWeights = {};
+
+      // Set all keys to 0
+      for (const key in weights) {
+        newWeights[key] = 0;
+      }
+
+      // Set mw to 1
+      newWeights.mw = 1;
+
+      return newWeights;
+    });
+  }
 
 
 </script>
@@ -1094,80 +1106,7 @@
 
 <main class="main-content">
 
-  <div class="A_molecule-slider-container">
-  <div class="A_molecule-slider">
-    mw:
-    <Slider
-      min={0}
-      max={1}
-      step={0.01}
-      bind:value={$A_molecule_prop.mw}
-    />
-    <span class="value">{$A_molecule_prop.mw.toFixed(2)}</span>
-  </div>
 
-  <div class="A_molecule-slider">
-    logP:
-    <Slider
-      min={0}
-      max={1}
-      step={0.01}
-      bind:value={$A_molecule_prop.logP}
-    />
-    <span class="value">{$A_molecule_prop.logP.toFixed(2)}</span>
-  </div>
-
-  <div class="A_molecule-slider">
-    hbd:
-    <Slider
-      min={0}
-      max={1}
-      step={0.01}
-      bind:value={$A_molecule_prop.hbd}
-    />
-    <span class="value">{$A_molecule_prop.hbd.toFixed(2)}</span>
-  </div>
-
-  <div class="A_molecule-slider">
-    hba:
-    <Slider
-      min={0}
-      max={1}
-      step={0.01}
-      bind:value={$A_molecule_prop.hba}
-    />
-    <span class="value">{$A_molecule_prop.hba.toFixed(2)}</span>
-  </div>
-
-  <div class="A_molecule-slider">
-    tpsa:
-    <Slider
-      min={0}
-      max={1}
-      step={0.01}
-      bind:value={$A_molecule_prop.tpsa}
-    />
-    <span class="value">{$A_molecule_prop.tpsa.toFixed(2)}</span>
-  </div>
-
-  <div class="A_molecule-slider">
-    rotb:
-    <Slider
-      min={0}
-      max={1}
-      step={0.01}
-      bind:value={$A_molecule_prop.rotb}
-    />
-    <span class="value">{$A_molecule_prop.rotb.toFixed(2)}</span>
-  </div>
-</div>
-
-
-
-
-
-
-<svg id="chart"></svg>
 
 
 
@@ -1306,7 +1245,7 @@
     <section class="section">
       <h2 class="section-title">Core concepts:  states, actions and trajectories</h2>
       <p class="section-annotation">
-        Placeholder to explain core concepts based on the tetris environment: states, actions, trajectories, DAG. Reader may skip if already familiar with reinforcement learning?
+        Placeholder to explain core concepts based on the tetris environment: states, actions, trajectories. Reader may skip if already familiar with reinforcement learning?
       </p>
       <p class="section-text">
         In this interactive demonstration, a neural policy trained under the GFlowNet framework is applied to the game of Tetris.
@@ -1364,9 +1303,75 @@
         Clicking the “Maximize weight” button sets the reward to favor heavy molecules.
         Under this setting, the heaviest molecule appears about 49% of the time, whereas lighter molecules receive minimal flow.
       </p>
-      <p class="section-annotation">
-        Placeholder for molecule graph<br><br><br><br><br><br><br><br>
-      </p>
+      <div class="A_molecule-slider-container">
+        <div class="A_molecule-slider">
+          Weight: {$A_molecule_prop.mw.toFixed(2)}
+          <Slider
+            min={0}
+            max={1}
+            step={0.01}
+            bind:value={$A_molecule_prop.mw}
+          />
+        </div>
+
+        <div class="A_molecule-slider">
+          Hydrophobicity: {$A_molecule_prop.logP.toFixed(2)}
+          <Slider
+            min={0}
+            max={1}
+            step={0.01}
+            bind:value={$A_molecule_prop.logP}
+          />
+        </div>
+
+        <div class="A_molecule-slider">
+          Donors: {$A_molecule_prop.hbd.toFixed(2)}
+          <Slider
+            min={0}
+            max={1}
+            step={0.01}
+            bind:value={$A_molecule_prop.hbd}
+          />
+        </div>
+
+        <div class="A_molecule-slider">
+          Acceptors: {$A_molecule_prop.hba.toFixed(2)}
+          <Slider
+            min={0}
+            max={1}
+            step={0.01}
+            bind:value={$A_molecule_prop.hba}
+          />
+        </div>
+
+        <div class="A_molecule-slider">
+          Polarity: {$A_molecule_prop.tpsa.toFixed(2)}
+          <Slider
+            min={0}
+            max={1}
+            step={0.01}
+            bind:value={$A_molecule_prop.tpsa}
+          />
+        </div>
+
+        <div class="A_molecule-slider">
+          Flexibility: {$A_molecule_prop.rotb.toFixed(2)}
+          <Slider
+            min={0}
+            max={1}
+            step={0.01}
+            bind:value={$A_molecule_prop.rotb}
+          />
+        </div>
+        <div class="A_molecule-slider">
+              <Button id="max-weight-btn"
+                      color="secondary"
+                      variant="raised"
+                      on:click={A_maximizeMw}>
+                Maximize Weight</Button>
+        </div>
+      </div>
+      <svg id="chart" style="width: 1000px; display:block; margin: 20px auto"></svg>
     </section>
 
     <section class="section">
