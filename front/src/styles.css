@@ -622,6 +622,18 @@ input[type="range"] {
   background-color: #ffb4b4;
   }
 
+.A_molecule-slider-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columns */
+  grid-template-rows: repeat(2, auto);   /* 2 rows */
+  gap: 16px; /* Optional spacing between sliders */
+  width: 800px;
+  margin: 0 auto;
+}
+.A_molecule-slider {
+  width: 200px;
+  margin-top: 10px;
+}
 
 
 

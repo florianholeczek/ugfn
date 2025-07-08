@@ -11,6 +11,7 @@
   import {plot_discrete, plot_continuous} from "./DC_vis.js"
   import {nodeById, edgeById, previousStatesFormula, nextStatesFormula, previousStatesValues, nextStatesValues} from "./DAG.js"
   import {policyFormula, policyValue, lossValue} from "./DAG.js"
+  import { initMoleculeFlow } from './molecule_flow.js';
   import {nodes, edges} from "./DAG.js"
   import Accordion, {Panel, Header, Content } from '@smui-extra/accordion';
   import Slider from '@smui/slider';
@@ -26,7 +27,7 @@
   import Textfield from '@smui/textfield';
   import Fab from '@smui/fab';
   import Snackbar, { Actions } from '@smui/snackbar';
-  import { flow_velocity, flow_n_particles,flow_vectorfield, flow_vectors, flow_changed} from './store.js';
+  import { flow_velocity, flow_n_particles,flow_vectorfield, flow_vectors, flow_changed, A_molecule_prop} from './store.js';
 
 
 
@@ -976,6 +977,11 @@
     tutorial_env_image = await create_env_image(Plotly, run_data["run3_density"]);
     await loadp5();
     await loadONNX();
+    if (typeof initMoleculeFlow === 'function') {
+      initMoleculeFlow('#chart');
+    } else {
+      console.error('initMoleculeFlow is not defined');
+    }
 
 
     // add listeners for changing the Environment
@@ -1031,6 +1037,11 @@
   document.title = "GFlowNet Playground";
 
 
+  // subscribe store as a local reactive variable
+  let weights = {};
+  $: weights = $A_molecule_prop;
+
+
 </script>
 
 
@@ -1083,10 +1094,80 @@
 
 <main class="main-content">
 
+  <div class="A_molecule-slider-container">
+  <div class="A_molecule-slider">
+    mw:
+    <Slider
+      min={0}
+      max={1}
+      step={0.01}
+      bind:value={$A_molecule_prop.mw}
+    />
+    <span class="value">{$A_molecule_prop.mw.toFixed(2)}</span>
+  </div>
+
+  <div class="A_molecule-slider">
+    logP:
+    <Slider
+      min={0}
+      max={1}
+      step={0.01}
+      bind:value={$A_molecule_prop.logP}
+    />
+    <span class="value">{$A_molecule_prop.logP.toFixed(2)}</span>
+  </div>
+
+  <div class="A_molecule-slider">
+    hbd:
+    <Slider
+      min={0}
+      max={1}
+      step={0.01}
+      bind:value={$A_molecule_prop.hbd}
+    />
+    <span class="value">{$A_molecule_prop.hbd.toFixed(2)}</span>
+  </div>
+
+  <div class="A_molecule-slider">
+    hba:
+    <Slider
+      min={0}
+      max={1}
+      step={0.01}
+      bind:value={$A_molecule_prop.hba}
+    />
+    <span class="value">{$A_molecule_prop.hba.toFixed(2)}</span>
+  </div>
+
+  <div class="A_molecule-slider">
+    tpsa:
+    <Slider
+      min={0}
+      max={1}
+      step={0.01}
+      bind:value={$A_molecule_prop.tpsa}
+    />
+    <span class="value">{$A_molecule_prop.tpsa.toFixed(2)}</span>
+  </div>
+
+  <div class="A_molecule-slider">
+    rotb:
+    <Slider
+      min={0}
+      max={1}
+      step={0.01}
+      bind:value={$A_molecule_prop.rotb}
+    />
+    <span class="value">{$A_molecule_prop.rotb.toFixed(2)}</span>
+  </div>
+</div>
 
 
 
 
+
+
+<svg id="chart"></svg>
 
 
 
@@ -1324,7 +1405,7 @@
               marker-end="url(#arrow-{edgeColors[edge.from + '-' + edge.to]})"
             />
 
-            <!-- Flow label
+            <!-- Flow label-->
             <text
               x="{(nodeById(edge.from).x + nodeById(edge.to).x) / 2}"
               y="{(nodeById(edge.from).y + nodeById(edge.to).y) / 2 - 10}"
@@ -1332,9 +1413,9 @@
               font-size="12"
               fill="black"
             >
-              F = {edge.flow}
+              {edge.flow}
             </text>
-            -->
+
 
             <!-- Particles -->
             <path
@@ -1426,8 +1507,8 @@
 
       </svg>
       <p class="mathexpl">
-        Hover over the edges (actions) to see the Flow and Policy calculations,
-        hover over the nodes (states) to see the Loss calculations.
+        Hover over the edges (actions) to see the Policy calculations,
+        hover over the nodes (states) to see the Flow and Loss calculations.
       </p>
 
       <table style="width: 900px; border-collapse: collapse; margin: 20px auto; font-family: 'Georgia', serif; font-size: 16px;">
