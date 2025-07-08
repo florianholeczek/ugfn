@@ -245,7 +245,7 @@ function drawSankey(selector, rawScores) {
       g.append('rect')
         .attr('width', CFG2.barMaxWidth * pct)
         .attr('height', CFG2.barHeight)
-        .attr('fill', '#3b82f6');
+        .attr('fill', '#7570b3'); //balken
       g.append('text')
         .attr('x', CFG2.barMaxWidth/2)
         .attr('y', CFG2.barHeight/2)
@@ -314,8 +314,8 @@ function drawSankey(selector, rawScores) {
       .attr('r', CFG2.particleSize)
       .attr('cx', segs[0].x0)
       .attr('cy', segs[0].y0)
-      .attr('fill', '#440154FF')   // Viridis yellow
-      .attr('opacity', 0.8);
+      .attr('fill', '#7570b3')   // particles
+      .attr('opacity', 0.9);
     circ.transition().duration(CFG2.particleDuration)
       .attrTween('transform', function() {
         return t => {
