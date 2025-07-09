@@ -1290,10 +1290,10 @@
       </div>
 
     
-    <div id="flowConservationContainer">
-      <svg id="flowConservationSVG"></svg>
+    <div id="flowConservationContainer" style="max-width:700px;margin:20px auto;">
+      <svg id="flowConservationSVG" style="width:100%;height:auto;"></svg>
     </div>
-    <script src="/static/flow_conservation.js">
+    <script src="flow_conservation.js">
       particlesJS("particles-js", {
   particles: {
     number: { value: 30, density: { enable: true, value_area: 600 } },
