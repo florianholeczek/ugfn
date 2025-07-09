@@ -1261,7 +1261,8 @@
     </section>
     <div class="A_centerwrap">
       <div class="A_tetriscontainer">
-        <div class="A_board">
+        <div class="A_board-column">
+          <div class="A_board">
           <!-- 1) Background canvas (will be painted with Viridis) -->
           <canvas
             id="tetrisBgCanvas"
@@ -1277,6 +1278,11 @@
             height="600"
             style="position: absolute; top: 0; left: 0; z-index: 1;"
           ></canvas>
+          </div>
+
+          <div id="flowConservationContainer" style="max-width:300px;margin:20px auto;">
+            <svg id="flowConservationSVG" style="width:100%;height:auto;"></svg>
+          </div>
         </div>
 
         <div class="A_sidebar">
@@ -1290,10 +1296,7 @@
       </div>
 
     
-    <div id="flowConservationContainer">
-      <svg id="flowConservationSVG"></svg>
-    </div>
-    <script src="/static/flow_conservation.js">
+    <script src="flow_conservation.js">
       particlesJS("particles-js", {
   particles: {
     number: { value: 30, density: { enable: true, value_area: 600 } },
