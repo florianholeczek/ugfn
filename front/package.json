@@ -1,0 +1,46 @@
+{
+  "name": "svelte-app",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "start": "sirv public --no-clear"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-terser": "^0.4.0",
+    "@smui-extra/accordion": "^7.0.0",
+    "@smui/button": "^7.0.0",
+    "@smui/data-table": "^7.0.0",
+    "@smui/fab": "^7.0.0",
+    "@smui/icon-button": "^7.0.0",
+    "@smui/linear-progress": "^7.0.0",
+    "@smui/paper": "^7.0.0",
+    "@smui/select": "^7.0.0",
+    "@smui/slider": "^7.0.0",
+    "@smui/snackbar": "^7.0.0",
+    "@smui/tab": "^7.0.0",
+    "@smui/tab-bar": "^7.0.0",
+    "@smui/textfield": "^7.0.0",
+    "@smui/tooltip": "^7.0.0",
+    "@types/plotly.js": "^2.35.1",
+    "rollup": "^3.15.0",
+    "rollup-plugin-css-only": "^4.3.0",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-svelte": "^7.1.2",
+    "svelte": "^4.2.2",
+    "svelte-range-slider-pips": "^2.3.1"
+  },
+  "dependencies": {
+    "plotly.js": "^2.35.3",
+    "plotly.js-dist": "^2.35.3",
+    "sirv-cli": "^2.0.0",
+    "svelte-collapsible": "^0.3.1",
+    "svelte-katex": "^0.2.0",
+    "svelte-material-ui": "^8.0.0-beta.3",
+    "wx-svelte-core": "^2.0.0-beta-2"
+  }
+}

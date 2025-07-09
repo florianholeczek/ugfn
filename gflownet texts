@@ -1,0 +1,142 @@
+In short, a generative flow network is a model class which allows sampling from an arbitrary probability distribution (similar to MCMC). They allow for generating objects with sequentially built compositional structure like trees or graphs.
+
+We train a model to learn a distribution p(x), so we can sample from it later. We need a reward function R(x) which assigns value to each object and we want p(x) to be proportional to it:  p(x) \propto R(x). This allows us later on to sample a diversity of solutions instead of just the reward-maximizing one.
+As we do not rely on a external dataset but only on our internal reward function we are only limited by compute - we can generate objects and query the reward function as often as we like.
+
+________________
+Example (And more introduction)
+
+Imagine building a robot: There might be differnt robots to solve a task and they could be assembled in different ways. You might start with a base, then a servo, then an arm and so on. If you take only valid steps you will end up with a robot which is more or less useful for your task. 
+The different possibilities of states of the composition form a graph: While in the beginning (state 0) only the base might be valid, in the next step you might be able to add a servo or a telescopic arm, and the next options depend on that choice.
+If you want to use a GFlowNet for your task, it is important that the resulting graph is acyclic, i.e. it is not possible to reach a previous state.
+If we built a robot in the end we have a trajectory (a sequence of states s_0 -> s_1 -> ... -> s_f), where trajectories can have different lengths, e.g. we could give a robot 1 joint or 100.
+
+As you might have guessed from the vocabulary, GFlowNets are very similar to Reinforcement learning methods, we sample trajectories and assign a reward R(x) to them (or to the states). The main difference is that usual RL methods try to find solutions which maximize the reward, whereas GFlowNets learn the underlying distribution p(x). So we want to train a model such that p(x) is proportional to the reward function R(x). This allows us to sample not only from the mode which has the highest reward, but also all other modes which might be almost as good. Imagine one final robot which does the tast very well, but others which might be almost as good and have other advantages which are not covered by our reward function. 
+
+While robots provide a good example, one of the main use case of GFNs right now is drug discovery SOURCE, where sampling from multiple modes is what you really want in order to discover not only the most promising molecule.
+
+________________
+
+
+When sequentially generating an object, we need to take actions which give us the next state: We could add one of the possible components or decide we are done. For this we use a neural net which represents our forward policy P_F(s_{t+1}|s_t), it gives us the action which leads to the next state.
+
+So far, everything sounds very nice, but how do we achieve this?
+
+Thats where the flow from the name comes into play. If you connect all possible states from s_0 to the terminal states you get a directed graph. If you want to use a GFlowNet for your task it is important that the graph is acyclic, i.e. it is not possible to reach a previous state. We can now interpret this directed acyclic graph (DAG) as a flow network. Imagine water flowing from s_0 through the intermediate states to the final states, following the edges of the DAG like pipes. 
+
+**image from blog**
+
+This places an important constraint on our model: Preservation of Flow. The pipes (edges) and states (nodes) can not be leaky, all of the water is preserved. This means:
+1. The flow going into the DAG is the same as the Flow going out of it (Sum of the flow of all terminal nodes).
+2. Same for the nodes: The sum of the flow going into a node is the same as the sum of the flow going out of it.
+
+We now can set the flow going out of a terminal state equal to it's reward. 
+Assuming edge flow F(s,s')>0, we can then express the Flow from one state s to its children s' as:
+
+\sum_{s' \in \varepsilon} F(s,s') = R(s') + \sum_{s'' \in \varepsilon} F(s',s'')  (1)
+
+We now define our forward policy as the proportion of the Flow s -> s' to the total Flow of s:
+
+P_F(s'|s) = \frac{F(s,s'}{\sum F(s)}    (2)
+
+By using this policy we will sample finished objects x according to p(x) \propto R(x).
+
+The only thing we miss for training is the loss. The easiest way would be to turn (1) into a MSE: 
+
+L(s') = (\sum_{s' \in \varpsilon} F(s,s') - R(s') - \sum_{s'' \in \varpsilon} F(s',s'')) (3)
+
+This is actually what the authors did in the first paper SOURCE, however it does not perform so well. We will later use the Trajectory Balance Loss (Malkin et al., 2022):
+
+L(\tau) = \left(\log Z_{\theta} + \sum_t \log P_F(s_{t+1}|s_t;\theta) - \log R(x) - \sum_t \log P_B(s_t|s_{t+1}; \theta) \right)^2   (4)
+
+With this we calculate the loss for a whole trajectory and do credit assignment for the states. It converges better, but looks more complicated - Let's ignore it for now and look at our environment.
+
+
+Toy Environment
+As we want to train GFlowNets quickly to explore how they behave, we need a simple environment which allows for exploring without needing a lot of compute during training. Here we use a simple 2D grid with each variable in the range [-3,3]. We then calculate the reward according to the Mixture of Multivariate Gaussians (for now two of them).
+
+For each action, the GFlowNet takes a step along both the x and y direction, this is repeated until the defined length of a trajectory is reached. Note that this is unusual: GFlowNets allow for variable trajectory lengths, so the action space usually contains an additional end of sequence action, where the current state becomes the final state.
+
+Above we stated that GFlowNets build an Acyclic Graph, so each state can only be visited once. We currently violate this assumption: While it is unlikely that a state gets visited twice in our continuous environment, it is still possible. To mitigate this we simply include a counter in our state which represents the current step.
+
+
+<h3>Training</h3>
+
+Now, how do we train a GFlowNet?
+
+
+First we need our GFN to be able to act in the environment. To do this we let it predict the parameters of a distribution (In our case the means and variances of our Gaussians). So during training we predict the parameters with a Neural Net and sample from the resulting distributions. By adding the counter for the step we get our actions, which we simply add to our current state to get the next state. 
+
+That was the easy part. We now want to train our GFN using Trajectory Balance loss. Here it is again:
+
+$$L(\tau) = \left(\log Z_{\theta} + \sum_t \log P_F(s_{t+1}|s_t;\theta) - \log R(x) - \sum_t \log P_B(s_t|s_{t+1}; \theta) \right)^2$$
+
+Let's look at its parts:
+- $P_F(s_{t+1}|s_t;\theta)$: The forward policy. It represents the distribution over the next states (the children) of the current state. 
+- $P_B(s_t|s_{t+1};\theta)$: The backward policy. Similar to as we defined the forward policy, we can define the backward policy as a distribution over the previous states (the parents) of a state. We can also estimate it using a NN (not the same as for the forward policy).
+- $Z_{\theta}$: The partition function. It is another parameter to be learned by our agent and should approach the true partition function given enough training. In our case, the true partition function is 2 (the number of gaussians), however it is usually not known.
+- $R(x)$: The reward
+
+Here $\theta$ are the parameters of our model (not to be confused with the parameters of our environment. They include the parameters of $P_F$, $P_B$ and $Z$ and we can update them using the loss above.
+
+If you want you can find more detailed background for the partition function, the backward policy and the trajectory balance loss below, as well as the algorithm for training.
+
+____________________________________________________
+More math:
+    The partition function for a mixture of gaussians is the sum of its mixture weights, so always 1. (therefore logZ is 0). However we do not compute a real mixture of gaussians here, for all mixture weights $\pi_k$ we have $\pi_k=1$. Therefore our partition function is the number of gaussians instead.
+    how to get trajectory balance loss
+    backward policy
+
+____________________________________________________
+
+____________________________________________________
+Algorithm:
+
+input: Reward function (part of the environment), model, hyperparameters
+1.initialize model parameters for PF, PB, logZ
+2.repeat for a number of iterations or until convergence:
+3.    repeat for trajectory length:
+4.        Sample action for current state from PF
+5.        Take step according to action
+6.        Add new state including step (step, x-value, y-value) to trajectory
+7.    Calculate reward of final state according to reward function
+8.    Calculate the sum of the log probabilities of all actions of the trajectory for each PF and PB
+9.    Calculate the TB-Loss: (logZ + log probabilities PF - log probabilities PB - log reward)^2
+10.    update the parameters PF, PB, logZ
+    
+______________________________________________________
+We trained a GFN on this environment for 2000 Iterations. 
+Below you see the progress of our GFN during training. While it first samples randomly, it learns to match the true distribution of our environment.
+
+
+
+Sampling according to the underlying distribution is one of the big advantages of GFlowNets: Other approaches usually learn to maximize the reward, so they would not sample from both of our modes (or everything in between), but they would find one of them and then just sample from it (especially if one of our modes would be greater than the other). This might be suboptimal e.g. in molecule discovery, where you might not want the most promising molecule, but many different of themmight be interesting.
+
+<h3>Mode Collapse</h3>
+
+So far, our distribution to match was very easy. Lets make it more challenging: If we lower the variance, we see the two modes are more seperated.
+
+
+
+Well thats not what we want! Instead of sampling from the true distribution we only sample from one mode, thats what common RL methods do. We can do better!
+
+There are two main possibilities to fix this:
+1. We could introduce a temperature parameter $\beta$ into our reward function:$R_{new}(x)=R(x)^\beta$. This would change the "peakyness" of the reward function and we would not sample proportional to the reward function but according to $p(x|\beta) \propto R(x)^\beta$. It is also possible to use $\beta$ as a trainable parameter and condition the model on it.
+2. A similar but simpler way is to just train off-policy. By adding a fixed variance to the logits of the forward policy, we explore more during training. As this is a very easy implementation let's go with this one.
+
+______________________________
+Changes to the algorithm:
+Training off-policy is even more helpful when we schedule it. We start with more a higher variance and scale it down during training until we reach on-policy training.
+Our new hyperparameter is the initial value for the off policy training, during each step we gradually decrease it until we reach 0.
+
+Important changes:
+Define schedule in the beginning: [start=initial value, stop=0, step=-initial value/number of iterations\]
+When sampling the actions we compute the logits as usual. Instead of just defining the policy distribution with them, we also define a exploratory distribution by adding the scheduled value to the variance. We then sample our actions from the exploratory distribution. We need the policy distribution later to compute the log probabilities of our actions. We do not use the scheduled values with the backward policy and during inference.
+______________________________
+
+
+
+
+
+
+

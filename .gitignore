@@ -1,0 +1,14 @@
+jupyter/
+.ipynb_checkpoints/
+front/node_modules/
+old/
+venv/
+python/testing.py
+.idea/
+__pycache__/
+front/README.md
+python/model.pth
+python/model_test.pth
+/front/public/Data/params.txt
+/dockercmds.txt
+Alex/
