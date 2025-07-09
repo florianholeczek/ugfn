@@ -1280,9 +1280,6 @@
           ></canvas>
           </div>
 
-          <div id="flowConservationContainer" style="max-width:300px;margin:20px auto;">
-            <svg id="flowConservationSVG" style="width:100%;height:auto;"></svg>
-          </div>
         </div>
 
         <div class="A_sidebar">
@@ -1299,37 +1296,6 @@
       <svg id="flowConservationSVG" style="width:100%;height:auto;"></svg>
     </div>
 
-    <script src="flow_conservation.js">
-      particlesJS("particles-js", {
-  particles: {
-    number: { value: 30, density: { enable: true, value_area: 600 } },
-    color: { value: "#00bfff" },
-    shape: { type: "circle" },
-    opacity: { value: 0.4, random: true },
-    size: { value: 2, random: true },
-    line_linked: { enable: false },
-    move: {
-      enable: true,
-      speed: 1,
-      straight: true,
-      random: false,
-      out_mode: "out"
-    }
-  },
-  interactivity: {
-    detect_on: "canvas",
-    events: { onhover: { enable: false }, onclick: { enable: false } }
-  },
-  retina_detect: false
-});
-
-
-    </script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        initFlowConservationDemo();
-      });
-    </script>
     </div>
 
     <section class="section">
