@@ -33,10 +33,21 @@
       return;
     }
 
-    const svg = d3.select('#flowConservationSVG');
+    let svg = d3.select('#flowConservationSVG');
     if (svg.empty()) {
-      console.error('SVG#flowConservationSVG not found');
-      return;
+      // Attempt to create the container on the fly if it does not exist
+      let container = d3.select('#flowConservationContainer');
+      if (container.empty()) {
+        container = d3.select('body')
+          .append('div')
+          .attr('id', 'flowConservationContainer')
+          .style('max-width', '700px')
+          .style('margin', '20px auto');
+      }
+      svg = container.append('svg')
+        .attr('id', 'flowConservationSVG')
+        .style('width', '100%')
+        .style('height', 'auto');
     }
 
     // --- clear any previous demo timer to avoid stacking ---
