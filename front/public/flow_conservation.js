@@ -38,10 +38,9 @@
     if (svg.empty()) {
       let container = d3.select('#flowConservationContainer');
       if (container.empty()) {
+        // Insert the container right before the "Domain application" heading if it exists
+        const domainHeading = Array.from(document.querySelectorAll('h2.section-title'))
 
-
-
-             const domainHeading = Array.from(document.querySelectorAll('h2.section-title'))
           .find(h => h.textContent.trim().toLowerCase().startsWith('domain application'));
         const beforeEl = domainHeading || null;
         const parent = beforeEl ? beforeEl.parentNode : document.body;
