@@ -46,6 +46,11 @@
           .attr('id', 'flowConservationContainer')
           .style('max-width', '700px')
           .style('margin', '20px auto');
+
+      const container = d3.select('#flowConservationContainer');
+      if (container.empty()) {
+        console.warn('flowConservationContainer not found');
+        return;
       }
       svg = container.append('svg')
         .attr('id', 'flowConservationSVG')
