@@ -35,14 +35,10 @@
 
     let svg = d3.select('#flowConservationSVG');
     if (svg.empty()) {
-      // Attempt to create the container on the fly if it does not exist
-      let container = d3.select('#flowConservationContainer');
+      const container = d3.select('#flowConservationContainer');
       if (container.empty()) {
-        container = d3.select('body')
-          .append('div')
-          .attr('id', 'flowConservationContainer')
-          .style('max-width', '700px')
-          .style('margin', '20px auto');
+        console.warn('flowConservationContainer not found');
+        return;
       }
       svg = container.append('svg')
         .attr('id', 'flowConservationSVG')
