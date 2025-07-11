@@ -1036,6 +1036,12 @@
   //Title to display in tab
   document.title = "GFlowNet Playground";
 
+  onMount(() => {
+    if (typeof initFlowConservationDemo === 'function') {
+      initFlowConservationDemo();
+    }
+  });
+
 
   function A_maximizeMw() {
     A_molecule_prop.update((weights) => {
@@ -1261,7 +1267,8 @@
     </section>
     <div class="A_centerwrap">
       <div class="A_tetriscontainer">
-        <div class="A_board">
+        <div class="A_board-column">
+          <div class="A_board">
           <!-- 1) Background canvas (will be painted with Viridis) -->
           <canvas
             id="tetrisBgCanvas"
@@ -1277,6 +1284,8 @@
             height="600"
             style="position: absolute; top: 0; left: 0; z-index: 1;"
           ></canvas>
+          </div>
+
         </div>
 
         <div class="A_sidebar">
@@ -1288,42 +1297,10 @@
           </div>
         </div>
       </div>
-
-    
-    <div id="flowConservationContainer">
-      <svg id="flowConservationSVG"></svg>
     </div>
-    <script src="/static/flow_conservation.js">
-      particlesJS("particles-js", {
-  particles: {
-    number: { value: 30, density: { enable: true, value_area: 600 } },
-    color: { value: "#00bfff" },
-    shape: { type: "circle" },
-    opacity: { value: 0.4, random: true },
-    size: { value: 2, random: true },
-    line_linked: { enable: false },
-    move: {
-      enable: true,
-      speed: 1,
-      straight: true,
-      random: false,
-      out_mode: "out"
-    }
-  },
-  interactivity: {
-    detect_on: "canvas",
-    events: { onhover: { enable: false }, onclick: { enable: false } }
-  },
-  retina_detect: false
-});
 
-
-    </script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        initFlowConservationDemo();
-      });
-    </script>
+    <div id="flowConservationContainer" style="max-width:700px;margin:20px auto;">
+      <svg id="flowConservationSVG" style="width:100%;height:auto;"></svg>
     </div>
 
     <section class="section">
