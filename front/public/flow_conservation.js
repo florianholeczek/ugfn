@@ -35,6 +35,18 @@
 
     let svg = d3.select('#flowConservationSVG');
     if (svg.empty()) {
+      let container = d3.select('#flowConservationContainer');
+      if (container.empty()) {
+        const domainHeading = Array.from(document.querySelectorAll('h2.section-title'))
+          .find(h => h.textContent.trim().toLowerCase().startsWith('domain application'));
+        const beforeEl = domainHeading || null;
+        const parent = beforeEl ? beforeEl.parentNode : document.body;
+        container = d3.select(parent)
+          .insert('div', beforeEl ? () => beforeEl : null)
+          .attr('id', 'flowConservationContainer')
+          .style('max-width', '700px')
+          .style('margin', '20px auto');
+
       const container = d3.select('#flowConservationContainer');
       if (container.empty()) {
         console.warn('flowConservationContainer not found');
