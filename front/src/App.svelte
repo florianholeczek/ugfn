@@ -1298,9 +1298,13 @@
         </div>
       </div>
 
+    </div>
+
     <div id="flowConservationContainer" style="max-width:700px;margin:20px auto;">
       <svg id="flowConservationSVG" style="width:100%;height:auto;"></svg>
+
     </div>
+
 
 
     </div>
