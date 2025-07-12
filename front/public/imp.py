@@ -215,6 +215,11 @@ class TetrisEnv:
         piece_type = self.current_piece['type']
         shape = np.rot90(TETROMINOES[piece_type], k=-rot)
 
+        # Count how many full lines exist before placing the piece. This allows
+        # us to compute the number of newly completed lines without actually
+        # clearing them from the board (the environment is acyclic).
+        prev_full_lines = int(np.sum(np.all(self.board, axis=1)))
+
         # Drop the piece. This logic is safe because get_valid_moves ensures this is possible.
         y = 0
         while not self._collides(shape, (x, y + 1)):
@@ -227,12 +232,19 @@ class TetrisEnv:
                 if shape[r, c]:
                     self.board[y + r, x + c] = True
 
-        # Clear lines and calculate reward for score
-        lines_cleared_this_step = self._clear_lines()
+        # Count new full lines created by this placement.  Since lines are never
+        # removed, this is the difference between the number of full rows before
+        # and after the piece is placed.
+        new_full_lines = int(np.sum(np.all(self.board, axis=1)))
+        lines_cleared_this_step = new_full_lines - prev_full_lines
+
+        # Clamp in case something goes wrong (should never exceed 4 in Tetris).
+        lines_cleared_this_step = max(0, min(lines_cleared_this_step, 4))
         self.lines_cleared += lines_cleared_this_step
+
         # Use standard squared rewards for bigger impact on score
         reward_map = {0: 0, 1: 1, 2: 3, 3: 5, 4: 8}
-        reward = reward_map[lines_cleared_this_step]
+        reward = reward_map.get(lines_cleared_this_step, reward_map[4])
         self.score += reward
 
 
@@ -351,25 +363,29 @@ class ProHeuristic:
         for rot, x in moves:
             # 1. Simulate placing the CURRENT piece
             sim_board = board.copy()
+            prev_lines_0 = int(np.sum(np.all(sim_board, axis=1)))
             self._sim_env.board = sim_board
             shape = np.rot90(TETROMINOES[current_piece_type], k=-rot)
-            
+
             y = 0
             # This check is technically redundant due to get_valid_moves, but good for safety
             if self._sim_env._collides(shape, (x, 0)):
                 scores.append(-1e9) # Should not happen with valid moves
                 continue
-            
-            while not self._sim_env._collides(shape, (x, y + 1)): y += 1
-            
+
+            while not self._sim_env._collides(shape, (x, y + 1)):
+                y += 1
+
             h, w = shape.shape
             for r in range(h):
                 for c in range(w):
-                    if shape[r, c]: sim_board[y + r, x + c] = True
+                    if shape[r, c]:
+                        sim_board[y + r, x + c] = True
 
             # 2. Check for line clears from this move
-            full_rows = np.all(sim_board, axis=1)
-            lines_cleared_this_step = int(np.sum(full_rows))
+            lines_after_first = int(np.sum(np.all(sim_board, axis=1)))
+            lines_cleared_this_step = lines_after_first - prev_lines_0
+            lines_cleared_this_step = max(0, min(lines_cleared_this_step, 4))
             cleared_counts.append(lines_cleared_this_step)
             # Do not actually clear lines; keep the board as is
             post_clear_board = sim_board
@@ -389,6 +405,7 @@ class ProHeuristic:
             else:
                 for next_rot, next_x in next_moves:
                     board_after_next = post_clear_board.copy()
+                    prev_lines_1 = lines_after_first
                     self._sim_env.board = board_after_next
 
                     next_shape = np.rot90(TETROMINOES[next_piece_type], k=-next_rot)
@@ -401,8 +418,9 @@ class ProHeuristic:
                             if next_shape[r, c]:
                                 board_after_next[next_y + r, next_x + c] = True
 
-                    full_rows_next = np.all(board_after_next, axis=1)
-                    lines_after_next = int(np.sum(full_rows_next))
+                    lines_after_next_total = int(np.sum(np.all(board_after_next, axis=1)))
+                    lines_after_next = lines_after_next_total - prev_lines_1
+                    lines_after_next = max(0, min(lines_after_next, 4))
                     # In the acyclic setting do not clear lines
                     cleared_board = board_after_next
 
@@ -420,6 +438,7 @@ class ProHeuristic:
                     else:
                         for nn_rot, nn_x in next_next_moves:
                             board_after_nn = cleared_board.copy()
+                            prev_lines_2 = lines_after_next_total
                             self._sim_env.board = board_after_nn
 
                             nn_shape = np.rot90(TETROMINOES[next_next_piece_type], k=-nn_rot)
@@ -432,8 +451,9 @@ class ProHeuristic:
                                     if nn_shape[r, c]:
                                         board_after_nn[nn_y + r, nn_x + c] = True
 
-                            full_rows_nn = np.all(board_after_nn, axis=1)
-                            lines_after_nn = int(np.sum(full_rows_nn))
+                            lines_after_nn_total = int(np.sum(np.all(board_after_nn, axis=1)))
+                            lines_after_nn = lines_after_nn_total - prev_lines_2
+                            lines_after_nn = max(0, min(lines_after_nn, 4))
 
                             score2 = self.score_state(board_after_nn, lines_after_nn)
                             if score2 > best_third_score:
