@@ -256,8 +256,6 @@ function heuristicScoreCandidate(board, cand) {
   let linesCleared = 0;
   for (let r = ROWS - 1; r >= 0; r--) {
     if (newBoard[r].every(v => v)) {
-      newBoard.splice(r, 1);
-      newBoard.unshift(new Array(COLS).fill(0));
       linesCleared++;
     }
   }
@@ -297,8 +295,6 @@ function applyPieceToBoard(board, piece) {
   let linesCleared = 0;
   for (let r = ROWS - 1; r >= 0; r--) {
     if (newBoard[r].every(v => v)) {
-      newBoard.splice(r, 1);
-      newBoard.unshift(new Array(COLS).fill(0));
       linesCleared++;
     }
   }
@@ -427,18 +423,12 @@ spawn_piece() {
    * clear_lines: Remove fully-filled rows, shift above rows down, update score.
    */
   clear_lines() {
-    const new_board = [];
+    let cleared = 0;
     for (let r = 0; r < this.board.length; r++) {
-      // If the row is not fully filled, keep it
-      if (!this.board[r].every(cell => cell === 1)) {
-        new_board.push(this.board[r]);
+      if (this.board[r].every(cell => cell === 1)) {
+        cleared++;
       }
     }
-    const cleared = this.rows - new_board.length;
-    for (let i = 0; i < cleared; i++) {
-      new_board.unshift(new Array(this.cols).fill(0));
-    }
-    this.board = new_board;
     this.score += cleared;
     return cleared;
   }
