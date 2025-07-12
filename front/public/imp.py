@@ -192,16 +192,8 @@ class TetrisEnv:
                         if shape[r, c]:
                             sim_board[y + r, x + c] = True
 
-                # Simulate line clears to match the actual environment step
-                full_rows = np.all(sim_board, axis=1)
-                if np.any(full_rows):
-                    cleared = np.zeros_like(sim_board)
-                    new_idx = BOARD_HEIGHT - 1
-                    for r_idx in range(BOARD_HEIGHT - 1, -1, -1):
-                        if not full_rows[r_idx]:
-                            cleared[new_idx] = sim_board[r_idx]
-                            new_idx -= 1
-                    sim_board = cleared
+                # In the acyclic setting we do not clear lines. We merely keep
+                # track of the board after placement, so no rows are removed.
 
                 board_hash = sim_board.tobytes()
                 if board_hash in seen_states:
@@ -255,18 +247,10 @@ class TetrisEnv:
         return self.get_state(), float(reward), self.game_over
 
     def _clear_lines(self) -> int:
-        """Clears completed lines from the board and returns the count."""
+        """Count completed lines without modifying the board."""
         full_rows = np.all(self.board, axis=1)
-        lines_to_clear = np.sum(full_rows)
-        if lines_to_clear > 0:
-            new_board = np.zeros_like(self.board)
-            new_row_idx = BOARD_HEIGHT - 1
-            for r in range(BOARD_HEIGHT - 1, -1, -1):
-                if not full_rows[r]:
-                    new_board[new_row_idx] = self.board[r]
-                    new_row_idx -= 1
-            self.board = new_board
-        return int(lines_to_clear)
+        # No rows are actually removed in the acyclic formulation
+        return int(np.sum(full_rows))
 
 
 class ProHeuristic:
@@ -387,15 +371,8 @@ class ProHeuristic:
             full_rows = np.all(sim_board, axis=1)
             lines_cleared_this_step = int(np.sum(full_rows))
             cleared_counts.append(lines_cleared_this_step)
-            if lines_cleared_this_step > 0:
-                post_clear_board = np.zeros_like(sim_board)
-                new_row_idx = BOARD_HEIGHT - 1
-                for r_idx in range(BOARD_HEIGHT - 1, -1, -1):
-                    if not full_rows[r_idx]:
-                        post_clear_board[new_row_idx] = sim_board[r_idx]
-                        new_row_idx -= 1
-            else:
-                post_clear_board = sim_board
+            # Do not actually clear lines; keep the board as is
+            post_clear_board = sim_board
             
             # --- 3. Two-step Lookahead ---
             best_next_score = -float("inf")
@@ -426,15 +403,8 @@ class ProHeuristic:
 
                     full_rows_next = np.all(board_after_next, axis=1)
                     lines_after_next = int(np.sum(full_rows_next))
-                    if lines_after_next > 0:
-                        cleared_board = np.zeros_like(board_after_next)
-                        new_idx = BOARD_HEIGHT - 1
-                        for r_idx in range(BOARD_HEIGHT - 1, -1, -1):
-                            if not full_rows_next[r_idx]:
-                                cleared_board[new_idx] = board_after_next[r_idx]
-                                new_idx -= 1
-                    else:
-                        cleared_board = board_after_next
+                    # In the acyclic setting do not clear lines
+                    cleared_board = board_after_next
 
                     # Second lookahead
                     self._sim_env.board = cleared_board
@@ -463,7 +433,7 @@ class ProHeuristic:
                                         board_after_nn[nn_y + r, nn_x + c] = True
 
                             full_rows_nn = np.all(board_after_nn, axis=1)
-                            lines_after_nn = int(np.sum(full_rows_nn)) if np.any(full_rows_nn) else 0
+                            lines_after_nn = int(np.sum(full_rows_nn))
 
                             score2 = self.score_state(board_after_nn, lines_after_nn)
                             if score2 > best_third_score:
