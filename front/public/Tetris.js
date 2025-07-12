@@ -70,6 +70,10 @@ let topCandidates = [];
 let appliedArrows = [];
 let particles = [];
 
+// Overlays for starting/restarting the game
+let startOverlay = null;
+let restartOverlay = null;
+
 // Some internal flags/states
 let simulationPaused = false;
 let lastPieceId = null;
@@ -1271,15 +1275,13 @@ function tickGameLogic() {
   const new_game_over = game.is_over();
   const new_piece_id = game.piece_id;
 
-  // If game ended just now, do TB update and reset
+  // If game ended just now, pause and offer restart
   if (new_game_over && !old_game_over) {
     const final_reward = game.get_final_reward();
     agent.update_trajectory(trajectory, final_reward);
     trajectory = [];
-    game.reset_game();
-    candidateListEl.innerHTML = "";
-    lastPieceId = null;
-    inputPaused = false;
+    simulationPaused = true;
+    showRestartOverlay();
   }
 
   // If a new piece was spawned, recalc new terminal moves
@@ -1736,6 +1738,10 @@ async function fetchCandidateMoves() {
 
 
 function doResetGame() {
+  if (restartOverlay) {
+    restartOverlay.remove();
+    restartOverlay = null;
+  }
   resetGameLogic();
 
   // Clear visuals
@@ -1758,6 +1764,70 @@ function doTogglePause() {
   if (pauseBtn) {
     pauseBtn.textContent = simulationPaused ? "Resume Game" : "Pause Game";
   }
+}
+
+function showStartOverlay() {
+  const boardDiv = document.getElementById("tetrisCanvas")?.parentElement;
+  if (!boardDiv || startOverlay) return;
+  boardDiv.style.position = "relative";
+  startOverlay = document.createElement("div");
+  startOverlay.id = "startOverlay";
+  Object.assign(startOverlay.style, {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "rgba(0,0,0,0.6)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 5
+  });
+  const btn = document.createElement("button");
+  btn.id = "startBtn";
+  btn.textContent = "Start Game";
+  btn.style.padding = "10px 20px";
+  btn.style.fontSize = "20px";
+  startOverlay.appendChild(btn);
+  boardDiv.appendChild(startOverlay);
+  btn.addEventListener("click", () => {
+    startOverlay.remove();
+    startOverlay = null;
+    init();
+  });
+}
+
+function showRestartOverlay() {
+  const boardDiv = document.getElementById("tetrisCanvas")?.parentElement;
+  if (!boardDiv || restartOverlay) return;
+  boardDiv.style.position = "relative";
+  restartOverlay = document.createElement("div");
+  restartOverlay.id = "restartOverlay";
+  Object.assign(restartOverlay.style, {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "rgba(0,0,0,0.6)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 5
+  });
+  const btn = document.createElement("button");
+  btn.id = "restartBtn";
+  btn.textContent = "Restart Game";
+  btn.style.padding = "10px 20px";
+  btn.style.fontSize = "20px";
+  restartOverlay.appendChild(btn);
+  boardDiv.appendChild(restartOverlay);
+  btn.addEventListener("click", () => {
+    restartOverlay.remove();
+    restartOverlay = null;
+    doResetGame();
+  });
 }
 
 function updateCandidateListUI() {
@@ -1874,4 +1944,4 @@ async function init() {
     .catch(()=>{/* ignore if none */});
 }
 
-window.addEventListener("DOMContentLoaded", init);
+window.addEventListener("DOMContentLoaded", showStartOverlay);
