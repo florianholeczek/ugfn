@@ -1743,6 +1743,8 @@ function doResetGame() {
     restartOverlay = null;
   }
   resetGameLogic();
+  // make sure a leftover inference doesn't block new scoring
+  scoringInProgress = false;
 
   // Clear visuals
   currentGameState = null;
