@@ -596,171 +596,195 @@ class GFNNet(nn.Module):
         logits = self.fc(x)
         return logits.view(-1, 4, BOARD_WIDTH) # (Batch, Rotations, Positions)
 
+# -------------------------------------------------
+# 1. GFlowNet Wrapper: Policy Network + logZ
+# -------------------------------------------------
 class TetrisFlowNet(nn.Module):
-    """Wraps GFNNet and adds the per-piece logZ parameters for GFlowNet."""
-    def __init__(self, n_pieces: int = N_PIECES, base_channels: int = 32):
+    """
+    Wraps the ResNet-style policy (GFNNet) and maintains per-piece
+    normalizing constants (logZ) as trainable parameters.
+
+    - `model`: outputs raw logits over (rotation, x) moves.
+    - `logZ`: a vector of length `n_pieces`, where each entry
+      estimates total forward "flow" out of the start state for
+      that initial piece type.
+    """
+    def __init__(self, n_pieces: int):
         super().__init__()
-        self.model = GFNNet(n_pieces=n_pieces, base_channels=base_channels)
+        self.model = GFNNet(n_pieces=n_pieces)
+        # Initialize all logZ[c] = 0: will learn relative ease of
+        # generating high-reward trajectories from each piece c.
         self.logZ = nn.Parameter(torch.zeros(n_pieces))
 
     def forward(self, board, cur_piece_id, nxt_piece_id):
-        cur_oh = F.one_hot(cur_piece_id, num_classes=len(PIECE_IDS)).float()
-        nxt_oh = F.one_hot(nxt_piece_id, num_classes=len(PIECE_IDS)).float()
-        return self.model(board, cur_oh, nxt_oh)
-
-
+        """
+        - `board`: tensor of shape (batch, H, W)
+        - `cur_piece_id`, `nxt_piece_id`: tensor of ints
+        Returns logits of shape (batch, 4, BOARD_WIDTH).
+        """
+        return self.model(board, cur_piece_id, nxt_piece_id)
+    
 # --- Training ---
-def get_current_alpha(step, args):
-    """Linearly anneals alpha from start to end over anneal_steps."""
+
+# -------------------------------------------------
+# 2. Alpha Annealing: Mixing Heuristic & Learned Policy
+# -------------------------------------------------
+def get_current_alpha(step: int, args) -> float:
+    """
+    Linearly interpolate α from alpha_start to alpha_end over
+    alpha_anneal_steps total training steps. Once step exceeds
+    the anneal schedule, α stays at alpha_end.
+    """
     if step >= args.alpha_anneal_steps:
         return args.alpha_end
-    return args.alpha_start + (args.alpha_end - args.alpha_start) * (step / args.alpha_anneal_steps)
+    return args.alpha_start + (args.alpha_end - args.alpha_start) * (
+        step / args.alpha_anneal_steps
+    )
 
-def run_episode(env, model, heuristic, alpha, device, is_imitation: bool, max_steps: int = 0):
+
+
+# -------------------------------------------------
+# 3. Trajectory Generation under Mixed Policy
+# -------------------------------------------------
+def run_episode(env, model, heuristic, alpha, device, is_imitation, max_steps=0):
     """
-    Runs a single episode of Tetris.
-    - If `is_imitation`, it follows the heuristic greedily and stores data for supervised learning.
-    - Otherwise, it samples from a combined policy and stores data for GFN loss.
+    Sample a full-piece-placement trajectory:
+
+    - If `is_imitation`, greedily follow the heuristic and record
+      (state, best_action) pairs for supervised pre-training.
+    - Otherwise, at each step:
+        • Compute model logits (log π_θ)
+        • Compute heuristic scores (h)
+        • Form p_mix = α·π_θ + (1−α)·h
+        • Sample an action under p_mix
+        • Store log_prob of the model’s π_θ for TB loss
+
+    Returns:
+        trajectory: list of dicts with keys {cur_piece_id, log_prob} (GFN)
+        final_score: total episode score for reward computation
     """
     state = env.reset()
-    game_over = env.game_over
     trajectory = []
     steps = 0
-    
-    while not game_over:
-        current_board = state['board']
-        current_piece_type = state['current_piece_type']
-        next_piece_type = state['next_piece_type']
-        next_next_piece_type = env.bag[1] if len(env.bag) > 1 else env.bag[0]
-        
+
+    while not env.game_over:
+        board = state['board']
+        cur_type = state['current_piece_type']
+        nxt_type = state['next_piece_type']
+        next_next_type = env.bag[1] if len(env.bag) > 1 else nxt_type
+
         valid_moves = env.get_valid_moves()
         if not valid_moves:
-            game_over = True # No more moves possible
-        
-            break
+            break  # No legal placements → game over
 
-        # Get Heuristic scores for all valid moves
+        # Compute heuristic scores for all valid moves
         heuristic_scores = heuristic.score_moves(
-            current_board,
-            current_piece_type,
-            next_piece_type,
-            next_next_piece_type,
-            valid_moves,
+            board, cur_type, nxt_type, next_next_type, valid_moves
         ).to(device)
 
         if is_imitation:
-            # --- IMITATION LEARNING ---
-            # Greedily choose the best action from the heuristic
-            best_action_idx = torch.argmax(heuristic_scores).item()
-            action = valid_moves[best_action_idx]
-            
-            # The label for imitation is the flat index of the best action
-            best_action_flat_idx = action[0] * BOARD_WIDTH + action[1]
-            
+            # Imitation: pick the single best move from the heuristic
+            best_idx = torch.argmax(heuristic_scores).item()
+            action = valid_moves[best_idx]
+            # Store board & label for cross-entropy training
             trajectory.append({
-                'board': current_board,
-                'cur_piece_id': PIECE_IDS[current_piece_type],
-                'nxt_piece_id': PIECE_IDS[next_piece_type],
-                'best_action_label': best_action_flat_idx,
+                'board': board,
+                'cur_piece_id': PIECE_IDS[cur_type],
+                'nxt_piece_id': PIECE_IDS[nxt_type],
+                'best_action_label': best_idx
             })
         else:
-            # --- GFN TRAINING ---
-            board_tensor = torch.from_numpy(current_board).unsqueeze(0).to(device)
-            cur_piece_id_tensor = torch.tensor([PIECE_IDS[current_piece_type]], device=device)
-            nxt_piece_id_tensor = torch.tensor([PIECE_IDS[next_piece_type]], device=device)
-        
-            with torch.no_grad():
-                model_logits = model(board_tensor, cur_piece_id_tensor, nxt_piece_id_tensor).squeeze(0)
-            
-            # Create a mask for valid moves on the logits tensor
-            valid_mask = torch.zeros_like(model_logits, dtype=torch.bool)
-            for rot, x in valid_moves:
-                if rot < 4 and x < BOARD_WIDTH:
-                    valid_mask[rot, x] = True
-            
-            # Create probability distributions over valid moves
-            valid_logits = model_logits[valid_mask]
-            # Add a small epsilon to prevent log(0) in case of empty valid_logits
-            model_probs = F.softmax(valid_logits, dim=0)
-            heuristic_probs = F.softmax(heuristic_scores, dim=0)
-            
-            # Combine policies
-            combined_probs = alpha * model_probs + (1 - alpha) * heuristic_probs
-            
-            # Sample action from the combined distribution
-            # The index will correspond to the flattened list of valid moves
-            action_idx = torch.multinomial(combined_probs, 1).item()
-            action = valid_moves[action_idx]
-            
-            # Store data needed for TB Loss
-            log_prob = torch.log(model_probs[action_idx] + 1e-9) # Add epsilon for stability
-            trajectory.append({
-                'cur_piece_id': PIECE_IDS[current_piece_type],
-                'log_prob': log_prob
-            })
+            # GFlowNet: combine model & heuristic
+            b = torch.from_numpy(board).unsqueeze(0).to(device)
+            cur_id = torch.tensor([PIECE_IDS[cur_type]], device=device)
+            nxt_id = torch.tensor([PIECE_IDS[nxt_type]], device=device)
 
-        state, _, game_over = env.step(action)
+            with torch.no_grad():
+                logits = model(b, cur_id, nxt_id).squeeze(0)
+
+            # Mask invalid logits
+            mask = torch.zeros_like(logits, dtype=torch.bool)
+            for i, (r, x) in enumerate(valid_moves):
+                mask[r, x] = True
+            valid_logits = logits[mask]
+
+            # Convert to distributions
+            p_model     = F.softmax(valid_logits, dim=0)
+            p_heuristic = F.softmax(heuristic_scores, dim=0)
+            p_mix = alpha * p_model + (1 - alpha) * p_heuristic
+
+            # Sample & record log-prob under the MODEL policy
+            idx = torch.multinomial(p_mix, 1).item()
+            action = valid_moves[idx]
+            logp = torch.log(p_model[idx] + 1e-9)
+            trajectory.append({'cur_piece_id': PIECE_IDS[cur_type], 'log_prob': logp})
+
+        # Apply action in the environment
+        state, _, _ = env.step(action)
         steps += 1
         if max_steps and steps >= max_steps:
-            game_over = True
-            env.game_over = True
+            break
 
     return trajectory, env.score
 
-def train_step(optimizer, model, batch_data, is_imitation, imitation_loss_fn, device):
-    """Performs a single training step."""
+# -------------------------------------------------
+# 4. Training Step with Trajectory Balance Loss
+# -------------------------------------------------
+def train_step(optimizer, model, batch_data, is_imitation, imitation_fn, device):
+    """
+    Perform one optimization step over a batch of trajectories.
+
+    - If `is_imitation`: stack collected (state → best_action) pairs
+      and apply CrossEntropyLoss to warm-start the policy.
+    - Else (GFN): for each trajectory:
+        • Sum the stored log_probs → log F(τ)
+        • Read logZ for the trajectory’s first piece
+        • Compute log R = log(max(score,1))
+        • Loss = (logZ + log F(τ) − log R)²
+      then average over the batch.
+    """
     optimizer.zero_grad()
-    
+
     if is_imitation:
-        # --- IMITATION LEARNING LOSS (SUPERVISED) ---
-        boards, cur_ids, nxt_ids, best_actions = [], [], [], []
-        
-        # Unpack the data from the batch buffer
-        for episode in batch_data:
-            for step in episode['trajectory']:
+        # --- Supervised imitation loss ---
+        boards, cur_ids, nxt_ids, labels = [], [], [], []
+        for ep in batch_data:
+            for step in ep['trajectory']:
                 boards.append(step['board'])
                 cur_ids.append(step['cur_piece_id'])
                 nxt_ids.append(step['nxt_piece_id'])
-                best_actions.append(step['best_action_label'])
-        
-        if not boards: return torch.tensor(0.0)
+                labels.append(step['best_action_label'])
 
-        boards = torch.from_numpy(np.array(boards)).to(device)
-        cur_ids = torch.tensor(cur_ids, dtype=torch.long, device=device)
-        nxt_ids = torch.tensor(nxt_ids, dtype=torch.long, device=device)
-        best_actions = torch.tensor(best_actions, dtype=torch.long, device=device)
-        
-        logits = model(boards, cur_ids, nxt_ids)
-        # Flatten logits from (Batch, 4, 10) to (Batch, 40) for CrossEntropyLoss
-        flat_logits = logits.view(logits.size(0), -1)
-        loss = imitation_loss_fn(flat_logits, best_actions)
+        if not boards:
+            return torch.tensor(0.0)
+        B = len(boards)
+        b = torch.from_numpy(np.stack(boards)).to(device)
+        c = torch.tensor(cur_ids, dtype=torch.long, device=device)
+        n = torch.tensor(nxt_ids, dtype=torch.long, device=device)
+        y = torch.tensor(labels, dtype=torch.long, device=device)
+
+        logits = model(b, c, n).view(B, -1)
+        loss = imitation_fn(logits, y)
     else:
-        # --- GFLOWNET TRAJECTORY BALANCE LOSS ---
+        # --- Trajectory Balance loss ---
         losses = []
-        for trajectory_data in batch_data:
-            traj, final_score = trajectory_data['trajectory'], trajectory_data['score']
-            if not traj: continue
-
-            log_forward_flow = torch.tensor(0.0, device=device)
-            start_piece_id = traj[0]['cur_piece_id']
-            log_Z = model.logZ[start_piece_id]
-            
-            for step in traj:
-                log_forward_flow += step['log_prob']
-            
-            # The reward is the log of the final game score.
-            # Use max(1.0) to avoid log(0) for scores of 0.
-            log_reward = torch.log(torch.tensor(max(1.0, final_score), device=device))
-            
-            # Trajectory Balance Loss Objective
-            loss_val = (log_Z + log_forward_flow - log_reward)**2
-            losses.append(loss_val)
-        
-        if not losses: return torch.tensor(0.0)
-        loss = torch.stack(losses).mean()
+        for ep in batch_data:
+            traj, final_score = ep['trajectory'], ep['score']
+            if not traj:
+                continue
+            # 4a) log forward flow
+            logF = sum(step['log_prob'] for step in traj)
+            # 4b) logZ of initial piece
+            init_c = traj[0]['cur_piece_id']
+            logZ = model.logZ[init_c]
+            # 4c) log reward (avoid log(0))
+            logR = torch.log(torch.tensor(max(final_score,1.0), device=logZ.device))
+            # 4d) squared TB loss
+            losses.append((logZ + logF - logR)**2)
+        loss = torch.stack(losses).mean() if losses else torch.tensor(0.0, device=device)
 
     loss.backward()
-    torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+    nn.utils.clip_grad_norm_(model.parameters(), 1.0)
     optimizer.step()
     return loss
 
