@@ -643,6 +643,33 @@ input[type="range"] {
   margin-top: 10px;
 }
 
+.concept-grid {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.concept-grid figure {
+  text-align: center;
+  margin: 10px;
+}
+
+.reward-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 40px;
+  background-color: #ffe18b;
+  border: 1px solid #333;
+}
+
+.dag-demo {
+  display: block;
+  margin: 20px auto;
+}
+
 
 
 

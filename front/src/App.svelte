@@ -111,6 +111,27 @@
   //tutorial visualization data
   let run_data = {};
 
+  // demonstration board and piece for the concepts section
+  const demoBoard = [
+    [0,0,0,0,0,0],
+    [0,0,0,0,0,0],
+    [0,1,1,0,0,0],
+    [0,1,1,0,0,0],
+    [0,0,0,0,0,0],
+    [1,1,1,0,0,0],
+    [0,0,0,0,0,0],
+    [0,0,0,0,0,0]
+  ];
+  const demoPiece = [
+    [1,1],
+    [1,1]
+  ];
+  const cellSize = 20;
+  const boardReward = demoBoard.reduce((acc,row)=>acc+row.reduce((a,b)=>a+b,0),0);
+  const boardAfter = demoBoard.map((row,i)=>
+    row.map((cell,j)=> (i<demoPiece.length && j<demoPiece[0].length) ? (cell || demoPiece[i][j]) : cell)
+  );
+
   // Gaussian tracking
   let selectedGaussian = null; // Tracks the currently selected Gaussian
   let hoveredGaussian = null; // Tracks the Gaussian to be highlighted for deletion
@@ -1341,6 +1362,100 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
       <svg id="flowConservationSVG" style="width:100%;height:auto;"></svg>
 
     </div>
+
+    <section class="section">
+      <h2 class="section-title">States and actions in Tetris</h2>
+      <p class="section-text">
+        The GFlowNet policy operates on discrete game states. A state is a Tetris board
+        configuration while an action corresponds to dropping the next tetromino piece.
+        The reward we use in this toy example is simply the number of occupied cells on
+        the board. The diagrams below show these components and how they fit into a very
+        small DAG.
+      </p>
+
+      <div class="concept-grid">
+        <figure>
+          <svg width={demoBoard[0].length * cellSize} height={demoBoard.length * cellSize}>
+            {#each demoBoard as row, r}
+              {#each row as cell, c}
+                <rect
+                  x={c * cellSize}
+                  y={r * cellSize}
+                  width={cellSize}
+                  height={cellSize}
+                  fill={cell ? '#31688e' : '#111'}
+                  stroke="#333"
+                  stroke-width="1" />
+              {/each}
+            {/each}
+          </svg>
+          <figcaption>State: Tetris board</figcaption>
+        </figure>
+        <figure>
+          <svg width={demoPiece[0].length * cellSize} height={demoPiece.length * cellSize}>
+            {#each demoPiece as row, r}
+              {#each row as cell, c}
+                {#if cell}
+                  <rect
+                    x={c * cellSize}
+                    y={r * cellSize}
+                    width={cellSize}
+                    height={cellSize}
+                    fill="#fde725"
+                    stroke="#333"
+                    stroke-width="1" />
+                {/if}
+              {/each}
+            {/each}
+          </svg>
+          <figcaption>Action: tetromino piece</figcaption>
+        </figure>
+        <figure>
+          <div class="reward-box">Reward: {boardReward}</div>
+        </figure>
+      </div>
+
+      <svg class="dag-demo" width="300" height="120">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="gray" />
+          </marker>
+        </defs>
+
+        <!-- root state -->
+        {#each demoBoard as row, r}
+          {#each row as cell, c}
+            <rect
+              x={10 + c * 6}
+              y={10 + r * 6}
+              width="6"
+              height="6"
+              fill={cell ? '#31688e' : '#fff'}
+              stroke="#333"
+              stroke-width="0.5" />
+          {/each}
+        {/each}
+        <!-- arrow to next state -->
+        <line x1="60" y1="35" x2="140" y2="35" stroke="#000" marker-end="url(#arrow)" />
+        <!-- next state -->
+        {#each boardAfter as row, r}
+          {#each row as cell, c}
+            <rect
+              x={150 + c * 6}
+              y={10 + r * 6}
+              width="6"
+              height="6"
+              fill={cell ? '#31688e' : '#fff'}
+              stroke="#333"
+              stroke-width="0.5" />
+          {/each}
+        {/each}
+      </svg>
+
+      <p class="section-text">
+        Try the interactive game above to experiment with these transitions yourself.
+      </p>
+    </section>
 
 
 
