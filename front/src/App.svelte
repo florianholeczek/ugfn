@@ -1040,8 +1040,15 @@
     if (typeof initFlowConservationDemo === 'function') {
       initFlowConservationDemo();
     }
-    if (typeof initComparisonChart === 'function') {
-      initComparisonChart();
+    const tryInitComparison = () => {
+      if (typeof initComparisonChart === 'function') {
+        initComparisonChart();
+      }
+    };
+    if (document.readyState === 'complete') {
+      tryInitComparison();
+    } else {
+      window.addEventListener('load', tryInitComparison, { once: true });
     }
   });
 

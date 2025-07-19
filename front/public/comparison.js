@@ -1,4 +1,5 @@
 function initComparisonChart() {
+  console.log('comparison.js: initComparisonChart running');
   const container = d3.select("#comparisonChart");
   const width = 300, height = 400;
 
@@ -178,3 +179,4 @@ defs.append("marker")
     return edges;
   }
 }
+window.initComparisonChart = initComparisonChart;
