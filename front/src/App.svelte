@@ -1362,6 +1362,10 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
       <svg id="flowConservationSVG" style="width:100%;height:auto;"></svg>
 
     </div>
+    <p class="section-text">
+      The flow conservation diagram also shows the parent state on the left,
+      with an arrow pointing to the current board.
+    </p>
 
     <section class="section">
       <h2 class="section-title">States and actions in Tetris</h2>

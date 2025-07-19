@@ -69,6 +69,8 @@ let candidateMoves = [];
 let topCandidates = [];
 let appliedArrows = [];
 let particles = [];
+// Track the previous board state so we can show it in the flow conservation demo
+let parentStateBoard = null;
 
 // Overlays for starting/restarting the game
 let startOverlay = null;
@@ -459,6 +461,10 @@ lock_piece() {
   // 2) Clear any full lines
   this.clear_lines();
 
+  // Capture the board before spawning a new piece so we can display it
+  // as the parent state in the flow conservation visualization
+  parentStateBoard = this.board.map(row => row.slice());
+
   // 3) Spawn the next piece and reset any cached info
   this.current_piece   = this.spawn_piece();
   this.target_piece    = null;
@@ -496,6 +502,9 @@ lock_piece() {
       }
     }
     this.clear_lines();
+    // Save board state before spawning a new piece so we can display the parent
+    // state in the flow conservation visualization
+    parentStateBoard = this.board.map(row => row.slice());
     this.current_piece = this.spawn_piece();
     this.target_piece = null;
     this.cached_moves = null;
@@ -1895,7 +1904,8 @@ function updateCandidateListUI() {
     initFlowConservationDemo({
       root:    { board: rootBoard },
       actions: actions,
-      results: results
+      results: results,
+      parents: parentStateBoard ? [{ board: parentStateBoard }] : []
     });
   }
 }
