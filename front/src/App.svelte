@@ -1036,25 +1036,34 @@
   //Title to display in tab
   document.title = "GFlowNet Playground";
 
+
   onMount(() => {
     if (typeof initFlowConservationDemo === 'function') {
       initFlowConservationDemo();
     }
+
     if (typeof initComparisonChart === 'function') {
       initComparisonChart();
+      
+      // You’d opened this `if` block, so all of this
+      // (the tryInitComparison and load listener)
+      // belongs inside it—so we close it at the bottom.
+      const tryInitComparison = () => {
+        if (typeof initComparisonChart === 'function') {
+          initComparisonChart();
+        }
+      };
 
-    const tryInitComparison = () => {
-      if (typeof initComparisonChart === 'function') {
-        initComparisonChart();
+      if (document.readyState === 'complete') {
+        tryInitComparison();
+      } else {
+        window.addEventListener('load', tryInitComparison, { once: true });
       }
-    };
-    if (document.readyState === 'complete') {
-      tryInitComparison();
-    } else {
-      window.addEventListener('load', tryInitComparison, { once: true });
+    }  // ← HERE: close your initComparisonChart `if`
 
-    }
-  });
+  });  // onMount
+
+
 
 
   function A_maximizeMw() {
@@ -1187,27 +1196,6 @@
 
 </section>
 
-    </section>
-
-    <section class="section">
-      <div class="image-container">
-        <Accordion>
-          <Panel color="secondary">
-            <Header>Comparison to reinforcement learning</Header>
-            <Content>
-              <p class="section-text">
-                A traditional reinforcement learning agent tends to focus its probability mass on
-                a single best trajectory. A GFlowNet instead distributes flow across many promising
-                paths. The animation below, generated with <code>comparison.js</code>, illustrates
-                this difference: the left graph shows a single-path RL policy, while the right graph
-                highlights how flow in a GFlowNet covers several alternatives.
-              </p>
-              <div id="comparisonChart" style="margin:20px auto; max-width:600px;"></div>
-            </Content>
-          </Panel>
-        </Accordion>
-      </div>
-    </section>
 
 
 
@@ -1278,25 +1266,24 @@
   </p>
 </section>
 
-<section class="section">
-  <div class="image-container">
-    <Accordion>
-      <Panel color="secondary">
-        <Header>Comparison to reinforcement learning</Header>
-        <Content>
-          <p class="section-text">
-            A traditional reinforcement learning agent tends to focus its probability mass on
-            a single best trajectory. A GFlowNet instead distributes flow across many promising
-            paths. The animation below, generated with <code>comparison.js</code>, illustrates
-            this difference: the left graph shows a single-path RL policy, while the right graph
-            highlights how flow in a GFlowNet covers several alternatives.
-          </p>
-          <div id="comparisonChart" style="margin:20px auto; max-width:600px;"></div>
-        </Content>
-      </Panel>
-    </Accordion>
-  </div>
-</section>
+    <section class="section">
+      <div class="image-container">
+        <Accordion>
+          <Panel color="secondary">
+            <Header>Comparison to reinforcement learning</Header>
+            <Content>
+              <p class="section-text">
+Unlike conventional reinforcement learning, which typically converges to a single best policy, GFlowNets aim to learn a distribution over many high-reward outcomes. This property of proportional sampling is especially valuable in applications where multiple viable solutions are required, such as diverse move sequences in games or candidate molecules in drug discovery.
+
+The figure contrasts the behavior of a standard single-path reinforcement learner with that of a GFlowNet. In the traditional RL approach (left), the policy concentrates probability mass along one “best” trajectory. In contrast, the GFlowNet (right) spreads its flow across several promising paths. Each path in the diagram represents an alternative construction strategy. By maintaining multiple plausible routes, GFlowNets preserve exploration and remain robust if the optimal solution changes over time.
+              </p>
+              <div id="comparisonChart" style="margin:20px auto; max-width:600px;"></div>
+            </Content>
+          </Panel>
+        </Accordion>
+      </div>
+    </section>
+
 
 <section class="section">
       <h2 class="section-title">Core concepts:  states, actions and trajectories</h2>
@@ -1357,7 +1344,6 @@
 
 
 
-    </div>
 
     <section class="section">
       <h2 class="section-title">Domain application </h2>
