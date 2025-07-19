@@ -1309,8 +1309,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
 <section class="section">
       <h2 class="section-title">Core concepts:  states, actions and trajectories</h2>
       <p class="section-annotation">
-        Placeholder to explain core concepts based on the tetris environment: states, actions, trajectories. Reader may skip if already familiar with reinforcement learning?
-      </p>
+
       <p class="section-text">
         In this interactive demonstration, a neural policy trained under the GFlowNet framework is applied to the game of Tetris.
         At each step, the network evaluates every legal placement of the falling tetromino and predicts a flow value that estimates the expected future reward (e.g., line clears plus a survival bonus).
@@ -1370,7 +1369,9 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
     <section class="section">
       <h2 class="section-title">States and actions in Tetris</h2>
       <p class="section-text">
-        The GFlowNet policy operates on discrete game states. A state is a Tetris board
+
+ The GFlowNet policy operates on discrete game states. A state is a Tetris board
+
         configuration while an action corresponds to dropping the next tetromino piece.
         The reward we use in this toy example is simply the number of occupied cells on
         the board. The diagrams below show these components and how they fit into a very
@@ -1457,9 +1458,57 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
       </svg>
 
       <p class="section-text">
-        Try the interactive game above to experiment with these transitions yourself.
+        In this interactive demonstration, a neural policy trained under the GFlowNet framework is applied to the game of Tetris.
+        At each step, the network evaluates every legal placement of the falling tetromino and predicts a flow value that estimates the expected future reward (e.g., line clears plus a survival bonus).
+        The sidebar lists all candidate moves ordered by their sampling probabilities (obtained via softmax over the predicted flows).
+        By default, the green move is executed automatically, but you may click any other candidate to override the choice.
+        You can also pause the game at any time to examine how flow values are redistributed across subsequent moves.
+        Conceptually, the GFlowNet constructs a DAG of board configurations.
+        The figure below displays only the top three moves from each state for clarity—internally, the GFlowNet still evaluates all legal moves.
+        All branches are drawn with uniform width and each branch is labeled with its predicted flow value.
+        This focused illustration shows how the GFlowNet maintains multiple promising trajectories, while internally still considering lower‐probability options.
       </p>
     </section>
+    <div class="A_centerwrap">
+      <div class="A_tetriscontainer">
+        <div class="A_board-column">
+          <div class="A_board">
+          <!-- 1) Background canvas (will be painted with Viridis) -->
+          <canvas
+            id="tetrisBgCanvas"
+            width="300"
+            height="300"
+            style="position: absolute; top: 0; left: 0; z-index: 0;"
+          ></canvas>
+
+          <!-- 2) The existing Tetris canvas on top -->
+          <canvas
+            id="tetrisCanvas"
+            width="180"
+            height="300"
+            style="position: absolute; top: 0; left: 0; z-index: 1;"
+          ></canvas>
+          </div>
+
+        </div>
+
+        <div class="A_sidebar">
+          <h2>Candidate Moves</h2>
+          <div id="candidateList" class="A_candidates"><!-- Populated by Tetris logic --></div>
+          <div class="A_controls">
+            <Button id="resetBtn" color="secondary" variant="raised" style="height:75px">Reset Game</Button>
+            <Button id="pauseBtn" color="secondary" variant="raised" style="height:75px">Pause Game</Button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="flowConservationContainer" style="max-width:700px;margin:20px auto;">
+      <svg id="flowConservationSVG" style="width:100%;height:auto;"></svg>
+
+    </div>
+
 
 
 
