@@ -1040,6 +1040,9 @@
     if (typeof initFlowConservationDemo === 'function') {
       initFlowConservationDemo();
     }
+    if (typeof initComparisonChart === 'function') {
+      initComparisonChart();
+    }
   });
 
 
@@ -1170,20 +1173,9 @@
         We also provide a <b>Playground</b> for experimenting with GFlowNet training.
         It provides an interactive environment to explore how GFlowNets adapt to changes in both reward functions and training hyperparameters.
       </p>
-    </section>
+</section>
 
-
-
-
-
-
-
-
-
-
-
-
-    <section class="section" id="Tutorial" bind:this={tutorialstart}>
+<section class="section" id="Tutorial" bind:this={tutorialstart}>
       <h2 class="section-title">What is a GFlowNet?</h2>
       <h2 class="annotations-header">Flo</h2>
       <p class="section-annotation">
@@ -1245,10 +1237,30 @@
         A Generative Flow Network (GFlowNet) is a probabilistic framework for constructing complex objects by sequentially sampling trajectories in a directed acyclic graph (DAG). Each trajectory corresponds to a sequence of actions that produces a complete object (for example, a finished Tetris board or a fully formed molecule). A GFlowNet assigns non-negative flow (probability mass) to each trajectory so that the marginal probability of sampling any complete object is proportional to a user-defined reward for that object.
         Unlike conventional reinforcement learning, which typically converges to a single best policy, GFlowNets aim to learn a distribution over many high-reward outcomes. This property of proportional sampling is especially valuable in applications where multiple viable solutions are required, such as diverse move sequences in games or candidate molecules in drug discovery.
         The figure contrasts the behavior of a standard single-path reinforcement learner with that of a GFlowNet. In the traditional RL approach (left), the policy concentrates probability mass along one “best” trajectory. In contrast, the GFlowNet (right) spreads its flow across several promising paths. Each path in the diagram represents an alternative construction strategy. By maintaining multiple plausible routes, GFlowNets preserve exploration and remain robust if the optimal solution changes over time.
-      </p>
-    </section>
+  </p>
+</section>
 
-    <section class="section">
+<section class="section">
+  <div class="image-container">
+    <Accordion>
+      <Panel color="secondary">
+        <Header>Comparison to reinforcement learning</Header>
+        <Content>
+          <p class="section-text">
+            A traditional reinforcement learning agent tends to focus its probability mass on
+            a single best trajectory. A GFlowNet instead distributes flow across many promising
+            paths. The animation below, generated with <code>comparison.js</code>, illustrates
+            this difference: the left graph shows a single-path RL policy, while the right graph
+            highlights how flow in a GFlowNet covers several alternatives.
+          </p>
+          <div id="comparisonChart" style="margin:20px auto; max-width:600px;"></div>
+        </Content>
+      </Panel>
+    </Accordion>
+  </div>
+</section>
+
+<section class="section">
       <h2 class="section-title">Core concepts:  states, actions and trajectories</h2>
       <p class="section-annotation">
         Placeholder to explain core concepts based on the tetris environment: states, actions, trajectories. Reader may skip if already familiar with reinforcement learning?
