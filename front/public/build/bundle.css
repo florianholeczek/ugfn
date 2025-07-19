@@ -19337,7 +19337,7 @@ input[type="range"] {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 600px;
+  height: 350px;
   width: 300px;
 }
 
@@ -19349,7 +19349,7 @@ input[type="range"] {
 
 .A_candidates {
   width: 100%;
-  height: 500px;
+  height: 300px;
   overflow-y: auto;
   padding: 10px;
   box-sizing: border-box;
@@ -19359,13 +19359,13 @@ input[type="range"] {
   display: flex;
   justify-content: space-evenly;
   padding: 10px 0;
-  height: 70px;
+  height: 50px;
 }
 
 .candidate {
   background: #e7e7e7;
   border-radius: 6px;
-  height:120px;
+  height:50px;
   padding: 10px;
   margin-bottom: 10px;
   cursor: pointer;
@@ -19412,6 +19412,33 @@ input[type="range"] {
   text-align: center;
   width: 200px;
   margin-top: 10px;
+}
+
+.concept-grid {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.concept-grid figure {
+  text-align: center;
+  margin: 10px;
+}
+
+.reward-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 40px;
+  background-color: #ffe18b;
+  border: 1px solid #333;
+}
+
+.dag-demo {
+  display: block;
+  margin: 20px auto;
 }
 
 
