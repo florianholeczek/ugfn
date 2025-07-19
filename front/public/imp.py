@@ -52,7 +52,7 @@ from torch.utils.tensorboard import SummaryWriter
 import torch
 
 # --- Constants and Configuration ---
-BOARD_WIDTH, BOARD_HEIGHT = 6, 20
+BOARD_WIDTH, BOARD_HEIGHT = 6, 10
 TETROMINOES: Dict[str, np.ndarray] = {
     'I': np.array([[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]], dtype=bool),
     'O': np.array([[1,1],[1,1]], dtype=bool),

@@ -44,7 +44,7 @@ async function loadGFlowNetModel() {
 
 const CELL_SIZE = 30;
 const COLS      = 6;
-const ROWS      = 20;
+const ROWS      = 10;
 const TICK_INTERVAL       = 700;
 const MOVE_PAUSE_DURATION = 2000;
 

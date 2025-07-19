@@ -19326,7 +19326,7 @@ input[type="range"] {
 .A_board {
   position: relative;
   width: 180px;
-  height: 600px; /* Adjusted to match canvas height */
+  height: 300px; /* Adjusted to match canvas height */
   background-color: #111;
   border: 2px solid #333;
 }

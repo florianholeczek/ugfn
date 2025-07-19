@@ -1331,7 +1331,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
           <canvas
             id="tetrisBgCanvas"
             width="300"
-            height="600"
+            height="300"
             style="position: absolute; top: 0; left: 0; z-index: 0;"
           ></canvas>
 
@@ -1339,7 +1339,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
           <canvas
             id="tetrisCanvas"
             width="180"
-            height="600"
+            height="300"
             style="position: absolute; top: 0; left: 0; z-index: 1;"
           ></canvas>
           </div>
