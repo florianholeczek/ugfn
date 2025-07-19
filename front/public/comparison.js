@@ -180,3 +180,21 @@ defs.append("marker")
   }
 }
 window.initComparisonChart = initComparisonChart;
+
+function initComparisonChartWhenReady() {
+  const el = document.getElementById('comparisonChart');
+  if (el) {
+    initComparisonChart();
+  } else {
+    const observer = new MutationObserver((_, obs) => {
+      const target = document.getElementById('comparisonChart');
+      if (target) {
+        obs.disconnect();
+        initComparisonChart();
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+}
+
+window.addEventListener('load', initComparisonChartWhenReady);
