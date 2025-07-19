@@ -1752,6 +1752,9 @@ function doResetGame() {
     restartOverlay = null;
   }
   resetGameLogic();
+  // Reset the parent board so the flow conservation demo starts from
+  // an empty state after a restart
+  parentStateBoard = game.board.map(row => row.slice());
   // make sure a leftover inference doesn't block new scoring
   scoringInProgress = false;
 
