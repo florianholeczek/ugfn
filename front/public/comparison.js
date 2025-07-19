@@ -178,3 +178,4 @@ defs.append("marker")
     return edges;
   }
 }
+window.initComparisonChart = initComparisonChart;
