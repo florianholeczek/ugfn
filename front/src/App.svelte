@@ -1042,6 +1042,17 @@
     }
     if (typeof initComparisonChart === 'function') {
       initComparisonChart();
+
+    const tryInitComparison = () => {
+      if (typeof initComparisonChart === 'function') {
+        initComparisonChart();
+      }
+    };
+    if (document.readyState === 'complete') {
+      tryInitComparison();
+    } else {
+      window.addEventListener('load', tryInitComparison, { once: true });
+
     }
   });
 
@@ -1173,7 +1184,34 @@
         We also provide a <b>Playground</b> for experimenting with GFlowNet training.
         It provides an interactive environment to explore how GFlowNets adapt to changes in both reward functions and training hyperparameters.
       </p>
+
 </section>
+
+    </section>
+
+    <section class="section">
+      <div class="image-container">
+        <Accordion>
+          <Panel color="secondary">
+            <Header>Comparison to reinforcement learning</Header>
+            <Content>
+              <p class="section-text">
+                A traditional reinforcement learning agent tends to focus its probability mass on
+                a single best trajectory. A GFlowNet instead distributes flow across many promising
+                paths. The animation below, generated with <code>comparison.js</code>, illustrates
+                this difference: the left graph shows a single-path RL policy, while the right graph
+                highlights how flow in a GFlowNet covers several alternatives.
+              </p>
+              <div id="comparisonChart" style="margin:20px auto; max-width:600px;"></div>
+            </Content>
+          </Panel>
+        </Accordion>
+      </div>
+    </section>
+
+
+
+
 
 <section class="section" id="Tutorial" bind:this={tutorialstart}>
       <h2 class="section-title">What is a GFlowNet?</h2>

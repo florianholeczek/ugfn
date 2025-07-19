@@ -23,6 +23,15 @@
         <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@rdkit/rdkit@2025.3.2-1.0.0/dist/RDKit_minimal.js"></script>
 
+        <script>
+          window.addEventListener('load', () => {
+            if (typeof initComparisonChart === 'function') {
+              console.log('Initializing comparison chart');
+              initComparisonChart();
+            }
+          });
+        </script>
+
 
 </head>
 
