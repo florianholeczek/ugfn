@@ -12,6 +12,7 @@
 
         <!-- Svelte bundle removed; using static HTML structure -->
         <script defer src="Tetris.js"></script>
+        <script defer src="build/bundle.js"></script>
 
 
         <script defer src="/flow_conservation.js"></script>
@@ -27,51 +28,6 @@
 </head>
 
 <body>
-  <section id="comparison-section" class="section">
-    <h2 class="section-title">Comparison to reinforcement learning</h2>
-    <p class="section-text">
-      A traditional reinforcement learning agent tends to focus its probability mass on
-      a single best trajectory. A GFlowNet instead distributes flow across many promising
-      paths. The animation below, generated with <code>comparison.js</code>, illustrates
-      this difference: the left graph shows a single-path RL policy, while the right graph
-      highlights how flow in a GFlowNet covers several alternatives.
-    </p>
-    <div id="comparisonChart" style="margin:20px auto; max-width:600px;"></div>
-  </section>
-
-  <section id="tetris-section" class="section">
-    <h2 class="section-title">Core concepts: states, actions and trajectories</h2>
-    <div class="A_centerwrap">
-      <div class="A_tetriscontainer">
-        <div class="A_board-column">
-          <div class="A_board">
-            <canvas
-              id="tetrisBgCanvas"
-              width="300"
-              height="600"
-              style="position: absolute; top: 0; left: 0; z-index: 0;"
-            ></canvas>
-            <canvas
-              id="tetrisCanvas"
-              width="180"
-              height="600"
-              style="position: absolute; top: 0; left: 0; z-index: 1;"
-            ></canvas>
-          </div>
-        </div>
-        <div class="A_sidebar">
-          <h2>Candidate Moves</h2>
-          <div id="candidateList" class="A_candidates"></div>
-          <div class="A_controls">
-            <button id="resetBtn" class="smui-button">Reset Game</button>
-            <button id="pauseBtn" class="smui-button">Pause Game</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id="flowConservationContainer" style="max-width:700px;margin:20px auto;">
-      <svg id="flowConservationSVG" style="width:100%;height:auto;"></svg>
-    </div>
-  </section>
+ 
 </body>
 </html>
