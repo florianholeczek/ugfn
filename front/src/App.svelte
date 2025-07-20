@@ -1343,8 +1343,8 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
       <p class="section-text">
         The current Tetris board layout, showing all settled tetrominoes. This captures both dangerous gaps and potential “almost complete” rows.
       </p>
-      <div class="image-container">
-        <img class="image" src="/images/screenshot1.png" alt="Screenshot illustrating Tetris state" />
+      <div class="screenshot-container">
+        <img class="image screenshot-image" src="/images/screenshot1.png" alt="Screenshot illustrating Tetris state" />
       </div>
     </li>
     <li class="section-text">
@@ -1352,8 +1352,8 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
       <p class="section-text">
         Each legal drop of the incoming tetromino (all rotations and column positions). Performing an action transitions the board to a new configuration.
       </p>
-      <div class="image-container">
-        <img class="image" src="/images/screenshot2.png" alt="Screenshot illustrating Tetris action" />
+      <div class="screenshot-container">
+        <img class="image screenshot-image" src="/images/screenshot2.png" alt="Screenshot illustrating Tetris action" />
       </div>
     </li>
     <li class="section-text">
@@ -1368,8 +1368,8 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
   <p class="section-text">
     This diagram shows how the GFlowNet maintains flow through multiple board configurations at once, converging from different past states and branching toward diverse future placements.
   </p>
-  <div class="image-container">
-    <img class="image" src="/images/screenshot4.png" alt="Full DAG illustration of Tetris configurations" />
+  <div class="screenshot-container">
+    <img class="image screenshot-image" src="/images/screenshot4.png" alt="Full DAG illustration of Tetris configurations" />
   </div>
 
   <h3 class="section-title3">From Flow to Sampling</h3>
