@@ -1344,7 +1344,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
         The current Tetris board layout, showing all settled tetrominoes. This captures both dangerous gaps and potential “almost complete” rows.
       </p>
       <div class="screenshot-container">
-        <img class="image screenshot-image" src="/images/screenshot1.png" alt="Screenshot illustrating Tetris state" />
+        <img class="image screenshot-image-small" src="/images/screenshot5.png" alt="Screenshot illustrating Tetris state" />
       </div>
     </li>
     <li class="section-text">

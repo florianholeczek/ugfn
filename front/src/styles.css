@@ -138,8 +138,14 @@
   .screenshot-image {
     width: 100%;
     max-width: 400px;
+    max-height: 400px;
   }
 
+  .screenshot-image-small {
+    width: 100%;
+    max-width: 300px;
+    max-height: 300px;
+  }
 
 
   @media (max-width: 768px) {
