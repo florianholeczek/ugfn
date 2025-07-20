@@ -119,12 +119,25 @@
       justify-content: center;
       margin: 0 auto 2rem;
   }
+  /* Smaller container used for tutorial screenshots */
+  .screenshot-container {
+    width: 400px;
+    display: flex;
+      justify-content: center;
+      margin: 0 auto 2rem;
+  }
 
   .image {
     max-width: 100%;
     width: 90%;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Uniform sizing for screenshots */
+  .screenshot-image {
+    width: 100%;
+    max-width: 400px;
   }
 
 
@@ -145,6 +158,9 @@
     .image {
       width: 80%;
     }
+    .screenshot-container {
+      width: 90%;
+    }
   }
 
   @media (max-width: 480px) {
@@ -161,6 +177,9 @@
     }
 
     .image {
+      width: 100%;
+    }
+    .screenshot-container {
       width: 100%;
     }
   }
