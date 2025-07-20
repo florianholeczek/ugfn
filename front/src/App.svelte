@@ -1369,7 +1369,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
     This diagram shows how the GFlowNet maintains flow through multiple board configurations at once, converging from different past states and branching toward diverse future placements.
   </p>
   <div class="image-container">
-    <img class="image" src="/images/screenshot3.png" alt="Full DAG illustration of Tetris configurations" />
+    <img class="image" src="/images/screenshot4.png" alt="Full DAG illustration of Tetris configurations" />
   </div>
 
   <h3 class="section-title3">From Flow to Sampling</h3>
