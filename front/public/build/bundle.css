@@ -19414,6 +19414,13 @@ input[type="range"] {
   margin-top: 10px;
 }
 
+.menu-button {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1000;
+  }
+
 
 
 

@@ -19,6 +19,8 @@
   import IconButton, { Icon } from '@smui/icon-button';
   import Tooltip, { Wrapper, Title } from '@smui/tooltip';
   import Tab from '@smui/tab';
+  import Menu from '@smui/menu';
+  import List, { Item, Separator, Text } from '@smui/list';
   import TabBar from '@smui/tab-bar';
   import Paper from '@smui/paper';
   import LinearProgress from '@smui/linear-progress';
@@ -52,9 +54,6 @@
   // elements
   let plotContainerEnv2d = "plot-container2d";
   let plotContainerEnv3d = "plot-container3d";
-  let tutorialstart;
-  let sourcesstart;
-  let playgroundstart;
   let Plotly;
   let p5;
   let flowContainer;
@@ -66,6 +65,19 @@
   let snackbar_load;
   let snackbar_training_done;
   let AnimInterval;
+
+  //ids for scrolling
+  let h_top;
+  let h_intro;
+  let h_coreConcepts;
+  let h_domain;
+  let h_policy;
+  let h_continuous;
+  let h_training;
+  let h_flow;
+  let h_playground;
+  let h_conclusion;
+  let h_sources;
 
   // UI Elements
   let active_tab = 'Basic';
@@ -1053,8 +1065,9 @@
   document.title = "GFlowNet Playground";
 
 
-
-
+  let clicked = 'nothing yet';
+  let menuOpen = false;
+  let anchor; // for anchoring the menu to the button
 
 
 </script>
@@ -1094,14 +1107,14 @@
 <Snackbar bind:this={snackbar_load} leading>
   <Label>Settings of this training run have been loaded into the playground</Label>
   <Actions>
-    <Button on:click={scrollTo(playgroundstart)}>Go to Playground</Button>
+    <Button on:click={scrollTo(h_playground)}>Go to Playground</Button>
   </Actions>
 </Snackbar>
 
 <Snackbar bind:this={snackbar_training_done} leading>
   <Label>Training completed</Label>
   <Actions>
-    <Button on:click={scrollTo(playgroundstart)}>Go to Playground</Button>
+    <Button on:click={scrollTo(h_playground)}>Go to Playground</Button>
   </Actions>
 </Snackbar>
 
@@ -1109,11 +1122,52 @@
 
 <main class="main-content">
 
-
-
-
-
-
+  <div class="menu-button">
+    <IconButton
+      bind:this={anchor}
+      on:click={() => (menuOpen = !menuOpen)}
+    ><Icon class="material-icons" style="font-size: 22px">menu</Icon>
+    </IconButton>
+    <Menu bind:open={menuOpen} anchor={anchor}>
+      <List>
+        <Item on:click={scrollTo(h_top)}>
+          <Text>Go to Top</Text>
+        </Item>
+        <Item on:click={scrollTo(h_intro)}>
+          <Text>What is a GFlowNet?</Text>
+        </Item>
+        <Item on:click={scrollTo(h_coreConcepts)}>
+          <Text>Core concepts</Text>
+        </Item>
+        <Item on:click={scrollTo(h_domain)}>
+          <Text>Domain application</Text>
+        </Item>
+        <Item on:click={scrollTo(h_policy)}>
+          <Text>Flow, Policies and Training Objective</Text>
+        </Item>
+        <Item on:click={scrollTo(h_continuous)}>
+          <Text>Towards continuous GFlowNets</Text>
+        </Item>
+        <Item on:click={scrollTo(h_training)}>
+          <Text>Training</Text>
+        </Item>
+        <Item on:click={scrollTo(h_flow)}>
+          <Text>Flow</Text>
+        </Item>
+        <Separator />
+        <Item on:click={scrollTo(h_playground)}>
+          <Text>Playground</Text>
+        </Item>
+        <Separator />
+        <Item on:click={scrollTo(h_conclusion)}>
+          <Text>Conclusion</Text>
+        </Item>
+        <Item on:click={scrollTo(h_sources)}>
+          <Text>Sources</Text>
+        </Item>
+      </List>
+    </Menu>
+  </div>
 
   {#if isMobile}
     <div class="mobile-disclaimer">
@@ -1126,7 +1180,7 @@
 
 
     <header class="header-top">
-      <div class="container">
+      <div class="container"bind:this={h_top}>
         <h1 class="title">GFlowNet Playground</h1>
         <p class="subtitle">Building an intuitive understanding of GFlowNet training</p>
       </div>
@@ -1180,7 +1234,7 @@
 
 
 
-    <section class="section" id="Tutorial" bind:this={tutorialstart}>
+    <section class="section" id="Tutorial" bind:this={h_intro}>
       <h2 class="section-title">What is a GFlowNet?</h2>
       <h2 class="annotations-header">Flo</h2>
       <p class="section-annotation">
@@ -1245,7 +1299,7 @@
       </p>
     </section>
 
-    <section class="section">
+    <section class="section" bind:this={h_coreConcepts}>
       <h2 class="section-title">Core concepts:  states, actions and trajectories</h2>
       <p class="section-annotation">
         Placeholder to explain core concepts based on the tetris environment: states, actions, trajectories. Reader may skip if already familiar with reinforcement learning?
@@ -1305,7 +1359,7 @@
 
 
 
-    <section class="section">
+    <section class="section" bind:this={h_domain}>
       <h2 class="section-title">Domain application </h2>
       <p class="section-text">
         The principles demonstrated in the Tetris demo extend naturally to molecular generation.
@@ -1389,7 +1443,7 @@
       <svg id="chart" style="width: 1000px; display:block; margin: 20px auto"></svg>
     </section>
 
-    <section class="section">
+    <section class="section" bind:this={h_policy}>
       <h2 class="section-title">Flow, Policies and Training Objective </h2>
       <p class="section-text">
         <br>If you connect all possible states from the start state to the terminal states you obtain a directed graph.
@@ -1861,8 +1915,10 @@
             </Panel>
           </Accordion>
         </div>
+    </section>
 
 
+    <section class="section" bind:this={h_continuous}>
       <h2 class="section-title">Towards continuous GFlowNets</h2>
       <p class="section-text">
         So far, we've only looked at discrete spaces,
@@ -1959,7 +2015,7 @@
 
 
 
-    <section class="section section-light">
+    <section class="section" bind:this={h_training}>
       <h2 class="section-title">Training</h2>
       <p class="section-text">
         Using the environment above we trained a GFlowNet with Trajectory Balance Loss.
@@ -2201,7 +2257,7 @@
 
     </section>
 
-    <section class="section" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);">
+    <section class="section" bind:this={h_flow}>
       <h2 class="section-title">Flow</h2>
       <p class="section-text">
         Below you can see the flow of the last training run.
@@ -2297,7 +2353,7 @@
 
 
       <!-- Playground -->
-    <header class="header-pg">
+    <header class="header-pg" bind:this={h_playground}>
       <div class="container">
         <h1 class="title">Playground</h1>
       </div>
@@ -2314,7 +2370,7 @@
         The <b>Flow</b> view visualizes the learned flow.
       </p>
     </section>
-    <div class="pg-background" id="Playground" bind:this={playgroundstart}>
+    <div class="pg-background" id="Playground">
       <div class = "pg-top-background">
       </div>
 
@@ -3055,7 +3111,7 @@
 
     </div>
 
-      <section class="section">
+      <section class="section" bind:this={h_conclusion}>
         <h2 class="section-title">Conclusion </h2>
         <p class="section-annotation">
           Placeholder for conclusion text <br><br><br><br><br><br><br><br><br><br>
@@ -3076,7 +3132,7 @@
         <div class="whatnext_t" >
           <div class="whatnext_b">
             <Fab
-            on:click={scrollTo(playgroundstart)}
+            on:click={scrollTo(h_playground)}
             disabled="{isRunning}"
           >
             <Icon class="material-icons">keyboard_arrow_up</Icon></Fab>
@@ -3102,7 +3158,7 @@
           </div>
           <div class="whatnext_b">
             <Fab
-            on:click={scrollTo(sourcesstart)}
+            on:click={scrollTo(h_sources)}
             disabled="{isRunning}"
           >
             <Icon class="material-icons">keyboard_arrow_down</Icon></Fab>
@@ -3136,7 +3192,7 @@
     </section>
 
 
-    <section class="section" id="Sources" bind:this={sourcesstart}>
+    <section class="section" id="Sources" bind:this={h_sources}>
       <h2 class="section-title">Sources</h2>
       <h3 class="section-title3">Literature</h3>
         <p class="section-text">

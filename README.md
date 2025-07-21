@@ -3,7 +3,7 @@
 This is a basic implementation of a [GFlowNet](https://dl.acm.org/doi/abs/10.5555/3648699.3648909) architecture to get an intuition of how they work and behave.
 
 
-The interactive Playground, a GFlowNet Tutorial and more information can be found [here](https://gfn-explorer.caleydoapp.org). For the code of the Tetris examples in the Tutorial look [here](https://github.com/Alexander070702/Alexander070702.github.io)
+The interactive Playground, a GFlowNet Tutorial and more information can be found [here](https://gfn-explorer.caleydoapp.org). For the code of the Tetris examples in the Tutorial look [here](https://github.com/Alexander070702/Alexander070702.github.io).
 
 Training happens in a very simple 2d environment where the reward is given proportional to the sum of n multivariate Gaussians.
 
