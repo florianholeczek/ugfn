@@ -780,11 +780,24 @@
     }
   }
 
+  // molecule weights
+  function A_maximizeMw() {
+    A_molecule_prop.update((weights) => {
+      const newWeights = {};
+
+      // Set all keys to 0
+      for (const key in weights) {
+        newWeights[key] = 0;
+      }
+
+      // Set mw to 1
+      newWeights.mw = 1;
+
+      return newWeights;
+    });
+  }
+
   //DAG Handling
-
-
-
-
   let hoveredNode= null;
   let hoveredEdge = null;
 
@@ -1042,21 +1055,6 @@
 
 
 
-  function A_maximizeMw() {
-    A_molecule_prop.update((weights) => {
-      const newWeights = {};
-
-      // Set all keys to 0
-      for (const key in weights) {
-        newWeights[key] = 0;
-      }
-
-      // Set mw to 1
-      newWeights.mw = 1;
-
-      return newWeights;
-    });
-  }
 
 
 </script>
