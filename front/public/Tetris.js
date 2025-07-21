@@ -71,6 +71,7 @@ let appliedArrows = [];
 let particles = [];
 // Track the previous board state so we can show it in the flow conservation demo
 let parentStateBoard = null;
+let grandParentStateBoard = null;
 
 // Overlays for starting/restarting the game
 let startOverlay = null;
@@ -463,6 +464,7 @@ lock_piece() {
 
   // Capture the board before spawning a new piece so we can display it
   // as the parent state in the flow conservation visualization
+  grandParentStateBoard = parentStateBoard;
   parentStateBoard = this.board.map(row => row.slice());
 
   // 3) Spawn the next piece and reset any cached info
@@ -504,6 +506,7 @@ lock_piece() {
     this.clear_lines();
     // Save board state before spawning a new piece so we can display the parent
     // state in the flow conservation visualization
+    grandParentStateBoard = parentStateBoard;
     parentStateBoard = this.board.map(row => row.slice());
     this.current_piece = this.spawn_piece();
     this.target_piece = null;
@@ -1755,6 +1758,7 @@ function doResetGame() {
   // Reset the parent board so the flow conservation demo starts from
   // an empty state after a restart
   parentStateBoard = game.board.map(row => row.slice());
+  grandParentStateBoard = null;
   // make sure a leftover inference doesn't block new scoring
   scoringInProgress = false;
 
@@ -1861,23 +1865,16 @@ function updateCandidateListUI() {
   });
 
   if (typeof initFlowConservationDemo === 'function') {
-    // 1) ROOT board: stamp the new piece at COLUMN 0 only
-    const rootBoard = currentGameState.board.map(row => row.slice());
-    const cp = currentGameState.current_piece;
-    if (cp && cp.shape) {
-      for (let r = 0; r < cp.shape.length; r++) {
-        for (let cc = 0; cc < cp.shape[r].length; cc++) {
-          if (cp.shape[r][cc]) {
-            // place at col index = cc (i.e. first columns)
-            rootBoard[cp.y + r][cc] = 2;
-          }
-        }
-      }
-    }
+    // 1) ROOT board: state before spawning the current piece
+    const rootBoard = parentStateBoard
+      ? parentStateBoard.map(row => row.slice())
+      : currentGameState.board.map(row => row.slice());
+
+    const parentFlow = topCandidates.reduce((s, c) => s + c.flow, 0);
 
     // 2) ACTION boards: exactly as before, highlight each candidate on real board
     const actions = topCandidates.map(cand => {
-      const b = currentGameState.board.map(row => row.slice());
+      const b = rootBoard.map(row => row.slice());
       const p = cand.piece;
       for (let r = 0; r < p.shape.length; r++) {
         for (let cc = 0; cc < p.shape[r].length; cc++) {
@@ -1891,7 +1888,7 @@ function updateCandidateListUI() {
 
     // 3) RESULT boards: lock each candidate in place (value=1)
     const results = topCandidates.map(cand => {
-      const b = currentGameState.board.map(row => row.slice());
+      const b = rootBoard.map(row => row.slice());
       const p = cand.piece;
       for (let r = 0; r < p.shape.length; r++) {
         for (let cc = 0; cc < p.shape[r].length; cc++) {
@@ -1908,7 +1905,7 @@ function updateCandidateListUI() {
       root:    { board: rootBoard },
       actions: actions,
       results: results,
-      parents: parentStateBoard ? [{ board: parentStateBoard }] : []
+      parents: grandParentStateBoard ? [{ board: grandParentStateBoard, flow: parentFlow }] : []
     });
   }
 }

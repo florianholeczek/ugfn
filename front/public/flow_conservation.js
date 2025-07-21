@@ -113,6 +113,16 @@
         .attr("stroke", "#000")
         .attr("stroke-width", 2)
         .attr("marker-end", "url(#mBlack)");
+      if (typeof p.flow === "number") {
+        svg
+          .append("text")
+          .attr("x", (PAD + bwRoot + xRoot) / 2)
+          .attr("y", (pLanes[i] + lanes[1]) / 2 - 6)
+          .attr("text-anchor", "middle")
+          .attr("fill", "#000")
+          .attr("font-size", 12)
+          .text("Flow: " + p.flow.toFixed(2));
+      }
     });
 
     drawMini(svg, data.root.board, xRoot, lanes[1] - bhRoot / 2, bwRoot, bhRoot, CS_ROOT, "State");
@@ -157,7 +167,7 @@
         .attr("font-size", 12)
         .text("Flow: " + a.flow.toFixed(2));
 
-      drawMini(svg, data.results[i].board, xResult, y - bhRoot / 2, bwRoot, bhRoot, CS_ROOT);
+      drawMini(svg, data.results[i].board, xResult, y - bhRoot / 2, bwRoot, bhRoot, CS_ROOT, "Next State");
     });
 
     const spawn = () => {
