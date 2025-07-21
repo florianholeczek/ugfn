@@ -55,7 +55,7 @@
           .select(h ? h.parentNode : document.body)
           .insert("div", h ? () => h : null)
           .attr("id", "flowConservationContainer")
-          .style("max-width", "700px")
+          .style("max-width", "900px")
           .style("margin", "20px auto");
       }
       svg = c
