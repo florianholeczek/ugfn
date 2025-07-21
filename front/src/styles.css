@@ -119,6 +119,13 @@
       justify-content: center;
       margin: 0 auto 2rem;
   }
+  /* Smaller container used for tutorial screenshots */
+  .screenshot-container {
+    width: 400px;
+    display: flex;
+      justify-content: center;
+      margin: 0 auto 2rem;
+  }
 
   .image {
     max-width: 100%;
@@ -127,6 +134,18 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
+  /* Uniform sizing for screenshots */
+  .screenshot-image {
+    width: 100%;
+    max-width: 400px;
+    max-height: 400px;
+  }
+
+  .screenshot-image-small {
+    width: 100%;
+    max-width: 300px;
+    max-height: 300px;
+  }
 
 
   @media (max-width: 768px) {
@@ -145,6 +164,9 @@
     .image {
       width: 80%;
     }
+    .screenshot-container {
+      width: 90%;
+    }
   }
 
   @media (max-width: 480px) {
@@ -161,6 +183,9 @@
     }
 
     .image {
+      width: 100%;
+    }
+    .screenshot-container {
       width: 100%;
     }
   }
@@ -555,7 +580,7 @@ input[type="range"] {
 .A_board {
   position: relative;
   width: 180px;
-  height: 600px; /* Adjusted to match canvas height */
+  height: 300px; /* Adjusted to match canvas height */
   background-color: #111;
   border: 2px solid #333;
 }
@@ -566,7 +591,7 @@ input[type="range"] {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 600px;
+  height: 350px;
   width: 300px;
 }
 
@@ -578,7 +603,7 @@ input[type="range"] {
 
 .A_candidates {
   width: 100%;
-  height: 500px;
+  height: 300px;
   overflow-y: auto;
   padding: 10px;
   box-sizing: border-box;
@@ -588,13 +613,13 @@ input[type="range"] {
   display: flex;
   justify-content: space-evenly;
   padding: 10px 0;
-  height: 70px;
+  height: 50px;
 }
 
 .candidate {
   background: #e7e7e7;
   border-radius: 6px;
-  height:120px;
+  height:50px;
   padding: 10px;
   margin-bottom: 10px;
   cursor: pointer;
@@ -649,6 +674,33 @@ input[type="range"] {
     left: 1rem;
     z-index: 1000;
   }
+
+.concept-grid {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.concept-grid figure {
+  text-align: center;
+  margin: 10px;
+}
+
+.reward-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 40px;
+  background-color: #ffe18b;
+  border: 1px solid #333;
+}
+
+.dag-demo {
+  display: block;
+  margin: 20px auto;
+}
 
 
 

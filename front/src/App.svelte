@@ -123,6 +123,27 @@
   //tutorial visualization data
   let run_data = {};
 
+  // demonstration board and piece for the concepts section
+  const demoBoard = [
+    [0,0,0,0,0,0],
+    [0,0,0,0,0,0],
+    [0,1,1,0,0,0],
+    [0,1,1,0,0,0],
+    [0,0,0,0,0,0],
+    [1,1,1,0,0,0],
+    [0,0,0,0,0,0],
+    [0,0,0,0,0,0]
+  ];
+  const demoPiece = [
+    [1,1],
+    [1,1]
+  ];
+  const cellSize = 20;
+  const boardReward = demoBoard.reduce((acc,row)=>acc+row.reduce((a,b)=>a+b,0),0);
+  const boardAfter = demoBoard.map((row,i)=>
+    row.map((cell,j)=> (i<demoPiece.length && j<demoPiece[0].length) ? (cell || demoPiece[i][j]) : cell)
+  );
+
   // Gaussian tracking
   let selectedGaussian = null; // Tracks the currently selected Gaussian
   let hoveredGaussian = null; // Tracks the Gaussian to be highlighted for deletion
@@ -1065,9 +1086,50 @@
   document.title = "GFlowNet Playground";
 
 
-  let clicked = 'nothing yet';
-  let menuOpen = false;
-  let anchor; // for anchoring the menu to the button
+  onMount(() => {
+    if (typeof initFlowConservationDemo === 'function') {
+      initFlowConservationDemo();
+    }
+
+    if (typeof initComparisonChart === 'function') {
+      initComparisonChart();
+
+      // You’d opened this `if` block, so all of this
+      // (the tryInitComparison and load listener)
+      // belongs inside it—so we close it at the bottom.
+      const tryInitComparison = () => {
+        if (typeof initComparisonChart === 'function') {
+          initComparisonChart();
+        }
+      };
+
+      if (document.readyState === 'complete') {
+        tryInitComparison();
+      } else {
+        window.addEventListener('load', tryInitComparison, { once: true });
+      }
+    }  // ← HERE: close your initComparisonChart `if`
+
+  });  // onMount
+
+
+
+
+  function A_maximizeMw() {
+    A_molecule_prop.update((weights) => {
+      const newWeights = {};
+
+      // Set all keys to 0
+      for (const key in weights) {
+        newWeights[key] = 0;
+      }
+
+      // Set mw to 1
+      newWeights.mw = 1;
+
+      return newWeights;
+    });
+  }
 
 
 </script>
@@ -1180,7 +1242,7 @@
 
 
     <header class="header-top">
-      <div class="container"bind:this={h_top}>
+      <div class="container" bind:this={h_top}>
         <h1 class="title">GFlowNet Playground</h1>
         <p class="subtitle">Building an intuitive understanding of GFlowNet training</p>
       </div>
@@ -1221,7 +1283,8 @@
         We also provide a <b>Playground</b> for experimenting with GFlowNet training.
         It provides an interactive environment to explore how GFlowNets adapt to changes in both reward functions and training hyperparameters.
       </p>
-    </section>
+
+</section>
 
 
 
@@ -1300,10 +1363,101 @@
     </section>
 
     <section class="section" bind:this={h_coreConcepts}>
-      <h2 class="section-title">Core concepts:  states, actions and trajectories</h2>
-      <p class="section-annotation">
-        Placeholder to explain core concepts based on the tetris environment: states, actions, trajectories. Reader may skip if already familiar with reinforcement learning?
+      <div class="image-container">
+        <Accordion>
+          <Panel color="secondary">
+            <Header>Comparison to reinforcement learning</Header>
+            <Content>
+              <p class="section-text">
+Unlike conventional reinforcement learning, which typically converges to a single best policy, GFlowNets aim to learn a distribution over many high-reward outcomes. This property of proportional sampling is especially valuable in applications where multiple viable solutions are required, such as diverse move sequences in games or candidate molecules in drug discovery.
+
+The figure contrasts the behavior of a standard single-path reinforcement learner with that of a GFlowNet. In the traditional RL approach (left), the policy concentrates probability mass along one “best” trajectory. In contrast, the GFlowNet (right) spreads its flow across several promising paths. Each path in the diagram represents an alternative construction strategy. By maintaining multiple plausible routes, GFlowNets preserve exploration and remain robust if the optimal solution changes over time.
+              </p>
+              <div id="comparisonChart" style="margin:20px auto; max-width:600px;"></div>
+            </Content>
+          </Panel>
+        </Accordion>
+      </div>
+    </section>
+
+
+<section class="section">
+  <h2 class="section-title">
+    GFlowNet Fundamentals Illustrated with Tetris
+  </h2>
+
+  <ul class="section-text">
+    <!-- State -->
+    <li>
+      <strong>State</strong>
+      <p>
+        A state describes a partial or complete object under construction. In GFlowNets, every possible state is a node in a directed acyclic graph (DAG). Defining states tells the model where it is in the generative process and what options remain.
       </p>
+      <p>
+        <em>In Tetris:</em> the current board layout, showing all settled tetrominoes. This captures both dangerous gaps and “almost complete” rows.
+      </p>
+      <div class="screenshot-container">
+        <img
+          class="image screenshot-image-small"
+          src="/images/screenshot5.png"
+          alt="Screenshot illustrating Tetris state"
+        />
+      </div>
+    </li>
+
+    <!-- Action -->
+    <li>
+      <strong>Action</strong>
+      <p>
+        Actions are the legal operations that move you from one state to the next (the edges of the DAG). They specify how you build up your object—whether by placing a block on a pyramid, attaching an atom in a molecule, or dropping a Tetris piece.
+      </p>
+      <p>
+        <em>In Tetris:</em> each legal drop of the incoming tetromino (all rotations and column positions). Performing an action transitions the board to a new configuration.
+      </p>
+      <div class="screenshot-container">
+        <img
+          class="image screenshot-image"
+          src="/images/screenshot2.png"
+          alt="Screenshot illustrating Tetris action"
+        />
+      </div>
+    </li>
+
+    <!-- Reward -->
+    <li>
+      <strong>Reward</strong>
+      <p>
+        In GFlowNets, the reward function is defined by the user to encode the task’s goal.
+        For the Tetris demo, the reward was set to the total number of tetrominoes placed on the board—
+        equivalently, the number of occupied cells at game end (with optional line-clear and survival bonuses).
+        When play finishes, the incoming flow into each terminal board configuration is set equal to this user-defined reward.
+      </p>
+    </li>
+  </ul>
+
+  <p class="section-text">
+    This diagram shows how the GFlowNet maintains flow through multiple board configurations at once, converging from different past states and branching toward diverse future placements.
+  </p>
+  <div class="screenshot-container">
+    <img
+      class="image screenshot-image"
+      src="/images/screenshot4.png"
+      alt="Full DAG illustration of Tetris configurations"
+    />
+  </div>
+
+  <h3 class="section-title3">From Flow to Sampling</h3>
+  <p class="section-text">
+    For every state–action pair, the GFlowNet predicts a flow value—an estimate of the long-term payoff of that move. These flows are then normalized into sampling probabilities so that:
+  </p>
+  <ul class="section-text">
+    <li>High-flow moves are chosen more often,</li>
+    <li>Lower-flow moves still retain a non-zero chance, preserving exploration.</li>
+  </ul>
+  <p class="section-text">
+    During training, the demo enforces flow consistency at every intermediate board: the sum of incoming flows equals the sum of outgoing flows. Together with reward-based boundary conditions at the terminals, this mechanism ensures that full game trajectories are sampled in proportion to their rewards, uncovering both immediate stack-filling moves and longer-term strategic placements.
+  </p>
+
       <p class="section-text">
         In this interactive demonstration, a neural policy trained under the GFlowNet framework is applied to the game of Tetris.
         At each step, the network evaluates every legal placement of the falling tetromino and predicts a flow value that estimates the expected future reward (e.g., line clears plus a survival bonus).
@@ -1324,7 +1478,7 @@
           <canvas
             id="tetrisBgCanvas"
             width="300"
-            height="600"
+            height="300"
             style="position: absolute; top: 0; left: 0; z-index: 0;"
           ></canvas>
 
@@ -1332,7 +1486,7 @@
           <canvas
             id="tetrisCanvas"
             width="180"
-            height="600"
+            height="300"
             style="position: absolute; top: 0; left: 0; z-index: 1;"
           ></canvas>
           </div>
@@ -1348,17 +1502,7 @@
           </div>
         </div>
       </div>
-
-    </div>
-
-    <div id="flowConservationContainer" style="max-width:700px;margin:20px auto;">
-      <svg id="flowConservationSVG" style="width:100%;height:auto;"></svg>
-
-    </div>
-
-
-
-
+</div>
     <section class="section" bind:this={h_domain}>
       <h2 class="section-title">Domain application </h2>
       <p class="section-text">

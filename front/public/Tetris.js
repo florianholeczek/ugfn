@@ -44,7 +44,7 @@ async function loadGFlowNetModel() {
 
 const CELL_SIZE = 30;
 const COLS      = 6;
-const ROWS      = 20;
+const ROWS      = 10;
 const TICK_INTERVAL       = 700;
 const MOVE_PAUSE_DURATION = 2000;
 
@@ -69,6 +69,9 @@ let candidateMoves = [];
 let topCandidates = [];
 let appliedArrows = [];
 let particles = [];
+// Track the previous board state so we can show it in the flow conservation demo
+let parentStateBoard = null;
+let grandParentStateBoard = null;
 
 // Overlays for starting/restarting the game
 let startOverlay = null;
@@ -428,7 +431,10 @@ spawn_piece() {
    */
   clear_lines() {
     let cleared = 0;
+    let cleared = 0;
     for (let r = 0; r < this.board.length; r++) {
+      if (this.board[r].every(cell => cell === 1)) {
+        cleared++;
       if (this.board[r].every(cell => cell === 1)) {
         cleared++;
       }
@@ -458,6 +464,11 @@ lock_piece() {
 
   // 2) Clear any full lines
   this.clear_lines();
+
+  // Capture the board before spawning a new piece so we can display it
+  // as the parent state in the flow conservation visualization
+  grandParentStateBoard = parentStateBoard;
+  parentStateBoard = this.board.map(row => row.slice());
 
   // 3) Spawn the next piece and reset any cached info
   this.current_piece   = this.spawn_piece();
@@ -496,6 +507,10 @@ lock_piece() {
       }
     }
     this.clear_lines();
+    // Save board state before spawning a new piece so we can display the parent
+    // state in the flow conservation visualization
+    grandParentStateBoard = parentStateBoard;
+    parentStateBoard = this.board.map(row => row.slice());
     this.current_piece = this.spawn_piece();
     this.target_piece = null;
     this.cached_moves = null;
@@ -1276,10 +1291,13 @@ function tickGameLogic() {
   const new_piece_id = game.piece_id;
 
   // If game ended just now, pause and offer restart
+  // If game ended just now, pause and offer restart
   if (new_game_over && !old_game_over) {
     const final_reward = game.get_final_reward();
     agent.update_trajectory(trajectory, final_reward);
     trajectory = [];
+    simulationPaused = true;
+    showRestartOverlay();
     simulationPaused = true;
     showRestartOverlay();
   }
@@ -1742,7 +1760,15 @@ function doResetGame() {
     restartOverlay.remove();
     restartOverlay = null;
   }
+  if (restartOverlay) {
+    restartOverlay.remove();
+    restartOverlay = null;
+  }
   resetGameLogic();
+  // Reset the parent board so the flow conservation demo starts from
+  // an empty state after a restart
+  parentStateBoard = game.board.map(row => row.slice());
+  grandParentStateBoard = null;
   // make sure a leftover inference doesn't block new scoring
   scoringInProgress = false;
 
@@ -1832,6 +1858,70 @@ function showRestartOverlay() {
   });
 }
 
+function showStartOverlay() {
+  const boardDiv = document.getElementById("tetrisCanvas")?.parentElement;
+  if (!boardDiv || startOverlay) return;
+  boardDiv.style.position = "relative";
+  startOverlay = document.createElement("div");
+  startOverlay.id = "startOverlay";
+  Object.assign(startOverlay.style, {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "rgba(0,0,0,0.6)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 5
+  });
+  const btn = document.createElement("button");
+  btn.id = "startBtn";
+  btn.textContent = "Start Game";
+  btn.style.padding = "10px 20px";
+  btn.style.fontSize = "20px";
+  startOverlay.appendChild(btn);
+  boardDiv.appendChild(startOverlay);
+  btn.addEventListener("click", () => {
+    startOverlay.remove();
+    startOverlay = null;
+    init();
+  });
+}
+
+function showRestartOverlay() {
+  const boardDiv = document.getElementById("tetrisCanvas")?.parentElement;
+  if (!boardDiv || restartOverlay) return;
+  boardDiv.style.position = "relative";
+  restartOverlay = document.createElement("div");
+  restartOverlay.id = "restartOverlay";
+  Object.assign(restartOverlay.style, {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "rgba(0,0,0,0.6)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 5
+  });
+  const btn = document.createElement("button");
+  btn.id = "restartBtn";
+  btn.textContent = "Restart Game";
+  btn.style.padding = "10px 20px";
+  btn.style.fontSize = "20px";
+  restartOverlay.appendChild(btn);
+  boardDiv.appendChild(restartOverlay);
+  btn.addEventListener("click", () => {
+    restartOverlay.remove();
+    restartOverlay = null;
+    doResetGame();
+  });
+}
+
 function updateCandidateListUI() {
   candidateListEl.innerHTML = "";
   topCandidates.forEach(c => {
@@ -1849,23 +1939,18 @@ function updateCandidateListUI() {
   });
 
   if (typeof initFlowConservationDemo === 'function') {
-    // 1) ROOT board: stamp the new piece at COLUMN 0 only
-    const rootBoard = currentGameState.board.map(row => row.slice());
-    const cp = currentGameState.current_piece;
-    if (cp && cp.shape) {
-      for (let r = 0; r < cp.shape.length; r++) {
-        for (let cc = 0; cc < cp.shape[r].length; cc++) {
-          if (cp.shape[r][cc]) {
-            // place at col index = cc (i.e. first columns)
-            rootBoard[cp.y + r][cc] = 2;
-          }
-        }
-      }
-    }
+    // 1) ROOT board: state before spawning the current piece
+    const rootBoard = parentStateBoard
+      ? parentStateBoard.map(row => row.slice())
+      : currentGameState.board.map(row => row.slice());
+
+
+    const parentFlow = topCandidates.reduce((s, c) => s + c.flow, 0);
+
 
     // 2) ACTION boards: exactly as before, highlight each candidate on real board
     const actions = topCandidates.map(cand => {
-      const b = currentGameState.board.map(row => row.slice());
+      const b = rootBoard.map(row => row.slice());
       const p = cand.piece;
       for (let r = 0; r < p.shape.length; r++) {
         for (let cc = 0; cc < p.shape[r].length; cc++) {
@@ -1879,7 +1964,7 @@ function updateCandidateListUI() {
 
     // 3) RESULT boards: lock each candidate in place (value=1)
     const results = topCandidates.map(cand => {
-      const b = currentGameState.board.map(row => row.slice());
+      const b = rootBoard.map(row => row.slice());
       const p = cand.piece;
       for (let r = 0; r < p.shape.length; r++) {
         for (let cc = 0; cc < p.shape[r].length; cc++) {
@@ -1895,7 +1980,10 @@ function updateCandidateListUI() {
     initFlowConservationDemo({
       root:    { board: rootBoard },
       actions: actions,
-      results: results
+      results: results,
+
+      parents: grandParentStateBoard ? [{ board: grandParentStateBoard, flow: parentFlow }] : []
+
     });
   }
 }
