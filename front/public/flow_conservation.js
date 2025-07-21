@@ -157,7 +157,7 @@
         .attr("font-size", 12)
         .text("Flow: " + a.flow.toFixed(2));
 
-      drawMini(svg, data.results[i].board, xResult, y - bhRoot / 2, bwRoot, bhRoot, CS_ROOT);
+      drawMini(svg, data.results[i].board, xResult, y - bhRoot / 2, bwRoot, bhRoot, CS_ROOT, "Next State");
     });
 
     const spawn = () => {
