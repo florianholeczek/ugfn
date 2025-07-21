@@ -982,6 +982,9 @@
     } else {
       console.error('initMoleculeFlow is not defined');
     }
+    if (typeof initFlowConservationDemo === 'function') {
+      initFlowConservationDemo();
+    }
 
 
     // add listeners for changing the Environment
@@ -1036,11 +1039,7 @@
   //Title to display in tab
   document.title = "GFlowNet Playground";
 
-  onMount(() => {
-    if (typeof initFlowConservationDemo === 'function') {
-      initFlowConservationDemo();
-    }
-  });
+
 
 
   function A_maximizeMw() {

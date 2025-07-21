@@ -150,10 +150,10 @@
       }
 
       const pColor = idx === 0
-        ? '#33ff66'
+        ? '#1b9e77'
         : idx === 1
-        ? '#ffd700'
-        : '#ff6666';
+        ? '#d95f02'
+        : '#7570b3';
 
       const seg = paths[idx];
       const circ = svg.append('circle')
