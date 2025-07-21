@@ -1307,69 +1307,68 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
 
 
 <section class="section">
-      <h2 class="section-title">Core concepts:  states, actions and trajectories</h2>
-      <p class="section-text">
-      Before exploring the interactive Tetris Playground, it helps to understand the three fundamental concepts that make a GFlowNet work.
-      </p>
+  <h2 class="section-title">
+    GFlowNet Fundamentals Illustrated with Tetris
+  </h2>
 
-<h3 class="section-title3">Core GFlowNet Concepts</h3>
   <ul class="section-text">
-    <li class="section-text">
+    <!-- State -->
+    <li>
       <strong>State</strong>
-     <p class="section-text">
+      <p>
         A state describes a partial or complete object under construction. In GFlowNets, every possible state is a node in a directed acyclic graph (DAG). Defining states tells the model where it is in the generative process and what options remain.
       </p>
+      <p>
+        <em>In Tetris:</em> the current board layout, showing all settled tetrominoes. This captures both dangerous gaps and “almost complete” rows.
+      </p>
+      <div class="screenshot-container">
+        <img
+          class="image screenshot-image-small"
+          src="/images/screenshot5.png"
+          alt="Screenshot illustrating Tetris state"
+        />
+      </div>
     </li>
-    <li class="section-text">
-      <strong class="section-text">Action</strong>
-      <p class="section-text">
+
+    <!-- Action -->
+    <li>
+      <strong>Action</strong>
+      <p>
         Actions are the legal operations that move you from one state to the next (the edges of the DAG). They specify how you build up your object—whether by placing a block on a pyramid, attaching an atom in a molecule, or dropping a Tetris piece.
       </p>
+      <p>
+        <em>In Tetris:</em> each legal drop of the incoming tetromino (all rotations and column positions). Performing an action transitions the board to a new configuration.
+      </p>
+      <div class="screenshot-container">
+        <img
+          class="image screenshot-image"
+          src="/images/screenshot2.png"
+          alt="Screenshot illustrating Tetris action"
+        />
+      </div>
     </li>
-    <li class="section-text">
+
+    <!-- Reward -->
+    <li>
       <strong>Reward</strong>
-     <p class="section-text">
-        Rewards assign a score to each terminal state, encoding its desirability. By enforcing flow matching—that the total incoming flow at a final state equals its reward, and preserving flow conservation at intermediates—GFlowNets guarantee that the probability of sampling any complete object <em>x</em> is proportional to <em>R(x)</em>. This turns local state–action decisions into a globally consistent, diverse sampling process.
+      <p>
+        In GFlowNets, the reward function is defined by the user to encode the task’s goal.
+        For the Tetris demo, the reward was set to the total number of tetrominoes placed on the board—
+        equivalently, the number of occupied cells at game end (with optional line-clear and survival bonuses).
+        When play finishes, the incoming flow into each terminal board configuration is set equal to this user-defined reward.
       </p>
     </li>
   </ul>
-
-
-  <h3 class="section-title3">Mapping to Tetris</h3>
-  <p class="section-text">In the Tetris demo the sole objective is to fill as many grid cells as possible. Here’s how the core concepts translate:</p>
-  <ul>
-    <li class="section-text">
-      <strong>State</strong>
-      <p class="section-text">
-        The current Tetris board layout, showing all settled tetrominoes. This captures both dangerous gaps and potential “almost complete” rows.
-      </p>
-      <div class="screenshot-container">
-        <img class="image screenshot-image-small" src="/images/screenshot5.png" alt="Screenshot illustrating Tetris state" />
-      </div>
-    </li>
-    <li class="section-text">
-      <strong class="section-text">Action</strong>
-      <p class="section-text">
-        Each legal drop of the incoming tetromino (all rotations and column positions). Performing an action transitions the board to a new configuration.
-      </p>
-      <div class="screenshot-container">
-        <img class="image screenshot-image" src="/images/screenshot2.png" alt="Screenshot illustrating Tetris action" />
-      </div>
-    </li>
-    <li class="section-text">
-      <strong class="section-text">Reward</strong>
-      <p class="section-text">
-        A simple scalar: the total number of occupied cells on the board (or equivalently, lines cleared plus a small survival bonus). At the end of play, the flow into each terminal board is set equal to this score.
-      </p>
-    </li>
-  </ul>
-
 
   <p class="section-text">
     This diagram shows how the GFlowNet maintains flow through multiple board configurations at once, converging from different past states and branching toward diverse future placements.
   </p>
   <div class="screenshot-container">
-    <img class="image screenshot-image" src="/images/screenshot4.png" alt="Full DAG illustration of Tetris configurations" />
+    <img
+      class="image screenshot-image"
+      src="/images/screenshot4.png"
+      alt="Full DAG illustration of Tetris configurations"
+    />
   </div>
 
   <h3 class="section-title3">From Flow to Sampling</h3>
@@ -1377,16 +1376,13 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
     For every state–action pair, the GFlowNet predicts a flow value—an estimate of the long-term payoff of that move. These flows are then normalized into sampling probabilities so that:
   </p>
   <ul class="section-text">
-    <li class="section-text">High-flow moves are chosen more often,</li>
-    <li class="section-text">Lower-flow moves still retain a non-zero chance, preserving exploration.</li>
+    <li>High-flow moves are chosen more often,</li>
+    <li>Lower-flow moves still retain a non-zero chance, preserving exploration.</li>
   </ul>
   <p class="section-text">
     During training, the demo enforces flow consistency at every intermediate board: the sum of incoming flows equals the sum of outgoing flows. Together with reward-based boundary conditions at the terminals, this mechanism ensures that full game trajectories are sampled in proportion to their rewards, uncovering both immediate stack-filling moves and longer-term strategic placements.
   </p>
 
-
-
- 
       <p class="section-text">
         In this interactive demonstration, a neural policy trained under the GFlowNet framework is applied to the game of Tetris.
         At each step, the network evaluates every legal placement of the falling tetromino and predicts a flow value that estimates the expected future reward (e.g., line clears plus a survival bonus).
