@@ -545,6 +545,13 @@ input[type="range"] {
   padding: 20px;
 }
 
+.A_board-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 300px;
+}
+
 .A_board {
   position: relative;
   width: 180px;

@@ -39,7 +39,7 @@
     "plotly.js-dist": "^2.35.3",
     "sirv-cli": "^2.0.0",
     "svelte-collapsible": "^0.3.1",
-    "svelte-katex": "^0.1.2",
+    "svelte-katex": "^0.2.0",
     "svelte-material-ui": "^8.0.0-beta.3",
     "wx-svelte-core": "^2.0.0-beta-2"
   }
