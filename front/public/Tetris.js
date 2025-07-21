@@ -1870,7 +1870,9 @@ function updateCandidateListUI() {
       ? parentStateBoard.map(row => row.slice())
       : currentGameState.board.map(row => row.slice());
 
+
     const parentFlow = topCandidates.reduce((s, c) => s + c.flow, 0);
+
 
     // 2) ACTION boards: exactly as before, highlight each candidate on real board
     const actions = topCandidates.map(cand => {
@@ -1905,7 +1907,9 @@ function updateCandidateListUI() {
       root:    { board: rootBoard },
       actions: actions,
       results: results,
+
       parents: grandParentStateBoard ? [{ board: grandParentStateBoard, flow: parentFlow }] : []
+
     });
   }
 }
