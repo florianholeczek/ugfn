@@ -87,6 +87,7 @@
   let losses_select = ["Trajectory Balance", "Flow Matching"];
   let view = "1. Environment";
   let showTooltip = false;
+  let menuOpen = false;
 
   let vectorgrid_size=31;
 
@@ -1031,6 +1032,20 @@
     if (typeof initFlowConservationDemo === 'function') {
       initFlowConservationDemo();
     }
+    if (typeof initComparisonChart === 'function') {
+      initComparisonChart();
+      const tryInitComparison = () => {
+        if (typeof initComparisonChart === 'function') {
+          initComparisonChart();
+        }
+      };
+
+      if (document.readyState === 'complete') {
+        tryInitComparison();
+      } else {
+        window.addEventListener('load', tryInitComparison, { once: true });
+      }
+    }
 
 
     // add listeners for changing the Environment
@@ -1084,37 +1099,6 @@
 
   //Title to display in tab
   document.title = "GFlowNet Playground";
-
-
-  onMount(() => {
-    if (typeof initFlowConservationDemo === 'function') {
-      initFlowConservationDemo();
-    }
-
-    if (typeof initComparisonChart === 'function') {
-      initComparisonChart();
-
-      // You’d opened this `if` block, so all of this
-      // (the tryInitComparison and load listener)
-      // belongs inside it—so we close it at the bottom.
-      const tryInitComparison = () => {
-        if (typeof initComparisonChart === 'function') {
-          initComparisonChart();
-        }
-      };
-
-      if (document.readyState === 'complete') {
-        tryInitComparison();
-      } else {
-        window.addEventListener('load', tryInitComparison, { once: true });
-      }
-    }  // ← HERE: close your initComparisonChart `if`
-
-  });  // onMount
-
-
-  let anchor;
-  let menuOpen = false;
 
 
 
@@ -1172,11 +1156,10 @@
 
   <div class="menu-button">
     <IconButton
-      bind:this={anchor}
       on:click={() => (menuOpen = !menuOpen)}
     ><Icon class="material-icons" style="font-size: 22px">menu</Icon>
     </IconButton>
-    <Menu bind:open={menuOpen} anchor={anchor}>
+    <Menu bind:open={menuOpen}>
       <List>
         <Item on:click={scrollTo(h_top)}>
           <Text>Go to Top</Text>
@@ -1354,11 +1337,8 @@
           <Panel color="secondary">
             <Header>Comparison to reinforcement learning</Header>
             <Content>
-              <p class="section-text">
-Unlike conventional reinforcement learning, which typically converges to a single best policy, GFlowNets aim to learn a distribution over many high-reward outcomes. This property of proportional sampling is especially valuable in applications where multiple viable solutions are required, such as diverse move sequences in games or candidate molecules in drug discovery.
-
-The figure contrasts the behavior of a standard single-path reinforcement learner with that of a GFlowNet. In the traditional RL approach (left), the policy concentrates probability mass along one “best” trajectory. In contrast, the GFlowNet (right) spreads its flow across several promising paths. Each path in the diagram represents an alternative construction strategy. By maintaining multiple plausible routes, GFlowNets preserve exploration and remain robust if the optimal solution changes over time.
-              </p>
+              Unlike conventional reinforcement learning, which typically converges to a single best policy, GFlowNets aim to learn a distribution over many high-reward outcomes. This property of proportional sampling is especially valuable in applications where multiple viable solutions are required, such as diverse move sequences in games or candidate molecules in drug discovery.
+              The figure contrasts the behavior of a standard single-path reinforcement learner with that of a GFlowNet. In the traditional RL approach (left), the policy concentrates probability mass along one “best” trajectory. In contrast, the GFlowNet (right) spreads its flow across several promising paths. Each path in the diagram represents an alternative construction strategy. By maintaining multiple plausible routes, GFlowNets preserve exploration and remain robust if the optimal solution changes over time.
               <div id="comparisonChart" style="margin:20px auto; max-width:600px;"></div>
             </Content>
           </Panel>
@@ -1483,8 +1463,8 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
           <h2>Candidate Moves</h2>
           <div id="candidateList" class="A_candidates"><!-- Populated by Tetris logic --></div>
           <div class="A_controls">
-            <Button id="resetBtn" color="secondary" variant="raised" style="height:75px">Reset Game</Button>
-            <Button id="pauseBtn" color="secondary" variant="raised" style="height:75px">Pause Game</Button>
+            <Button id="resetBtn" color="secondary" variant="raised" style="height:50px; font-size: 12px">Reset Game</Button>
+            <Button id="pauseBtn" color="secondary" variant="raised" style="height:50px; font-size: 12px">Pause Game</Button>
           </div>
         </div>
       </div>
