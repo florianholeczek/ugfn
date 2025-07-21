@@ -1307,7 +1307,6 @@
 
 
 
-    </div>
 
     <section class="section">
       <h2 class="section-title">Domain application </h2>
