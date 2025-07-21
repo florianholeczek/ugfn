@@ -102,7 +102,7 @@
       bhAct = rows * CS_ACT + PAD * 2;
     const xRoot = parents.length ? 200 : PAD,
       xAction = xRoot + 300,
-      xResult = W - bwRoot - PAD;
+      xResult = W - bwRoot - PAD - 40; // shift next state board left so it isn't cut
     const lanes = [H / 4, H / 2, (3 * H) / 4];
     const pLanes = parents.map((_, i) => ((i + 1) / (parents.length + 1)) * H);
 
@@ -233,9 +233,10 @@
     };
 
     window._spawnTimer = setInterval(spawn, SPAWN_INT);
-    if (parentPaths.length) {
-      window._spawnParentTimer = setInterval(spawnParent, SPAWN_INT);
-    }
+    // disable flow particles from parent state to board
+    // if (parentPaths.length) {
+    //   window._spawnParentTimer = setInterval(spawnParent, SPAWN_INT);
+    // }
 
     return {
       stop: () => {
