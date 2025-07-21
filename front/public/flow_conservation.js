@@ -69,6 +69,10 @@
       clearInterval(window._spawnTimer);
       window._spawnTimer = null;
     }
+    if (window._spawnParentTimer) {
+      clearInterval(window._spawnParentTimer);
+      window._spawnParentTimer = null;
+    }
 
     svg.attr("viewBox", `0 0 ${W} ${H}`).style("background", "#fff").selectAll("*").remove();
 
@@ -102,6 +106,7 @@
     const lanes = [H / 4, H / 2, (3 * H) / 4];
     const pLanes = parents.map((_, i) => ((i + 1) / (parents.length + 1)) * H);
 
+    const parentPaths = [];
     parents.forEach((p, i) => {
       drawMini(svg, p.board, PAD, pLanes[i] - bhRoot / 2, bwRoot, bhRoot, CS_ROOT, "Parent");
       svg
@@ -113,16 +118,10 @@
         .attr("stroke", "#000")
         .attr("stroke-width", 2)
         .attr("marker-end", "url(#mBlack)");
-      if (typeof p.flow === "number") {
-        svg
-          .append("text")
-          .attr("x", (PAD + bwRoot + xRoot) / 2)
-          .attr("y", (pLanes[i] + lanes[1]) / 2 - 6)
-          .attr("text-anchor", "middle")
-          .attr("fill", "#000")
-          .attr("font-size", 12)
-          .text("Flow: " + p.flow.toFixed(2));
-      }
+      parentPaths.push([
+        { x: PAD + bwRoot, y: pLanes[i] },
+        { x: xRoot, y: lanes[1] }
+      ]);
     });
 
     drawMini(svg, data.root.board, xRoot, lanes[1] - bhRoot / 2, bwRoot, bhRoot, CS_ROOT, "State");
@@ -171,7 +170,7 @@
     });
 
     const spawn = () => {
-      if (svg.selectAll("circle").size() >= MAX_PARTICLES) return;
+      if (svg.selectAll("circle.flow").size() >= MAX_PARTICLES) return;
       let r = Math.random(),
         cum = 0,
         idx = weights.length - 1;
@@ -186,6 +185,7 @@
       const color = idx === 0 ? "#33ff66" : idx === 1 ? "#ffd700" : "#ff6666";
       const circ = svg
         .append("circle")
+        .attr("class", "flow")
         .attr("r", 5)
         .attr("fill", color)
         .attr("cx", seg[0].x)
@@ -206,12 +206,45 @@
         });
     };
 
+    const spawnParent = () => {
+      if (!parentPaths.length) return;
+      if (svg.selectAll("circle.parent-flow").size() >= MAX_PARTICLES) return;
+      const idx = Math.floor(Math.random() * parentPaths.length);
+      const seg = parentPaths[idx];
+      const circ = svg
+        .append("circle")
+        .attr("class", "parent-flow")
+        .attr("r", 4)
+        .attr("fill", "#000")
+        .attr("cx", seg[0].x)
+        .attr("cy", seg[0].y);
+
+      circ
+        .transition()
+        .duration(DURATION / 2)
+        .attrTween("transform", () => (t) => {
+          const x = seg[0].x + (seg[1].x - seg[0].x) * t;
+          const y = seg[0].y + (seg[1].y - seg[0].y) * t;
+          return `translate(${x - seg[0].x},${y - seg[0].y})`;
+        })
+        .on("end", function () {
+          d3.select(this).remove();
+        });
+    };
+
     window._spawnTimer = setInterval(spawn, SPAWN_INT);
+    if (parentPaths.length) {
+      window._spawnParentTimer = setInterval(spawnParent, SPAWN_INT);
+    }
 
     return {
       stop: () => {
         clearInterval(window._spawnTimer);
         window._spawnTimer = null;
+        if (window._spawnParentTimer) {
+          clearInterval(window._spawnParentTimer);
+          window._spawnParentTimer = null;
+        }
       }
     };
   };
