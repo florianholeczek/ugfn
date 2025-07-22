@@ -1753,10 +1753,9 @@
           <Katex>{`P_F(s'|s) = \\frac{F(s \\to s')}{F_{out}}`}</Katex>
         </li>
         <li>
-          All Flow is non-negative: <Katex>{`F(s \\to s')>0`}</Katex>
+          All flow is non-negative: <Katex>{`F(s \\to s')>0`}</Katex>
         </li>
         <li>
-          The outgoing Flow of a state is its Reward plus the Flow to its parents:
           <Katex>{`F_{out} = R(s) + \\sum_{s' \\in \\{parents(s)\\}} F(s \\to s')`}</Katex>
         </li>
         <li>
@@ -1765,7 +1764,7 @@
         </li>
         <li>
           The flow consistency holds for all states:
-          <Katex>\sum_{"{s' \\in \\{children(s)\\}} F(s' \\to s) = F_{out}"}</Katex>
+          <Katex>\sum_{"{s' \\in \\{children(s)\\}} F(s' \\to s) = R(s) + \\sum_{s' \\in \\{parents(s)\\}} F(s \\to s')"}</Katex>
         </li>
       </ul>
       </div>
@@ -1786,7 +1785,7 @@
             F(s_0) = \sum_x R(x) =Z
           </Katex>.
           The flow consistency also holds for the entire DAG,
-          the incoming Flow at the start state <Katex>s_0</Katex> is is equal to the outgoing flow of the DAG.
+          the incoming flow at the start state <Katex>s_0</Katex> is equal to the outgoing flow of the DAG.
           The outgoing flow is the sum of all rewards and is called the partition function, denoted as
           <Katex>Z</Katex>.
           While the sum of the reward function is fixed and usually unknown and intractable,
@@ -1984,7 +1983,7 @@
                     We can estimate it using a Neural Network as well.
                   </li>
                   <li>
-                    The reward <Katex>R(X)</Katex>of the final state of the trajectory.
+                    The reward <Katex>R(x)</Katex>of the final state of the trajectory.
                   </li>
                 </ul>
                 <br>
@@ -3228,8 +3227,22 @@
 
       <section class="section" bind:this={h_conclusion}>
         <h2 class="section-title">Conclusion </h2>
-        <p class="section-annotation">
-          Placeholder for conclusion text <br><br><br><br><br><br><br><br><br><br>
+        <p class="section-text">
+          With this article, you should have gained a solid understanding of how Generative Flow Networks work
+          and what sets them apart from more traditional methods like reinforcement learning and MCMC.
+          We showed how flow consistency enables sampling proportional to reward,
+          allowing GFlowNets to produce not just a single optimal solution but a diverse set of high-reward candidates.
+          <br><br>
+          We highlighted key components of GFlowNet training like policies, flow and the partition function
+          and showed how off-policy training can mitigate mode collapse by encouraging exploration.
+          Our interactive examples revealed how flow shapes sampling behaviour in both discrete and continuous domains,
+          emphasizing the importance of visualizations to understand model behaviour.
+          <br>
+          We moved between different levels of abstraction:
+          from observing the high-level action choices of a trained GFlowNet in Tetris,
+          down to inspecting very small state spaces to break down core formulas like Flow Matching and Trajectory Balance.
+          If you’re curious to go further, we encourage you to experiment with the Playground,
+          use the code to build new models and environments or have a look into the resources listed below.
         </p>
       </section>
 
