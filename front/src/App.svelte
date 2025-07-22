@@ -1744,66 +1744,72 @@
         The example above shows a perfectly trained model and you can see an important property of it:
         For each state, the incoming flow is equal to the outgoing flow.
         This is called Flow Consistency or Flow Matching and is the key to our goal: Sampling diverse candidates.
-        In their original GFlowNet Paper, Bengio et al. (2021) proved that if Flow Consistency holds
-        and we sample final states x using the Policy above, we will always sample proportionally to their reward.
-        In this case the probability to sample <Katex>x</Katex> is the reward of <Katex>x</Katex> divided by the sum of all rewards.
-        This is the main theorem of GFlowNets, so let’s look at it in detail.
+
+        In their original GFlowNet Paper, Bengio et al. (2021) proved that
+        if Flow Consistency holds and we sample final states <Katex>x</Katex> using the Policy above,
+        we will always sample proportionally to their reward.
+        In this case, the probability of sampling <Katex>x</Katex> is the reward of <Katex>x</Katex> divided by the sum of all rewards Z.
+        This is the main theorem of GFlowNets and the reason for diversity in the sampled states.
+        You can find more detail about it in the box below.
         <br><br>
-        If the following assumptions hold:
+        If Flow Consistency holds for all states, it also holds for the entire DAG.
+        In this case, the incoming flow at the start state <Katex>s_0</Katex> is equal to the outgoing flow of the DAG.
+        The outgoing flow is the sum of all rewards. It is called the partition function, denoted as <Katex>Z</Katex>.
+        While the sum of the reward function is fixed and usually unknown and intractable,
+        the model implicitly learns it during training by adjusting the flow of <Katex>s_0</Katex>.
       </p>
-      <div class="section-text" style="padding-left: 2rem;">
-      <ul>
-        <li>We sample new states <Katex>s'</Katex> using the policy defined above:
-          <Katex>{`P_F(s'|s) = \\frac{F(s \\to s')}{F_{out}}`}</Katex>
-        </li>
-        <li>
-          All flow is non-negative: <Katex>{`F(s \\to s')>0`}</Katex>
-        </li>
-        <li>
-          <Katex>{`F_{out} = R(s) + \\sum_{s' \\in \\{parents(s)\\}} F(s \\to s')`}</Katex>
-        </li>
-        <li>
-          <Katex>{`R(s)=0`}</Katex> for non-terminal states <Katex>s</Katex>
-          and <Katex>R(x)=F(x)>0</Katex> for terminal states <Katex>x</Katex>.
-        </li>
-        <li>
-          The flow consistency holds for all states:
-          <Katex>\sum_{"{s' \\in \\{children(s)\\}} F(s' \\to s) = R(s) + \\sum_{s' \\in \\{parents(s)\\}} F(s \\to s')"}</Katex>
-        </li>
-      </ul>
-      </div>
-      <p class="section-text">
-        Then:
-      </p>
-      <div class="section-text" style="padding-left: 2rem;">
-      <ul>
-        <li>
-          <Katex>
-            {`P_F(s) = \\frac{F(s)}{F(s_0)}`}
-          </Katex>
-          , where <Katex>P_F(s)</Katex> is the probability of visiting <Katex>s</Katex> when starting at
-          <Katex>s_0</Katex> and following the policy.
-        </li>
-        <li>
-          <Katex>
-            F(s_0) = \sum_x R(x) =Z
-          </Katex>.
-          The flow consistency also holds for the entire DAG,
-          the incoming flow at the start state <Katex>s_0</Katex> is equal to the outgoing flow of the DAG.
-          The outgoing flow is the sum of all rewards and is called the partition function, denoted as
-          <Katex>Z</Katex>.
-          While the sum of the reward function is fixed and usually unknown and intractable,
-          the model implicitly learns it during training by adjusting the flow of <Katex>s_0</Katex>.
-        </li>
-        <li>
-          <Katex>
-            {`P_F(x) = \\frac{R(x)}{\\sum_{x'}R(x')} = \\frac{R(x)}{Z}`}
-          </Katex>.
-          The probability to sample a final state is its proportion of the total rewards.
-          This is the property we want for diverse sampling.
-        </li>
-      </ul>
-      </div>
+      <Accordion class="image-container" style="width:1000px">
+        <Panel color="secondary">
+          <Header>Main Theorem</Header>
+          <Content>
+            If the following assumptions hold:
+            <ul>
+              <li>We sample new states <Katex>s'</Katex> using the policy defined above:
+                <Katex>{`P_F(s'|s) = \\frac{F(s \\to s')}{F_{out}}`}</Katex>
+              </li>
+              <li>
+                All flow is non-negative: <Katex>{`F(s \\to s')>0`}</Katex>
+              </li>
+              <li>
+                <Katex>{`F_{out} = R(s) + \\sum_{s' \\in \\{parents(s)\\}} F(s \\to s')`}</Katex>
+              </li>
+              <li>
+                <Katex>{`R(s)=0`}</Katex> for non-terminal states <Katex>s</Katex>
+                and <Katex>R(x)=F(x)>0</Katex> for terminal states <Katex>x</Katex>.
+              </li>
+              <li>
+                The flow consistency holds for all states:
+                <Katex>\sum_{"{s' \\in \\{children(s)\\}} F(s' \\to s) = R(s) + \\sum_{s' \\in \\{parents(s)\\}} F(s \\to s')"}</Katex>
+              </li>
+            </ul>
+            Then:
+            <ul>
+              <li>
+                <Katex>
+                  {`P_F(s) = \\frac{F(s)}{F(s_0)}`}
+                </Katex>
+                , where <Katex>P_F(s)</Katex> is the probability of visiting <Katex>s</Katex> when starting at
+                <Katex>s_0</Katex> and following the policy.
+              </li>
+              <li>
+                <Katex>
+                  F(s_0) = \sum_x R(x) =Z
+                </Katex>.
+                The flow consistency also holds for the entire DAG,
+                the incoming flow at the start state <Katex>s_0</Katex> is equal to the outgoing flow of the DAG.
+              </li>
+              <li>
+                <Katex>
+                  {`P_F(x) = \\frac{R(x)}{\\sum_{x'}R(x')} = \\frac{R(x)}{Z}`}
+                </Katex>.
+                The probability to sample a final state is its proportion of the total rewards.
+                This is the property we want for diverse sampling.
+              </li>
+            </ul>
+          </Content>
+        </Panel>
+      </Accordion>
+
       <p class="section-text">
         We now know that the way to diverse candidates is to achieve Flow Matching.
         Turning this into a training objective is actually quite simple, we just use a Mean Squared Error for each state.
