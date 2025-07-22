@@ -3228,7 +3228,7 @@
       <section class="section" bind:this={h_conclusion}>
         <h2 class="section-title">Conclusion </h2>
         <p class="section-text">
-          With this article, you should have gained a solid understanding of how Generative Flow Networks work
+          With this article, you should have gained a solid understanding of how Generative Flow Networks work, where they are applied
           and what sets them apart from more traditional methods like reinforcement learning and MCMC.
           We showed how flow consistency enables sampling proportional to reward,
           allowing GFlowNets to produce not just a single optimal solution but a diverse set of high-reward candidates.
