@@ -2371,7 +2371,7 @@
 
     </section>
 
-    <section class="section" bind:this={h_flow}>
+    <section class="section" bind:this={h_flow} style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);">
       <h2 class="section-title">Flow</h2>
       <p class="section-text">
         Below you can see the flow of the last training run.
