@@ -1053,9 +1053,9 @@
     window.addEventListener('mouseup', stopDrag);
     tutorial_flow_observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && !isRunning) {
 
-          view = "2. Training"
+
           if (flowvis_instance) {
             flowvis_instance.remove();
             flowvis_instance = null;
@@ -1079,12 +1079,16 @@
           if (tutorial_flowvis_instance) {
             tutorial_flowvis_instance.remove();
             tutorial_flowvis_instance = null;
+            if (view === "3. Flow") {
+              view = "1. Environment";
+              view = "3. Flow";
+            }
           }
         }
       },
       {
         threshold: 0.1, // 10% visible
-        rootMargin: '400px 0px'
+        rootMargin: '0px 0px'
       }
     );
     if (tutorial_flowContainer) {
@@ -2395,6 +2399,15 @@
 
       <div class="flow-container">
         <div bind:this={tutorial_flowContainer}></div>
+        <!--
+        {#if !isRunning}
+
+        {:else}
+          <div style="display: flex; justify-content: center; align-items: center;">
+          Visualization not available while training is happening in the Playground.
+          </div>
+        {/if}-->
+
       </div>
       <div style="width: 750px; margin: auto; display: flex; align-items: flex-start;">
         <!-- Left: Select component centered vertically -->
