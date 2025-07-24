@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="20.250214mm"
+   height="32.250145mm"
+   viewBox="0 0 20.250214 32.250145"
+   version="1.1"
+   id="svg24611"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   sodipodi:docname="tetris-state.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview24613"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="2.9540685"
+     inkscape:cx="97.154147"
+     inkscape:cy="83.952015"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs24608">
+    <style
+       id="style25061"><![CDATA[
+.background-cell {
+  fill:#ffffff;
+  fill-opacity:1;
+  paint-order:fill markers stroke;
+  stroke:#cccccc;
+  stroke-dasharray:none;
+  stroke-opacity:1;
+  stroke-width:0.25;
+}
+.piece-o-fill {
+  fill:#ffea2f;
+  fill-opacity:1;
+  paint-order:fill markers stroke;
+  stroke:none;
+  stroke-dasharray:none;
+  stroke-opacity:1;
+  stroke-width:0.25;
+}
+.piece-o-line-inner {
+  fill:none;
+  stroke:#f5db00;
+  stroke-linecap:butt;
+  stroke-linejoin:miter;
+  stroke-opacity:1;
+  stroke-width:0.264583px;
+}
+.piece-o-line-outer {
+  fill:none;
+  fill-opacity:1;
+  paint-order:fill markers stroke;
+  stroke:#2d2d2d;
+  stroke-dasharray:none;
+  stroke-opacity:1;
+  stroke-width:0.25;
+}
+.piece-l-fill {
+  fill:#f46d12;
+  fill-opacity:1;
+  paint-order:fill markers stroke;
+  stroke:none;
+  stroke-dasharray:none;
+  stroke-opacity:1;
+  stroke-width:0.25;
+}
+.piece-l-line-inner {
+  fill:none;
+  stroke:#db5e0a;
+  stroke-linecap:butt;
+  stroke-linejoin:miter;
+  stroke-opacity:1;
+  stroke-width:0.264583px;
+}
+.piece-l-line-outer {
+  fill:none;
+  fill-opacity:1;
+  paint-order:fill markers stroke;
+  stroke:#2d2d2d;
+  stroke-dasharray:none;
+  stroke-opacity:1;
+  stroke-width:0.25;
+}
+.piece-z-fill {
+  fill:#dc0000;
+  fill-opacity:1;
+  paint-order:fill markers stroke;
+  stroke:none;
+  stroke-dasharray:none;
+  stroke-opacity:1;
+  stroke-width:0.25;
+}
+.piece-z-line-inner {
+  fill:none;
+  stroke:#c90000;
+  stroke-linecap:butt;
+  stroke-linejoin:miter;
+  stroke-opacity:1;
+  stroke-width:0.264583px;
+}
+.piece-z-line-outer {
+  fill:none;
+  fill-opacity:1;
+  paint-order:fill markers stroke;
+  stroke:#2d2d2d;
+  stroke-dasharray:none;
+  stroke-opacity:1;
+  stroke-width:0.25;
+}
+.piece-r-fill {
+  fill:#005c94;
+  fill-opacity:1;
+  paint-order:fill markers stroke;
+  stroke:none;
+  stroke-dasharray:none;
+  stroke-opacity:1;
+  stroke-width:0.25;
+}
+.piece-r-line-inner {
+  fill:none;
+  stroke:#004f7f;
+  stroke-linecap:butt;
+  stroke-linejoin:miter;
+  stroke-opacity:1;
+  stroke-width:0.264583px;
+}
+.piece-r-line-outer {
+  fill:none;
+  fill-opacity:1;
+  paint-order:fill markers stroke;
+  stroke:#2d2d2d;
+  stroke-dasharray:none;
+  stroke-opacity:1;
+  stroke-width:0.25;
+}
+.piece-s-fill {
+  fill:#009100;
+  fill-opacity:1;
+  paint-order:fill markers stroke;
+  stroke:none;
+  stroke-dasharray:none;
+  stroke-opacity:1;
+  stroke-width:0.25;
+}
+.piece-s-line-inner {
+  fill:none;
+  stroke:#007e00;
+  stroke-linecap:butt;
+  stroke-linejoin:miter;
+  stroke-opacity:1;
+  stroke-width:0.264583px;
+}
+.piece-s-line-outer {
+  fill:none;
+  fill-opacity:1;
+  paint-order:fill markers stroke;
+  stroke:#2d2d2d;
+  stroke-dasharray:none;
+  stroke-opacity:1;
+  stroke-width:0.25;
+}
+]]></style>
+  </defs>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Grid"
+     transform="translate(-28.567293,-20.776012)">
+    <rect
+       id="rect24436"
+       width="4"
+       height="4"
+       x="32.692295"
+       y="20.901012"
+       ry="0"
+       class="background-cell" />
+    <rect
+       id="rect24438"
+       width="4"
+       height="4"
+       x="28.692293"
+       y="20.901012"
+       ry="0"
+       class="background-cell" />
+    <rect
+       id="rect24440"
+       width="4"
+       height="4"
+       x="40.692291"
+       y="20.901012"
+       ry="0"
+       class="background-cell" />
+    <rect
+       id="rect24442"
+       width="4"
+       height="4"
+       x="36.692295"
+       y="20.901012"
+       ry="0"
+       class="background-cell" />
+    <rect
+       id="rect24444"
+       width="4"
+       height="4"
+       x="44.692291"
+       y="20.901012"
+       ry="0"
+       class="background-cell" />
+    <rect
+       id="rect24446"
+       width="4"
+       height="4"
+       x="40.692291"
+       y="24.901012"
+       ry="0"
+       class="background-cell" />
+    <rect
+       id="rect24448"
+       width="4"
+       height="4"
+       x="36.692295"
+       y="24.901012"
+       ry="0"
+       class="background-cell" />
+    <rect
+       id="rect24450"
+       width="4"
+       height="4"
+       x="44.692291"
+       y="24.901012"
+       ry="0"
+       class="background-cell" />
+    <rect
+       id="rect24452"
+       width="4"
+       height="4"
+       x="44.692291"
+       y="28.901012"
+       ry="0"
+       class="background-cell" />
+    <rect
+       id="rect24454"
+       width="4"
+       height="4"
+       x="28.692293"
+       y="32.901012"
+       ry="0"
+       class="background-cell" />
+    <rect
+       id="rect24456"
+       width="4"
+       height="4"
+       x="28.692293"
+       y="36.901012"
+       ry="0"
+       class="background-cell" />
+    <rect
+       id="rect24458"
+       width="4"
+       height="4"
+       x="36.692295"
+       y="36.901012"
+       ry="0"
+       class="background-cell" />
+    <rect
+       id="rect24460"
+       width="4"
+       height="4"
+       x="28.692293"
+       y="40.901012"
+       ry="0"
+       class="background-cell" />
+    <rect
+       id="rect24462"
+       width="4"
+       height="4"
+       x="36.692295"
+       y="40.901012"
+       ry="0"
+       class="background-cell" />
+    <rect
+       id="rect24464"
+       width="4"
+       height="4"
+       x="28.692293"
+       y="44.901012"
+       ry="0"
+       class="background-cell" />
+    <rect
+       id="rect24466"
+       width="4"
+       height="4"
+       x="40.692291"
+       y="44.901012"
+       ry="0"
+       class="background-cell" />
+  </g>
+  <g
+     inkscape:label="Pieces"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-28.567293,-20.776012)">
+    <path
+       id="path24468"
+       d="m 28.692437,24.900914 v 4.00027 3.99976 h 3.999756 4.000272 v -3.99976 -4.00027 h -4.000272 z"
+       class="piece-o-fill" />
+    <path
+       d="m 32.692292,24.901004 -1e-4,7.99994"
+       id="path24470"
+       class="piece-o-line-inner" />
+    <path
+       d="M 36.692465,28.901184 H 28.692437"
+       id="path24472"
+       class="piece-o-line-inner" />
+    <path
+       id="path24474"
+       d="m 28.692437,24.900914 v 4.00027 3.99976 h 3.999756 4.000272 v -3.99976 -4.00027 h -4.000272 z"
+       class="piece-o-line-outer" />
+    <path
+       id="path24476"
+       d="m 36.692465,28.901184 v 3.99976 h 3.999755 v 4.00027 h 4.000273 3.999756 v -4.00027 h -3.999756 v -3.99976 H 40.69222 Z"
+       class="piece-z-fill" />
+    <path
+       d="m 40.692292,28.901004 -7.2e-5,3.99994 h 4.000273 v 4.00027"
+       id="path24478"
+       class="piece-z-line-inner" />
+    <path
+       id="path24480"
+       d="m 36.692465,28.901184 v 3.99976 h 3.999755 v 4.00027 h 4.000273 3.999756 v -4.00027 h -3.999756 v -3.99976 H 40.69222 Z"
+       class="piece-z-line-outer" />
+    <path
+       id="path24482"
+       d="m 40.692478,36.901214 v 4.00027 3.99976 h 3.999756 4.000273 v -3.99976 -4.00027 h -4.000273 z"
+       class="piece-o-fill" />
+    <path
+       d="m 44.692334,36.901304 -1e-4,7.99994"
+       id="path24484"
+       class="piece-o-line-inner" />
+    <path
+       d="M 48.692507,40.901484 H 40.692478"
+       id="path24486"
+       class="piece-o-line-inner" />
+    <path
+       id="path24488"
+       d="m 40.692478,36.901214 v 4.00027 3.99976 h 3.999756 4.000273 v -3.99976 -4.00027 h -4.000273 z"
+       class="piece-o-line-outer" />
+    <path
+       id="path24490"
+       d="m 40.692292,44.901134 v 3.99976 h -3.999755 v 4.000265 h -4.000273 -3.999756 v -4.000265 h 3.999756 v -3.99976 h 4.000273 z"
+       class="piece-s-fill" />
+    <path
+       d="m 36.692465,44.900954 7.2e-5,3.99994 h -4.000273 v 4.000265"
+       id="path24492"
+       class="piece-s-line-inner" />
+    <path
+       id="path24494"
+       d="m 40.692292,44.901134 v 3.99976 h -3.999755 v 4.000265 h -4.000273 -3.999756 v -4.000265 h 3.999756 v -3.99976 h 4.000273 z"
+       class="piece-s-line-outer" />
+    <path
+       id="path24496"
+       d="m 44.692493,44.901244 v 3.99976 H 40.69222 36.692465 v 3.999745 h 3.999755 4.000273 3.999756 v -3.999745 -3.99976 z"
+       class="piece-l-fill" />
+    <path
+       d="m 40.69222,48.901004 v 3.999745"
+       id="path24498"
+       class="piece-l-line-inner" />
+    <path
+       d="m 44.692293,48.901004 2e-4,3.999745"
+       id="path24500"
+       class="piece-l-line-inner" />
+    <path
+       d="m 44.692293,48.901004 h 3.999956"
+       id="path24502"
+       class="piece-l-line-inner" />
+    <path
+       id="path24504"
+       d="m 44.692493,44.901244 v 3.99976 H 40.69222 36.692465 v 3.999745 h 3.999755 4.000273 3.999756 v -3.999745 -3.99976 z"
+       class="piece-l-line-outer" />
+    <path
+       id="path24506"
+       d="m 40.692221,36.900704 h -3.99976 v 4.00027 3.99976 h -3.99975 v -3.99976 -4.00027 -3.99976 h 3.99975 3.99976 z"
+       class="piece-r-fill" />
+    <path
+       d="m 36.692461,40.900974 h -3.99975"
+       id="path24508"
+       class="piece-r-line-inner" />
+    <path
+       d="m 36.692461,36.900904 -3.99975,-2e-4"
+       id="path24510"
+       class="piece-r-line-inner" />
+    <path
+       d="m 36.692461,36.900904 v -3.99996"
+       id="path24512"
+       class="piece-r-line-inner" />
+    <path
+       id="path24514"
+       d="m 40.692221,36.900704 h -3.99976 v 4.00027 3.99976 h -3.99975 v -3.99976 -4.00027 -3.99976 h 3.99975 3.99976 z"
+       class="piece-r-line-outer" />
+  </g>
+</svg>

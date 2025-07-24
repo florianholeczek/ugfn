@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 320" width="220" height="320">
+  <!-- transparent background -->
+  <!-- right column of 3 squares -->
+  <rect x="100" y="0"   width="100" height="100" fill="#6a0dad" stroke="#888888" stroke-width="10"/>
+  <rect x="100" y="100" width="100" height="100" fill="#6a0dad" stroke="#888888" stroke-width="10"/>
+  <rect x="100" y="200" width="100" height="100" fill="#6a0dad" stroke="#888888" stroke-width="10"/>
+
+  <!-- left square in the middle row -->
+  <rect x="0"   y="100" width="100" height="100" fill="#6a0dad" stroke="#888888" stroke-width="10"/>
+</svg>

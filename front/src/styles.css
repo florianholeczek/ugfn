@@ -203,6 +203,7 @@
     .tetris-image-small,
     .tetris-image-large,
     .tetris-center-image {
+
       width: 100%;
       max-width: 300px;
     }
@@ -234,7 +235,7 @@
     .tetris-center-image {
       max-width: 100%;
     }
-  }
+
 
 
 
