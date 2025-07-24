@@ -161,6 +161,19 @@
     flex-shrink: 0;
   }
 
+  .tetris-image-small {
+    width: 150px;
+  }
+
+  .tetris-image-large {
+    width: 220px;
+  }
+
+  .tetris-center-image {
+    width: 300px;
+  }
+
+
 
   @media (max-width: 768px) {
     .title {
@@ -187,6 +200,10 @@
       align-items: flex-start;
     }
 
+    .tetris-image,
+    .tetris-image-small,
+    .tetris-image-large,
+    .tetris-center-image {
     .tetris-image {
       width: 100%;
       max-width: 300px;
@@ -212,11 +229,6 @@
     .screenshot-container {
       width: 100%;
     }
-
-    .tetris-image {
-      max-width: 100%;
-    }
-  }
 
 
 

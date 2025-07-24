@@ -1341,7 +1341,8 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
         </p>
       </div>
       <img
-        class="tetris-image"
+        class="tetris-image tetris-image-small"
+
         src="/images/Tetris-state.svg"
         alt="Tetris board state illustration"
       />
@@ -1362,11 +1363,20 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
         </p>
       </div>
       <img
-        class="tetris-image"
+        class="tetris-image tetris-image-large"
+
         src="/images/Tetris-action.svg"
         alt="Tetris action illustration"
       />
     </li>
+
+    <div class="image-container-small">
+      <img
+        class="tetris-center-image"
+        src="/images/tetris-state-action.svg"
+        alt="Tetris state to action transition"
+      />
+    </div>
 
     <!-- Reward -->
     <li>
@@ -1376,11 +1386,14 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
         hand. In this simplified Tetris demo we use the number of occupied cells
         once no further moves are possible as the final reward.
       </p>
-      <img
-        class="tetris-image"
-        src="/images/Tetris-reward.svg"
-        alt="Tetris reward illustration"
-      />
+      <div class="image-container-small">
+        <img
+          class="tetris-center-image"
+          src="/images/Tetris-reward.svg"
+          alt="Tetris reward illustration"
+        />
+      </div>
+
     </li>
   </ul>
 
@@ -1392,7 +1405,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
   </p>
   <div class="image-container-small">
     <img
-      class="tetris-image"
+      class="tetris-center-image"
       src="/images/tetris-dag.svg"
       alt="Tetris DAG illustration"
     />
