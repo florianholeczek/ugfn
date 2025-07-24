@@ -1362,7 +1362,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
         </p>
       </div>
       <img
-        class="tetris-image tetris-image-large"
+        class="tetris-image tetris-image-large-action"
 
         src="/images/Tetris-action.svg"
         alt="Tetris action illustration"

@@ -19479,17 +19479,28 @@ input[type="range"] {
     flex-shrink: 0;
   }
 
-  .tetris-image-small {
-    width: 150px;
-  }
-
-  .tetris-image-large {
-    width: 220px;
-  }
-
   .tetris-center-image {
-    width: 300px;
+    width: 450px;
     display: block;
     margin: 0 auto;
   }
+
+  .tetris-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tetris-image-small {
+  width: 80px;
+}
+
+.tetris-image-large {
+  width: 120px;
+}
+
+.tetris-image-large-action {
+  width: 80px;
+}
 span.svelte-1cqd9ua{width:50px;text-align:center;color:black}span.li.svelte-1cqd9ua{width:100%;display:list-item;list-style-type:disc;margin-left:40px;text-align:left}.mathexpl.svelte-1cqd9ua{display:block;text-align:center;font-size:0.8rem;color:grey;width:500px;margin:5px auto 1rem}

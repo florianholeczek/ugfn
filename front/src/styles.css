@@ -708,17 +708,27 @@ input[type="range"] {
     flex-shrink: 0;
   }
 
-  .tetris-image-small {
-    width: 150px;
-  }
-
-  .tetris-image-large {
-    width: 220px;
-  }
-
   .tetris-center-image {
-    width: 300px;
-    height: 300px; 
+    width: 450px;
     display: block;
     margin: 0 auto;
   }
+
+  .tetris-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tetris-image-small {
+  width: 80px;
+}
+
+.tetris-image-large {
+  width: 120px;
+}
+
+.tetris-image-large-action {
+  width: 80px;
+}
