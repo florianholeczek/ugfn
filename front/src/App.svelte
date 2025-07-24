@@ -1311,15 +1311,32 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
     GFlowNet Fundamentals Illustrated with Tetris
   </h2>
 
+  <p class="section-text">
+    To better understand the core concepts used by GFlowNets, let’s consider a
+    simplified version of the Tetris game. In traditional Tetris, players remove
+    filled lines to survive as long as possible. Here we ignore line clears so
+    the goal becomes filling the entire grid.
+  </p>
+  <p class="section-text">
+    GFlowNets sample trajectories iteratively by moving from one state to the
+    next via available actions. All state–action possibilities form a directed
+    acyclic graph (DAG) representing every way the game could unfold. Because the
+    action space is huge, we use this simplified Tetris setting to illustrate the
+    idea.
+  </p>
+
   <ul class="section-text">
     <!-- State -->
     <li>
       <strong>State</strong>
       <p>
-        A state describes a partial or complete object under construction. In GFlowNets, every possible state is a node in a directed acyclic graph (DAG). Defining states tells the model where it is in the generative process and what options remain.
+        A state fully describes the environment at a given moment. In a GFlowNet
+        every state is a node in the DAG that captures the generative process and
+        implicitly encodes which actions are still available.
       </p>
       <p>
-        <em>In Tetris:</em> the current board layout, showing all settled tetrominoes. This captures both dangerous gaps and “almost complete” rows.
+        <em>In Tetris:</em> the state corresponds to the current board with all
+        placed tetrominoes.
       </p>
       <div class="screenshot-container">
         <img
@@ -1334,10 +1351,13 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
     <li>
       <strong>Action</strong>
       <p>
-        Actions are the legal operations that move you from one state to the next (the edges of the DAG). They specify how you build up your object—whether by placing a block on a pyramid, attaching an atom in a molecule, or dropping a Tetris piece.
+        Actions transform one state into another and form the edges of the DAG.
+        They specify how the object under construction is extended step by step.
       </p>
       <p>
-        <em>In Tetris:</em> each legal drop of the incoming tetromino (all rotations and column positions). Performing an action transitions the board to a new configuration.
+        <em>In Tetris:</em> each legal drop of the falling tetromino—across all
+        rotations and column choices—constitutes a distinct action that yields a
+        new board configuration.
       </p>
       <div class="screenshot-container">
         <img
@@ -1352,16 +1372,18 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
     <li>
       <strong>Reward</strong>
       <p>
-        In GFlowNets, the reward function is defined by the user to encode the task’s goal.
-        For the Tetris demo, the reward was set to the total number of tetrominoes placed on the board—
-        equivalently, the number of occupied cells at game end (with optional line-clear and survival bonuses).
-        When play finishes, the incoming flow into each terminal board configuration is set equal to this user-defined reward.
+        The reward function quantifies how desirable a state is for the task at
+        hand. In this simplified Tetris demo we use the number of occupied cells
+        once no further moves are possible as the final reward.
       </p>
-    </li>
+      </li>
   </ul>
 
   <p class="section-text">
-    This diagram shows how the GFlowNet maintains flow through multiple board configurations at once, converging from different past states and branching toward diverse future placements.
+    The sampling process takes place on an implicit DAG where flows indicate the
+    desirability of each transition. The illustration below shows a small part of
+    the Tetris DAG: state <em>t</em> can be reached from two different parents and
+    branches out to several future states.
   </p>
   <div class="screenshot-container">
     <img
