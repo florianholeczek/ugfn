@@ -1327,45 +1327,45 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
 
   <ul class="section-text">
     <!-- State -->
-    <li>
-      <strong>State</strong>
-      <p>
-        A state fully describes the environment at a given moment. In a GFlowNet
-        every state is a node in the DAG that captures the generative process and
-        implicitly encodes which actions are still available.
-      </p>
-      <p>
-        <em>In Tetris:</em> the state corresponds to the current board with all
-        placed tetrominoes.
-      </p>
-      <div class="screenshot-container">
-        <img
-          class="image screenshot-image-small"
-          src="/images/screenshot5.png"
-          alt="Screenshot illustrating Tetris state"
-        />
+    <li class="tetris-row">
+      <div>
+        <strong>State</strong>
+        <p>
+          A state fully describes the environment at a given moment. In a GFlowNet
+          every state is a node in the DAG that captures the generative process and
+          implicitly encodes which actions are still available.
+        </p>
+        <p>
+          <em>In Tetris:</em> the state corresponds to the current board with all
+          placed tetrominoes.
+        </p>
       </div>
+      <img
+        class="tetris-image"
+        src="/images/Tetris-state.svg"
+        alt="Tetris board state illustration"
+      />
     </li>
 
     <!-- Action -->
-    <li>
-      <strong>Action</strong>
-      <p>
-        Actions transform one state into another and form the edges of the DAG.
-        They specify how the object under construction is extended step by step.
-      </p>
-      <p>
-        <em>In Tetris:</em> each legal drop of the falling tetromino—across all
-        rotations and column choices—constitutes a distinct action that yields a
-        new board configuration.
-      </p>
-      <div class="screenshot-container">
-        <img
-          class="image screenshot-image"
-          src="/images/screenshot2.png"
-          alt="Screenshot illustrating Tetris action"
-        />
+    <li class="tetris-row">
+      <div>
+        <strong>Action</strong>
+        <p>
+          Actions transform one state into another and form the edges of the DAG.
+          They specify how the object under construction is extended step by step.
+        </p>
+        <p>
+          <em>In Tetris:</em> each legal drop of the falling tetromino—across all
+          rotations and column choices—constitutes a distinct action that yields a
+          new board configuration.
+        </p>
       </div>
+      <img
+        class="tetris-image"
+        src="/images/Tetris-action.svg"
+        alt="Tetris action illustration"
+      />
     </li>
 
     <!-- Reward -->
@@ -1376,7 +1376,12 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
         hand. In this simplified Tetris demo we use the number of occupied cells
         once no further moves are possible as the final reward.
       </p>
-      </li>
+      <img
+        class="tetris-image"
+        src="/images/Tetris-reward.svg"
+        alt="Tetris reward illustration"
+      />
+    </li>
   </ul>
 
   <p class="section-text">
@@ -1385,11 +1390,11 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
     the Tetris DAG: state <em>t</em> can be reached from two different parents and
     branches out to several future states.
   </p>
-  <div class="screenshot-container">
+  <div class="image-container-small">
     <img
-      class="image screenshot-image"
-      src="/images/screenshot4.png"
-      alt="Full DAG illustration of Tetris configurations"
+      class="tetris-image"
+      src="/images/tetris-dag.svg"
+      alt="Tetris DAG illustration"
     />
   </div>
 
