@@ -19472,4 +19472,24 @@ input[type="range"] {
   display: block;
   margin: 20px auto;
 }
+
+
+  .tetris-image {
+    width: 180px;
+    flex-shrink: 0;
+  }
+
+  .tetris-image-small {
+    width: 150px;
+  }
+
+  .tetris-image-large {
+    width: 220px;
+  }
+
+  .tetris-center-image {
+    width: 300px;
+    display: block;
+    margin: 0 auto;
+  }
 span.svelte-1cqd9ua{width:50px;text-align:center;color:black}span.li.svelte-1cqd9ua{width:100%;display:list-item;list-style-type:disc;margin-left:40px;text-align:left}.mathexpl.svelte-1cqd9ua{display:block;text-align:center;font-size:0.8rem;color:grey;width:500px;margin:5px auto 1rem}
