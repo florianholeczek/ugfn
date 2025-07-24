@@ -174,7 +174,6 @@
   }
 
 
-
   @media (max-width: 768px) {
     .title {
       font-size: 2.5rem;
@@ -204,7 +203,7 @@
     .tetris-image-small,
     .tetris-image-large,
     .tetris-center-image {
-    .tetris-image {
+
       width: 100%;
       max-width: 300px;
     }
@@ -229,6 +228,14 @@
     .screenshot-container {
       width: 100%;
     }
+
+    .tetris-image,
+    .tetris-image-small,
+    .tetris-image-large,
+    .tetris-center-image {
+      max-width: 100%;
+    }
+
 
 
 
