@@ -19439,6 +19439,13 @@ input[type="range"] {
   margin-top: 10px;
 }
 
+.menu-button {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1000;
+  }
+
 .concept-grid {
   display: flex;
   justify-content: space-around;
@@ -19465,11 +19472,4 @@ input[type="range"] {
   display: block;
   margin: 20px auto;
 }
-
-
-
-
-
-
-
 span.svelte-1cqd9ua{width:50px;text-align:center;color:black}span.li.svelte-1cqd9ua{width:100%;display:list-item;list-style-type:disc;margin-left:40px;text-align:left}.mathexpl.svelte-1cqd9ua{display:block;text-align:center;font-size:0.8rem;color:grey;width:500px;margin:5px auto 1rem}

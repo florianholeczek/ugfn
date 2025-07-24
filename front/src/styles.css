@@ -147,32 +147,6 @@
     max-height: 300px;
   }
 
-  /* Layout for Tetris concept illustrations */
-  .tetris-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .tetris-image {
-    width: 180px;
-    max-width: 40%;
-    flex-shrink: 0;
-  }
-
-  .tetris-image-small {
-    width: 150px;
-  }
-
-  .tetris-image-large {
-    width: 220px;
-  }
-
-  .tetris-center-image {
-    width: 300px;
-  }
-
 
   @media (max-width: 768px) {
     .title {
@@ -192,20 +166,6 @@
     }
     .screenshot-container {
       width: 90%;
-    }
-
-    .tetris-row {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .tetris-image,
-    .tetris-image-small,
-    .tetris-image-large,
-    .tetris-center-image {
-
-      width: 100%;
-      max-width: 300px;
     }
   }
 
@@ -228,14 +188,7 @@
     .screenshot-container {
       width: 100%;
     }
-
-    .tetris-image,
-    .tetris-image-small,
-    .tetris-image-large,
-    .tetris-center-image {
-      max-width: 100%;
-    }
-
+  }
 
 
 
@@ -715,6 +668,13 @@ input[type="range"] {
   margin-top: 10px;
 }
 
+.menu-button {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1000;
+  }
+
 .concept-grid {
   display: flex;
   justify-content: space-around;
@@ -741,9 +701,3 @@ input[type="range"] {
   display: block;
   margin: 20px auto;
 }
-
-
-
-
-
-
