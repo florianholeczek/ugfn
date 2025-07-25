@@ -1549,7 +1549,40 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
         </div>
       </div>
       <svg id="chart" style="width: 1000px; display:block; margin: 20px auto"></svg>
+
+        <p class="section-text">
+    GFlowNets are applied in this domain because they can ensure a diverse sampling of candidate molecules. This is desirable when the reward is distributed among potentially many modes, where sampling in a too narrow region of the candidate space might miss out entire families of potentially interesting molecules. <!-- TODO: cite some of the molecule-related papers from below -->
+  </p>
+  <p class="section-text">
+    The following are some other interesting examples of GFlowNets being applied to problems in which diverse samples are desirable:
+  </p>
+  <ul class="section-text">
+    <li>
+      <strong>Listwise recommendation.</strong> GFlowNets can also be applied to generating lists of user recommendations, such as items in a web shop that might be of interest for a customer to check out next. Each action adds an item to the recommendation list. This generation can be conditioned on the user, ensuring that the resulting recommendations are diversely sampled yet still relevant for the specific user (<a href="https://doi.org/10.1145/3580305.3599364" target="_blank" rel="noopener">DOI: 10.1145/3580305.3599364</a>).
+    </li>
+    <li>
+      <strong>Games.</strong> Adversarial Flow Networks (AFlowNets) are modified versions of GFlowNets capable of learning robust policies through self‑play. Such AFlowNets have already been applied to simple zero‑sum games, such as tic‑tac‑toe or Connect Four, and may be applied to games with larger state spaces in the future (<a href="https://arxiv.org/pdf/2310.02779" target="_blank" rel="noopener">arXiv:2310.02779</a>).
+    </li>
+    <li>
+      <strong>Biological sequence design &amp; editing.</strong> Designing biological sequences is a significant challenge in medicine and materials design. GFlowNets have been shown to generate more diverse and novel batches of candidate nucleic acid sequences than other existing methods (<a href="https://proceedings.mlr.press/v162/jain22a/jain22a.pdf" target="_blank" rel="noopener">Jain et al. 2022</a>) and have been proposed for editing existing sequences to improve specific properties (<a href="https://openreview.net/pdf?id=9BQ3l8OVru" target="_blank" rel="noopener">OpenReview:9BQ3l8OVru</a>).
+    </li>
+    <li>
+      <strong>Computational phylogenetics.</strong> In phylogenetic inference, trees are viewed as compound states and each action joins two subtrees at their roots by a common ancestor. GFlowNets achieve a balance between fidelity of the constructed trees and broad exploration of the vast solution space (<a href="https://arxiv.org/pdf/2310.08774" target="_blank" rel="noopener">arXiv:2310.08774</a>).
+    </li>
+    <li>
+      <strong>Crystal structure generation.</strong> A crystal’s unit cell is treated as a state, and adding an atom at a specific location is an action. This allows diverse sampling of crystal structures with desirable properties, such as low formation energy (<a href="https://openreview.net/forum?id=l167FjdPOv" target="_blank" rel="noopener">OpenReview:l167FjdPOv</a>).
+    </li>
+    <li>
+      <strong>Other examples:</strong> Vehicle routing (<a href="https://arxiv.org/abs/2503.01931" target="_blank" rel="noopener">arXiv:2503.01931</a>), realistic terrain dataset generation (<a href="https://arxiv.org/abs/2208.07681" target="_blank" rel="noopener">arXiv:2208.07681</a>), symbolic regression (<a href="https://arxiv.org/pdf/2312.00396" target="_blank" rel="noopener">arXiv:2312.00396</a>), and causal discovery (<a href="https://openreview.net/attachment?id=atgDufs209&amp;name=pdf" target="_blank" rel="noopener">OpenReview:atgDufs209</a>).
+    </li>
+  </ul>
+  <p class="section-text">
+    Next, we’ll take a closer look at how GFlowNets manage to create diverse candidate samples by learning to draw proportionally to the reward distribution.
+  </p>
     </section>
+
+
+
 
     <section class="section">
       <h2 class="section-title">Flow, Policies and Training Objective </h2>
