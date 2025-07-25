@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="151.51602mm"
-   height="116.66721mm"
-   viewBox="0 0 151.51603 116.66721"
+   width="155.74936mm"
+   height="120.90054mm"
+   viewBox="0 0 155.74937 120.90054"
    version="1.1"
    id="svg24611"
    inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
@@ -24,9 +24,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="1.4770343"
-     inkscape:cx="170.61215"
-     inkscape:cy="181.44467"
+     inkscape:zoom="5.9081371"
+     inkscape:cx="424.49929"
+     inkscape:cy="62.794751"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
@@ -457,12 +457,18 @@
        width="123.51478"
        height="67.607834"
        id="rect38863" />
+    <rect
+       x="116.74052"
+       y="551.28448"
+       width="123.51478"
+       height="67.607834"
+       id="rect8-3-9-3-1-0-2-8" />
   </defs>
   <g
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Grid"
-     transform="translate(8.5205984,30.579739)"
+     transform="translate(10.637267,32.6964)"
      style="display:inline">
     <rect
        id="rect24436"
@@ -1109,7 +1115,7 @@
      inkscape:label="Pieces"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(8.5205984,30.579739)"
+     transform="translate(10.637267,32.6964)"
      style="display:inline">
     <path
        id="path24468"
@@ -1896,37 +1902,48 @@
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="Text + Arrows"
-     transform="translate(37.087891,51.355751)"
+     transform="translate(39.204559,53.472412)"
      style="display:inline">
     <text
        xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068623,-24.755281,-201.64215)"
+       transform="scale(1.0156297,0.98461082)"
        id="text23506"
-       class="title-text"><tspan
-         x="116.74023"
-         y="562.09424"
-         id="tspan43645">State <tspan
-   style="font-style:italic"
-   id="tspan43643">t</tspan> +1</tspan></text>
+       class="title-text"
+       x="-9.9239569"
+       y="-204.79376"
+       style="font-size:4.15213px;text-align:center;text-anchor:middle"><tspan
+         x="24.47846"
+         y="-10.302937"
+         id="tspan43645"
+         style="text-align:center;text-anchor:middle;stroke-width:0.57296">State <tspan
+   style="font-style:italic;text-align:center;text-anchor:middle;stroke-width:0.57296"
+   id="tspan43643">t</tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068624,29.639596,-125.38484)"
+       transform="matrix(0.35141911,0,0,0.34068624,15.327645,-125.38484)"
        id="text8-1-0-1-00-9-4"
-       class="text-small"><tspan
-         x="116.74023"
+       class="text-small"
+       x="21.544357"
+       y="0"
+       style="text-align:center"><tspan
+         x="156.34434"
          y="559.63418"
-         id="tspan56692"><tspan
+         id="tspan1473"><tspan
            style="font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI'"
-           id="tspan56690">Reward: 28</tspan></tspan></text>
+           id="tspan1471">Reward: 28</tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068624,-76.747595,-219.76667)"
+       transform="scale(1.0156297,0.98461083)"
        id="text8-1-0-1-1"
-       class="title-text"><tspan
-         x="116.74023"
-         y="562.09424"
-         id="tspan43653">State <tspan
-   style="font-style:italic"
+       class="title-text"
+       x="-58.423756"
+       y="-223.20155"
+       style="font-size:4.15213px;text-align:center;text-anchor:middle"><tspan
+         x="-26.440039"
+         y="-28.710732"
+         id="tspan43653"
+         style="text-align:center;text-anchor:middle;stroke-width:0.57296">State <tspan
+   style="font-style:italic;text-align:center;text-anchor:middle;stroke-width:0.57296"
    id="tspan43651">t</tspan> −1</tspan></text>
     <path
        style="marker-end:url(#TriangleStart-7)"
@@ -2021,14 +2038,6 @@
        d="M -1.998891,23.229386 V 26.4046 29.57941 H 1.175915 4.351131 V 26.4046 23.229386 H 1.175915 Z"
        class="piece-o-line-outer"
        style="display:inline;fill:none;fill-opacity:1;stroke:#2d2d2d;stroke-width:0.25;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke" />
-    <text
-       xml:space="preserve"
-       transform="matrix(0.24738201,0,0,0.23982659,14.784973,-96.34969)"
-       id="text8-1-0-1-1-4-5-5"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:start;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-3-9-3-9-1-2-6);display:inline;fill:#b2b2b2;fill-opacity:1;stroke:none;stroke-width:2.35229;stroke-dasharray:none;stroke-opacity:1"><tspan
-         x="116.74023"
-         y="562.20366"
-         id="tspan56694">STOP</tspan></text>
     <path
        id="path4116-9"
        style="display:inline;fill:#b2b2b2;fill-opacity:1;stroke:none;stroke-width:0.499999;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
@@ -2108,73 +2117,106 @@
        class="piece-t-line-outer" />
     <text
        xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068624,0.50338376,-147.31698)"
+       transform="matrix(0.35141911,0,0,0.34068624,-15.382417,-147.31698)"
        id="text38761"
-       class="text-small"><tspan
-         x="116.74023"
+       class="text-small"
+       x="15.943766"
+       y="0"
+       style="text-align:center"><tspan
+         x="161.94494"
          y="559.63418"
-         id="tspan56698"><tspan
+         id="tspan1477"><tspan
            style="font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI'"
-           id="tspan56696">Flow: 28</tspan></tspan></text>
+           id="tspan1475">Flow: 28</tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068624,29.925537,-177.857)"
+       transform="matrix(0.35141911,0,0,0.34068624,14.039661,-177.857)"
        id="text38781"
-       class="text-small"><tspan
-         x="116.74023"
+       class="text-small"
+       x="15.885519"
+       y="0"
+       style="text-align:center"><tspan
+         x="161.94494"
          y="559.63418"
-         id="tspan56702"><tspan
+         id="tspan1481"><tspan
            style="font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI'"
-           id="tspan56700">Flow: 32</tspan></tspan></text>
+           id="tspan1479">Flow: 32</tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068624,17.766556,-198.02065)"
+       transform="matrix(0.35141911,0,0,0.34068624,1.4089419,-198.02065)"
        id="text38801"
-       class="text-small"><tspan
-         x="116.74023"
+       class="text-small"
+       x="15.885519"
+       y="0"
+       style="text-align:center"><tspan
+         x="161.94494"
          y="559.63418"
-         id="tspan56706"><tspan
+         id="tspan1485"><tspan
            style="font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI'"
-           id="tspan56704">Flow: 32</tspan></tspan></text>
+           id="tspan1483">Flow: 32</tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068624,0.52384817,-215.19595)"
+       transform="matrix(0.35141911,0,0,0.34068624,-15.361948,-215.19595)"
        id="text38821"
-       class="text-small"><tspan
-         x="116.74023"
+       class="text-small"
+       x="15.885519"
+       y="0"
+       style="text-align:center"><tspan
+         x="161.94494"
          y="559.63418"
-         id="tspan56710"><tspan
+         id="tspan1489"><tspan
            style="font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI'"
-           id="tspan56708">Flow: 32</tspan></tspan></text>
+           id="tspan1487">Flow: 32</tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068624,-45.702115,-205.1608)"
+       transform="matrix(0.35141911,0,0,0.34068624,-61.587911,-205.1608)"
        id="text38841"
-       class="text-small"><tspan
-         x="116.74023"
+       class="text-small"
+       x="15.885519"
+       y="0"
+       style="text-align:center"><tspan
+         x="161.94494"
          y="559.63418"
-         id="tspan56714"><tspan
+         id="tspan1493"><tspan
            style="font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI'"
-           id="tspan56712">Flow: 62</tspan></tspan></text>
+           id="tspan1491">Flow: 91</tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068624,-45.702115,-157.58284)"
+       transform="matrix(0.35141911,0,0,0.34068624,-61.612911,-157.58284)"
        id="text38861"
-       class="text-small"><tspan
-         x="116.74023"
+       class="text-small"
+       x="15.885519"
+       y="0"
+       style="text-align:center"><tspan
+         x="161.94494"
          y="559.63418"
-         id="tspan56718"><tspan
+         id="tspan1497"><tspan
            style="font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI'"
-           id="tspan56716">Flow: 62</tspan></tspan></text>
+           id="tspan1495">Flow: 33</tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068623,41.427427,-239.92707)"
+       transform="scale(1.0156297,0.98461082)"
        id="text11646"
-       class="title-text"><tspan
-         x="116.74023"
-         y="562.09424"
-         id="tspan43683">State <tspan
-   style="font-style:italic"
-   id="tspan43681">t</tspan> +1</tspan></text>
+       class="title-text"
+       x="45.051628"
+       y="-243.67706"
+       style="font-size:4.15213px;text-align:center;text-anchor:middle"><tspan
+         x="77.035347"
+         y="-49.186237"
+         id="tspan43683"
+         style="text-align:center;text-anchor:middle;stroke-width:0.57296">State <tspan
+   style="font-style:italic;text-align:center;text-anchor:middle;stroke-width:0.57296"
+   id="tspan43681">t</tspan> + 1</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.24738201,0,0,0.23982659,3.2687429,-96.406941)"
+       id="text8-1-0-1-1-4-5"
+       style="font-weight:bold;font-family:'Segoe UI';font-size:9.17601px;text-align:center;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-3-9-3-1-0-2-8);display:inline;fill:#b2b2b2;fill-opacity:1;stroke:none;stroke-width:1.6559;stroke-dasharray:none;stroke-opacity:1"
+       class="text-small"
+       x="11.208496"
+       y="0"><tspan
+         x="166.87204"
+         y="559.63418"
+         id="tspan1499">STOP</tspan></text>
   </g>
 </svg>

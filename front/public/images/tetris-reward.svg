@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="147.25024mm"
-   height="43.002563mm"
-   viewBox="0 0 147.25025 43.002563"
+   width="151.48358mm"
+   height="47.235897mm"
+   viewBox="0 0 151.48359 47.235897"
    version="1.1"
    id="svg24611"
    inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
@@ -24,9 +24,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="1.4770343"
-     inkscape:cx="352.05683"
-     inkscape:cy="26.404262"
+     inkscape:zoom="2.9540685"
+     inkscape:cx="376.76851"
+     inkscape:cy="120.51176"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
@@ -210,7 +210,8 @@
   stroke-dasharray:none;
   stroke-opacity:1;
   stroke-width:1.6559;
-  text-align:start;
+  text-align:center;
+  text-anchor:middle;
   white-space:pre;
   writing-mode:lr-tb;
 }
@@ -225,17 +226,20 @@
   stroke-width:0.5;
 }
 .text-small {
+  -inkscape-font-specification:'Segoe UI';
+  font-family:'Segoe UI';
+  font-size:4.15213px;
   direction:ltr;
   display:inline;
   fill:#505050;
   fill-opacity:1;
   font-size:9.17601px;
-  shape-inside:url(#rect8-3-9-3-1-0-2);
   stroke:none;
   stroke-dasharray:none;
   stroke-opacity:1;
   stroke-width:1.6559;
-  text-align:start;
+  text-align:center;
+  text-anchor:middle;
   white-space:pre;
   writing-mode:lr-tb;
 }
@@ -319,12 +323,18 @@
        width="123.51478"
        height="67.607834"
        id="rect30405" />
+    <rect
+       x="116.74052"
+       y="551.28448"
+       width="123.51478"
+       height="67.607834"
+       id="rect2200" />
   </defs>
   <g
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Grid"
-     transform="translate(13.766042,-14.056308)"
+     transform="translate(15.882712,-11.939642)"
      style="display:inline">
     <rect
        id="rect24436"
@@ -971,7 +981,7 @@
      inkscape:label="Pieces"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(13.766042,-14.056308)">
+     transform="translate(15.882712,-11.939642)">
     <path
        id="path24468"
        d="m 28.692437,24.900914 v 4.00027 3.99976 h 3.999756 4.000272 v -3.99976 -4.00027 h -4.000272 z"
@@ -1307,18 +1317,23 @@
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="Text + Arrows"
-     transform="translate(42.333335,6.7197044)">
+     transform="translate(44.450005,8.8363705)">
     <text
        xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068623,2.6659476,-195.29102)"
+       transform="scale(1.0156297,0.98461082)"
        id="text23506"
-       style="shape-inside:url(#rect23508)"
-       class="title-text"><tspan
-         x="116.74023"
-         y="562.09421"
-         id="tspan31352">State <tspan
-   style="font-style:italic"
-   id="tspan31350">t</tspan> +1</tspan></text>
+       class="title-text"
+       x="17.240515"
+       y="-198.34337"
+       style="font-size:4.15213px"><tspan
+         x="51.7514"
+         y="-3.8525405"
+         id="tspan2423"
+         style="text-align:center;text-anchor:middle;stroke-width:0.57296">State <tspan
+   style="font-style:italic;text-align:center;text-anchor:middle;stroke-width:0.57296"
+   id="tspan2419">T</tspan> <tspan
+   style="font-style:italic;text-align:center;text-anchor:middle;stroke-width:0.57296"
+   id="tspan2421">−</tspan> 1</tspan></text>
     <path
        d="M 21.836282,17.516353 H 38.971724"
        id="path23558"
@@ -1329,24 +1344,16 @@
        class="arrow" />
     <text
        xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068623,-15.823785,-188.13318)"
+       transform="scale(1.0156297,0.98461082)"
        id="text23575"
-       style="shape-inside:url(#rect23577)"
-       class="title-text"><tspan
-         x="116.74023"
-         y="562.09421"
-         id="tspan31354">Action</tspan></text>
-    <text
-       xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068623,-37.210878,-195.29102)"
-       id="text27372"
-       style="shape-inside:url(#rect27374)"
-       class="title-text"><tspan
-         x="116.74023"
-         y="562.09421"
-         id="tspan31358">State <tspan
-   style="font-style:italic"
-   id="tspan31356">t</tspan></tspan></text>
+       class="title-text"
+       x="-18.804607"
+       y="-191.07365"
+       style="font-size:4.15213px"><tspan
+         x="30.881432"
+         y="3.4171746"
+         id="tspan1269"
+         style="stroke-width:0.57296">Action</tspan></text>
     <path
        d="M 64.169618,17.516353 H 81.30506"
        id="path29695"
@@ -1357,55 +1364,72 @@
        class="arrow" />
     <text
        xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068623,26.509551,-188.13318)"
+       transform="scale(1.0156297,0.98461082)"
        id="text29753"
-       style="shape-inside:url(#rect29755)"
-       class="title-text"><tspan
-         x="116.74023"
-         y="562.09421"
-         id="tspan31360">Action</tspan></text>
+       class="title-text"
+       x="22.922615"
+       y="-191.07365"
+       style="font-size:4.15213px"><tspan
+         x="72.60865"
+         y="3.4171746"
+         id="tspan1271"
+         style="stroke-width:0.57296">Action</tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.24738201,0,0,0.23982659,40.982993,-120.09476)"
+       transform="scale(1.0156297,0.98461083)"
        id="text8-1-0-1-1-4-5"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:start;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect8-3-9-3-9-1-2);display:inline;fill:#b2b2b2;fill-opacity:1;stroke:none;stroke-width:2.35229;stroke-dasharray:none;stroke-opacity:1"><tspan
-         x="116.74023"
-         y="562.20366"
-         id="tspan31362">STOP</tspan></text>
+       style="font-weight:bold;font-size:3.175px;text-align:center;fill:#b2b2b2;fill-opacity:1"
+       class="text-small"
+       x="34.575214"
+       y="-121.43436"><tspan
+         x="72.490959"
+         y="14.878526"
+         id="tspan711"
+         style="stroke-width:0.403336">STOP</tspan></text>
     <path
        id="path4116"
        style="fill:#b2b2b2;fill-opacity:1;stroke:none;stroke-width:0.499999;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
        d="m 73.624993,6.1249935 a 2.6775238,2.6775238 0 0 0 -2.67735,2.67759 2.6775238,2.6775238 0 0 0 2.67735,2.6775905 2.6775238,2.6775238 0 0 0 2.67758,-2.6775905 2.6775238,2.6775238 0 0 0 -2.67758,-2.67759 z m 0,0.8417 a 1.8359047,1.8359047 0 0 1 1.83589,1.83589 1.8359047,1.8359047 0 0 1 -0.27485,0.966 l -2.52705,-2.52704 a 1.8359047,1.8359047 0 0 1 0.96601,-0.27485 z m -1.56105,0.8699 2.52704,2.5270405 a 1.8359047,1.8359047 0 0 1 -0.96599,0.27484 1.8359047,1.8359047 0 0 1 -1.8359,-1.8358905 1.8359047,1.8359047 0 0 1 0.27485,-0.96599 z" />
     <text
        xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068623,44.999283,-195.29102)"
+       transform="scale(1.0156297,0.98461082)"
        id="text29889"
-       style="shape-inside:url(#rect29891)"
-       class="title-text"><tspan
-         x="116.74023"
-         y="562.09421"
-         id="tspan31366">State <tspan
-   style="font-style:italic"
-   id="tspan31364">t</tspan> +2</tspan></text>
+       class="title-text"
+       x="53.086479"
+       y="-198.34337"
+       style="font-size:4.15213px"><tspan
+         x="93.067314"
+         y="-3.8525405"
+         id="tspan2433"
+         style="text-align:center;text-anchor:middle;stroke-width:0.57296">State <tspan
+   style="font-style:italic;text-align:center;text-anchor:middle;stroke-width:0.57296"
+   id="tspan2431">T</tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068624,46.294123,-154.41344)"
+       transform="scale(1.0156297,0.98461083)"
        id="text8-1-0-1-00-9-4"
-       class="text-small"><tspan
-         x="116.74023"
-         y="559.63418"
-         id="tspan31370"><tspan
-           style="font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI'"
-           id="tspan31368">Reward: 28</tspan></tspan></text>
+       class="text-small"
+       x="46.610004"
+       y="-156.82687"
+       style="font-size:3.175px"><tspan
+         x="93.252289"
+         y="36.812733"
+         id="tspan715"
+         style="stroke-width:0.57296;font-size:3.175px"><tspan
+           style="font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI';stroke-width:0.57296;font-size:3.175px"
+           id="tspan713">Reward: 28</tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.35141911,0,0,0.34068623,-79.836603,-195.29102)"
+       transform="scale(1.0156297,0.98461082)"
        id="text30403"
-       style="shape-inside:url(#rect30405)"
-       class="title-text"><tspan
-         x="116.74023"
-         y="562.09421"
-         id="tspan31372">State 0</tspan></text>
+       class="title-text"
+       x="-74.482208"
+       y="-198.34337"
+       style="font-size:4.15213px"><tspan
+         x="-31.746124"
+         y="-3.8525405"
+         id="tspan2439"
+         style="text-align:center;text-anchor:middle;stroke-width:0.57296">State 0</tspan></text>
     <path
        d="m -9.0102447,17.516353 h 5.6486346"
        id="path30461"
@@ -1437,5 +1461,21 @@
        cx="-10.302421"
        cy="17.541351"
        r="0.27500001" />
+    <text
+       xml:space="preserve"
+       transform="scale(1.0156297,0.98461082)"
+       id="text2198"
+       class="title-text"
+       x="-23.806765"
+       y="-198.34337"
+       style="font-size:4.15213px"><tspan
+         x="9.9985838"
+         y="-3.8525405"
+         id="tspan2445"
+         style="text-align:center;text-anchor:middle;stroke-width:0.57296">State <tspan
+   style="font-style:italic;text-align:center;text-anchor:middle;stroke-width:0.57296"
+   id="tspan2441">T</tspan> <tspan
+   style="font-style:italic;text-align:center;text-anchor:middle;stroke-width:0.57296"
+   id="tspan2443">−</tspan> 2</tspan></text>
   </g>
 </svg>

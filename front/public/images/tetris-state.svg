@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="20.250214mm"
-   height="32.250145mm"
-   viewBox="0 0 20.250214 32.250145"
+   width="24.483549mm"
+   height="36.483479mm"
+   viewBox="0 0 24.48355 36.483479"
    version="1.1"
    id="svg24611"
    inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
@@ -25,8 +25,8 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="2.9540685"
-     inkscape:cx="97.154147"
-     inkscape:cy="83.952015"
+     inkscape:cx="79.551304"
+     inkscape:cy="92.414919"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
@@ -182,7 +182,7 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Grid"
-     transform="translate(-28.567293,-20.776012)">
+     transform="translate(-26.450624,-18.659344)">
     <rect
        id="rect24436"
        width="4"
@@ -316,7 +316,7 @@
      inkscape:label="Pieces"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-28.567293,-20.776012)">
+     transform="translate(-26.450624,-18.659344)">
     <path
        id="path24468"
        d="m 28.692437,24.900914 v 4.00027 3.99976 h 3.999756 4.000272 v -3.99976 -4.00027 h -4.000272 z"
