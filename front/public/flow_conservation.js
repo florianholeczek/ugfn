@@ -182,7 +182,7 @@
         }
       }
       const seg = paths[idx];
-      const color = idx === 0 ? "#33ff66" : idx === 1 ? "#ffd700" : "#ff6666";
+      const color = idx === 0 ? "#1b9e77" : idx === 1 ? "#d95f02" : "#7570b3";
       const circ = svg
         .append("circle")
         .attr("class", "flow")
