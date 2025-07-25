@@ -19503,4 +19503,7 @@ input[type="range"] {
 .tetris-image-large-action {
   width: 80px;
 }
+.tetris-smaller-image {
+  height: 120px;
+}
 span.svelte-1cqd9ua{width:50px;text-align:center;color:black}span.li.svelte-1cqd9ua{width:100%;display:list-item;list-style-type:disc;margin-left:40px;text-align:left}.mathexpl.svelte-1cqd9ua{display:block;text-align:center;font-size:0.8rem;color:grey;width:500px;margin:5px auto 1rem}

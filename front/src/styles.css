@@ -732,3 +732,6 @@ input[type="range"] {
 .tetris-image-large-action {
   width: 80px;
 }
+.tetris-smaller-image {
+  height: 120px;
+}
