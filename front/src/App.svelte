@@ -19,6 +19,8 @@
   import IconButton, { Icon } from '@smui/icon-button';
   import Tooltip, { Wrapper, Title } from '@smui/tooltip';
   import Tab from '@smui/tab';
+  import Menu from '@smui/menu';
+  import List, { Item, Separator, Text } from '@smui/list';
   import TabBar from '@smui/tab-bar';
   import Paper from '@smui/paper';
   import LinearProgress from '@smui/linear-progress';
@@ -52,9 +54,6 @@
   // elements
   let plotContainerEnv2d = "plot-container2d";
   let plotContainerEnv3d = "plot-container3d";
-  let tutorialstart;
-  let sourcesstart;
-  let playgroundstart;
   let Plotly;
   let p5;
   let flowContainer;
@@ -67,6 +66,19 @@
   let snackbar_training_done;
   let AnimInterval;
 
+  //ids for scrolling
+  let h_top;
+  let h_intro;
+  let h_coreConcepts;
+  let h_domain;
+  let h_policy;
+  let h_continuous;
+  let h_training;
+  let h_flow;
+  let h_playground;
+  let h_conclusion;
+  let h_sources;
+
   // UI Elements
   let active_tab = 'Basic';
   let n_iterations_select = ["128", "1024", "2048", "4096", "8192", "10240"];
@@ -75,6 +87,7 @@
   let losses_select = ["Trajectory Balance", "Flow Matching"];
   let view = "1. Environment";
   let showTooltip = false;
+  let menuOpen = false;
 
   let vectorgrid_size=31;
 
@@ -801,11 +814,24 @@
     }
   }
 
+  // molecule weights
+  function A_maximizeMw() {
+    A_molecule_prop.update((weights) => {
+      const newWeights = {};
+
+      // Set all keys to 0
+      for (const key in weights) {
+        newWeights[key] = 0;
+      }
+
+      // Set mw to 1
+      newWeights.mw = 1;
+
+      return newWeights;
+    });
+  }
+
   //DAG Handling
-
-
-
-
   let hoveredNode= null;
   let hoveredEdge = null;
 
@@ -1003,6 +1029,23 @@
     } else {
       console.error('initMoleculeFlow is not defined');
     }
+    if (typeof initFlowConservationDemo === 'function') {
+      initFlowConservationDemo();
+    }
+    if (typeof initComparisonChart === 'function') {
+      initComparisonChart();
+      const tryInitComparison = () => {
+        if (typeof initComparisonChart === 'function') {
+          initComparisonChart();
+        }
+      };
+
+      if (document.readyState === 'complete') {
+        tryInitComparison();
+      } else {
+        window.addEventListener('load', tryInitComparison, { once: true });
+      }
+    }
 
 
     // add listeners for changing the Environment
@@ -1010,9 +1053,9 @@
     window.addEventListener('mouseup', stopDrag);
     tutorial_flow_observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && !isRunning) {
 
-          view = "2. Training"
+
           if (flowvis_instance) {
             flowvis_instance.remove();
             flowvis_instance = null;
@@ -1036,12 +1079,16 @@
           if (tutorial_flowvis_instance) {
             tutorial_flowvis_instance.remove();
             tutorial_flowvis_instance = null;
+            if (view === "3. Flow") {
+              view = "1. Environment";
+              view = "3. Flow";
+            }
           }
         }
       },
       {
         threshold: 0.1, // 10% visible
-        rootMargin: '400px 0px'
+        rootMargin: '0px 0px'
       }
     );
     if (tutorial_flowContainer) {
@@ -1057,51 +1104,6 @@
   //Title to display in tab
   document.title = "GFlowNet Playground";
 
-
-  onMount(() => {
-    if (typeof initFlowConservationDemo === 'function') {
-      initFlowConservationDemo();
-    }
-
-    if (typeof initComparisonChart === 'function') {
-      initComparisonChart();
-      
-      // You’d opened this `if` block, so all of this
-      // (the tryInitComparison and load listener)
-      // belongs inside it—so we close it at the bottom.
-      const tryInitComparison = () => {
-        if (typeof initComparisonChart === 'function') {
-          initComparisonChart();
-        }
-      };
-
-      if (document.readyState === 'complete') {
-        tryInitComparison();
-      } else {
-        window.addEventListener('load', tryInitComparison, { once: true });
-      }
-    }  // ← HERE: close your initComparisonChart `if`
-
-  });  // onMount
-
-
-
-
-  function A_maximizeMw() {
-    A_molecule_prop.update((weights) => {
-      const newWeights = {};
-
-      // Set all keys to 0
-      for (const key in weights) {
-        newWeights[key] = 0;
-      }
-
-      // Set mw to 1
-      newWeights.mw = 1;
-
-      return newWeights;
-    });
-  }
 
 
 </script>
@@ -1141,14 +1143,14 @@
 <Snackbar bind:this={snackbar_load} leading>
   <Label>Settings of this training run have been loaded into the playground</Label>
   <Actions>
-    <Button on:click={scrollTo(playgroundstart)}>Go to Playground</Button>
+    <Button on:click={scrollTo(h_playground)}>Go to Playground</Button>
   </Actions>
 </Snackbar>
 
 <Snackbar bind:this={snackbar_training_done} leading>
   <Label>Training completed</Label>
   <Actions>
-    <Button on:click={scrollTo(playgroundstart)}>Go to Playground</Button>
+    <Button on:click={scrollTo(h_playground)}>Go to Playground</Button>
   </Actions>
 </Snackbar>
 
@@ -1156,11 +1158,51 @@
 
 <main class="main-content">
 
-
-
-
-
-
+  <div class="menu-button">
+    <IconButton
+      on:click={() => (menuOpen = !menuOpen)}
+    ><Icon class="material-icons" style="font-size: 22px">menu</Icon>
+    </IconButton>
+    <Menu bind:open={menuOpen}>
+      <List>
+        <Item on:click={scrollTo(h_top)}>
+          <Text>Go to Top</Text>
+        </Item>
+        <Item on:click={scrollTo(h_intro)}>
+          <Text>What is a GFlowNet?</Text>
+        </Item>
+        <Item on:click={scrollTo(h_coreConcepts)}>
+          <Text>Fundamentals Illustrated with Tetris</Text>
+        </Item>
+        <Item on:click={scrollTo(h_domain)}>
+          <Text>Domain application</Text>
+        </Item>
+        <Item on:click={scrollTo(h_policy)}>
+          <Text>Flow, Policies and Training Objective</Text>
+        </Item>
+        <Item on:click={scrollTo(h_continuous)}>
+          <Text>Towards continuous GFlowNets</Text>
+        </Item>
+        <Item on:click={scrollTo(h_training)}>
+          <Text>Training</Text>
+        </Item>
+        <Item on:click={scrollTo(h_flow)}>
+          <Text>Flow</Text>
+        </Item>
+        <Separator />
+        <Item on:click={scrollTo(h_playground)}>
+          <Text>Playground</Text>
+        </Item>
+        <Separator />
+        <Item on:click={scrollTo(h_conclusion)}>
+          <Text>Conclusion</Text>
+        </Item>
+        <Item on:click={scrollTo(h_sources)}>
+          <Text>Sources</Text>
+        </Item>
+      </List>
+    </Menu>
+  </div>
 
   {#if isMobile}
     <div class="mobile-disclaimer">
@@ -1173,7 +1215,7 @@
 
 
     <header class="header-top">
-      <div class="container">
+      <div class="container" bind:this={h_top}>
         <h1 class="title">GFlowNet Playground</h1>
         <p class="subtitle">Building an intuitive understanding of GFlowNet training</p>
       </div>
@@ -1215,90 +1257,48 @@
         It provides an interactive environment to explore how GFlowNets adapt to changes in both reward functions and training hyperparameters.
       </p>
 
-</section>
+    </section>
 
 
-
-
-
-
-<section class="section" id="Tutorial" bind:this={tutorialstart}>
+    <section class="section" id="Tutorial" bind:this={h_intro}>
       <h2 class="section-title">What is a GFlowNet?</h2>
-      <h2 class="annotations-header">Flo</h2>
-      <p class="section-annotation">
-        In short, a generative flow network is a model class that allows sampling proportional to an unknown distribution.
-        In this, it is similar to Markov Chain Monte Carlo, but offers some advantages regarding compute and sparse environments.
-        GFlowNets enable the generation of objects with sequentially built compositional structures, such as trees or graphs. They construct the final object stepwise.
-
-        <br>
-        If we have a reward function <Katex>R(x)</Katex>, which assigns value to each final object <Katex>x</Katex>,
-        we can train a model that learns to sample proportional to the reward.
-        This allows us to sample a diversity of solutions later on, instead of just the reward-maximizing one.
+      <p class="section-text">
+        A GFlowNet is a probabilistic framework for constructing complex objects by sampling trajectories in a directed acyclic graph (DAG).
+        Each trajectory corresponds to a sequence of actions that produces a final object <Katex>x</Katex> (e.g. a molecule).
+        Training a GFlowNet requires a reward function <Katex>R(x)</Katex>, that assigns value to each final object.
+        A trained GFlowNet samples x proportional to its reward. This allows us to sample a diversity of solutions,
+        instead of just the reward-maximizing one.
         As we do not rely on an external dataset but only on our internal reward function, we are only limited by compute.
-        Thus we can generate objects and query the reward function as often as we like.
-
+        Thus, we can generate objects and query the reward function as often as we like.
+        <br><br>
+        In the following sections we will go into detail how GFlowNets work. Below you can find comparisons to other sampling methods.
       </p>
-        <div class="image-container">
-          <Accordion>
-            <Panel color="secondary">
-              <Header>Too fast? Expand for an example and a more detailed introduction</Header>
-              <Content>
-                Imagine building a Lego Pyramid. There are different blocks, and you can place them at various angles and locations.
-                <br>You might start with an empty plane, add a 2x4 block, and so on.
-                After some steps, you might end up with an object that is more or less pyramid-shaped.
-                <br>
-                <br>The different possibilities of states of the object form a graph:
-                While in the beginning (state 0) you can only place something in the first level,
-                later on, you might have different options, and they depend on your first choices.
-                One option is always to choose to be finished instead of continuing to build.
-                <br>
-                <br>If you want to use a GFlowNet for your task, it is important that the resulting graph is acyclic,
-                i.e., it is not possible to reach a previous state.
-                In terms of our pyramid, this means that taking away blocks is not possible.
-                <br>If we built a pyramid, in the end we have a trajectory (a sequence of states <Katex>s_0 \to s_1 \to ... \to s_{"T"}</Katex>). As we can choose to stop anytime, our trajectories can have different lengths, e.g. we can build a pyramid from 1 piece or from 100.
-                <br>
-                <br>As you might have guessed from the vocabulary, GFlowNets are very similar to Reinforcement learning methods, we sample trajectories and assign a reward R(x) to them (or to the states).
-                The main difference is that usual RL methods try to find solutions which maximize the reward,
-                whereas GFlowNets learn the underlying distribution p(x). So we want to train a model such that p(x) is proportional to the reward function R(x). This allows us to sample not only from the mode which has the highest reward, but also all other modes which might be almost as good.
 
-                Imagine a pyramid that contains  a 2x4 block, we could just replace it with two 2x2 blocks. Both options are valid and we might be interested in finding many possible ways to build pyramids.
-                <br>
-                <br>Building Lego Pyramids is maybe not usecase number one for GFlowNets, but they are used for drug discovery (Nica et al., 2022), where sampling from multiple modes is really what you want in order to discover not only the most promising molecule.
-
-              </Content>
-            </Panel>
-          </Accordion>
-        </div>
-      <p class="section-annotation">
-        When sequentially generating an object, we need to take actions which give us the next state:
-        We could add one of the possible components (e.g. adding an atom when generating a molecule)
-        or decide we are done by making this state a final state.
-        For this we use a neural net which represents our forward policy.
-        It gives us the action which leads to the next state.
-        Changing the policy leads to changes in the transition probabilities between states and in consequence to different probabilities for the final states.
-        During training the network adjusts in a way that the probabilities for sampling the final states is proportional to their reward.
-
-      </p>
-      <h2 class="annotations-header">Alex</h2>
-      <p class="section-annotation">
-        A Generative Flow Network (GFlowNet) is a probabilistic framework for constructing complex objects by sequentially sampling trajectories in a directed acyclic graph (DAG). Each trajectory corresponds to a sequence of actions that produces a complete object (for example, a finished Tetris board or a fully formed molecule). A GFlowNet assigns non-negative flow (probability mass) to each trajectory so that the marginal probability of sampling any complete object is proportional to a user-defined reward for that object.
-        Unlike conventional reinforcement learning, which typically converges to a single best policy, GFlowNets aim to learn a distribution over many high-reward outcomes. This property of proportional sampling is especially valuable in applications where multiple viable solutions are required, such as diverse move sequences in games or candidate molecules in drug discovery.
-        The figure contrasts the behavior of a standard single-path reinforcement learner with that of a GFlowNet. In the traditional RL approach (left), the policy concentrates probability mass along one “best” trajectory. In contrast, the GFlowNet (right) spreads its flow across several promising paths. Each path in the diagram represents an alternative construction strategy. By maintaining multiple plausible routes, GFlowNets preserve exploration and remain robust if the optimal solution changes over time.
-  </p>
-</section>
-
-    <section class="section">
       <div class="image-container">
-        <Accordion>
+        <Accordion multiple>
           <Panel color="secondary">
-            <Header>Comparison to reinforcement learning</Header>
+            <Header>Comparison to Reinforcement Learning</Header>
             <Content>
-              <p class="section-text">
-Unlike conventional reinforcement learning, which typically converges to a single best policy, GFlowNets aim to learn a distribution over many high-reward outcomes. This property of proportional sampling is especially valuable in applications where multiple viable solutions are required, such as diverse move sequences in games or candidate molecules in drug discovery.
-
-The figure contrasts the behavior of a standard single-path reinforcement learner with that of a GFlowNet. In the traditional RL approach (left), the policy concentrates probability mass along one “best” trajectory. In contrast, the GFlowNet (right) spreads its flow across several promising paths. Each path in the diagram represents an alternative construction strategy. By maintaining multiple plausible routes, GFlowNets preserve exploration and remain robust if the optimal solution changes over time.
-              </p>
+              Unlike conventional reinforcement learning, which typically converges to a single best policy, GFlowNets aim to learn a distribution over many high-reward outcomes. This property of proportional sampling is especially valuable in applications where multiple viable solutions are required, such as diverse move sequences in games or candidate molecules in drug discovery.
+              The figure contrasts the behavior of a standard single-path reinforcement learner with that of a GFlowNet. In the traditional RL approach (left), the policy concentrates probability mass along one “best” trajectory. In contrast, the GFlowNet (right) spreads its flow across several promising paths. Each path in the diagram represents an alternative construction strategy. By maintaining multiple plausible routes, GFlowNets preserve exploration and remain robust if the optimal solution changes over time.
               <div id="comparisonChart" style="margin:20px auto; max-width:600px;"></div>
+            </Content>
+          </Panel>
+          <Panel color="secondary">
+            <Header>Comparison to Markov Chain Monte Carlo</Header>
+            <Content>
+              Markov Chain Monte Carlo sampling (MCMC) approximates a distribution by creating an ensemble of Markov chains in such a way,
+              that their equilibrium distribution is proportional to it.
+              However, compute grows with the length of the chains.
+              Even worse, if the modes of the distribution are small or distributed over a large space with little probability mass between them,
+              the time to find them can grow exponentially. But MCMC does not use all available information:
+              The previous samples might contain information that could be used to improve the sampling using machine learning.
+              This is called amortisation and exactly what GFlowNets do. One could describe GFlowNets as MCMC with memory:
+              Where MCMC samples the same in each iteration, GFlowNets use the already generated pairs of final objects and their reward to guide future sampling.
+              This way, they can estimate the statistical structure of the reward function and guess the presence of modes from it.
+              This gives GFlowNets an advantage over MCMC in spaces where such underlying structure exists, something Bengio et al. (2021) could show.
+              Note that representing the distribution happens very differently in both methods.
+              MCMC represents it non-parametrically via its samples, whereas GFlowNets do this implicitly via the learned flow.
             </Content>
           </Panel>
         </Accordion>
@@ -1306,10 +1306,10 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
     </section>
 
 
-<section class="section">
-  <h2 class="section-title">
-    GFlowNet Fundamentals Illustrated with Tetris
-  </h2>
+    <section class="section" bind:this={h_coreConcepts}>
+      <h2 class="section-title" >
+        GFlowNet fundamentals illustrated with Tetris
+      </h2>
 
   <p class="section-text">
     To better understand the core concepts used by GFlowNets, let’s consider a
@@ -1467,7 +1467,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
         </div>
       </div>
 </div>
-    <section class="section">
+    <section class="section" bind:this={h_domain}>
       <h2 class="section-title">Domain application </h2>
       <p class="section-text">
         The principles demonstrated in the Tetris demo extend naturally to molecular generation.
@@ -1581,10 +1581,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
   </p>
     </section>
 
-
-
-
-    <section class="section">
+    <section class="section" bind:this={h_policy}>
       <h2 class="section-title">Flow, Policies and Training Objective </h2>
       <p class="section-text">
         <br>If you connect all possible states from the start state to the terminal states you obtain a directed graph.
@@ -1816,18 +1813,73 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
         The example above shows a perfectly trained model and you can see an important property of it:
         For each state, the incoming flow is equal to the outgoing flow.
         This is called Flow Consistency or Flow Matching and is the key to our goal: Sampling diverse candidates.
-        If we sample trajectories (a path from <Katex>s_0</Katex> to a final state <Katex>x</Katex>) using our policy and matched flows,
-        we will sample the final states proportional to their reward.
-        So a final state with half the reward of the best final state will get sampled half as often -
-        But in contrast to reward maximizing approaches it <i>will</i> get sampled eventually.
-        <br>
-        <br>
-        If Flow Consistency holds for all states it also holds for the whole DAG.
-        In this case the incoming flow at the start state s0 is equal to the outgoing flow of the DAG.
-        The outgoing flow is the sum of all rewards and is called the partition function, denoted as <Katex>Z</Katex>.
-        While the sum of the reward function is fixed and usually not known,
+
+        In their original GFlowNet Paper, Bengio et al. (2021) proved that
+        if Flow Consistency holds and we sample final states <Katex>x</Katex> using the Policy above,
+        we will always sample proportionally to their reward.
+        In this case, the probability of sampling <Katex>x</Katex> is the reward of <Katex>x</Katex> divided by the sum of all rewards Z.
+        This is the main theorem of GFlowNets and the reason for diversity in the sampled states.
+        You can find more detail about it in the box below.
+        <br><br>
+        If Flow Consistency holds for all states, it also holds for the entire DAG.
+        In this case, the incoming flow at the start state <Katex>s_0</Katex> is equal to the outgoing flow of the DAG.
+        The outgoing flow is the sum of all rewards. It is called the partition function, denoted as <Katex>Z</Katex>.
+        While the sum of the reward function is fixed and usually unknown and intractable,
         the model implicitly learns it during training by adjusting the flow of <Katex>s_0</Katex>.
-        <br>
+      </p>
+      <Accordion class="image-container" style="width:1000px">
+        <Panel color="secondary">
+          <Header>Main Theorem</Header>
+          <Content>
+            If the following assumptions hold:
+            <ul>
+              <li>We sample new states <Katex>s'</Katex> using the policy defined above:
+                <Katex>{`P_F(s'|s) = \\frac{F(s \\to s')}{F_{out}}`}</Katex>
+              </li>
+              <li>
+                All flow is non-negative: <Katex>{`F(s \\to s')>0`}</Katex>
+              </li>
+              <li>
+                <Katex>{`F_{out} = R(s) + \\sum_{s' \\in \\{parents(s)\\}} F(s \\to s')`}</Katex>
+              </li>
+              <li>
+                <Katex>{`R(s)=0`}</Katex> for non-terminal states <Katex>s</Katex>
+                and <Katex>R(x)=F(x)>0</Katex> for terminal states <Katex>x</Katex>.
+              </li>
+              <li>
+                The flow consistency holds for all states:
+                <Katex>\sum_{"{s' \\in \\{children(s)\\}} F(s' \\to s) = R(s) + \\sum_{s' \\in \\{parents(s)\\}} F(s \\to s')"}</Katex>
+              </li>
+            </ul>
+            Then:
+            <ul>
+              <li>
+                <Katex>
+                  {`P_F(s) = \\frac{F(s)}{F(s_0)}`}
+                </Katex>
+                , where <Katex>P_F(s)</Katex> is the probability of visiting <Katex>s</Katex> when starting at
+                <Katex>s_0</Katex> and following the policy.
+              </li>
+              <li>
+                <Katex>
+                  F(s_0) = \sum_x R(x) =Z
+                </Katex>.
+                The flow consistency also holds for the entire DAG,
+                the incoming flow at the start state <Katex>s_0</Katex> is equal to the outgoing flow of the DAG.
+              </li>
+              <li>
+                <Katex>
+                  {`P_F(x) = \\frac{R(x)}{\\sum_{x'}R(x')} = \\frac{R(x)}{Z}`}
+                </Katex>.
+                The probability to sample a final state is its proportion of the total rewards.
+                This is the property we want for diverse sampling.
+              </li>
+            </ul>
+          </Content>
+        </Panel>
+      </Accordion>
+
+      <p class="section-text">
         We now know that the way to diverse candidates is to achieve Flow Matching.
         Turning this into a training objective is actually quite simple, we just use a Mean Squared Error for each state.
         The lower the difference between the incoming and the outgoing flow of a state is the lower its <b>loss</b>.
@@ -2010,7 +2062,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
                     We can estimate it using a Neural Network as well.
                   </li>
                   <li>
-                    The reward <Katex>R(X)</Katex>of the final state of the trajectory.
+                    The reward <Katex>R(x)</Katex>of the final state of the trajectory.
                   </li>
                 </ul>
                 <br>
@@ -2056,8 +2108,10 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
             </Panel>
           </Accordion>
         </div>
+    </section>
 
 
+    <section class="section" bind:this={h_continuous}>
       <h2 class="section-title">Towards continuous GFlowNets</h2>
       <p class="section-text">
         So far, we've only looked at discrete spaces,
@@ -2154,7 +2208,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
 
 
 
-    <section class="section section-light">
+    <section class="section" bind:this={h_training}>
       <h2 class="section-title">Training</h2>
       <p class="section-text">
         Using the environment above we trained a GFlowNet with Trajectory Balance Loss.
@@ -2396,7 +2450,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
 
     </section>
 
-    <section class="section" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);">
+    <section class="section" bind:this={h_flow} style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);">
       <h2 class="section-title">Flow</h2>
       <p class="section-text">
         Below you can see the flow of the last training run.
@@ -2492,7 +2546,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
 
 
       <!-- Playground -->
-    <header class="header-pg">
+    <header class="header-pg" bind:this={h_playground}>
       <div class="container">
         <h1 class="title">Playground</h1>
       </div>
@@ -2509,7 +2563,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
         The <b>Flow</b> view visualizes the learned flow.
       </p>
     </section>
-    <div class="pg-background" id="Playground" bind:this={playgroundstart}>
+    <div class="pg-background" id="Playground">
       <div class = "pg-top-background">
       </div>
 
@@ -3250,10 +3304,24 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
 
     </div>
 
-      <section class="section">
+      <section class="section" bind:this={h_conclusion}>
         <h2 class="section-title">Conclusion </h2>
-        <p class="section-annotation">
-          Placeholder for conclusion text <br><br><br><br><br><br><br><br><br><br>
+        <p class="section-text">
+          With this article, you should have gained a solid understanding of how Generative Flow Networks work, where they are applied
+          and what sets them apart from more traditional methods like reinforcement learning and MCMC.
+          We showed how flow consistency enables sampling proportional to reward,
+          allowing GFlowNets to produce not just a single optimal solution but a diverse set of high-reward candidates.
+          <br><br>
+          We highlighted key components of GFlowNet training like policies, flow and the partition function
+          and showed how off-policy training can mitigate mode collapse by encouraging exploration.
+          Our interactive examples revealed how flow shapes sampling behaviour in both discrete and continuous domains,
+          emphasizing the importance of visualizations to understand model behaviour.
+          <br>
+          We moved between different levels of abstraction:
+          from observing the high-level action choices of a trained GFlowNet in Tetris,
+          down to inspecting very small state spaces to break down core formulas like Flow Matching and Trajectory Balance.
+          If you’re curious to go further, we encourage you to experiment with the Playground,
+          use the code to build new models and environments or have a look into the resources listed below.
         </p>
       </section>
 
@@ -3271,7 +3339,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
         <div class="whatnext_t" >
           <div class="whatnext_b">
             <Fab
-            on:click={scrollTo(playgroundstart)}
+            on:click={scrollTo(h_playground)}
             disabled="{isRunning}"
           >
             <Icon class="material-icons">keyboard_arrow_up</Icon></Fab>
@@ -3297,7 +3365,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
           </div>
           <div class="whatnext_b">
             <Fab
-            on:click={scrollTo(sourcesstart)}
+            on:click={scrollTo(h_sources)}
             disabled="{isRunning}"
           >
             <Icon class="material-icons">keyboard_arrow_down</Icon></Fab>
@@ -3331,7 +3399,7 @@ The figure contrasts the behavior of a standard single-path reinforcement learne
     </section>
 
 
-    <section class="section" id="Sources" bind:this={sourcesstart}>
+    <section class="section" id="Sources" bind:this={h_sources}>
       <h2 class="section-title">Sources</h2>
       <h3 class="section-title3">Literature</h3>
         <p class="section-text">
