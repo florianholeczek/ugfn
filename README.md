@@ -16,33 +16,9 @@ When the training is successfull we can see that the GFN learned the true underl
 
 ## Python only
 If you want to use the Python code, all relevant files are in the "python" folder.
-Create 
-
-
-
-## How to run
-The "python" folder contains all python files which are used for training.
-The folder "front" has the data for building the website with svelte.
-If you want to run the webpage locally you can use the docker image:
-```shell
-docker pull florianholeczek/ugfn:latest 
-docker run -p 8000:8000 florianholeczek/ugfn:latest
-```
-
-As an alternative you can build it: 
-Clone the repository first or download and extract the .zip manually
-
-```shell
-cd yourworkingdirectory
-
-git clone https://github.com/florianholeczek/ugfn
-```
-
 To set up the environment you will need python version >3.8 and <3.11.
-
 It is tested with version [3.10.11](https://www.python.org/downloads/release/python-31011/).
-
-The following creates a virtual environment:
+Create a virtual environment using the requirements.txt file:
 
 Windows
 ```shell
@@ -63,9 +39,6 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
-
-
-### Plain python
 If you want to simply train models you can change the hyperparameters at the beginning of 
 the python/main.py file to change the model and the environment. 
 
@@ -78,9 +51,16 @@ python python\main.py
 python3 python/main.py
 ```
 
-#### Running the webpage locally
-To run the webpage locally you will need [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
-and nodejs. 
+## Running the webpage locally
+If you want to run the webpage locally you can either use the docker image:
+```shell
+docker pull florianholeczek/ugfn:latest 
+docker run -p 8000:8000 florianholeczek/ugfn:latest
+```
+Or you build it yourself:
+Clone the repository and create a venv like above.
+
+You will need [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and nodejs. 
 Node Version 22.12.0 is tested.
 
 To get it, install nvm via this [link](https://github.com/coreybutler/nvm-windows/releases/download/1.2.2/nvm-setup.exe)
@@ -111,7 +91,7 @@ From the root folder, you can start the page with
 uvicorn back:app --host 0.0.0.0 --port 8000
 ```
 
-You can find it on port 8000:
+You can then find it on port 8000:
 http://0.0.0.0:8000
 
 
