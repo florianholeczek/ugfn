@@ -1293,7 +1293,25 @@
           <Panel color="secondary">
             <Header>Comparison to Markov Chain Monte Carlo</Header>
             <Content>
-              Markov chain Monte Carlo sampling (MCMC) approximates a distribution p by creating an ensemble of Markov chains such that their equilibrium distribution is proportional to p. However, computational complexity grows with the length of the chains. Even worse, if the modes of the distribution are small or distributed over a large space with little probability mass between them, the time to find them can grow exponentially. MCMC does not use all available information: The previous samples might contain information that could be used to improve the sampling using machine learning. This is called amortization and is exactly what GFlowNets do. One could describe GFlowNets as MCMC with memory: Where MCMC samples the same in each iteration, GFlowNets use the already generated pairs of final objects and their reward to guide future sampling. This way, they can estimate the statistical structure of the reward function and guess the presence of modes from it. This should give GFlowNets an advantage over MCMC in spaces where such an underlying structure exists, as Bengio et al. (2021) have demonstrated. Note that distributions are represented rather differently in the two methods. MCMC uses a non-parametric representation based on samples, whereas GFlowNets represents the distribution implicitly via the flow along trajectories.
+              Markov chain Monte Carlo sampling (MCMC) approximates a distribution
+              <Katex>p</Katex>
+              by creating an ensemble of Markov chains such that their equilibrium distribution is proportional to
+              <Katex>p</Katex>.
+              However, computational complexity grows with the length of the chains.
+              Even worse, if the modes of the distribution are small or distributed over a large space with little probability mass between them,
+              the time to find them can grow exponentially.
+              MCMC does not use all available information:
+              The previous samples might contain information that could be used to improve the sampling using machine learning.
+              This is called amortization and is exactly what GFlowNets do.
+              <br>
+              One could describe GFlowNets as MCMC with memory:
+              Where MCMC samples the same in each iteration,
+              GFlowNets use the already generated pairs of final objects and their reward to guide future sampling.
+              This way, they can estimate the statistical structure of the reward function and guess the presence of modes from it.
+              This should give GFlowNets an advantage over MCMC in spaces where such an underlying structure exists,
+              as <a href="#ref1">Bengio et al. (2021) </a> have demonstrated.
+              Note that distributions are represented rather differently in the two methods.
+              MCMC uses a non-parametric representation based on samples, whereas GFlowNets represents the distribution implicitly via the flow along trajectories.
             </Content>
           </Panel>
         </Accordion>
@@ -3332,72 +3350,71 @@
           <a href="https://editor.p5js.org/Mathcurious/sketches/bdp6luRil" target="_blank">Mathcurious' implementation</a>.
         </span>
       </p>
-
     </section>
 
 
     <section class="section" id="Sources" bind:this={h_sources}>
       <h2 class="section-title">References</h2>
-      <p class="section-text">
+      <p class="section-text" id="Bengio21">
         Bengio, Emmanuel, Moksh Jain, Maksym Korablyov, Doina Precup, and Yoshua Bengio (2021). “Flow network based generative models for non-iterative diverse candidate generation”. In: Advances in Neural Information Processing Systems 34, pp. 27381–27394.
         <a href="https://proceedings.neurips.cc/paper/2021/hash/e614f646836aaed9f89ce58e837e2310-Abstract.html" style="color: #21918c">[URL]</a>
-
-        <br><br>
+      </p>
+      <p class="section-text" id="Bengio23">
         Bengio, Yoshua, Salem Lahlou, Tristan Deleu, Edward J Hu, Mo Tiwari, and Emmanuel Bengio (2023). “GFlowNet Foundations”. In: Journal of Machine Learning Research 24.210, pp. 1–55.
         <a href="https://www.jmlr.org/papers/v24/22-0364.html" style="color: #21918c">[URL]</a>
-
-        <br><br>
+      </p>
+      <p class="section-text" id="Ghari23">
         Ghari, Pouya M, Alex Tseng, Gökcen Eraslan, Romain Lopez, Tommaso Biancalani, Gabriele Scalia, and Ehsan Hajiramezanali (2023). “Generative flow networks assisted biological sequence editing”. In: NeurIPS 2023 Generative AI and Biology (GenBio) Workshop.
         <a href="https://openreview.net/forum?id=9BQ3l8OVru" style="color: #21918c">[URL]</a>
-
-        <br><br>
+      </p>
+      <p class="section-text" id="Jain22">
         Jain, Moksh, Emmanuel Bengio, Alex Hernández-Garcıa, Jarrid Rector-Brooks, Bonaventure FP Dossou, Chanakya Ajit Ekbote, Jie Fu, Tianyu Zhang, Michael Kilgour, Dinghuai Zhang, et al. (2022). “Biological sequence design with GFlowNets”. In: International Conference on Machine Learning. PMLR, pp. 9786–9801.
         <a href="https://proceedings.mlr.press/v162/jain22a.html" style="color: #21918c">[URL]</a>
-
-        <br><br>
+      </p>
+      <p class="section-text" id="Jiralerspong24">
         Jiralerspong, Marco, Bilun Sun, Danilo Vucetic, Tianyu Zhang, Yoshua Bengio, Gauthier Gidel, and Nikolay Malkin (2024). Expected flow networks in stochastic environments and two-player zero-sum games. arXiv: 2310.02779 [cs.LG].
         <a href="https://arxiv.org/abs/2310.02779" style="color: #21918c">[URL]</a>
-
-        <br><br>
+      </p>
+      <p class="section-text" id="Lahlou23">
         Lahlou, Salem, Tristan Deleu, Pablo Lemos, Dinghuai Zhang, Alexandra Volokhova, Alex Hernández-Garcıa, Léna Néhale Ezzine, Yoshua Bengio, and Nikolay Malkin (2023). “A theory of continuous generative flow networks”. In: International Conference on Machine Learning. PMLR, pp. 18269–18300.
         <a href="https://proceedings.mlr.press/v202/lahlou23a.html" style="color: #21918c">[URL]</a>
-
-        <br><br>
+      </p>
+      <p class="section-text" id="Li23">
         Li, Sida, Ioana Marinescu, and Sebastian Musslick (2023). GFN-SR: symbolic regression with generative flow networks. arXiv: 2312.00396 [cs.LG].
         <a href="https://arxiv.org/abs/2312.00396" style="color: #21918c">[URL]</a>
-
-        <br><br>
+      </p>
+      <p class="section-text" id="Liu23">
         Liu, Shuchang, Qingpeng Cai, Zhankui He, Bowen Sun, Julian McAuley, Dong Zheng, Peng Jiang, and Kun Gai (2023). “Generative Flow Network for Listwise Recommendation”. In: Proceedings of the 29th ACM SIGKDD Conference on Knowledge Discovery and Data Mining. New York, NY, USA: Association for Computing Machinery, pp. 1524–1534. DOI: 10.1145/3580305.3599364.
-
-        <br><br>
+      </p>
+      <p class="section-text" id="Malkin22">
         Malkin, Nikolay, Moksh Jain, Emmanuel Bengio, Chen Sun, and Yoshua Bengio (2022). “Trajectory balance: Improved credit assignment in GFlowNets”. In: Advances in Neural Information Processing Systems 35, pp. 5955–5967.
         <a href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/27b51baca8377a0cf109f6ecc15a0f70-Abstract-Conference.html" style="color: #21918c">[URL]</a>
-
-        <br><br>
+      </p>
+      <p class="section-text" id="Manta23">
         Manta, Dragos Cristian, Edward J Hu, and Yoshua Bengio (2023). “GFlowNets for causal discovery: an overview”. In: ICML 2023 Workshop on Structured Probabilistic Inference & Generative Modeling.
         <a href="https://openreview.net/forum?id=atgDufs209" style="color: #21918c">[URL]</a>
-
-        <br><br>
+      </p>
+      <p class="section-text" id="Mistal23">
         Mistal, Alex Hernández-García, Alexandra Volokhova, Alexandre AGM Duval, Yoshua Bengio, Divya Sharma, Pierre Luc Carrier, Michał Koziarski, and Victor Schmidt (2023). “Crystal-GFN: sampling materials with desirable properties and constraints”. In: AI for Accelerated Materials Design – NeurIPS 2023 Workshop.
         <a href="https://openreview.net/forum?id=l167FjdPOv" style="color: #21918c">[URL]</a>
-
-        <br><br>
+      </p>
+      <p class="section-text" id="Nica22">
         Nica, Andrei Cristian, Moksh Jain, Emmanuel Bengio, Cheng-Hao Liu, Maksym Korablyov, Michael M Bronstein, and Yoshua Bengio (2022). “Evaluating generalization in GFlowNets for molecule design”. In: ICLR2022 Machine Learning for Drug Discovery.
         <a href="https://openreview.net/forum?id=JFSaHKNZ35b" style="color: #21918c">[URL]</a>
-
-        <br><br>
+      </p>
+      <p class="section-text" id="Shen23">
         Shen, Max W, Emmanuel Bengio, Ehsan Hajiramezanali, Andreas Loukas, Kyunghyun Cho, and Tommaso Biancalani (2023). “Towards understanding and improving GFlowNet training”. In: International Conference on Machine Learning. PMLR, pp. 30956–30975.
         <a href="https://proceedings.mlr.press/v202/shen23a.html" style="color: #21918c">[URL]</a>
-
-        <br><br>
+      </p>
+      <p class="section-text" id="Zhang23">
         Zhang, Chong and Lizhi Yang (2023). Generating a terrain-robustness benchmark for legged locomotion: A prototype via terrain authoring and active learning. arXiv: 2208.07681 [cs.RO].
         <a href="https://arxiv.org/abs/2208.07681" style="color: #21918c">[URL]</a>
-
-        <br><br>
+      </p>
+      <p class="section-text" id="Zhang25">
         Zhang, Ni, Jingfeng Yang, Zhiguang Cao, and Xu Chi (2025). Adversarial generative flow network for solving vehicle routing problems. arXiv: 2503.01931 [cs.LG].
         <a href="https://arxiv.org/abs/2503.01931" style="color: #21918c">[URL]</a>
-
-        <br><br>
+      </p>
+      <p class="section-text" id="Zhou24">
         Zhou, Mingyang, Zichao Yan, Elliot Layne, Nikolay Malkin, Dinghuai Zhang, Moksh Jain, Mathieu Blanchette, and Yoshua Bengio (2024). PhyloGFN: Phylogenetic inference with generative flow networks. arXiv: 2310.08774 [q-bio.PE].
         <a href="https://arxiv.org/abs/2310.08774" style="color: #21918c">[URL]</a>
       </p>
