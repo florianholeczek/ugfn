@@ -32,7 +32,6 @@ venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
-
 Linux:
 ```shell
 python3 -m venv venv
