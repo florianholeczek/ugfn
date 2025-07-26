@@ -1309,7 +1309,7 @@
               GFlowNets use the already generated pairs of final objects and their reward to guide future sampling.
               This way, they can estimate the statistical structure of the reward function and guess the presence of modes from it.
               This should give GFlowNets an advantage over MCMC in spaces where such an underlying structure exists,
-              as <a href="#ref1">Bengio et al. (2021) </a> have demonstrated.
+              as <a href="#Bengio21" style="color: black">Bengio et al. (2021) </a> have demonstrated.
               Note that distributions are represented rather differently in the two methods.
               MCMC uses a non-parametric representation based on samples, whereas GFlowNets represents the distribution implicitly via the flow along trajectories.
             </Content>
@@ -1829,7 +1829,7 @@
         For each state, the total incoming flow is equal to the total outgoing flow.
         This is called <i>flow consistency</i> or <i>flow matching</i>, and it is the key to our goal: sampling diverse candidates.
         <br><br>
-        In their original GFlowNet Paper, E. Bengio et al. (2021) proved that if Flow Consistency holds
+        In their original GFlowNet Paper, <a href="#Bengio21" style="color: #21918c">E. Bengio et al. (2021)</a> proved that if Flow Consistency holds
         and we sample final states <Katex>x</Katex> using the policy above, we will always sample proportionally to their reward.
         In this case, the probability of sampling <Katex>x</Katex> is the reward of <Katex>x</Katex> divided by the sum of all rewards <Katex>Z</Katex>.
         This is the main theorem of GFlowNets and the reason for diversity in the sampled states.
@@ -1902,9 +1902,9 @@
         The lower the difference between the incoming and outgoing flow of a state, the lower its <b>loss</b>.
         You can see the loss calculation by hovering over the states in Figure 99.
         As our example has perfect flow matching, the result will always be 0.
-        In the first GFlowNet paper (E. Bengio et al. 2021), the authors used this simple loss;
+        In the first GFlowNet paper (<a href="#Bengio21" style="color: #21918c">E. Bengio et al. 2021</a>), the authors used this simple loss;
         however, many improvements have been proposed since.
-        In the Playground we use trajectory balance loss (Malkin et al. 2022); you can learn about it below.
+        In the Playground we use trajectory balance loss (<a href="#Malkin22" style="color: #21918c">Malkin et al. 2022</a>); you can learn about it below.
       </p>
 
       <div class="image-container">
@@ -2137,7 +2137,7 @@
 
         <!-- Center Grid -->
         <div class="DC-center-grid">
-          <div>
+          <div class="DC-quadrant">
             {#if DC_view === 0}
               In a grid-based environment, the reward function can be defined as a value assigned to each cell. An agent moves across the grid and collects the reward of the cell it ends up in. The agent is free to move in both the x and y directions, taking steps of size n. For simplicity–and to help visualize the flow later on–we fix the number of steps (i.e., the trajectory length).
               <br><br>
@@ -2154,11 +2154,35 @@
               When visualizing the flow, we can aggregate the flows for each possible state. Recall the grey arrows representing possible actions: Each of these has an associated flow value. Treating them as vectors with their flow as the magnitude, we can show the direction of the highest flow. Doing this for all states produces a vector field, which reveals the most probable directions the agent will take. High-reward states appear as points of convergence in this field.
             {/if}
           </div>
-          <div id="DC_discrete_plot"></div>
-          <div id="DC_continuous_plot"></div>
-          <div>
+          <div class="DC-plot-wrapper">
+            <div id="DC_discrete_plot" class="DC-plot"></div>
             {#if DC_view === 0}
-              On a continuous plane, we have no cells, but we can specify the reward by a distribution. In this case, we use the mixture of multivariate Gaussians (for now, two components). The agent moves similarly to the discrete case for a fixed number of steps and then collects the reward based on the probability density function (PDF) of the distribution.
+              <div class="mathexpl" style="width: 100%">Figure 99: Reward of a discrete grid by assigned values.</div>
+            {:else if DC_view ===1}
+              <div class="mathexpl" style="width: 100%">Figure 99: Sampling on a discrete grid by choosing an action.</div>
+            {:else if DC_view ===2}
+              <div class="mathexpl" style="width: 100%">Figure 99: Sampling proportional to the reward function.</div>
+            {:else}
+              <div class="mathexpl" style="width: 100%">Figure 99: Direction of the highest flow for each state of the grid.</div>
+            {/if}
+          </div>
+
+          <!-- Continuous plot with caption -->
+          <div class="DC-plot-wrapper">
+            <div id="DC_continuous_plot" class="DC-plot"></div>
+            {#if DC_view === 0}
+              <div class="mathexpl" style="width: 100%">Figure 99: Reward of a continuous plane by the sum of Gaussian PDFs. </div>
+            {:else if DC_view ===1}
+              <div class="mathexpl" style="width: 100%">Figure 99: Sampling on a continuous plane by drawing from the sampling distribution</div>
+            {:else if DC_view ===2}
+              <div class="mathexpl" style="width: 100%">Figure 99: Sampling proportional to the reward function</div>
+            {:else}
+              <div class="mathexpl" style="width: 100%">Figure 99: Direction of the highest flow for gridpoints on the continuous plane.</div>
+            {/if}
+          </div>
+          <div class="DC-quadrant">
+            {#if DC_view === 0}
+              On a continuous plane, we have no cells, but we can specify the reward by a distribution. In this case, we use the sum of multivariate Gaussians (for now, two components). The agent moves similarly to the discrete case for a fixed number of steps and then collects the reward based on the probability density function (PDF) of the distribution.
               <br><br>
               This will be the environment of the Playground, where we simplified the variance of the Gaussians to one parameter, so the variance for x and y is the same and there is no covariance
               <Katex>(\Sigma = \sigma^2 I)</Katex>.
@@ -2170,6 +2194,8 @@
               The same principle applies in the continuous case. If we're interested in obtaining diverse high-reward solutions, we can, for instance, select the top five samples with the highest reward. These are likely to come from different modes of the reward distribution, reflecting the GFlowNet’s ability to explore multiple promising regions.
             {:else}
               In the continuous case, the flow is represented by the sampling distribution. The mean of this distribution corresponds to the expected action, which we interpret as the highest flow. By computing the predicted means of the sampling distribution at various points on the plane, we can again construct a vector field that shows the dominant flow directions. As in the discrete case, the modes of the reward function serve as attractors—clear convergence points in the vector field.
+              <br>
+              You can find more information about continuous GFlowNets in <a href="#Lahlou23" style="color: #21918c"> Lahlou et al. (2023).</a>
             {/if}
           </div>
         </div>
@@ -2239,6 +2265,9 @@
           </Tooltip>
         </Wrapper>
       </div>
+      <div class="mathexpl">
+        Figure 99: Example training run. During training the model learns to sample proportional to the reward function.
+      </div>
 
       <div style="height:50px"></div>
       <p class="section-text">
@@ -2292,6 +2321,9 @@
             Load the settings of this training run for the Playground
           </Tooltip>
         </Wrapper>
+      </div>
+      <div class="mathexpl">
+        Figure 99: Example training run showing mode collapse. The model samples only from one of the available modes and does not improve.
       </div>
       <div style="height:50px"></div>
       <p class="section-text">
@@ -2392,6 +2424,11 @@
           </Tooltip>
         </Wrapper>
       </div>
+      <div class="mathexpl">
+        Figure 99: Example training run showing the effect of off-policy training.
+        By encouraging exploration, the model samples from a wider range of the state space.
+        This leads to the discovery of the second mode and thereby to sampling proportional to the reward function.
+      </div>
       <div style="height:50px"></div>
       <p class="section-text">
         Off-policy training helped: We now sample proportionally to the reward function again.
@@ -2479,7 +2516,13 @@
           </div>
         </div>
       </div>
-
+      <div style="height:10px"></div>
+      <div class="mathexpl">
+        Figure 99: Highest Flow for gridpoints on the continuous plane.
+        After training, the modes of the reward function act as convergence points.
+        For the first steps of the agent these convergent points lie close together in the center.
+        They move outward towards the modes as the agent takes more steps.
+      </div>
       <div style="height:50px"></div>
 
 
@@ -3359,10 +3402,12 @@
         Bengio, Emmanuel, Moksh Jain, Maksym Korablyov, Doina Precup, and Yoshua Bengio (2021). “Flow network based generative models for non-iterative diverse candidate generation”. In: Advances in Neural Information Processing Systems 34, pp. 27381–27394.
         <a href="https://proceedings.neurips.cc/paper/2021/hash/e614f646836aaed9f89ce58e837e2310-Abstract.html" style="color: #21918c">[URL]</a>
       </p>
+      <!--
       <p class="section-text" id="Bengio23">
         Bengio, Yoshua, Salem Lahlou, Tristan Deleu, Edward J Hu, Mo Tiwari, and Emmanuel Bengio (2023). “GFlowNet Foundations”. In: Journal of Machine Learning Research 24.210, pp. 1–55.
         <a href="https://www.jmlr.org/papers/v24/22-0364.html" style="color: #21918c">[URL]</a>
       </p>
+      -->
       <p class="section-text" id="Ghari23">
         Ghari, Pouya M, Alex Tseng, Gökcen Eraslan, Romain Lopez, Tommaso Biancalani, Gabriele Scalia, and Ehsan Hajiramezanali (2023). “Generative flow networks assisted biological sequence editing”. In: NeurIPS 2023 Generative AI and Biology (GenBio) Workshop.
         <a href="https://openreview.net/forum?id=9BQ3l8OVru" style="color: #21918c">[URL]</a>
@@ -3402,10 +3447,12 @@
         Nica, Andrei Cristian, Moksh Jain, Emmanuel Bengio, Cheng-Hao Liu, Maksym Korablyov, Michael M Bronstein, and Yoshua Bengio (2022). “Evaluating generalization in GFlowNets for molecule design”. In: ICLR2022 Machine Learning for Drug Discovery.
         <a href="https://openreview.net/forum?id=JFSaHKNZ35b" style="color: #21918c">[URL]</a>
       </p>
+      <!--
       <p class="section-text" id="Shen23">
         Shen, Max W, Emmanuel Bengio, Ehsan Hajiramezanali, Andreas Loukas, Kyunghyun Cho, and Tommaso Biancalani (2023). “Towards understanding and improving GFlowNet training”. In: International Conference on Machine Learning. PMLR, pp. 30956–30975.
         <a href="https://proceedings.mlr.press/v202/shen23a.html" style="color: #21918c">[URL]</a>
       </p>
+      -->
       <p class="section-text" id="Zhang23">
         Zhang, Chong and Lizhi Yang (2023). Generating a terrain-robustness benchmark for legged locomotion: A prototype via terrain authoring and active learning. arXiv: 2208.07681 [cs.RO].
         <a href="https://arxiv.org/abs/2208.07681" style="color: #21918c">[URL]</a>
@@ -3418,6 +3465,8 @@
         Zhou, Mingyang, Zichao Yan, Elliot Layne, Nikolay Malkin, Dinghuai Zhang, Moksh Jain, Mathieu Blanchette, and Yoshua Bengio (2024). PhyloGFN: Phylogenetic inference with generative flow networks. arXiv: 2310.08774 [q-bio.PE].
         <a href="https://arxiv.org/abs/2310.08774" style="color: #21918c">[URL]</a>
       </p>
+
+
       <h2 class="section-title3">Tutorials & Libraries</h2>
       <p class="section-text">
         Bengio, Yoshua, Nikolay Malkin, and Moksh Jain (2022). The GFlowNet Tutorial.
