@@ -1,16 +1,24 @@
-# Understanding GFlowNets
+# GFlowNet Playground
 
-This is a basic implementation of a [GFlowNet](https://dl.acm.org/doi/abs/10.5555/3648699.3648909) architecture to get an intuition of how they work and behave.
+This repo contains the code for the [GFlowNet Playground](https://gfn-playground.caleydoapp.org), 
+an interactive article to learn about [GFlowNets](https://dl.acm.org/doi/abs/10.5555/3648699.3648909) and how to train them.
 
-The interactive Playground, a GFlowNet Tutorial and more information can be found [here](https://gfn-explorer.caleydoapp.org).
+Here you find the code for the webpage and the Python code to train models using the Playground environment.
+The code for the Tetris example can be found [here](https://github.com/Alexander070702/Alexander070702.github.io).
 
-Training happens in a very simple 2d environment where the reward is given proportional to the mixture of n multivariate Gaussians.
+Training in the playground environment happens on a continuous 2d plane where the reward is given proportional to the sum of n multivariate Gaussians.
 
 ![](https://github.com/florianholeczek/ugfn/blob/master/front/public/images/env1.png)
 
 When the training is successfull we can see that the GFN learned the true underlying distribution:
 
 ![](https://github.com/florianholeczek/ugfn/blob/master/front/public/images/run3.png)
+
+## Python only
+If you want to use the Python code, all relevant files are in the "python" folder.
+Create 
+
+
 
 ## How to run
 The "python" folder contains all python files which are used for training.
