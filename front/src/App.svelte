@@ -1032,20 +1032,6 @@
     if (typeof initFlowConservationDemo === 'function') {
       initFlowConservationDemo();
     }
-    if (typeof initComparisonChart === 'function') {
-      initComparisonChart();
-      const tryInitComparison = () => {
-        if (typeof initComparisonChart === 'function') {
-          initComparisonChart();
-        }
-      };
-
-      if (document.readyState === 'complete') {
-        tryInitComparison();
-      } else {
-        window.addEventListener('load', tryInitComparison, { once: true });
-      }
-    }
 
 
     // add listeners for changing the Environment
@@ -1283,7 +1269,7 @@
               an alternative construction strategy. By maintaining multiple plausible routes, GFlowNets preserve
               exploration and remain robust if the optimal solution changes over time.
               <div id="comparisonChart" style="margin:20px auto; max-width:600px;"></div>
-              <p class="mathexpl">
+              <p class="mathexpl" style="color: white">
                 Fig. 1: Difference in path selection between reinforcement learning and GFlowNets.
                 In reinforcement learning the objective is to maximize the expected reward.
                 GFlowNets, on the other hand, sample proportionally to the reward distribution.
