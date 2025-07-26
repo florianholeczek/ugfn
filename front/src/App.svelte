@@ -3321,7 +3321,7 @@
         <span class="li">The
           <a href="https://github.com/GFNOrg/torchgfn/blob/master/tutorials/notebooks/intro_gfn_continuous_line_simple.ipynb" target="_blank">continuous line</a>
           example by Joseph Viviano & Kolya Malkin.
-          The idea for the environment is based on their notebook and much of the training code is adapted from their tutorial.
+          The idea for the playground environment is based on their notebook and much of the training code is adapted from their tutorial.
       </span>
       <span class="li">The
           <a href="https://playground.tensorflow.org/" target="_blank">
@@ -3338,40 +3338,93 @@
 
     <section class="section" id="Sources" bind:this={h_sources}>
       <h2 class="section-title">References</h2>
-        <p class="section-text">
-          Malkin, N., Jain, M., Bengio, E., Sun, C., & Bengio, Y. (2022). Trajectory balance: Improved credit
-          assignment in gflownets. Advances in Neural Information Processing Systems, 35, 5955-5967.
-          <br><br>
-          Shen, M. W., Bengio, E., Hajiramezanali, E., Loukas, A., Cho, K., & Biancalani, T. (2023, July).
-          Towards understanding and improving gflownet training. In International Conference on Machine
-          Learning (pp. 30956-30975). PMLR.
-          <br><br>
-          Bengio, Y., Lahlou, S., Deleu, T., Hu, E. J., Tiwari, M., & Bengio, E. (2023). Gflownet foundations. The
-          Journal of Machine Learning Research, 24(1), 10006-10060.
-          <br><br>
-          Bengio, E., Jain, M., Korablyov, M., Precup, D., & Bengio, Y. (2021). Flow network based generative
-          models for non-iterative diverse candidate generation. Advances in Neural Information Processing
-          Systems, 34, 27381-27394.
-          <br><br>
-          Nica, A. C., Jain, M., Bengio, E., Liu, C. H., Korablyov, M., Bronstein, M. M., & Bengio, Y. (2022). Evaluating generalization in gflownets for molecule design. In ICLR2022 Machine Learning for Drug Discovery.
-          <br><br>
-          Lahlou, S., Deleu, T., Lemos, P., Zhang, D., Volokhova, A., Hernández-Garcıa, A., ... & Malkin, N. (2023, July). A theory of continuous generative flow networks. In International Conference on Machine Learning (pp. 18269-18300). PMLR.
-        </p>
-      <h2 class="section-title3">Tutorials & Libraries</h2>
-        <p class="section-text">
-          <a href="https://milayb.notion.site/The-GFlowNet-Tutorial-95434ef0e2d94c24aab90e69b30be9b3" target="_blank">MILA Tutorial (Theory)</a>
-          <br><br>
-          <a href="https://colab.research.google.com/drive/1fUMwgu2OhYpQagpzU5mhe9_Esib3Q2VR" target="_blank">MILA Tutorial (Code)</a>
+      <p class="section-text">
+        Bengio, Emmanuel, Moksh Jain, Maksym Korablyov, Doina Precup, and Yoshua Bengio (2021). “Flow network based generative models for non-iterative diverse candidate generation”. In: Advances in Neural Information Processing Systems 34, pp. 27381–27394.
+        <a href="https://proceedings.neurips.cc/paper/2021/hash/e614f646836aaed9f89ce58e837e2310-Abstract.html" style="color: #21918c">[URL]</a>
 
-          <br><br>
-          <a href="https://github.com/GFNOrg/torchgfn/blob/master/tutorials/notebooks/intro_gfn_continuous_line_simple.ipynb" target="_blank">Continuous Line Tutorial</a>
-          <br><br>
-          <a href="https://github.com/alexhernandezgarcia/gflownet" target="_blank">https://github.com/alexhernandezgarcia/gflownet</a>
-          <br><br>
-          <a href="https://github.com/GFNOrg/torchgfn" target="_blank">https://github.com/GFNOrg/torchgfn</a>
-          <br><br>
-          <a href="https://github.com/augustwester/gflownet" target="_blank">https://github.com/augustwester/gflownet</a>
-        </p>
+        <br><br>
+        Bengio, Yoshua, Salem Lahlou, Tristan Deleu, Edward J Hu, Mo Tiwari, and Emmanuel Bengio (2023). “GFlowNet Foundations”. In: Journal of Machine Learning Research 24.210, pp. 1–55.
+        <a href="https://www.jmlr.org/papers/v24/22-0364.html" style="color: #21918c">[URL]</a>
+
+        <br><br>
+        Ghari, Pouya M, Alex Tseng, Gökcen Eraslan, Romain Lopez, Tommaso Biancalani, Gabriele Scalia, and Ehsan Hajiramezanali (2023). “Generative flow networks assisted biological sequence editing”. In: NeurIPS 2023 Generative AI and Biology (GenBio) Workshop.
+        <a href="https://openreview.net/forum?id=9BQ3l8OVru" style="color: #21918c">[URL]</a>
+
+        <br><br>
+        Jain, Moksh, Emmanuel Bengio, Alex Hernández-Garcıa, Jarrid Rector-Brooks, Bonaventure FP Dossou, Chanakya Ajit Ekbote, Jie Fu, Tianyu Zhang, Michael Kilgour, Dinghuai Zhang, et al. (2022). “Biological sequence design with GFlowNets”. In: International Conference on Machine Learning. PMLR, pp. 9786–9801.
+        <a href="https://proceedings.mlr.press/v162/jain22a.html" style="color: #21918c">[URL]</a>
+
+        <br><br>
+        Jiralerspong, Marco, Bilun Sun, Danilo Vucetic, Tianyu Zhang, Yoshua Bengio, Gauthier Gidel, and Nikolay Malkin (2024). Expected flow networks in stochastic environments and two-player zero-sum games. arXiv: 2310.02779 [cs.LG].
+        <a href="https://arxiv.org/abs/2310.02779" style="color: #21918c">[URL]</a>
+
+        <br><br>
+        Lahlou, Salem, Tristan Deleu, Pablo Lemos, Dinghuai Zhang, Alexandra Volokhova, Alex Hernández-Garcıa, Léna Néhale Ezzine, Yoshua Bengio, and Nikolay Malkin (2023). “A theory of continuous generative flow networks”. In: International Conference on Machine Learning. PMLR, pp. 18269–18300.
+        <a href="https://proceedings.mlr.press/v202/lahlou23a.html" style="color: #21918c">[URL]</a>
+
+        <br><br>
+        Li, Sida, Ioana Marinescu, and Sebastian Musslick (2023). GFN-SR: symbolic regression with generative flow networks. arXiv: 2312.00396 [cs.LG].
+        <a href="https://arxiv.org/abs/2312.00396" style="color: #21918c">[URL]</a>
+
+        <br><br>
+        Liu, Shuchang, Qingpeng Cai, Zhankui He, Bowen Sun, Julian McAuley, Dong Zheng, Peng Jiang, and Kun Gai (2023). “Generative Flow Network for Listwise Recommendation”. In: Proceedings of the 29th ACM SIGKDD Conference on Knowledge Discovery and Data Mining. New York, NY, USA: Association for Computing Machinery, pp. 1524–1534. DOI: 10.1145/3580305.3599364.
+
+        <br><br>
+        Malkin, Nikolay, Moksh Jain, Emmanuel Bengio, Chen Sun, and Yoshua Bengio (2022). “Trajectory balance: Improved credit assignment in GFlowNets”. In: Advances in Neural Information Processing Systems 35, pp. 5955–5967.
+        <a href="https://proceedings.neurips.cc/paper_files/paper/2022/hash/27b51baca8377a0cf109f6ecc15a0f70-Abstract-Conference.html" style="color: #21918c">[URL]</a>
+
+        <br><br>
+        Manta, Dragos Cristian, Edward J Hu, and Yoshua Bengio (2023). “GFlowNets for causal discovery: an overview”. In: ICML 2023 Workshop on Structured Probabilistic Inference & Generative Modeling.
+        <a href="https://openreview.net/forum?id=atgDufs209" style="color: #21918c">[URL]</a>
+
+        <br><br>
+        Mistal, Alex Hernández-García, Alexandra Volokhova, Alexandre AGM Duval, Yoshua Bengio, Divya Sharma, Pierre Luc Carrier, Michał Koziarski, and Victor Schmidt (2023). “Crystal-GFN: sampling materials with desirable properties and constraints”. In: AI for Accelerated Materials Design – NeurIPS 2023 Workshop.
+        <a href="https://openreview.net/forum?id=l167FjdPOv" style="color: #21918c">[URL]</a>
+
+        <br><br>
+        Nica, Andrei Cristian, Moksh Jain, Emmanuel Bengio, Cheng-Hao Liu, Maksym Korablyov, Michael M Bronstein, and Yoshua Bengio (2022). “Evaluating generalization in GFlowNets for molecule design”. In: ICLR2022 Machine Learning for Drug Discovery.
+        <a href="https://openreview.net/forum?id=JFSaHKNZ35b" style="color: #21918c">[URL]</a>
+
+        <br><br>
+        Shen, Max W, Emmanuel Bengio, Ehsan Hajiramezanali, Andreas Loukas, Kyunghyun Cho, and Tommaso Biancalani (2023). “Towards understanding and improving GFlowNet training”. In: International Conference on Machine Learning. PMLR, pp. 30956–30975.
+        <a href="https://proceedings.mlr.press/v202/shen23a.html" style="color: #21918c">[URL]</a>
+
+        <br><br>
+        Zhang, Chong and Lizhi Yang (2023). Generating a terrain-robustness benchmark for legged locomotion: A prototype via terrain authoring and active learning. arXiv: 2208.07681 [cs.RO].
+        <a href="https://arxiv.org/abs/2208.07681" style="color: #21918c">[URL]</a>
+
+        <br><br>
+        Zhang, Ni, Jingfeng Yang, Zhiguang Cao, and Xu Chi (2025). Adversarial generative flow network for solving vehicle routing problems. arXiv: 2503.01931 [cs.LG].
+        <a href="https://arxiv.org/abs/2503.01931" style="color: #21918c">[URL]</a>
+
+        <br><br>
+        Zhou, Mingyang, Zichao Yan, Elliot Layne, Nikolay Malkin, Dinghuai Zhang, Moksh Jain, Mathieu Blanchette, and Yoshua Bengio (2024). PhyloGFN: Phylogenetic inference with generative flow networks. arXiv: 2310.08774 [q-bio.PE].
+        <a href="https://arxiv.org/abs/2310.08774" style="color: #21918c">[URL]</a>
+      </p>
+      <h2 class="section-title3">Tutorials & Libraries</h2>
+      <p class="section-text">
+        Bengio, Yoshua, Nikolay Malkin, and Moksh Jain (2022). The GFlowNet Tutorial.
+        <a href="https://milayb.notion.site/The-GFlowNet-Tutorial-95434ef0e2d94c24aab90e69b30be9b3" style="color: #21918c">[Tutorial]</a>
+        <a href="https://colab.research.google.com/drive/1fUMwgu2OhYpQagpzU5mhe9_Esib3Q2VR" style="color: #21918c">[Code]</a>
+
+        <br><br>
+        Hernández-García, Alex, Nikita Saxena, Alexandra Volokhova, Michał Koziarski, Divya Sharma, Joseph D Viviano, Pierre Luc Carrier, and Victor Schmidt (2024). gflownet.
+        <a href="https://github.com/alexhernandezgarcia/gflownet" style="color: #21918c">[Code]</a>
+
+        <br><br>
+        Lahlou, Salem, Joseph D. Viviano, Victor Schmidt, and Yoshua Bengio (2023). torchgfn: A PyTorch GFlowNet library. arXiv: 2305.14594 [cs.LG].
+        <a href="https://arxiv.org/abs/2305.14594" style="color: #21918c">[URL]</a>
+        <a href="https://github.com/GFNOrg/torchgfn" style="color: #21918c">[Code]</a>
+
+        <br><br>
+        Viviano, Joseph and Nikolay Malkin (2025). Continuous GFlowNets on a Simple 1D Line Environment. GFNOrg.
+        <a href="https://github.com/GFNOrg/torchgfn/blob/master/tutorials/notebooks/intro_continuous.ipynb" style="color: #21918c">[Code]</a>
+
+        <br><br>
+        Wester, August (2022). Proportional Reward Sampling With GFlowNets.
+        <a href="https://sigmoidprime.com/post/gflownets/" style="color: #21918c">[Tutorial]</a>
+        <a href="https://github.com/augustwester/gflownet" style="color: #21918c">[Code]</a>
+      </p>
     </section>
   {/if}
 </main>
