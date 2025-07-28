@@ -1327,9 +1327,7 @@
     idea.
   </p>
 
-  <ul class="section-text">
-    <!-- State -->
-    <li class="tetris-row">
+
       <div>
         <strong>State</strong>
         <p>
@@ -1347,10 +1345,10 @@
         src="/images/Tetris-state.svg"
         alt="Tetris board state illustration"
       />
-    </li>
+ 
 
     <!-- Action -->
-    <li class="tetris-row">
+
       <div>
         <strong>Action</strong>
         <p>
@@ -1363,7 +1361,7 @@
           new board configuration.
         </p>
       </div>
-    </li>
+
 
     <div class="image-container-small">
       <img
@@ -1373,8 +1371,7 @@
       />
     </div>
 
-    <!-- Reward -->
-    <li>
+´
       <strong>Reward</strong>
       <p>
         The reward function quantifies how desirable a state is for the task at
@@ -1389,8 +1386,6 @@
         />
       </div>
 
-    </li>
-  </ul>
 
   <p class="section-text">
     The sampling process takes place on an implicit DAG where flows indicate the
