@@ -31,7 +31,7 @@
     "rollup-plugin-css-only": "^4.3.0",
     "rollup-plugin-livereload": "^2.0.0",
     "rollup-plugin-svelte": "^7.1.2",
-    "svelte": "^4.2.2",
+    "svelte": "^5.37.1",
     "svelte-range-slider-pips": "^2.3.1"
   },
   "dependencies": {

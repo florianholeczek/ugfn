@@ -1270,7 +1270,7 @@
               exploration and remain robust if the optimal solution changes over time.
               <div id="comparisonChart" style="margin:20px auto; max-width:600px;"></div>
               <p class="mathexpl" style="color: white">
-                Fig. 1: Difference in path selection between reinforcement learning and GFlowNets.
+                Figure 1: Difference in path selection between reinforcement learning and GFlowNets.
                 In reinforcement learning the objective is to maximize the expected reward.
                 GFlowNets, on the other hand, sample proportionally to the reward distribution.
               </p>
@@ -1345,6 +1345,10 @@
         src="/images/Tetris-state.svg"
         alt="Tetris board state illustration"
       />
+            <p class="mathexpl">
+        Figure 2: State of a Tetris game.
+      </p>
+
  
 
     <!-- Action -->
@@ -1370,8 +1374,12 @@
         alt="Tetris state to action transition"
       />
     </div>
+      <p class="mathexpl">
+        Figure 3: Action in a Tetris game.
+      </p>
 
-´
+
+
       <strong>Reward</strong>
       <p>
         The reward function quantifies how desirable a state is for the task at
@@ -1385,7 +1393,9 @@
           alt="Tetris reward illustration"
         />
       </div>
-
+            <p class="mathexpl">
+        Figure 4: Reward in a Tetris game.
+      </p>
 
   <p class="section-text">
     The sampling process takes place on an implicit DAG where flows indicate the
@@ -1400,6 +1410,9 @@
       alt="Tetris DAG illustration"
     />
   </div>
+    <p class="mathexpl">
+        Figure 5: The two previous Tetris‑like boards (flows 91 & 33) merge into one current state, which then splits into three next states by placing different tetrominoes (each flow 32) or terminates with reward 28 (flow 28)
+      </p>
 
   <h3 class="section-title3">From Flow to Sampling</h3>
   <p class="section-text">
@@ -1457,6 +1470,12 @@
           </div>
         </div>
       </div>
+
+      <p class="mathexpl">
+        Figure 6: Interactive GFlowNet Tetris visualization. In the candidate list the top 3 moves can be selected, below the corresponding DAG is presented. 
+      </p>
+
+
 </div>
     <section class="section" bind:this={h_domain}>
       <h2 class="section-title">Domain Applications </h2>
@@ -1540,6 +1559,9 @@
         </div>
       </div>
       <svg id="chart" style="width: 1000px; display:block; margin: 20px auto"></svg>
+      <p class="mathexpl">
+        Figure 7:  Interactive molecular visualization. The GFlowNet selects molecules based on their properties, which are weighted with the parameter sliders.
+      </p>
 
         <p class="section-text">
     GFlowNets are applied in this domain because they can ensure a diverse sampling of candidate molecules. This is desirable when the reward is distributed among potentially many modes, where sampling in a too narrow region of the candidate space might miss out entire families of potentially interesting molecules. <!-- TODO: cite some of the molecule-related papers from below -->
@@ -1709,7 +1731,7 @@
 
       </svg>
       <p class="mathexpl">
-        Fig 99: A DAG with flow values at the edges representing a fully trained GFlowNet.
+        Figure 8: A DAG with flow values at the edges representing a fully trained GFlowNet.
         Hover over the edges (actions) to see the Policy calculations,
         hover over the nodes (states) to see the Flow and Loss calculations.
       </p>
@@ -1984,7 +2006,7 @@
                   {/each}
                 </svg>
                 <p class="mathexpl" style="color: white; width:550px;">
-                  Fig. 99: The same DAG as in Figure 99.
+                  Figure 9: The same DAG as in Figure 8.
                   Choose a trajectory by selecting on one of the purple states until you reach a final state.
                   Reset by selecting s0 or another orange state.
                 </p>
@@ -2132,13 +2154,13 @@
           <div class="DC-plot-wrapper">
             <div id="DC_discrete_plot" class="DC-plot"></div>
             {#if DC_view === 0}
-              <div class="mathexpl" style="width: 100%">Figure 99: Reward of a discrete grid by assigned values.</div>
+              <div class="mathexpl" style="width: 100%">Figure 10: Reward of a discrete grid by assigned values.</div>
             {:else if DC_view ===1}
-              <div class="mathexpl" style="width: 100%">Figure 99: Sampling on a discrete grid by choosing an action.</div>
+              <div class="mathexpl" style="width: 100%">Figure 11: Sampling on a discrete grid by choosing an action.</div>
             {:else if DC_view ===2}
-              <div class="mathexpl" style="width: 100%">Figure 99: Sampling proportional to the reward function.</div>
+              <div class="mathexpl" style="width: 100%">Figure 12: Sampling proportional to the reward function.</div>
             {:else}
-              <div class="mathexpl" style="width: 100%">Figure 99: Direction of the highest flow for each state of the grid.</div>
+              <div class="mathexpl" style="width: 100%">Figure 13: Direction of the highest flow for each state of the grid.</div>
             {/if}
           </div>
 
@@ -2146,13 +2168,13 @@
           <div class="DC-plot-wrapper">
             <div id="DC_continuous_plot" class="DC-plot"></div>
             {#if DC_view === 0}
-              <div class="mathexpl" style="width: 100%">Figure 99: Reward of a continuous plane by the sum of Gaussian PDFs. </div>
+              <div class="mathexpl" style="width: 100%">Figure 14: Reward of a continuous plane by the sum of Gaussian PDFs. </div>
             {:else if DC_view ===1}
-              <div class="mathexpl" style="width: 100%">Figure 99: Sampling on a continuous plane by drawing from the sampling distribution</div>
+              <div class="mathexpl" style="width: 100%">Figure 15: Sampling on a continuous plane by drawing from the sampling distribution</div>
             {:else if DC_view ===2}
-              <div class="mathexpl" style="width: 100%">Figure 99: Sampling proportional to the reward function</div>
+              <div class="mathexpl" style="width: 100%">Figure 16: Sampling proportional to the reward function</div>
             {:else}
-              <div class="mathexpl" style="width: 100%">Figure 99: Direction of the highest flow for gridpoints on the continuous plane.</div>
+              <div class="mathexpl" style="width: 100%">Figure 17: Direction of the highest flow for gridpoints on the continuous plane.</div>
             {/if}
           </div>
           <div class="DC-quadrant">
@@ -2241,7 +2263,7 @@
         </Wrapper>
       </div>
       <div class="mathexpl">
-        Figure 99: Example training run. During training the model learns to sample proportional to the reward function.
+        Figure 18: Example training run. During training the model learns to sample proportional to the reward function.
       </div>
 
       <div style="height:50px"></div>
@@ -2298,7 +2320,7 @@
         </Wrapper>
       </div>
       <div class="mathexpl">
-        Figure 99: Example training run showing mode collapse. The model samples only from one of the available modes and does not improve.
+        Figure 19: Example training run showing mode collapse. The model samples only from one of the available modes and does not improve.
       </div>
       <div style="height:50px"></div>
       <p class="section-text">
@@ -2400,7 +2422,7 @@
         </Wrapper>
       </div>
       <div class="mathexpl">
-        Figure 99: Example training run showing the effect of off-policy training.
+        Figure 20: Example training run showing the effect of off-policy training.
         By encouraging exploration, the model samples from a wider range of the state space.
         This leads to the discovery of the second mode and thereby to sampling proportional to the reward function.
       </div>
@@ -2493,7 +2515,7 @@
       </div>
       <div style="height:10px"></div>
       <div class="mathexpl">
-        Figure 99: Highest Flow for gridpoints on the continuous plane.
+        Figure 21: Highest Flow for gridpoints on the continuous plane.
         After training, the modes of the reward function act as convergence points.
         For the first steps of the agent these convergent points lie close together in the center.
         They move outward towards the modes as the agent takes more steps.
@@ -3283,6 +3305,9 @@
       -->
 
     </div>
+          <div class="mathexpl">
+        Figure 22: GFlowNet Playground: three linked views—Environment for defining continuous reward functions: Training for tuning hyperparameters and visualizing sample distributions and Flow for inspecting learned probability flows.
+      </div>
 
       <section class="section" bind:this={h_conclusion}>
         <h2 class="section-title">Conclusion </h2>
