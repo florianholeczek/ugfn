@@ -1313,31 +1313,17 @@
         GFlowNet Fundamentals Illustrated with Tetris
       </h2>
 
-  <p class="section-text">
-    To better understand the core concepts used by GFlowNets, let’s consider a
-    simplified version of the Tetris game. In traditional Tetris, players remove
-    filled lines to survive as long as possible. Here we ignore line clears so
-    the goal becomes filling the entire grid.
-  </p>
-  <p class="section-text">
-    GFlowNets sample trajectories iteratively by moving from one state to the
-    next via available actions. All state–action possibilities form a directed
-    acyclic graph (DAG) representing every way the game could unfold. Because the
-    action space is huge, we use this simplified Tetris setting to illustrate the
-    idea.
-  </p>
+      <p class="section-text">
+        To better understand the core concepts used by GFlowNets, let’s consider a simplified version of the Tetris game. In Tetris, players control falling pieces, which are shaped like so-called “tetrominoes”. Players attempt to orient and stack these shapes such that they fill out entire lines in a grid-based playing field. In traditional Tetris, lines that are completely filled are removed, allowing the player to play on for as long as they can keep the playing field sufficiently empty. In our simplified version of Tetris, let’s disregard the clearing of filled lines. The new objective becomes to fill out the entire grid as completely as possible.
+      </p>
 
-
+      <p class="section-text"></p>
+        As stated in the tl;dr section above, GFlowNet sampling occurs iteratively, going from one state to the next using different available actions. The combination of all possible states and actions results in a directed acyclic graph (DAG) that describes all possible paths to any possible final state. Note that for most use cases it’s infeasible to show the complete DAG because action spaces are typically vast. To better illustrate these concepts, we use our simplified version of the game Tetris.
+      </p>
 
         <strong>State</strong>
         <p>
-          A state fully describes the environment at a given moment. In a GFlowNet
-          every state is a node in the DAG that captures the generative process and
-          implicitly encodes which actions are still available.
-        </p>
-        <p>
-          <em>In Tetris:</em> the state corresponds to the current board with all
-          placed tetrominoes.
+        A state is the full description of what our environment looks like at a given point in time. In GFlowNets, every possible state is a node in a directed acyclic graph (DAG). The state information describes the current position in the generative process and implicitly includes the options that remain. In our Tetris example, the state is simply the current board, including all tetrominoes that have already been placed. 
         </p>
       <img
         class="tetris-image tetris-image-small"
@@ -1350,13 +1336,7 @@
 
         <strong>Action</strong>
         <p>
-          Actions transform one state into another and form the edges of the DAG.
-          They specify how the object under construction is extended step by step.
-        </p>
-        <p>
-          <em>In Tetris:</em> each legal drop of the falling tetromino—across all
-          rotations and column choices—constitutes a distinct action that yields a
-          new board configuration.
+          Actions are the legal operations that act on one state and change it to another. In our DAG, actions are the edges that connect the state nodes. Actions specify how our object is built up step by step. In our Tetris example, each legal drop of an incoming tetromino is an action. Even for a single tetromino, many individual actions are possible, as each rotation and translation must be accounted for. Performing an action transitions the board to a new state by adding the new piece to the configuration.
         </p>
 
 
@@ -1375,9 +1355,8 @@
 
       <strong>Reward</strong>
       <p>
-        The reward function quantifies how desirable a state is for the task at
-        hand. In this simplified Tetris demo we use the number of occupied cells
-        once no further moves are possible as the final reward.
+       In GFlowNets, the reward function defines how desirable a specific state is for the given task. For the simplified Tetris demo, we define the reward as the number of occupied cells at the end of the game. Once no more moves are possible or a specially defined “stop” action is performed, the final reward can be assigned to the end state.
+
       </p>
       <div class="image-container-small">
         <img
@@ -1390,12 +1369,12 @@
         Figure 4: Reward in a Tetris game.
       </p>
 
+  <strong>DAG (Directed Acyclic Graph) and Flow</strong>
   <p class="section-text">
-    The sampling process takes place on an implicit DAG where flows indicate the
-    desirability of each transition. The illustration below shows a small part of
-    the Tetris DAG: state <em>t</em> can be reached from two different parents and
-    branches out to several future states.
+   The sampling process in GFlowNets happens in an implicitly built DAG. Throughout the DAG, the so-called flow encodes the desirability of a transition from one state to the next. Figure x illustrates an extract of the Tetris DAG. A current state (t) can be reached from two different parent states (t-1) through different actions (adding the yellow or purple tetromino, respectively). From State t, various actions result in different next or final states (t+1).
   </p>
+
+  
   <div class="image-container-small">
     <img
       class="tetris-center-image"
@@ -1407,29 +1386,18 @@
         Figure 5: The two previous Tetris‑like boards (flows 91 & 33) merge into one current state, which then splits into three next states by placing different tetrominoes (each flow 32) or terminates with reward 28 (flow 28)
       </p>
 
-  <h3 class="section-title3">From Flow to Sampling</h3>
-  <p class="section-text">
-    For every state–action pair, the GFlowNet predicts a flow value—an estimate of the long-term payoff of that move. These flows are then normalized into sampling probabilities so that:
-  </p>
-  <ul class="section-text">
-    <li>High-flow moves are chosen more often,</li>
-    <li>Lower-flow moves still retain a non-zero chance, preserving exploration.</li>
-  </ul>
-  <p class="section-text">
-    During training, the demo enforces flow consistency at every intermediate board: the sum of incoming flows equals the sum of outgoing flows. Together with reward-based boundary conditions at the terminals, this mechanism ensures that full game trajectories are sampled in proportion to their rewards, uncovering both immediate stack-filling moves and longer-term strategic placements.
-  </p>
+      <p class="section-text">
+        For the interactive demonstration shown below, we trained a neural policy under the GFlowNet framework and applied it to the simplified game of Tetris. At each step, the network evaluates every legal placement of the falling tetromino and selects an action proportionally to the future reward (i.e., the number of filled spaces in the grid). The sidebar lists the top three actions according to the policy prediction. In this game, the green move is executed automatically, but you may click any other action to override the choice. You can also pause the game at any time to examine how flow values are redistributed across subsequent moves.
+      </p>
 
       <p class="section-text">
-        In this interactive demonstration, a neural policy trained under the GFlowNet framework is applied to the game of Tetris.
-        At each step, the network evaluates every legal placement of the falling tetromino and predicts a flow value that estimates the expected future reward (e.g., line clears plus a survival bonus).
-        The sidebar lists all candidate moves ordered by their sampling probabilities (obtained via softmax over the predicted flows).
-        By default, the green move is executed automatically, but you may click any other candidate to override the choice.
-        You can also pause the game at any time to examine how flow values are redistributed across subsequent moves.
-        Conceptually, the GFlowNet constructs a DAG of board configurations.
-        The figure below displays only the top three moves from each state for clarity—internally, the GFlowNet still evaluates all legal moves.
-        All branches are drawn with uniform width and each branch is labeled with its predicted flow value.
-        This focused illustration shows how the GFlowNet maintains multiple promising trajectories, while internally still considering lower‐probability options.
+
+        Conceptually, the GFlowNet constructs a DAG of the board states. The figure below displays only the top three moves from each state for clarity—internally, the GFlowNet still evaluates all legal moves. All branches are drawn with uniform width, and each branch is labeled with its predicted flow value. This illustration demonstrates how the GFlowNet maintains multiple promising trajectories while still considering lower-probability options internally.
+
       </p>
+
+
+
     </section>
     <div class="A_centerwrap">
       <div class="A_tetriscontainer">
@@ -1473,15 +1441,9 @@
     <section class="section" bind:this={h_domain}>
       <h2 class="section-title">Domain Applications </h2>
       <p class="section-text">
-        The principles demonstrated in the Tetris demo extend naturally to molecular generation.
-        In this context, each node represents a partial molecule and each edge an added fragment.
-        In molecular design, a GFlowNet sequentially adds fragments to an evolving structure until a complete molecule is produced and scored by a reward function.
-        Thanks to flow conservation, the total incoming probability at each intermediate molecule is redistributed among its possible extensions.
-        Higher-reward molecules therefore attract more flow, while alternative structures retain non-zero probability and remain available for sampling.
-        The interactive visualization below lets you adjust the reward function using a slider.
-        As you move the slider, the percentage of generated molecules shifts in real time.
-        Clicking the “Maximize weight” button sets the reward to favor heavy molecules.
-        Under this setting, the heaviest molecule appears about 49% of the time, whereas lighter molecules receive minimal flow.
+       The same principles demonstrated in the Tetris example can be applied to many other problems, which can be framed as a sequence of actions applied to certain states with clearly defined reward functions. One particularly interesting example is the generation of molecules. In this context, each node in our graph represents a partial molecule, and each edge represents the action of adding a new fragment to it. In molecular design, a GFlowNet sequentially adds fragments to an evolving structure until a complete molecule is produced, which is then scored based on a reward function. For example, the estimated hydrophobicity of the molecule might drive the reward if the goal of the molecule search is to find a compound with low polarity. Thanks to flow conservation, the total incoming probability at each intermediate molecule is redistributed among its possible extensions. Higher-reward molecules, therefore, attract more flow, while alternative structures retain non-zero probability and remain available for sampling. The interactive visualization below lets you adjust the reward function using a slider. As you move the slider, the percentage of generated molecules shifts in real time. Clicking the “Maximize weight” button sets the reward to favor heavy molecules. Under this setting, the heaviest molecule appears about 49% of the time, whereas lighter molecules receive minimal flow.
+
+
       </p>
       <div class="A_molecule-slider-container">
         <div class="A_molecule-slider">
@@ -1557,10 +1519,10 @@
       </p>
 
         <p class="section-text">
-    GFlowNets are applied in this domain because they can ensure a diverse sampling of candidate molecules. This is desirable when the reward is distributed among potentially many modes, where sampling in a too narrow region of the candidate space might miss out entire families of potentially interesting molecules. <!-- TODO: cite some of the molecule-related papers from below -->
+GFlowNets are applied in this domain because they can ensure a diverse sampling of candidate molecules. This is desirable when the reward is distributed among potentially many modes, where sampling in a too narrow region of the candidate space might miss out entire families of potentially interesting molecules (Nica et al. 2022).
   </p>
   <p class="section-text">
-    The following are some other interesting examples of GFlowNets being applied to problems in which diverse samples are desirable:
+The following are some other interesting examples of GFlowNets being applied to problems in which diverse samples are desirable:
   </p>
   <ul class="section-text">
     <li>
