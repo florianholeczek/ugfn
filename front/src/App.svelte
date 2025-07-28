@@ -1348,11 +1348,6 @@
         Figure 2: State of a Tetris game.
       </p>
 
- 
-
-    <!-- Action -->
-
-      <div>
         <strong>Action</strong>
         <p>
           Actions transform one state into another and form the edges of the DAG.
@@ -1363,7 +1358,6 @@
           rotations and column choices—constitutes a distinct action that yields a
           new board configuration.
         </p>
-      </div>
 
 
     <div class="image-container-small">
@@ -1811,7 +1805,7 @@
 
 
       <p class="section-text">
-        Each edge of the network has an assigned <b>flow</b> value; you can see it by hovering over the edges in Figure 99.
+        Each edge of the network has an assigned <b>flow</b> value; you can see it by hovering over the edges in Figure 8.
         Imagine the flow as the amount of water that flows through a pipe.
         Hovering also shows the forward <b>policy</b> <Katex>P_F(s'|s)</Katex> of an edge;
         it gives us a transition probability from one state <Katex>s</Katex> to a child state <Katex>s’</Katex>.
@@ -1896,7 +1890,7 @@
         Turning this into a training objective is quite simple;
         we just measure the difference between the incoming and outgoing flow for each state using a mean squared error.
         The lower the difference between the incoming and outgoing flow of a state, the lower its <b>loss</b>.
-        You can see the loss calculation by hovering over the states in Figure 99.
+        You can see the loss calculation by hovering over the states in Figure 8.
         As our example has perfect flow matching, the result will always be 0.
         In the first GFlowNet paper (<a href="#Bengio21" style="color: #21918c">E. Bengio et al. 2021</a>), the authors used this simple loss;
         however, many improvements have been proposed since.
@@ -2457,7 +2451,7 @@
     <section class="section" bind:this={h_flow} style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);">
       <h2 class="section-title">Flow</h2>
       <p class="section-text">
-        In Figure 99 you can see the flow of the last training run. Use the Step slider to adjust the current step. We fixed the number of steps for the agent at 6, so it collects the reward after taking 6 steps. Use the iteration slider to compare the flow at the start of the training to the end.
+        In Figure 21 you can see the flow of the last training run. Use the Step slider to adjust the current step. We fixed the number of steps for the agent at 6, so it collects the reward after taking 6 steps. Use the iteration slider to compare the flow at the start of the training to the end.
         <br>
         You can see that for the trained model (last iteration), the flow differs depending on the step. In the first step the agent takes, it tends to move towards the center. Later on in the trajectory, the points of convergence split up and move outwards to the modes of the distribution. In the last two steps, they even move past them, probably to achieve the separation of the modes.
         <br><br>
