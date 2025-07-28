@@ -1363,12 +1363,6 @@
           new board configuration.
         </p>
       </div>
-      <img
-        class="tetris-image tetris-image-large-action"
-
-        src="/images/Tetris-action.svg"
-        alt="Tetris action illustration"
-      />
     </li>
 
     <div class="image-container-small">
