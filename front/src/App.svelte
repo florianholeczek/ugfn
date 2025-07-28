@@ -1328,7 +1328,7 @@
   </p>
 
 
-      <div>
+
         <strong>State</strong>
         <p>
           A state fully describes the environment at a given moment. In a GFlowNet
@@ -1339,7 +1339,6 @@
           <em>In Tetris:</em> the state corresponds to the current board with all
           placed tetrominoes.
         </p>
-      </div>
       <img
         class="tetris-image tetris-image-small"
         src="/images/Tetris-state.svg"
