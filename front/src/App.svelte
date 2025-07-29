@@ -1511,26 +1511,29 @@
       </p>
       <ul class="section-text">
         <li>
-          <strong>Listwise recommendation.</strong> GFlowNets can also be applied to generating lists of user recommendations, such as items in a web shop that might be of interest for a customer to check out next. Each action adds an item to the recommendation list. This generation can be conditioned on the user, ensuring that the resulting recommendations are diversely sampled yet still relevant for the specific user <a href="#Liu23" style="color: #21918c">Liu et al. (2023)</a>.
+          <strong>Listwise recommendation.</strong>
+          GFlowNets can also be applied to generating lists of user recommendations, such as items in a web shop that might be of interest for a customer to check out next. Each action adds an item to the recommendation list. This generation can be conditioned on the user, ensuring that the resulting recommendations are diversely sampled yet still relevant for the specific user <a href="#Liu23" style="color: #21918c">(Liu et al. 2023)</a>.
         </li>
         <li>
-          <strong>Games.</strong> Adversarial Flow Networks (AFlowNets) are modified versions of GFlowNets capable of learning robust policies through self‑play. Such AFlowNets have already been applied to simple zero‑sum games, such as tic‑tac‑toe or Connect Four, and may be applied to games with larger state spaces in the future <a href="#Jiralerspong24" style="color: #21918c">Jiralerspong et al. (2024)</a>.
+          <strong>Games.</strong>
+          Adversarial Flow Networks (AFlowNets) are modified versions of GFlowNets capable of learning robust policies through self‑play. Such AFlowNets have already been applied to simple zero‑sum games, such as tic‑tac‑toe or Connect Four, and may be applied to games with larger state spaces in the future <a href="#Jiralerspong24" style="color: #21918c">(Jiralerspong et al. 2024)</a>.
         </li>
         <li>
-          <strong>Biological sequence design &amp; editing.</strong> Designing biological sequences is a significant challenge in medicine and materials design. GFlowNets have been shown to generate more diverse and novel batches of candidate nucleic acid sequences than other existing methods <a href="#Jain22" style="color: #21918c">Jain et al. (2022)</a> and have been proposed for editing existing sequences to improve specific properties <a href="#Ghari23" style="color: #21918c">Ghari et al. (2023)</a>.
+          <strong>Biological sequence design &amp; editing.</strong>
+          Designing biological sequences is a significant challenge in medicine and materials design. GFlowNets have been shown to generate more diverse and novel batches of candidate nucleic acid sequences than other existing methods <a href="#Jain22" style="color: #21918c">(Jain et al. 2022)</a> and have been proposed for editing existing sequences to improve specific properties <a href="#Ghari23" style="color: #21918c">(Ghari et al. 2023)</a>.
         </li>
         <li>
-          <strong>Computational phylogenetics.</strong> In phylogenetic inference, trees are viewed as compound states and each action joins two subtrees at their roots by a common ancestor. GFlowNets achieve a balance between fidelity of the constructed trees and broad exploration of the vast solution space <a href="#Zhou24" style="color: #21918c">Zhou et al. (2024)</a>.
+          <strong>Computational phylogenetics.</strong>
+          In phylogenetic inference, trees are viewed as compound states and each action joins two subtrees at their roots by a common ancestor. GFlowNets achieve a balance between fidelity of the constructed trees and broad exploration of the vast solution space <a href="#Zhou24" style="color: #21918c">(Zhou et al. 2024)</a>.
         </li>
         <li>
-          <strong>Crystal structure generation.</strong> A crystal can be described by its unit cell, which is the most primitive three-dimensional structure that is repeated in the crystal lattice. To sample crystal structures with GFlowNets, unit cells are sequentially constructed by selecting its properties, such as the chemical composition, the symmetry properties and the shape. This approach enables the incorporation of physical and geometrical constraints and the generation of diverse samples of crystal structures with desirable properties, such as low formation energy <a href="#Mistal23" style="color: #21918c">Mistal et al. (2023)</a>.
-          <br>
-          Additional examples of GFlowNet applications include vehicle routing <a href="#Zhang25" style="color: #21918c">(Zhang et al. (2025)</a>, the generation of realistic terrain datasets <a href="#Zhang23" style="color: #21918c">C. Zhang and Yang (2023)</a>, symbolic regression <a href="#Li23" style="color: #21918c">Li, Marinescu, and Musslick (2023)</a>, and causal discovery <a href="#Manta23" style="color: #21918c">Manta, Hu, and Y. Bengio (2023)</a>.
-          <br>
-          Next, we’ll take a closer look at how GFlowNets manage to create diverse candidate samples by learning to draw proportionally to the reward distribution.
+          <strong>Crystal structure generation.</strong>
+          A crystal can be described by its unit cell, which is the most primitive three-dimensional structure that is repeated in the crystal lattice. To sample crystal structures with GFlowNets, unit cells are sequentially constructed by selecting its properties, such as the chemical composition, the symmetry properties and the shape. This approach enables the incorporation of physical and geometrical constraints and the generation of diverse samples of crystal structures with desirable properties, such as low formation energy <a href="#Mistal23" style="color: #21918c">(Mistal et al. 2023)</a>.
         </li>
       </ul>
       <p class="section-text">
+        Additional examples of GFlowNet applications include vehicle routing <a href="#Zhang25" style="color: #21918c">(Zhang et al. 2025)</a>, the generation of realistic terrain datasets <a href="#Zhang23" style="color: #21918c">(C. Zhang and Yang, 2023)</a>, symbolic regression <a href="#Li23" style="color: #21918c">(Li, Marinescu, and Musslick, 2023)</a>, and causal discovery <a href="#Manta23" style="color: #21918c">(Manta, Hu, and Y. Bengio, 2023)</a>.
+        <br><br>
         Next, we’ll take a closer look at how GFlowNets manage to create diverse candidate samples by learning to draw proportionally to the reward distribution.
       </p>
     </section>
@@ -1842,9 +1845,9 @@
         The lower the difference between the incoming and outgoing flow of a state, the lower its <b>loss</b>.
         You can see the loss calculation by hovering over the states in Figure 8.
         As our example has perfect flow matching, the result will always be 0.
-        In the first GFlowNet paper (<a href="#Bengio21" style="color: #21918c">E. Bengio et al. 2021</a>), the authors used this simple loss;
+        In the first GFlowNet paper <a href="#Bengio21" style="color: #21918c">(E. Bengio et al. 2021)</a>, the authors used this simple loss;
         however, many improvements have been proposed since.
-        In the Playground we use trajectory balance loss (<a href="#Malkin22" style="color: #21918c">Malkin et al. 2022</a>); you can learn about it below.
+        In the Playground we use trajectory balance loss <a href="#Malkin22" style="color: #21918c">(Malkin et al. 2022)</a>; you can learn about it below.
       </p>
 
       <div class="image-container">
