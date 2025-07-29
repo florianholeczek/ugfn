@@ -1271,7 +1271,7 @@
               exploration and remain robust if the optimal solution changes over time.
               <div id="comparisonChart" style="margin:20px auto; max-width:600px;"></div>
               <p class="mathexpl" style="color: white">
-                Figure 1: Difference in path selection between reinforcement learning and GFlowNets.
+                Fig. 1: Difference in path selection between reinforcement learning and GFlowNets.
                 In reinforcement learning the objective is to maximize the expected reward.
                 GFlowNets, on the other hand, sample proportionally to the reward distribution.
               </p>
@@ -1334,7 +1334,7 @@
       />
       </div>
             <p class="mathexpl">
-        Figure 2: State of a Tetris game.
+        Fig. 2: State of a Tetris game.
       </p>
 
 
@@ -1352,7 +1352,7 @@
       />
     </div>
       <p class="mathexpl">
-        Figure 3: Action in a Tetris game.
+        Fig. 3: Action in a Tetris game.
       </p>
 
 
@@ -1371,7 +1371,7 @@
         />
       </div>
             <p class="mathexpl">
-        Figure 4: Reward in a Tetris game.
+        Fig. 4: Reward in a Tetris game.
       </p>
 
   <p class="section-text">
@@ -1388,7 +1388,7 @@
     />
   </div>
     <p class="mathexpl">
-        Figure 5: The two previous Tetris‑like boards (flows 91 & 33) merge into one current state, which then splits into three next states by placing different tetrominoes (each flow 32) or terminates with reward 28 (flow 28)
+        Fig. 5: The two previous Tetris‑like boards (flows91 &33) merge into one current state, which then splits into three next states by placing different tetrominoes (each flow 32) or terminates with reward 28 (flow 28)
       </p>
 
       <p class="section-text">
@@ -1438,7 +1438,7 @@
       </div>
 
       <p class="mathexpl">
-        Figure 6: Interactive GFlowNet Tetris visualization. In the candidate list the top 3 moves can be selected, below the corresponding DAG is presented.
+        Fig. 6: Interactive GFlowNet Tetris visualization. In the candidate list the top 3 moves can be selected, below the corresponding DAG is presented.
       </p>
 
 
@@ -1520,7 +1520,7 @@
       </div>
       <svg id="chart" style="width: 1000px; display:block; margin: 20px auto"></svg>
       <p class="mathexpl">
-        Figure 7:  Interactive molecular visualization. The GFlowNet selects molecules based on their properties, which are weighted with the parameter sliders.
+        Fig. 7:  Interactive molecular visualization. The GFlowNet selects molecules based on their properties, which are weighted with the parameter sliders.
       </p>
 
         <p class="section-text">
@@ -1786,7 +1786,7 @@ The following are some other interesting examples of GFlowNets being applied to 
         As the flow determines the transition probabilities, it also determines the probabilities for sampling the final states <Katex>x</Katex>.
         <br>
         Hover over the states to see their incoming and outgoing flow.
-        The example in Figure x shows a perfectly trained model, and you can see an important property of GFlowNets:
+        The example in Figure 8 shows a perfectly trained model, and you can see an important property of GFlowNets:
         For each state, the total incoming flow is equal to the total outgoing flow.
         This is called <i>flow consistency</i> or <i>flow matching</i>, and it is the key to our goal: sampling diverse candidates.
         <br><br>
@@ -2049,11 +2049,11 @@ The following are some other interesting examples of GFlowNets being applied to 
                 we multiply the forward policies along the trajectory.
                 Similarly, we compute the product of the backward policies to get the probability of selecting this trajectory
                 among all those that end at the same final state.
-                We use this in the calculation of the trajectory balance; the formula is shown in Figure 99.
+                We use this in the calculation of the trajectory balance; the formula is shown in Figure 9.
                 The numerator represents the fraction of the total flow <Katex>Z</Katex> that goes forward through this trajectory <Katex>\tau</Katex>.
                 The denominator represents the fraction of the reward <Katex>R(x)</Katex> that goes backward through <Katex>\tau</Katex>.
                 <br>
-                The DAG in Figure 99 shows the same trained model as before.
+                The DAG in Figure 9 shows the same trained model as before.
                 Select a trajectory to see the calculation of the policies and the loss.
                 The trajectory balance loss adds a bit more model complexity:
                 In addition to the parameters of the forward policy, we learn the backward policy and the scalar parameter <Katex>Z_\theta</Katex>.
@@ -2119,13 +2119,13 @@ The following are some other interesting examples of GFlowNets being applied to 
           <div class="DC-plot-wrapper">
             <div id="DC_discrete_plot" class="DC-plot"></div>
             {#if DC_view === 0}
-              <div class="mathexpl" style="width: 100%">Figure 10: Reward of a discrete grid by assigned values.</div>
+              <div class="mathexpl" style="width: 100%">Fig. 10: Reward of a discrete grid by assigned values.</div>
             {:else if DC_view ===1}
-              <div class="mathexpl" style="width: 100%">Figure 11: Sampling on a discrete grid by choosing an action.</div>
+              <div class="mathexpl" style="width: 100%">Fig. 12: Sampling on a discrete grid by choosing an action.</div>
             {:else if DC_view ===2}
-              <div class="mathexpl" style="width: 100%">Figure 12: Sampling proportional to the discrete reward function.</div>
+              <div class="mathexpl" style="width: 100%">Fig. 14: Sampling proportional to the discrete reward function.</div>
             {:else}
-              <div class="mathexpl" style="width: 100%">Figure 13: Direction of the highest flow for each state of the grid.</div>
+              <div class="mathexpl" style="width: 100%">Fig. 16: Direction of the highest flow for each state of the grid.</div>
             {/if}
           </div>
 
@@ -2133,13 +2133,13 @@ The following are some other interesting examples of GFlowNets being applied to 
           <div class="DC-plot-wrapper">
             <div id="DC_continuous_plot" class="DC-plot"></div>
             {#if DC_view === 0}
-              <div class="mathexpl" style="width: 100%">Figure 14: Reward of a continuous plane by the sum of Gaussian PDFs. </div>
+              <div class="mathexpl" style="width: 100%">Fig. 11: Reward of a continuous plane by the sum of Gaussian PDFs. </div>
             {:else if DC_view ===1}
-              <div class="mathexpl" style="width: 100%">Figure 15: Sampling on a continuous plane by drawing from the sampling distribution</div>
+              <div class="mathexpl" style="width: 100%">Fig. 13: Sampling on a continuous plane by drawing from the sampling distribution</div>
             {:else if DC_view ===2}
-              <div class="mathexpl" style="width: 100%">Figure 16: Sampling proportional to the continuous reward function</div>
+              <div class="mathexpl" style="width: 100%">Fig. 15: Sampling proportional to the continuous reward function</div>
             {:else}
-              <div class="mathexpl" style="width: 100%">Figure 17: Direction of the highest flow for gridpoints on the continuous plane.</div>
+              <div class="mathexpl" style="width: 100%">Fig. 17: Direction of the highest flow for gridpoints on the continuous plane.</div>
             {/if}
           </div>
           <div class="DC-quadrant">
@@ -2228,7 +2228,7 @@ The following are some other interesting examples of GFlowNets being applied to 
         </Wrapper>
       </div>
       <div class="mathexpl">
-        Figure 18: Example training run on a 2-d gaussian plane. The model samples from both of the available modes. Hover over points to see the sampling trajectory.
+        Fig. 18: Example training run on a 2-d gaussian plane. The model samples from both of the available modes. Hover over points to see the sampling trajectory.
       </div>
 
       <div style="height:50px"></div>
@@ -2285,7 +2285,7 @@ The following are some other interesting examples of GFlowNets being applied to 
         </Wrapper>
       </div>
       <div class="mathexpl">
-        Figure 19: Example training run showing mode collapse. The model samples only from one of the available modes and does not improve.
+        Fig. 19: Example training run showing mode collapse. The model samples only from one of the available modes and does not improve.
       </div>
       <div style="height:50px"></div>
       <p class="section-text">
@@ -2391,7 +2391,7 @@ The following are some other interesting examples of GFlowNets being applied to 
         </Wrapper>
       </div>
       <div class="mathexpl">
-        Figure 20: Example training run showing the effect of off-policy training.
+        Fig. 20: Example training run showing the effect of off-policy training.
         By encouraging exploration, the model samples from a wider range of the state space.
         This leads to the discovery of the second mode and thereby to sampling proportionally to the reward function.
       </div>
@@ -2484,7 +2484,7 @@ The following are some other interesting examples of GFlowNets being applied to 
       </div>
       <div style="height:10px"></div>
       <div class="mathexpl">
-        Figure 21: Highest flow for gridpoints on the continuous plane.
+        Fig. 21: Highest flow for gridpoints on the continuous plane.
         After training, the modes of the reward function act as convergence points.
         For the first steps of the agent these convergent points lie close together in the center.
         They move outward towards the modes as the agent takes more steps.
@@ -3275,7 +3275,7 @@ The following are some other interesting examples of GFlowNets being applied to 
 
     </div>
           <div class="mathexpl">
-        Figure 22: GFlowNet Playground: three linked views—Environment for defining continuous reward functions: Training for tuning hyperparameters and visualizing sample distributions and Flow for inspecting learned probability flows.
+        Fig. 22: GFlowNet Playground: three linked views—Environment for defining continuous reward functions: Training for tuning hyperparameters and visualizing sample distributions and Flow for inspecting learned probability flows.
       </div>
 
       <section class="section" bind:this={h_conclusion}>
