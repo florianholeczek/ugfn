@@ -512,7 +512,7 @@ input[type="range"] {
 
   .DC-container {
     width: 1000px;
-    height: 900px;
+    height: 850px;
     margin: 10px auto; /* 10px top/bottom, centered horizontally */
     display: flex;
     flex-direction: row;
@@ -534,7 +534,7 @@ input[type="range"] {
     grid-template-rows: 420px 420px;
     gap: 10px;
     width: 900px; /* 400 + 400 + 50 gap */
-    height: 900px;
+    height: 850px;
     box-sizing: border-box;
     padding: 0; /* No internal padding */
   }
@@ -544,6 +544,7 @@ input[type="range"] {
     justify-content: center;
     font-size: 1rem;
     margin-top: 20px;
+    margin-left: 10px;
   }
 
   .DC-icon {
