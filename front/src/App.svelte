@@ -1695,6 +1695,7 @@ The following are some other interesting examples of GFlowNets being applied to 
         hover over the nodes (states) to see the Flow and Loss calculations.
       </p>
 
+
       <table style="width: 900px; border-collapse: collapse; margin: 20px auto; font-family: 'Georgia', serif; font-size: 16px;">
         <tr>
           <td style="width: 120px; height: 110px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid black;">Flow</td>
