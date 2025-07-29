@@ -1361,7 +1361,13 @@
       </p>
       <p class="section-text">
         <strong>Directed Acyclic Graph and Flow</strong>
-        The sampling process in GFlowNets happens in an implicitly built DAG. Throughout the DAG, the so-called flow encodes the desirability of a transition from one state to the next. Figure 5 illustrates an extract of the Tetris DAG. A current state (t) can be reached from two different parent states (t-1) through different actions (adding the yellow or purple tetromino, respectively). From State t, various actions result in different next or final states (t+1).      </p>
+        The sampling process in GFlowNets happens in an implicitly built DAG.
+        Throughout the DAG, the so-called flow encodes the desirability of a transition from one state to the next.
+        Figure 5 illustrates an extract of the Tetris DAG. A current state <Katex>(t)</Katex>
+        can be reached from two different parent states <Katex>(t-1)</Katex> through different actions
+        (adding the yellow or purple tetromino, respectively).
+        From State <Katex>t</Katex> , various actions result in different next or final states <Katex>(t+1)</Katex>.
+      </p>
       <div class="image-container-small">
         <img
           class="tetris-center-image"
@@ -1373,11 +1379,14 @@
         Fig. 5: Two possible previous states can result in the current state. Choosing different tetrominoes results in different next states (Flow 32) and choosing to terminate results in a final state with reward 28.
       </p>
       <p class="section-text">
-        For the interactive demonstration shown below, we trained a neural network policy under the GFlowNet framework and applied it to the simplified game of Tetris. At each step, the network evaluates every legal placement of the falling tetromino and selects an action proportionally to the future reward (i.e., the number of filled spaces in the grid). The sidebar lists the top three actions according to the policy prediction. In this game, the green move is executed automatically, but you may click any other action to override the choice. You can also pause the game at any time to examine how flow values are redistributed across subsequent moves.        <br><br>
+        For the interactive demonstration shown below, we trained a neural network policy under the GFlowNet framework and applied it to the simplified game of Tetris. At each step, the network evaluates every legal placement of the falling tetromino and selects an action proportionally to the future reward (i.e., the number of filled spaces in the grid). The sidebar lists the top three actions according to the policy prediction. In this game, the green move is executed automatically, but you may click any other action to override the choice. You can also pause the game at any time to examine how flow values are redistributed across subsequent moves.
         <br><br>
         Conceptually, the GFlowNet constructs a DAG of the board states.
         All branches are drawn with uniform width, and each branch is labeled with its predicted flow value. This illustration demonstrates how the GFlowNet maintains multiple promising trajectories while still considering lower-probability options internally. Finally, note that the decomposition of Tetris boards into states determined by the addition of one tetromino at a time is a natural design choice, but, in general, one has freedom to define convenient states and actions for each task.
       </p>
+
+
+
     </section>
 
     <!--Tetris game-->
