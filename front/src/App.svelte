@@ -2281,7 +2281,7 @@
           It is also possible to use <Katex>\beta</Katex> as a trainable parameter and condition the model on it.
         </span>
         <span class="li">
-          When sampling an action, we could add the option to sample a random action by a small probability.
+          When sampling an action, we could add the option to select a random action with a small probability.
         </span>
         <span class="li">
           A simpler way is to just train off-policy.
