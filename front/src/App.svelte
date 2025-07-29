@@ -3320,8 +3320,6 @@
       </div>
     </section>
 
-    <section class="section">
-    </section>
 
     <section class="section">
       <h2 class="section-title">Acknowledgements</h2>
