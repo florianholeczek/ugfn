@@ -1322,21 +1322,24 @@
         As stated in the tl;dr section above, GFlowNet sampling occurs iteratively, going from one state to the next using different available actions. The combination of all possible states and actions results in a directed acyclic graph (DAG) that describes all possible paths to any possible final state. Note that for most use cases it’s infeasible to show the complete DAG because action spaces are typically vast. To better illustrate these concepts, we use our simplified version of the game Tetris.
       </p>
 
-        <strong>State</strong>
-        <p>
+        <p class="section-text">
+          <strong>State</strong>
         A state is the full description of what our environment looks like at a given point in time. In GFlowNets, every possible state is a node in a directed acyclic graph (DAG). The state information describes the current position in the generative process and implicitly includes the options that remain. In our Tetris example, the state is simply the current board, including all tetrominoes that have already been placed.
         </p>
+      <div class="image-container-small">
       <img
         class="tetris-image tetris-image-small"
-        src="/images/Tetris-state.svg"
+        src="/images/tetris-state.svg"
         alt="Tetris board state illustration"
       />
+      </div>
             <p class="mathexpl">
         Figure 2: State of a Tetris game.
       </p>
 
-        <strong>Action</strong>
-        <p>
+
+        <p class="section-text">
+          <strong>Action</strong>
           Actions are the legal operations that act on one state and change it to another. In our DAG, actions are the edges that connect the state nodes. Actions specify how our object is built up step by step. In our Tetris example, each legal drop of an incoming tetromino is an action. Even for a single tetromino, many individual actions are possible, as each rotation and translation must be accounted for. Performing an action transitions the board to a new state by adding the new piece to the configuration.
         </p>
 
@@ -1354,15 +1357,16 @@
 
 
 
-      <strong>Reward</strong>
-      <p>
+
+      <p class="section-text">
+        <strong>Reward</strong>
        In GFlowNets, the reward function defines how desirable a specific state is for the given task. For the simplified Tetris demo, we define the reward as the number of occupied cells at the end of the game. Once no more moves are possible or a specially defined “stop” action is performed, the final reward can be assigned to the end state.
 
       </p>
       <div class="image-container-small">
         <img
           class="tetris-center-image"
-          src="/images/Tetris-reward.svg"
+          src="/images/tetris-reward.svg"
           alt="Tetris reward illustration"
         />
       </div>
@@ -1370,8 +1374,8 @@
         Figure 4: Reward in a Tetris game.
       </p>
 
-  <strong>DAG (Directed Acyclic Graph) and Flow</strong>
   <p class="section-text">
+    <strong>DAG (Directed Acyclic Graph) and Flow</strong>
    The sampling process in GFlowNets happens in an implicitly built DAG. Throughout the DAG, the so-called flow encodes the desirability of a transition from one state to the next. Figure x illustrates an extract of the Tetris DAG. A current state (t) can be reached from two different parent states (t-1) through different actions (adding the yellow or purple tetromino, respectively). From State t, various actions result in different next or final states (t+1).
   </p>
 
