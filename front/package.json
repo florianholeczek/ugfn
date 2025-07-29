@@ -18,6 +18,8 @@
     "@smui/fab": "^7.0.0",
     "@smui/icon-button": "^7.0.0",
     "@smui/linear-progress": "^7.0.0",
+    "@smui/list": "^7.0.0",
+    "@smui/menu": "^7.0.0",
     "@smui/paper": "^7.0.0",
     "@smui/select": "^7.0.0",
     "@smui/slider": "^7.0.0",
