@@ -1088,8 +1088,6 @@
   //Title to display in tab
   document.title = "GFlowNet Playground";
 
-
-
 </script>
 
 
