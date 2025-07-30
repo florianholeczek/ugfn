@@ -1618,7 +1618,7 @@ function draw() {
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
         if (currentGameState.board[r][c]) {
-          ctx.fillStyle = "#666";
+          ctx.fillStyle = "#31688e";
           ctx.fillRect(c*CELL_SIZE, r*CELL_SIZE, CELL_SIZE, CELL_SIZE);
           ctx.strokeStyle = "#444";
           ctx.strokeRect(c*CELL_SIZE, r*CELL_SIZE, CELL_SIZE, CELL_SIZE);
