@@ -1029,9 +1029,7 @@
     } else {
       console.error('initMoleculeFlow is not defined');
     }
-    if (typeof initFlowConservationDemo === 'function') {
-      initFlowConservationDemo();
-    }
+
 
 
     // add listeners for changing the Environment
@@ -2272,8 +2270,7 @@
         Without changing our training settings, our model runs into a so-called <i>mode collapse</i>.
         In this case, the model quickly discovered one mode and only sampled from it.
         This happens because we do not encourage exploration enough, and as a result the model acts greedily.
-
-        <br>
+        <br><br>
         There are three main possibilities to fix this:
         <span class="li">
           We could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:
