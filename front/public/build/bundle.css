@@ -19283,7 +19283,7 @@ input[type="range"] {
 
   .DC-container {
     width: 1000px;
-    height: 850px;
+    height: 870px;
     margin: 10px auto; /* 10px top/bottom, centered horizontally */
     display: flex;
     flex-direction: row;
@@ -19305,7 +19305,7 @@ input[type="range"] {
     grid-template-rows: 420px 420px;
     gap: 10px;
     width: 900px; /* 400 + 400 + 50 gap */
-    height: 850px;
+    height: 870px;
     box-sizing: border-box;
     padding: 0; /* No internal padding */
   }

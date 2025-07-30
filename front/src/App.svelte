@@ -1421,8 +1421,9 @@
         </div>
       </div>
     </div>
-    <p class="mathexpl" style="margin-top: 20px">
-      Fig. 6: Interactive GFlowNet Tetris game. In the candidate list the top 3 moves can be selected. On the right, an sctract of the DAG is presented.
+    <div style="height:20px"></div>
+    <p class="mathexpl">
+      Fig. 6: Interactive GFlowNet Tetris game. In the candidate list the top 3 moves can be selected. On the right, an extract of the DAG is presented.
     </p>
 
 
@@ -1851,7 +1852,7 @@
         In the Playground we use trajectory balance loss <a href="#Malkin22" style="color: #21918c">(Malkin et al. 2022)</a>; you can learn about it below.
       </p>
 
-      <div class="image-container">
+      <div class="image-container" style="width:1000px">
         <Accordion multiple>
             <Panel color="secondary">
               <Header>Trajectory Balance: Theory</Header>
@@ -2085,7 +2086,7 @@
           <div class="DC-quadrant">
             {#if DC_view === 0}
               In a grid-based environment, the reward function can be defined as a value assigned to each cell. An agent moves across the grid and collects the reward of the cell it ends up in. In our case, the agent is designed to start in the central cell and take actions in both the x and y directions, taking steps of size n. For simplicity–and to help visualize the flow later on–we fix the number of steps (i.e., the trajectory length).
-              <br><br>
+              <br>
               Allowing free movement in any direction  violates an assumption of the DAG: A state can be visited more than once, so the graph that models our state-space can become cyclic. A simple way to solve this is to modify the representation of our states to include a timestamp (the current step) in addition to the position.
             {:else if DC_view ===1}
               In the discrete case, sampling works the same way as in the previous examples. One of the possible actions (shown as grey arrows) is sampled based on the transition probabilities provided by the policy. The agent then moves according to the chosen action (black arrow), and this becomes its new state. After a fixed number of steps (in this case, three), the final state is reached (marked by the black tripod), and the reward is calculated. This example illustrates an untrained GFlowNet, akin to random sampling. To calculate the transition probabilities, we need to sum the flow over all possible next states. While this is feasible in the discrete case, it becomes intractable in the continuous case due to the infinite number of possible next states.
