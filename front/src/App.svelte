@@ -1329,7 +1329,7 @@
       />
       </div>
       <p class="mathexpl">
-        Fig. 2: State of a Tetris game.
+        Fig. 2: State in our Tetris game.
       </p>
       <p class="section-text">
         <strong>Action</strong>
@@ -1343,7 +1343,7 @@
         />
       </div>
       <p class="mathexpl">
-        Fig. 3: Action in a Tetris game.
+        Fig. 3: Action in our Tetris game.
       </p>
       <p class="section-text">
         <strong>Reward</strong>
@@ -1357,7 +1357,7 @@
         />
       </div>
       <p class="mathexpl">
-        Fig. 4: Trajectory and reward in a Tetris game.
+        Fig. 4: Trajectory and reward in our Tetris game.
       </p>
       <p class="section-text">
         <strong>Directed Acyclic Graph and Flow</strong>
@@ -1376,7 +1376,9 @@
         />
       </div>
       <p class="mathexpl">
-        Fig. 5: Two possible previous states can result in the current state. Choosing different tetrominoes results in different next states (Flow 32) and choosing to terminate results in a final state with reward 28.
+        Fig. 5: Extract of the DAG for our Tetris example.
+        Two states (t-1) can result in the current state (t). Choosing different tetrominoes results in various next states (t+1)
+        and choosing to terminate results in a final state with reward 28.
       </p>
       <p class="section-text">
         For the interactive demonstration shown below, we trained a neural network policy under the GFlowNet framework and applied it to the simplified game of Tetris. At each step, the network evaluates every legal placement of the falling tetromino and selects an action proportionally to the future reward (i.e., the number of filled spaces in the grid). The sidebar lists the top three actions according to the policy prediction. In this game, the green move is executed automatically, but you may click any other action to override the choice. You can also pause the game at any time to examine how flow values are redistributed across subsequent moves.
@@ -1420,7 +1422,7 @@
       </div>
     </div>
     <p class="mathexpl" style="margin-top: 20px">
-      Fig. 6: Interactive GFlowNet Tetris visualization. In the candidate list the top 3 moves can be selected, below the corresponding DAG is presented.
+      Fig. 6: Interactive GFlowNet Tetris game. In the candidate list the top 3 moves can be selected. On the right, an sctract of the DAG is presented.
     </p>
 
 
@@ -1500,7 +1502,8 @@
       </div>
       <svg id="chart" style="width: 1000px; display:block; margin: 20px auto"></svg>
       <p class="mathexpl">
-        Fig. 7:  Interactive molecular visualization. The GFlowNet selects molecules based on their properties, which are weighted with the parameter sliders.
+        Fig. 7: Interactive molecule generation DAG. The GFlowNet generates molecules proportionally to the reward defined with the property sliders.
+
       </p>
 
       <p class="section-text">
@@ -1676,9 +1679,7 @@
 
       </svg>
       <p class="mathexpl" style="width:750px">
-        Fig 8: A DAG with flow values at the edges representing a fully trained GFlowNet.
-        Hover over the edges (actions) to see the Policy calculations,
-        hover over the nodes (states) to see the Flow and Loss calculations.
+        Fig. 8: A DAG with flow values at the edges representing a fully trained GFlowNet. Hover over the edges (actions) to see the policy calculations. Hover over the nodes (states) to see the flow and loss calculations.
       </p>
 
 
@@ -2083,17 +2084,13 @@
         <div class="DC-center-grid">
           <div class="DC-quadrant">
             {#if DC_view === 0}
-              In a grid-based environment, the reward function can be defined as a value assigned to each cell. An agent moves across the grid and collects the reward of the cell it ends up in. The agent is free to move in both the x and y directions, taking steps of size n. For simplicity–and to help visualize the flow later on–we fix the number of steps (i.e., the trajectory length).
+              In a grid-based environment, the reward function can be defined as a value assigned to each cell. An agent moves across the grid and collects the reward of the cell it ends up in. In our case, the agent is designed to start in the central cell and take actions in both the x and y directions, taking steps of size n. For simplicity–and to help visualize the flow later on–we fix the number of steps (i.e., the trajectory length).
               <br><br>
-              Allowing movement like this violates an assumption of the DAG: A state can be visited more than once, so the state-space might become cyclic. To solve this, we simply modify the representation of our states to include a timestamp (the current step) in addition to the position.
+              Allowing free movement in any direction  violates an assumption of the DAG: A state can be visited more than once, so the graph that models our state-space can become cyclic. A simple way to solve this is to modify the representation of our states to include a timestamp (the current step) in addition to the position.
             {:else if DC_view ===1}
-              In the discrete case, sampling works the same way as in the previous examples. One of the possible actions (shown as grey arrows) is sampled based on the transition probabilities provided by the policy. The agent then moves according to the chosen action (black arrow), and this becomes its new state. After a fixed number of steps (in this case, three), the final state is reached (marked by the black tripod), and the reward is calculated.
-              <br>
-              This example illustrates random sampling, representing an untrained GFlowNet.
-              <br>
-              To calculate the transition probabilities, we need to sum the flow over all possible next states. While this is feasible in the discrete case, it becomes intractable in the continuous case due to the infinite number of possible next states.
+              In the discrete case, sampling works the same way as in the previous examples. One of the possible actions (shown as grey arrows) is sampled based on the transition probabilities provided by the policy. The agent then moves according to the chosen action (black arrow), and this becomes its new state. After a fixed number of steps (in this case, three), the final state is reached (marked by the black tripod), and the reward is calculated. This example illustrates an untrained GFlowNet, akin to random sampling. To calculate the transition probabilities, we need to sum the flow over all possible next states. While this is feasible in the discrete case, it becomes intractable in the continuous case due to the infinite number of possible next states.
             {:else if DC_view ===2}
-              After training, sampling becomes proportional to the reward function: states with higher rewards are sampled more frequently. In our example, the two high-reward states are visited most often, though the agent still occasionally samples lower-reward states.
+              After training, sampling becomes proportional to the reward function: states with higher rewards are sampled more frequently. In our example, the two highest-reward states are visited most often, though the agent still occasionally samples lower-reward states.
             {:else}
               When visualizing the flow, we can aggregate the flows for each possible state. Recall the grey arrows representing possible actions: Each of these has an associated flow value. Treating them as vectors with their flow as the magnitude, we can show the direction of the highest flow. Doing this for all states produces a vector field, which reveals the most probable directions the agent will take. High-reward states appear as points of convergence in this field.
             {/if}
@@ -2101,7 +2098,7 @@
           <div class="DC-plot-wrapper">
             <div id="DC_discrete_plot" class="DC-plot"></div>
             {#if DC_view === 0}
-              <div class="mathexpl" style="width: 100%">Fig. 10: Reward of a discrete grid by assigned values.</div>
+              <div class="mathexpl" style="width: 100%">Fig. 10: Rewards in a discrete grid.</div>
             {:else if DC_view ===1}
               <div class="mathexpl" style="width: 100%">Fig. 12: Sampling on a discrete grid by choosing an action.</div>
             {:else if DC_view ===2}
@@ -2115,7 +2112,7 @@
           <div class="DC-plot-wrapper">
             <div id="DC_continuous_plot" class="DC-plot"></div>
             {#if DC_view === 0}
-              <div class="mathexpl" style="width: 100%">Fig. 11: Reward of a continuous plane by the sum of Gaussian PDFs. </div>
+              <div class="mathexpl" style="width: 100%">Fig. 11: Rewards in a continuous plane. </div>
             {:else if DC_view ===1}
               <div class="mathexpl" style="width: 100%">Fig. 13: Sampling on a continuous plane by drawing from the sampling distribution</div>
             {:else if DC_view ===2}
@@ -2126,12 +2123,12 @@
           </div>
           <div class="DC-quadrant">
             {#if DC_view === 0}
-              On a continuous plane, we have no cells, but we can specify the reward by a distribution. In this case, we use the sum of multivariate Gaussians (for now, two components). The agent moves similarly to the discrete case for a fixed number of steps and then collects the reward based on the probability density function (PDF) of the distribution.
+              On a continuous plane, we have no cells, but we can specify the reward by a continuous function. In our example, we use the sum of multivariate Gaussians (for now, two components). Similarly to the discrete case, we allow the agent to move freely for a fixed number of steps (starting from the origin at the center). Note that this is a design choice; we could have also chosen to restrict the movement in a different way. At the end of the trajectory, the reward is obtained by evaluating the continuous function.
               <br><br>
               This will be the environment of the Playground, where we simplified the variance of the Gaussians to one parameter, so the variance for x and y is the same and there is no covariance
               <Katex>(\Sigma = \sigma^2 I)</Katex>.
             {:else if DC_view ===1}
-              Instead, the neural network representing our policy outputs a <b>sampling distribution</b>. This distribution is represented by a mean (grey arrow) and a variance (grey circle). It represents the flow: for any given state, the network provides a probability distribution over actions. We then sample an action from it (black arrow), and the agent moves accordingly. As before, after a fixed number of steps, the final state (black tripod) is reached.
+              Instead, the neural network representing our policy outputs <b>the parameters of a continuous distribution</b>. In this case, we use a Gaussian distribution parameterized by a mean (grey arrow) and a variance (grey circle). It represents the flow: for any given state, the network provides a probability distribution over actions. We then sample an action from it (black arrow), and the agent moves accordingly. As before, after a fixed number of steps, the final state (black tripod) is reached.
               <br>
               Note: Do not confuse the reward distribution with the sampling distribution: The reward distribution is fixed for the whole training process and (usually) unknown. The sampling distribution is determined by the policy and varies depending on the agent's current state.
             {:else if DC_view ===2}
@@ -2158,7 +2155,7 @@
     <section class="section" bind:this={h_training}>
       <h2 class="section-title">Training</h2>
       <p class="section-text">
-        Using the environment above, we trained a GFlowNet with trajectory balance loss. Below, you can see the model's progress during training. While it first samples randomly, it learns to match the true distribution of our environment. Use the controls below to iterate through the training process. The button on the right lets you load the settings used for this run to the Playground. Hover over a sample to see its trajectory.
+        Using the environment above, we trained a GFlowNet with the trajectory balance loss. Below, you can see the model's progress during training. While it first samples randomly, it learns to match the reward distribution of our environment. Use the controls below to iterate through the training process. The button on the right lets you load the settings used for this run to the Playground. Hover over a sample to see its trajectory.
       </p>
       <div id="runplot1" style="display: flex; justify-content: center;"></div>
       <div style="width: 700px; margin: auto; text-align:center;display:flex; margin-top: 10px">
@@ -2379,7 +2376,7 @@
       </div>
       <div style="height:50px"></div>
       <p class="section-text">
-        Off-policy training helped: We now sample proportionally to the reward function again.
+        Off-policy training helped: We now sample (approximately) proportionally to the reward function again.
       </p>
       <div class="image-container">
         <Accordion>
