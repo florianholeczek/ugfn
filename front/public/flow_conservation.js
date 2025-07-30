@@ -53,14 +53,14 @@
           .select(h ? h.parentNode : document.body)
           .insert("div", h ? () => h : null)
           .attr("id", "flowConservationContainer")
-          .style("max-width", "600px")
-          .style("margin", "20px auto");
+          .style("max-width", "400px")
+          .style("margin", "10px auto");
       }
       svg = c
         .append("svg")
         .attr("id", "flowConservationSVG")
         .style("width", "100%")
-        .style("height", "auto");
+        .style("height", "500px");
     }
 
     if (window._spawnTimer) {
@@ -106,11 +106,11 @@
 
     const parentPaths = [];
     parents.forEach((p, i) => {
-      drawMini(svg, p.board, pLanes[i] - bwRoot / 2, PAD, bwRoot, bhRoot, CS_ROOT, "Parent");
+      drawMini(svg, p.board, pLanes[i] - bwRoot / 2, PAD+20, bwRoot, bhRoot, CS_ROOT, "Parent");
       svg
         .append("line")
         .attr("x1", pLanes[i])
-        .attr("y1", PAD + bhRoot)
+        .attr("y1", PAD + bhRoot+20)
         .attr("x2", lanes[1])
         .attr("y2", yRoot-30)
         .attr("stroke", "#000")
@@ -132,7 +132,7 @@
       return [
         { x: lanes[1], y: yRoot + bhRoot },
         { x: lanes[i], y: midY },
-        { x: lanes[i], y: yResult - 30 }
+        { x: lanes[i], y: yResult - 10 }
       ];
     });
 
@@ -158,7 +158,7 @@
         .attr("x1", x)
         .attr("y1", midY)
         .attr("x2", x)
-        .attr("y2", yResult - 30)
+        .attr("y2", yResult - 10)
         .attr("stroke", "#000")
         .attr("stroke-width", 2)
         .attr("marker-end", "url(#mGreen)");
@@ -171,7 +171,7 @@
         .attr("font-size", 12)
         .text("Flow: " + a.flow.toFixed(2));
 
-      drawMini(svg, data.results[i].board, x - bwRoot / 2, yResult, bwRoot, bhRoot, CS_ROOT, "Next State");
+      drawMini(svg, data.results[i].board, x - bwRoot / 2, yResult+20, bwRoot, bhRoot, CS_ROOT, "Next State");
     });
 
     const spawn = () => {

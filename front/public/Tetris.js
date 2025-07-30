@@ -1857,6 +1857,7 @@ function updateCandidateListUI() {
     div.style.heigth = `100px`;
     div.innerHTML = `
       <h3>${c.action_key}</h3>
+      <br>
       <p>Flow: ${c.flow.toFixed(2)}</p>
       <p>Prob: ${(c.probability * 100).toFixed(1)}%</p>
     `;

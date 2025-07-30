@@ -1394,30 +1394,30 @@
       <div class="A_tetriscontainer">
         <div class="A_board-column">
           <div class="A_board">
-          <canvas
-            id="tetrisBgCanvas"
-            width="300"
-            height="300"
-            style="position: absolute; top: 0; left: 0; z-index: 0;"
-          ></canvas>
-          <canvas
-            id="tetrisCanvas"
-            width="180"
-            height="300"
-            style="position: absolute; top: 0; left: 0; z-index: 1;"
-          ></canvas>
+            <canvas
+              id="tetrisBgCanvas"
+              width="300"
+              height="300"
+              style="position: absolute; top: 0; left: 0; z-index: 0;"
+            ></canvas>
+            <canvas
+              id="tetrisCanvas"
+              width="180"
+              height="300"
+              style="position: absolute; top: 0; left: 0; z-index: 1;"
+            ></canvas>
           </div>
+            <Button id="resetBtn" color="secondary" variant="raised" style="height:50px; width:180px; margin-top:20px">Reset Game</Button>
+            <Button id="pauseBtn" color="secondary" variant="raised" style="height:50px; width:180px;">Pause Game</Button>
         </div>
 
         <div class="A_sidebar">
           <h2>Candidate Moves</h2>
           <div id="candidateList" class="A_candidates"><!-- Populated by Tetris logic --></div>
-          <div class="A_controls">
-            <Button id="resetBtn" color="secondary" variant="raised" style="height:75px">Reset Game</Button>
-            <Button id="pauseBtn" color="secondary" variant="raised" style="height:75px">Pause Game</Button>
-          </div>
+
         </div>
       </div>
+      <div id="flowConservationContainer"></div>
     </div>
     <div style="height:20px"></div>
     <p class="mathexpl">
