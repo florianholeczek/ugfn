@@ -1,7 +1,7 @@
 (function () {
   const PAD = 8,
-    CS_ROOT = 6,
-    CS_ACT = 4,
+    CS_ROOT = 9,
+    CS_ACT = 7,
     W = 500,
     H = 600,
     SPAWN_INT = 200,
@@ -14,17 +14,17 @@
     g.append("rect")
       .attr("width", bw)
       .attr("height", bh)
-      .attr("fill", "#31688e")
-      .attr("stroke", "#5ec962")
+      .attr("fill", "none")
+      .attr("stroke", "#000000")
       .attr("stroke-width", 2);
     board.forEach((row, r) =>
       row.forEach((v, c) => {
         g.append("rect")
-          .attr("x", PAD + c * cs)
-          .attr("y", PAD + r * cs)
+          .attr("x", c * cs)
+          .attr("y", r * cs)
           .attr("width", cs)
           .attr("height", cs)
-          .attr("fill", v === 1 ? "#31688e" : v === 2 ? "#fde725" : "#111")
+          .attr("fill", v === 1 ? "#31688e" : v === 2 ? "#d9c324" : "#ffffff")
           .attr("stroke", "#333")
           .attr("stroke-width", 0.5);
       })
@@ -94,10 +94,10 @@
     const parents = data.parents || [];
     const cols = data.root.board[0].length,
       rows = data.root.board.length;
-    const bwRoot = cols * CS_ROOT + PAD * 2,
-      bhRoot = rows * CS_ROOT + PAD * 2;
-    const bwAct = cols * CS_ACT + PAD * 2,
-      bhAct = rows * CS_ACT + PAD * 2;
+    const bwRoot = cols * CS_ROOT,
+      bhRoot = rows * CS_ROOT;
+    const bwAct = cols * CS_ACT,
+      bhAct = rows * CS_ACT;
     const yRoot = parents.length ? 200 : PAD,
       yAction = yRoot + 300,
       yResult = H - bhRoot - PAD - 40;
@@ -150,7 +150,7 @@
         .attr("stroke", "#000")
         .attr("stroke-width", 2);
 
-      drawMini(svg, a.board, x - bwAct / 2 -30, yAction -160, bwAct, bhAct, CS_ACT, "Action");
+      drawMini(svg, a.board, x - bwAct / 2 -30, yAction -140, bwAct, bhAct, CS_ACT, "Action");
 
       // Vertical line from mid to result
       svg
@@ -166,7 +166,7 @@
       svg
         .append("text")
         .attr("x", x - bwAct / 2 -40)
-        .attr("y", yAction-90)
+        .attr("y", yAction-55)
         .attr("fill", "#000")
         .attr("font-size", 12)
         .text("Flow: " + a.flow.toFixed(2));

@@ -19368,7 +19368,7 @@ input[type="range"] {
   position: relative;
   width: 180px;
   height: 300px; /* Adjusted to match canvas height */
-  background-color: #3d3d3d;
+  background-color: #5f5f5f;
   border: 2px solid #333;
 }
 

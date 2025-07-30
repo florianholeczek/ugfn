@@ -1383,7 +1383,7 @@ function drawCurrentPiece(gs) {
     0, 0, 0, piece.shape.length * CELL_SIZE
   );
   grad.addColorStop(0, "#c0c0c0");
-  grad.addColorStop(1, "#a0a0a0");
+  grad.addColorStop(1, "#d9c324");
   ctx.fillStyle = grad;
 
   for (let r = 0; r < piece.shape.length; r++) {
