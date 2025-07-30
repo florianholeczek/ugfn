@@ -976,7 +976,7 @@
         .reduce((sum, e) => sum + e.flow, 0));
     }
     TB_current.pf =res.toFixed(3);
-    return form + "=" + calc + "=" + TB_current.pf;
+    return form + "= \\\\ =" + calc + "=" + TB_current.pf;
   }
 
   function TB_calculate_PB () {
@@ -1002,7 +1002,7 @@
 
     }
     TB_current.pb =res.toFixed(3);
-    return form + "=" + calc + "=" + TB_current.pb;
+    return form + "= \\\\ =" + calc + "=" + TB_current.pb;
   }
 
 
