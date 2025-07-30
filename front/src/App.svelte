@@ -2111,7 +2111,7 @@
             {:else if DC_view ===2}
               <div class="mathexpl" style="width: 100%">Fig. 15: Sampling proportional to the continuous reward function</div>
             {:else}
-              <div class="mathexpl" style="width: 100%">Fig. 17: Direction of the highest flow for gridpoints on the continuous plane.</div>
+              <div class="mathexpl" style="width: 100%">Fig. 17: Direction of the highest flow for grid points in the continuous plane.</div>
             {/if}
           </div>
           <div class="DC-quadrant">
@@ -2265,21 +2265,23 @@
         In this case, the model quickly discovered one mode and only sampled from it.
         This happens because we do not encourage exploration enough, and as a result the model acts greedily.
         <br><br>
-        There are three main possibilities to fix this:
+        There are two main possibilities to fix this:
         <span class="li">
-          We could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:
+          The simplest solution is to train “off-policy.”
+          By using a different policy for action selection during training,
+          we can increase exploration by sampling actions more randomly
+          while still using the target policy to estimate the flow.
+          One option to train off-policy is to select a random action with a small probability.
+          Another option is to add a fixed value to the variance of the sampling distribution provided by the forward policy.
+          As this is a straightforward implementation, we will proceed with this one in our example.
+        </span>
+        <span class="li">
+          If adjusting the reward is an option,
+          we could introduce a temperature parameter <Katex>\beta</Katex> into our reward function:
           <Katex>R_{"{new}"}(x)=R(x)^\beta</Katex>.
-          This would change how "peaky" the reward function is: if the reward is not concentrated at a single point but more spread out, the probability of discovery increases.
+          This would change how 'peaky' the reward function is:
+          if the reward is not concentrated at a single point but more spread out, the probability of discovery increases.
           It is also possible to use <Katex>\beta</Katex> as a trainable parameter and condition the model on it.
-        </span>
-        <span class="li">
-          When sampling an action, we could add the option to select a random action with a small probability.
-        </span>
-        <span class="li">
-          A simpler way is to just train off-policy.
-          By adding a fixed variance to the variance of the sampling distribution provided by the forward policy,
-          we explore more during training.
-          As this is a straightforward implementation, we will proceed with this one.
         </span>
       </p>
       <div class="image-container">
@@ -2287,25 +2289,27 @@
           <Panel color="secondary">
             <Header>Changes to the algorithm</Header>
             <Content>
-              Training off-policy is even more helpful when it is scheduled. We start with a higher variance and scale it down during training until we reach on-policy training.
+              Training off-policy is even more helpful when it is scheduled. At the beginning of the training, we add a higher value to the variance. We then scale this value down during training until we reach on-policy training.
+              Our new hyperparameter is the initial value for off-policy training; during each step, we gradually decrease it until we reach 0.
               <br>
               Our new hyperparameter is the initial value for off-policy training; during each step, we gradually decrease it until we reach 0.
               <br>
               <br>Important changes:
               <ul>
                 <li>
-                  Define schedule in the beginning: [start=initial value, stop=0, step=-initial value/number of iterations\]
+                  Define schedule in the beginning: [start=initial value, stop=0, step=-initial value/number of iterations]
                 </li>
                 <li>
-                  When sampling the actions, we compute the logits as usual.
+                  When sampling the actions, we compute the logits (mean and variance of the sampling distribution) as usual.
                 </li>
                 <li>
-                  Instead of just defining the policy distribution with them, we also define an exploratory distribution by adding the scheduled value to the variance.
+                  We then define two policies: We define the target policy using the logits as usual and add the scheduled value to the variance to define the exploratory distribution.
                 </li>
                 <li>
-                  We then sample our actions from the exploratory distribution. We need the policy distribution later to compute the log probabilities of our actions.                </li>
+                  We then sample our actions from the exploratory distribution. We need the target policy later to compute the log probabilities of our actions (for both the forward and backward policy).
+                </li>
                 <li>
-                  We do not use the scheduled values with the backward policy or during inference.
+                  Sampling off-policy is only useful during training; during inference, we sample our actions on-policy.
                 </li>
               </ul>
             </Content>
