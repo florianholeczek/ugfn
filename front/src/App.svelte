@@ -1395,12 +1395,6 @@
         <div class="A_board-column">
           <div class="A_board">
             <canvas
-              id="tetrisBgCanvas"
-              width="300"
-              height="300"
-              style="position: absolute; top: 0; left: 0; z-index: 0;"
-            ></canvas>
-            <canvas
               id="tetrisCanvas"
               width="180"
               height="300"

@@ -1595,11 +1595,11 @@ function draw() {
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
   // background
-  ctx.fillStyle = "#222";
+  ctx.fillStyle = "#ffffff";
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
   // 1) draw grid lines
-  ctx.strokeStyle = "rgba(255,255,255,0.1)";
+  ctx.strokeStyle = "#666666";
   for (let x = 0; x <= COLS; x++) {
     ctx.beginPath();
     ctx.moveTo(x*CELL_SIZE, 0);
@@ -1796,7 +1796,7 @@ function showStartOverlay() {
     left: 0,
     width: "100%",
     height: "100%",
-    background: "rgba(0,0,0,0.6)",
+    background: "rgba(0,0,0,0.3)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -1828,7 +1828,7 @@ function showRestartOverlay() {
     left: 0,
     width: "100%",
     height: "100%",
-    background: "rgba(0,0,0,0.6)",
+    background: "rgba(0,0,0,0.3)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
