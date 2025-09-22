@@ -71,6 +71,7 @@
   let h_intro;
   let h_coreConcepts;
   let h_domain;
+  let h_applied;
   let h_policy;
   let h_continuous;
   let h_training;
@@ -1159,6 +1160,9 @@
         <Item on:click={scrollTo(h_domain)}>
           <Text>Domain Applications</Text>
         </Item>
+          <Item on:click={scrollTo(h_applied)}>
+          <Text>Domain Applications</Text>
+        </Item>
         <Item on:click={scrollTo(h_policy)}>
           <Text>Flow, Policies, and Training Objective</Text>
         </Item>
@@ -1329,8 +1333,7 @@
       </p>
       <p class="section-text">
         <strong>Action</strong>
-        Actions are the operations that act on one state and change it to another. In our DAG, actions are the edges that connect the state nodes. Actions specify how our object is built up step by step. In our Tetris example, each drop of an incoming tetromino is an action. Even for a single tetromino, many individual actions are possible, as each rotation and translation must be accounted for. However, given a state, not all actions may be legal or valid. For example, adding tetrominoes that would overflow the board are invalid. The possibility of discarding invalid actions introduces the potential of incorporating hard constraints in the generation process. Performing a legal action transitions the board to a new state by adding the new piece to the configuration.
-      </p>
+      An action is understood as the operation that maps one board state to the next board state. In the DAG, actions appear as edges between state nodes and specify how the object is assembled step by step. In Tetris, this can be modeled as piece-selection + placement, where a tetromino is first selected and then placed by choosing its rotation and landing column (gravity brings it to rest). Actions that would overlap existing blocks or exceed the board boundary are treated as invalid and are excluded, thereby enforcing hard constraints during generation. When a legal action is executed, the board is augmented with the new piece and the trajectory advances from board to board. Episodes are ended when no legal placement remains (or when an explicit Stop is taken, if present) and the terminal reward is computed on the final board.  </p>
       <div class="image-container-small">
         <img
           class="tetris-center-image tetris-smaller-image"
@@ -1377,11 +1380,13 @@
         and choosing to terminate results in a final state with reward 28.
       </p>
       <p class="section-text">
-        For the interactive demonstration shown below, we trained a neural network policy under the GFlowNet framework and applied it to the simplified game of Tetris. At each step, the network evaluates every legal placement of the falling tetromino and selects an action proportionally to the future reward (i.e., the number of filled spaces in the grid). The sidebar lists the top three actions according to the policy prediction. In this game, the green move is executed automatically, but you may click any other action to override the choice. You can also pause the game at any time to examine how flow values are redistributed across subsequent moves.
+        For the interactive demonstration shown below, we trained a neural network policy under the GFlowNet framework and applied it to the simplified game of Tetris. 
+        In this simplified setup, at each step only the placement of the current tetromino is considered. Its rotation and landing column can be chosen while the next piece cannot be picked and is provided by the environment; an action is then sampled proportionally to the estimated future reward (i.e., the final number of filled cells)        
+        The sidebar lists the top three actions according to the policy prediction. In this game, the green move is executed automatically, but you may click any other action to override the choice. You can also pause the game at any time to examine how flow values are redistributed across subsequent moves.
         <br><br>
         Conceptually, the GFlowNet constructs a DAG of the board states.
-        All branches are drawn with uniform width, and each branch is labeled with its predicted flow value. This illustration demonstrates how the GFlowNet maintains multiple promising trajectories while still considering lower-probability options internally. Finally, note that the decomposition of Tetris boards into states determined by the addition of one tetromino at a time is a natural design choice, but, in general, one has freedom to define convenient states and actions for each task.
-      </p>
+        All branches are drawn with uniform width, and each branch is labeled with its predicted flow value. This illustration demonstrates how the GFlowNet maintains multiple promising trajectories while still considering lower-probability options internally. 
+Finally, the one-piece-at-a-time decomposition is natural for Tetris; in this demo it is further simplified to placement-only (rotation + landing column) and excludes selecting the next piece, though in general one is free to define other state–action choices for a task.      </p>
 
 
 
@@ -1416,121 +1421,6 @@
       Fig. 6: Interactive GFlowNet Tetris game. In the candidate list the top 3 moves can be selected. On the right, an extract of the DAG is presented.
     </p>
 
-
-
-    <section class="section" bind:this={h_domain}>
-      <h2 class="section-title">Domain Applications </h2>
-      <p class="section-text">
-        The same principles demonstrated in the Tetris example can be applied to many other problems, which can be framed as a sequence of actions applied to certain states with clearly defined reward functions. One particularly interesting example is the generation of molecules. In this context, each node in our graph represents a partial molecule, and each edge represents the action of adding a new fragment to it. In molecular design, a GFlowNet sequentially adds fragments to an evolving structure until a complete molecule is produced, which is then scored based on a reward function. For example, the estimated hydrophobicity of the molecule might drive the reward if the goal of the molecule search is to find a compound with low polarity. Thanks to flow conservation, the total incoming probability at each intermediate molecule is redistributed among its possible extensions. Higher-reward molecules, therefore, attract more flow, while alternative structures retain non-zero probability and remain available for sampling. The interactive visualization below lets you adjust the reward function using a slider. As you move the slider, the percentage of generated molecules shifts in real time. Clicking the “Maximize weight” button sets the reward to favor heavy molecules. Under this setting, the heaviest molecule appears about 49% of the time, whereas lighter molecules receive minimal flow.
-      </p>
-      <div class="A_molecule-slider-container">
-        <div class="A_molecule-slider">
-          Weight: {$A_molecule_prop.mw.toFixed(2)}
-          <Slider
-            min={0}
-            max={1}
-            step={0.01}
-            bind:value={$A_molecule_prop.mw}
-          />
-        </div>
-
-        <div class="A_molecule-slider">
-          Hydrophobicity: {$A_molecule_prop.logP.toFixed(2)}
-          <Slider
-            min={0}
-            max={1}
-            step={0.01}
-            bind:value={$A_molecule_prop.logP}
-          />
-        </div>
-
-        <div class="A_molecule-slider">
-          Donors: {$A_molecule_prop.hbd.toFixed(2)}
-          <Slider
-            min={0}
-            max={1}
-            step={0.01}
-            bind:value={$A_molecule_prop.hbd}
-          />
-        </div>
-
-        <div class="A_molecule-slider">
-          Acceptors: {$A_molecule_prop.hba.toFixed(2)}
-          <Slider
-            min={0}
-            max={1}
-            step={0.01}
-            bind:value={$A_molecule_prop.hba}
-          />
-        </div>
-
-        <div class="A_molecule-slider">
-          Polarity: {$A_molecule_prop.tpsa.toFixed(2)}
-          <Slider
-            min={0}
-            max={1}
-            step={0.01}
-            bind:value={$A_molecule_prop.tpsa}
-          />
-        </div>
-
-        <div class="A_molecule-slider">
-          Flexibility: {$A_molecule_prop.rotb.toFixed(2)}
-          <Slider
-            min={0}
-            max={1}
-            step={0.01}
-            bind:value={$A_molecule_prop.rotb}
-          />
-        </div>
-        <div class="A_molecule-slider">
-              <Button id="max-weight-btn"
-                      color="secondary"
-                      variant="raised"
-                      on:click={A_maximizeMw}>
-                Maximize Weight</Button>
-        </div>
-      </div>
-      <svg id="chart" style="width: 1000px; display:block; margin: 20px auto"></svg>
-      <p class="mathexpl">
-        Fig. 7: Interactive molecule generation DAG. The GFlowNet generates molecules proportionally to the reward defined with the property sliders.
-
-      </p>
-
-      <p class="section-text">
-        GFlowNets are applied in this domain because they can ensure a diverse sampling of candidate molecules. This is desirable when the reward is distributed among potentially many modes, where sampling in a too narrow region of the candidate space might miss out entire families of potentially interesting molecules (Nica et al. 2022).
-      </p>
-      <p class="section-text">
-        The following are some other interesting examples of GFlowNets being applied to problems in which diverse samples are desirable:
-      </p>
-      <ul class="section-text">
-        <li>
-          <strong>Listwise recommendation.</strong>
-          GFlowNets can also be applied to generating lists of user recommendations, such as items in a web shop that might be of interest for a customer to check out next. Each action adds an item to the recommendation list. This generation can be conditioned on the user, ensuring that the resulting recommendations are diversely sampled yet still relevant for the specific user <a href="#Liu23" style="color: #21918c">(Liu et al. 2023)</a>.
-        </li>
-        <li>
-          <strong>Games.</strong>
-          Adversarial Flow Networks (AFlowNets) are modified versions of GFlowNets capable of learning robust policies through self‑play. Such AFlowNets have already been applied to simple zero‑sum games, such as tic‑tac‑toe or Connect Four, and may be applied to games with larger state spaces in the future <a href="#Jiralerspong24" style="color: #21918c">(Jiralerspong et al. 2024)</a>.
-        </li>
-        <li>
-          <strong>Biological sequence design &amp; editing.</strong>
-          Designing biological sequences is a significant challenge in medicine and materials design. GFlowNets have been shown to generate more diverse and novel batches of candidate nucleic acid sequences than other existing methods <a href="#Jain22" style="color: #21918c">(Jain et al. 2022)</a> and have been proposed for editing existing sequences to improve specific properties <a href="#Ghari23" style="color: #21918c">(Ghari et al. 2023)</a>.
-        </li>
-        <li>
-          <strong>Computational phylogenetics.</strong>
-          In phylogenetic inference, trees are viewed as compound states and each action joins two subtrees at their roots by a common ancestor. GFlowNets achieve a balance between fidelity of the constructed trees and broad exploration of the vast solution space <a href="#Zhou24" style="color: #21918c">(Zhou et al. 2024)</a>.
-        </li>
-        <li>
-          <strong>Crystal structure generation.</strong>
-          A crystal can be described by its unit cell, which is the most primitive three-dimensional structure that is repeated in the crystal lattice. To sample crystal structures with GFlowNets, unit cells are sequentially constructed by selecting its properties, such as the chemical composition, the symmetry properties and the shape. This approach enables the incorporation of physical and geometrical constraints and the generation of diverse samples of crystal structures with desirable properties, such as low formation energy <a href="#Mistal23" style="color: #21918c">(Mistal et al. 2023)</a>.
-        </li>
-      </ul>
-      <p class="section-text">
-        Additional examples of GFlowNet applications include vehicle routing <a href="#Zhang25" style="color: #21918c">(Zhang et al. 2025)</a>, the generation of realistic terrain datasets <a href="#Zhang23" style="color: #21918c">(C. Zhang and Yang, 2023)</a>, symbolic regression <a href="#Li23" style="color: #21918c">(Li, Marinescu, and Musslick, 2023)</a>, and causal discovery <a href="#Manta23" style="color: #21918c">(Manta, Hu, and Y. Bengio, 2023)</a>.
-        <br><br>
-        Next, we’ll take a closer look at how GFlowNets manage to create diverse candidate samples by learning to draw proportionally to the reward distribution.
-      </p>
-    </section>
 
 
     <section class="section" bind:this={h_policy}>
@@ -1670,7 +1560,7 @@
 
       </svg>
       <p class="mathexpl" style="width:750px">
-        Fig. 8: A DAG with flow values at the edges representing a fully trained GFlowNet. Hover over the edges (actions) to see the policy calculations. Hover over the nodes (states) to see the flow and loss calculations.
+        Fig. 7: A DAG with flow values at the edges representing a fully trained GFlowNet. Hover over the edges (actions) to see the policy calculations. Hover over the nodes (states) to see the flow and loss calculations.
       </p>
 
 
@@ -1944,7 +1834,7 @@
                   {/each}
                 </svg>
                 <p class="mathexpl" style="color: white; width:750px;">
-                  Fig. 9: The same DAG as in Figure 8.
+                  Fig. 8: The same DAG as in Figure 7.
                   Choose a trajectory by selecting on one of the purple states until you reach a final state.
                   Reset by selecting s0 or another orange state.
                 </p>
@@ -2058,6 +1948,90 @@
           </Accordion>
         </div>
     </section>
+
+
+
+
+    <section class="section" bind:this={h_domain}>
+      <h2 class="section-title">Molecule Generation with GFlowNets
+ </h2>
+      <p class="section-text">
+The same principles introduced with trajectory balance apply to many other problems that can be framed as a sequence of actions on states with clearly defined reward functions. One particularly relevant example is molecule generation. Here, each node in the graph represents a partial molecule and each edge represents adding a new fragment. A GFlowNet sequentially extends the structure until a complete molecule is produced, which is then scored by a reward function. For example, if the goal is to find compounds with low polarity, the reward may down-weight estimated hydrophobicity accordingly. Thanks to flow conservation, the total incoming probability at each intermediate molecule is redistributed among its possible extensions. Higher-reward molecules therefore attract more flow, while alternative structures retain non-zero probability and remain available for sampling. The interactive visualization below lets you adjust the reward with sliders. As the sliders move, the percentage of generated molecules shifts in real time. Clicking “Maximize weight” sets the reward to favor heavy molecules; under this setting, the heaviest molecule appears about 49% of the time, whereas lighter molecules receive minimal flow.      </p>
+      <div class="A_molecule-slider-container">
+        <div class="A_molecule-slider">
+          Weight: {$A_molecule_prop.mw.toFixed(2)}
+          <Slider
+            min={0}
+            max={1}
+            step={0.01}
+            bind:value={$A_molecule_prop.mw}
+          />
+        </div>
+
+        <div class="A_molecule-slider">
+          Hydrophobicity: {$A_molecule_prop.logP.toFixed(2)}
+          <Slider
+            min={0}
+            max={1}
+            step={0.01}
+            bind:value={$A_molecule_prop.logP}
+          />
+        </div>
+
+        <div class="A_molecule-slider">
+          Donors: {$A_molecule_prop.hbd.toFixed(2)}
+          <Slider
+            min={0}
+            max={1}
+            step={0.01}
+            bind:value={$A_molecule_prop.hbd}
+          />
+        </div>
+
+        <div class="A_molecule-slider">
+          Acceptors: {$A_molecule_prop.hba.toFixed(2)}
+          <Slider
+            min={0}
+            max={1}
+            step={0.01}
+            bind:value={$A_molecule_prop.hba}
+          />
+        </div>
+
+        <div class="A_molecule-slider">
+          Polarity: {$A_molecule_prop.tpsa.toFixed(2)}
+          <Slider
+            min={0}
+            max={1}
+            step={0.01}
+            bind:value={$A_molecule_prop.tpsa}
+          />
+        </div>
+
+        <div class="A_molecule-slider">
+          Flexibility: {$A_molecule_prop.rotb.toFixed(2)}
+          <Slider
+            min={0}
+            max={1}
+            step={0.01}
+            bind:value={$A_molecule_prop.rotb}
+          />
+        </div>
+        <div class="A_molecule-slider">
+              <Button id="max-weight-btn"
+                      color="secondary"
+                      variant="raised"
+                      on:click={A_maximizeMw}>
+                Maximize Weight</Button>
+        </div>
+      </div>
+      <svg id="chart" style="width: 1000px; display:block; margin: 20px auto"></svg>
+      <p class="mathexpl">
+        Fig. 9: Interactive molecule generation DAG. The GFlowNet generates molecules proportionally to the reward defined with the property sliders.
+
+      </p>
+    </section>
+
 
 
     <section class="section" bind:this={h_continuous}>
@@ -3247,6 +3221,43 @@
       -->
 
     </div>
+
+ <section class="section" bind:this={h_applied}>
+       <h2 class="section-title">Domain Application
+      <p class="section-text">
+        GFlowNets are applied in this domain because they can ensure a diverse sampling of candidate molecules. This is desirable when the reward is distributed among potentially many modes, where sampling in a too narrow region of the candidate space might miss out entire families of potentially interesting molecules (Nica et al. 2022).
+      </p>
+      <p class="section-text">
+        The following are some other interesting examples of GFlowNets being applied to problems in which diverse samples are desirable:
+      </p>
+      <ul class="section-text">
+        <li>
+          <strong>Listwise recommendation.</strong>
+          GFlowNets can also be applied to generating lists of user recommendations, such as items in a web shop that might be of interest for a customer to check out next. Each action adds an item to the recommendation list. This generation can be conditioned on the user, ensuring that the resulting recommendations are diversely sampled yet still relevant for the specific user <a href="#Liu23" style="color: #21918c">(Liu et al. 2023)</a>.
+        </li>
+        <li>
+          <strong>Games.</strong>
+          Adversarial Flow Networks (AFlowNets) are modified versions of GFlowNets capable of learning robust policies through self‑play. Such AFlowNets have already been applied to simple zero‑sum games, such as tic‑tac‑toe or Connect Four, and may be applied to games with larger state spaces in the future <a href="#Jiralerspong24" style="color: #21918c">(Jiralerspong et al. 2024)</a>.
+        </li>
+        <li>
+          <strong>Biological sequence design &amp; editing.</strong>
+          Designing biological sequences is a significant challenge in medicine and materials design. GFlowNets have been shown to generate more diverse and novel batches of candidate nucleic acid sequences than other existing methods <a href="#Jain22" style="color: #21918c">(Jain et al. 2022)</a> and have been proposed for editing existing sequences to improve specific properties <a href="#Ghari23" style="color: #21918c">(Ghari et al. 2023)</a>.
+        </li>
+        <li>
+          <strong>Computational phylogenetics.</strong>
+          In phylogenetic inference, trees are viewed as compound states and each action joins two subtrees at their roots by a common ancestor. GFlowNets achieve a balance between fidelity of the constructed trees and broad exploration of the vast solution space <a href="#Zhou24" style="color: #21918c">(Zhou et al. 2024)</a>.
+        </li>
+        <li>
+          <strong>Crystal structure generation.</strong>
+          A crystal can be described by its unit cell, which is the most primitive three-dimensional structure that is repeated in the crystal lattice. To sample crystal structures with GFlowNets, unit cells are sequentially constructed by selecting its properties, such as the chemical composition, the symmetry properties and the shape. This approach enables the incorporation of physical and geometrical constraints and the generation of diverse samples of crystal structures with desirable properties, such as low formation energy <a href="#Mistal23" style="color: #21918c">(Mistal et al. 2023)</a>.
+        </li>
+      </ul>
+      <p class="section-text">
+        Additional examples of GFlowNet applications include vehicle routing <a href="#Zhang25" style="color: #21918c">(Zhang et al. 2025)</a>, the generation of realistic terrain datasets <a href="#Zhang23" style="color: #21918c">(C. Zhang and Yang, 2023)</a>, symbolic regression <a href="#Li23" style="color: #21918c">(Li, Marinescu, and Musslick, 2023)</a>, and causal discovery <a href="#Manta23" style="color: #21918c">(Manta, Hu, and Y. Bengio, 2023)</a>.
+        <br><br>
+        Next, we’ll take a closer look at how GFlowNets manage to create diverse candidate samples by learning to draw proportionally to the reward distribution.
+      </p>
+  </section>
 
       <section class="section" bind:this={h_conclusion}>
         <h2 class="section-title">Conclusion </h2>
