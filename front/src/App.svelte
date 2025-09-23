@@ -94,7 +94,7 @@
 
   // ranges for means and variances
   const range = { min: -3, max: 3 };
-  const varianceRange = { min: 0.1, max: 1.0 };
+  const varianceRange = { min: 0.2, max: 1.0 };
 
   // flow visualization
   let flow_velocity_value = 0.5;
@@ -120,6 +120,7 @@
   let display_trainhistory=false;
   let isRunning = false;
   let isRunningAnim = false;
+  let training_status = "No training"
 
 
   //tutorial visualization data
@@ -519,7 +520,7 @@
     let value = parseFloat(e.target.value);
     if (isNaN(value)) value=0;
     if (param==="variance"){
-      value = Math.min(1, Math.max(0.1, value));
+      value = Math.min(1, Math.max(0.2, value));
       $gaussians[i][param] = value;
     } else {
       value = Math.min(3, Math.max(-3, value));
@@ -569,6 +570,7 @@
       // Disable sliders and switch button state
       isRunning = true;
       display_trainhistory = true;
+      training_status = 'Training in progress. Press "Stop" to finish the training early.'
       training_progress = 0;
       if (isRunningAnim) stop_animation_run();
       const curr_gaussians = $gaussians;
@@ -615,6 +617,7 @@
     try {
       if (!session_id) throw new Error("No session in progress.");
       // Stop training on backend
+      training_status = "Interrupting training."
       const response = await fetch(`${BACKEND_URL}/stop_training/${session_id}`,{
         method: 'POST',
       });
@@ -654,12 +657,14 @@
         if (data.completed && !completed) {
           completed = true;
           clearInterval(pollingTimer); //stop polling
+          training_status = "Calculating flows."
           await get_final_data();
           training_step_value_slider = 0;
           await tick();
           isRunning = false;
           await tick();
           snackbar_training_done.open();
+          training_status = "Training done"
           training_step_value_slider = current_nSteps-1; //also triggers plot for trainhistory
         }
       } catch (error) {
@@ -1157,14 +1162,11 @@
         <Item on:click={scrollTo(h_coreConcepts)}>
           <Text>Fundamentals Illustrated with Tetris</Text>
         </Item>
-        <Item on:click={scrollTo(h_domain)}>
-          <Text>Domain Applications</Text>
-        </Item>
-          <Item on:click={scrollTo(h_applied)}>
-          <Text>Domain Applications</Text>
-        </Item>
         <Item on:click={scrollTo(h_policy)}>
           <Text>Flow, Policies, and Training Objective</Text>
+        </Item>
+        <Item on:click={scrollTo(h_domain)}>
+          <Text>Reward functions</Text>
         </Item>
         <Item on:click={scrollTo(h_continuous)}>
           <Text>Towards Continuous GFlowNets</Text>
@@ -1180,6 +1182,9 @@
           <Text>Playground</Text>
         </Item>
         <Separator />
+        <Item on:click={scrollTo(h_applied)}>
+          <Text>Domain Applications</Text>
+        </Item>
         <Item on:click={scrollTo(h_conclusion)}>
           <Text>Conclusion</Text>
         </Item>
@@ -1235,7 +1240,7 @@
         Imagine you want to discover new molecules for a life-saving drug.
         With an estimated size of <Katex>{'10^{60}'}</Katex>, the space of possible molecular structures is vast, and promising candidates are potentially sparse and difficult to find. Traditional optimization methods might guide you to a single best guess, but what if this guess is toxic, has side effects, or fails in a later stage of testing? What if you need many diverse, high-quality candidates to test? This is where Generative Flow Networks (GFlowNets) come in. They are a class of generative models that don't just aim for a single optimal solution—they aim to diversely sample from a space of possibilities, with a preference for high-reward outcomes.
         <br><br>
-        In this article, we introduce the core concepts behind GFlowNets, outline their theoretical foundations and common training pitfalls, and guide readers toward an intuitive understanding of how they work. We provide an interactive Playground, where reward functions and hyperparameters can be adjusted on the fly to reveal a GFlowNet’s learning dynamics. A Tetris example brings these ideas to life, as the network uncovers stacking strategies in real time. By journey’s end, readers will have both a practical grasp of GFlowNet behavior and inspiration for applying them to their own challenges.
+        In this article, we introduce the core concepts behind GFlowNets, outline their theoretical foundations and common training pitfalls, and guide readers toward an intuitive understanding of how they work. We provide an interactive Playground, where the environment and hyperparameters can be adjusted on the fly to reveal a GFlowNet’s learning dynamics. A Tetris example brings these ideas to life, as the network uncovers stacking strategies in real time. By journey’s end, readers will have both a practical grasp of GFlowNet behavior and inspiration for applying them to their own challenges.
       </p>
     </section>
 
@@ -1298,6 +1303,12 @@
               as <a href="#Bengio21" style="color: black">Bengio et al. (2021) </a> have demonstrated.
               Note that distributions are represented rather differently in the two methods.
               MCMC uses a non-parametric representation based on samples, whereas GFlowNets represents the distribution implicitly via the flow along trajectories.
+              <div id="comparisonChartMCMC" style="margin:20px auto; max-width:600px;"></div>
+              <p class="mathexpl" style="color: white">
+                Fig. 2: Difference in path selection between MCMC and GFlowNets.
+                MCMC constructs a Markov chain with the previous samples, sampling each time from the estimated reward function.
+                GFlowNets use the previous samples to guide future sampling, increasing the chance to cover all high-reward areas.
+              </p>
             </Content>
           </Panel>
         </Accordion>
@@ -1329,7 +1340,7 @@
       />
       </div>
       <p class="mathexpl">
-        Fig. 2: State in our Tetris game.
+        Fig. 3: State in our Tetris game.
       </p>
       <p class="section-text">
         <strong>Action</strong>
@@ -1342,7 +1353,7 @@
         />
       </div>
       <p class="mathexpl">
-        Fig. 3: Action in our Tetris game.
+        Fig. 4: Action in our Tetris game.
       </p>
       <p class="section-text">
         <strong>Reward</strong>
@@ -1356,13 +1367,13 @@
         />
       </div>
       <p class="mathexpl">
-        Fig. 4: Trajectory and reward in our Tetris game.
+        Fig. 5: Trajectory and reward in our Tetris game.
       </p>
       <p class="section-text">
         <strong>Directed Acyclic Graph and Flow</strong>
         The sampling process in GFlowNets happens in an implicitly built DAG.
         Throughout the DAG, the so-called flow encodes the desirability of a transition from one state to the next.
-        Figure 5 illustrates an extract of the Tetris DAG. A current state <Katex>(t)</Katex>
+        Figure 6 illustrates an extract of the Tetris DAG. A current state <Katex>(t)</Katex>
         can be reached from two different parent states <Katex>(t-1)</Katex> through different actions
         (adding the yellow or purple tetromino, respectively).
         From State <Katex>t</Katex> , various actions result in different next or final states <Katex>(t+1)</Katex>.
@@ -1375,7 +1386,7 @@
         />
       </div>
       <p class="mathexpl">
-        Fig. 5: Extract of the DAG for our Tetris example.
+        Fig. 6: Extract of the DAG for our Tetris example.
         Two states (t-1) can result in the current state (t). Choosing different tetrominoes results in various next states (t+1)
         and choosing to terminate results in a final state with reward 28.
       </p>
@@ -1418,7 +1429,7 @@ Finally, the one-piece-at-a-time decomposition is natural for Tetris; in this de
     </div>
     <div style="height:20px"></div>
     <p class="mathexpl">
-      Fig. 6: Interactive GFlowNet Tetris game. In the candidate list the top 3 moves can be selected. On the right, an extract of the DAG is presented.
+      Fig. 7: Interactive GFlowNet Tetris game. In the candidate list the top 3 moves can be selected. On the right, an extract of the DAG is presented.
     </p>
 
 
@@ -1560,7 +1571,7 @@ Finally, the one-piece-at-a-time decomposition is natural for Tetris; in this de
 
       </svg>
       <p class="mathexpl" style="width:750px">
-        Fig. 7: A DAG with flow values at the edges representing a fully trained GFlowNet. Hover over the edges (actions) to see the policy calculations. Hover over the nodes (states) to see the flow and loss calculations.
+        Fig. 8: A DAG with flow values at the edges representing a fully trained GFlowNet. Hover over the edges (actions) to see the policy calculations. Hover over the nodes (states) to see the flow and loss calculations.
       </p>
 
 
@@ -1834,8 +1845,8 @@ Finally, the one-piece-at-a-time decomposition is natural for Tetris; in this de
                   {/each}
                 </svg>
                 <p class="mathexpl" style="color: white; width:750px;">
-                  Fig. 8: The same DAG as in Figure 7.
-                  Choose a trajectory by selecting on one of the purple states until you reach a final state.
+                  Fig. 9: The same DAG as in Figure 8.
+                  To see the policy and loss calculations for a specific trajectory, choose a trajectory by selecting on one of the purple states until you reach a final state.
                   Reset by selecting s0 or another orange state.
                 </p>
                 <table style="width: 900px; border-collapse: collapse; margin: 20px auto; font-family: 'Georgia', serif; font-size: 16px;">
@@ -1953,10 +1964,10 @@ Finally, the one-piece-at-a-time decomposition is natural for Tetris; in this de
 
 
     <section class="section" bind:this={h_domain}>
-      <h2 class="section-title">Molecule Generation with GFlowNets
+      <h2 class="section-title">Reward functions
  </h2>
       <p class="section-text">
-The same principles introduced with trajectory balance apply to many other problems that can be framed as a sequence of actions on states with clearly defined reward functions. One particularly relevant example is molecule generation. Here, each node in the graph represents a partial molecule and each edge represents adding a new fragment. A GFlowNet sequentially extends the structure until a complete molecule is produced, which is then scored by a reward function. For example, if the goal is to find compounds with low polarity, the reward may down-weight estimated hydrophobicity accordingly. Thanks to flow conservation, the total incoming probability at each intermediate molecule is redistributed among its possible extensions. Higher-reward molecules therefore attract more flow, while alternative structures retain non-zero probability and remain available for sampling. The interactive visualization below lets you adjust the reward with sliders. As the sliders move, the percentage of generated molecules shifts in real time. Clicking “Maximize weight” sets the reward to favor heavy molecules; under this setting, the heaviest molecule appears about 49% of the time, whereas lighter molecules receive minimal flow.      </p>
+      A big part of training a GFlowNet is defining the reward function, since it ultimately determines what kinds of outcomes are sampled more often. We highlight this with a real world use-case of GFlowNets: Molecule generation. Here each node in the graph represents a partial molecule, each edge adds a fragment, and the process continues until a complete structure is formed and scored by a reward function. For example, if the goal is to find compounds with low polarity, the reward may down-weight estimated hydrophobicity accordingly. Thanks to flow conservation, the total incoming probability at each intermediate molecule is redistributed among its possible extensions. Higher-reward molecules therefore attract more flow, while alternative structures retain non-zero probability and remain available for sampling. The interactive visualization below lets you adjust the reward with sliders. As the sliders move, the percentage of generated molecules shifts in real time. Clicking “Maximize weight” sets the reward to favor heavy molecules; under this setting, the heaviest molecule appears about 49% of the time, whereas lighter molecules receive minimal flow.      </p>
       <div class="A_molecule-slider-container">
         <div class="A_molecule-slider">
           Weight: {$A_molecule_prop.mw.toFixed(2)}
@@ -2027,7 +2038,7 @@ The same principles introduced with trajectory balance apply to many other probl
       </div>
       <svg id="chart" style="width: 1000px; display:block; margin: 20px auto"></svg>
       <p class="mathexpl">
-        Fig. 9: Interactive molecule generation DAG. The GFlowNet generates molecules proportionally to the reward defined with the property sliders.
+        Fig. 10: Interactive molecule generation DAG. The GFlowNet generates molecules proportionally to the reward defined with the property sliders.
 
       </p>
     </section>
@@ -2063,13 +2074,13 @@ The same principles introduced with trajectory balance apply to many other probl
           <div class="DC-plot-wrapper">
             <div id="DC_discrete_plot" class="DC-plot"></div>
             {#if DC_view === 0}
-              <div class="mathexpl" style="width: 100%">Fig. 10: Rewards in a discrete grid.</div>
+              <div class="mathexpl" style="width: 100%">Fig. 11: Rewards in a discrete grid.</div>
             {:else if DC_view ===1}
-              <div class="mathexpl" style="width: 100%">Fig. 12: Sampling on a discrete grid by choosing an action.</div>
+              <div class="mathexpl" style="width: 100%">Fig. 13: Sampling on a discrete grid by choosing an action.</div>
             {:else if DC_view ===2}
-              <div class="mathexpl" style="width: 100%">Fig. 14: Sampling proportional to the discrete reward function.</div>
+              <div class="mathexpl" style="width: 100%">Fig. 15: Sampling proportional to the discrete reward function.</div>
             {:else}
-              <div class="mathexpl" style="width: 100%">Fig. 16: Direction of the highest flow for each state of the grid.</div>
+              <div class="mathexpl" style="width: 100%">Fig. 17: Direction of the highest flow for each state of the grid.</div>
             {/if}
           </div>
 
@@ -2077,13 +2088,13 @@ The same principles introduced with trajectory balance apply to many other probl
           <div class="DC-plot-wrapper">
             <div id="DC_continuous_plot" class="DC-plot"></div>
             {#if DC_view === 0}
-              <div class="mathexpl" style="width: 100%">Fig. 11: Rewards in a continuous plane. </div>
+              <div class="mathexpl" style="width: 100%">Fig. 12: Rewards in a continuous plane. </div>
             {:else if DC_view ===1}
-              <div class="mathexpl" style="width: 100%">Fig. 13: Sampling on a continuous plane by drawing from the sampling distribution</div>
+              <div class="mathexpl" style="width: 100%">Fig. 14: Sampling on a continuous plane by drawing from the sampling distribution</div>
             {:else if DC_view ===2}
-              <div class="mathexpl" style="width: 100%">Fig. 15: Sampling proportional to the continuous reward function</div>
+              <div class="mathexpl" style="width: 100%">Fig. 16: Sampling proportional to the continuous reward function</div>
             {:else}
-              <div class="mathexpl" style="width: 100%">Fig. 17: Direction of the highest flow for grid points in the continuous plane.</div>
+              <div class="mathexpl" style="width: 100%">Fig. 18: Direction of the highest flow for grid points in the continuous plane.</div>
             {/if}
           </div>
           <div class="DC-quadrant">
@@ -2172,7 +2183,7 @@ The same principles introduced with trajectory balance apply to many other probl
         </Wrapper>
       </div>
       <div class="mathexpl">
-        Fig. 18: Example training run on a 2-d gaussian plane. The model samples from both of the available modes. Hover over points to see the sampling trajectory.
+        Fig. 19: Example training run on a 2-d gaussian plane. The model samples from both of the available modes. Hover over points to see the sampling trajectory.
       </div>
 
       <div style="height:50px"></div>
@@ -2229,7 +2240,7 @@ The same principles introduced with trajectory balance apply to many other probl
         </Wrapper>
       </div>
       <div class="mathexpl">
-        Fig. 19: Example training run showing mode collapse. The model samples only from one of the available modes and does not improve.
+        Fig. 20: Example training run showing mode collapse. The model samples only from one of the available modes and does not improve.
       </div>
       <div style="height:50px"></div>
       <p class="section-text">
@@ -2239,7 +2250,7 @@ The same principles introduced with trajectory balance apply to many other probl
         <br><br>
         There are two main possibilities to fix this:
         <span class="li">
-          The simplest solution is to train “off-policy.”
+          The simplest solution is to train “off-policy”.
           By using a different policy for action selection during training,
           we can increase exploration by sampling actions more randomly
           while still using the target policy to estimate the flow.
@@ -2338,7 +2349,7 @@ The same principles introduced with trajectory balance apply to many other probl
         </Wrapper>
       </div>
       <div class="mathexpl">
-        Fig. 20: Example training run showing the effect of off-policy training.
+        Fig. 21: Example training run showing the effect of off-policy training.
         By encouraging exploration, the model samples from a wider range of the state space.
         This leads to the discovery of the second mode and thereby to sampling proportionally to the reward function.
       </div>
@@ -2374,7 +2385,7 @@ The same principles introduced with trajectory balance apply to many other probl
     <section class="section" bind:this={h_flow} style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);">
       <h2 class="section-title">Flow</h2>
       <p class="section-text">
-        In Figure 21 you can see the flow of the last training run. Use the Step slider to adjust the current step. We fixed the number of steps for the agent at 6, so it collects the reward after taking 6 steps. Use the iteration slider to compare the flow at the start of the training to the end.
+        In Figure 22 you can see the flow of the last training run. Use the Step slider to adjust the current step. We fixed the number of steps for the agent at 6, so it collects the reward after taking 6 steps. Use the iteration slider to compare the flow at the start of the training to the end.
         <br>
         You can see that for the trained model (last iteration), the flow differs depending on the step. In the first step the agent takes, it tends to move towards the center. Later on in the trajectory, the points of convergence split up and move outwards to the modes of the distribution. In the last two steps, they even move past them, probably to achieve the separation of the modes.
         <br><br>
@@ -2431,7 +2442,7 @@ The same principles introduced with trajectory balance apply to many other probl
       </div>
       <div style="height:10px"></div>
       <div class="mathexpl">
-        Fig. 21: Highest flow for gridpoints on the continuous plane.
+        Fig. 22: Highest flow for gridpoints on the continuous plane.
         After training, the modes of the reward function act as convergence points.
         For the first steps of the agent these convergent points lie close together in the center.
         They move outward towards the modes as the agent takes more steps.
@@ -2536,6 +2547,11 @@ The same principles introduced with trajectory balance apply to many other probl
 
 
               </div>
+              <div style="color: #848484; font-size: 12px; margin-left: 50px;">
+                Adjust the reward function by dragging the grey circles in the left plot or by setting the parameters directly in the table.
+                You can find more information by clicking on the info symbols next to the elements.
+                If you are done, continue to the "Training" tab.
+              </div>
             </div>
 
             <div class="pg-ngaussians">
@@ -2597,7 +2613,7 @@ The same principles introduced with trajectory balance apply to many other probl
                     on:mousedown={(e) => startDragVariance(e, g)}
                     role="slider"
                     aria-valuenow="{g.variance}"
-                    aria-valuemin="0.1"
+                    aria-valuemin="0.2"
                     aria-valuemax="1"
                     tabindex="0"
                   ></div>
@@ -2634,7 +2650,7 @@ The same principles introduced with trajectory balance apply to many other probl
                   <Content style="text-align: left; color: white; font-size: 12px">
                     <br>
                     The Table shows the parameters of the Gaussians.
-                    Each row represents one Gaussian with its mean in x- and y direction as well as its variance.
+                    Each row represents one Gaussian with its mean in x and y direction as well as its variance.
                     You can also set the values if you want them to be precise.
                   </Content>
                 </Tooltip>
@@ -2749,20 +2765,22 @@ The same principles introduced with trajectory balance apply to many other probl
                   {/if}
                 </Wrapper>
               </div>
-              <div class="pg-loss">
-                <div class="columns margins" style="justify-content: flex-start; visibility:hidden;">
-                  <Select bind:value="{loss_choice}" label="Loss" color="primary" disabled="true" style="visibility: hidden" >
-                    {#each losses_select as select}
-                      <Option value={select}>{select}</Option>
-                    {/each}
-                  </Select>
+              {#if !display_trainhistory && !isRunning}
+                <div style="color: #848484; font-size: 12px; margin-left: 50px;">
+                  Adjust the hyperparameters and press "Play" to start training the model.
                 </div>
-                <div class="pg-iterations">
-                  <div class="columns margins" style="justify-content: flex-start;">
+              {:else if isRunning}
+                <div style="color: #848484; font-size: 12px; margin-left: 50px;">
+                  Status: {training_status}
+                </div>
+              {:else}
+                <div style="color: #848484; font-size: 12px; margin-left: 50px;">
+                  Hover over a sample to see its trajectory.
+                  By adjusting the "Iteration" slider you can see the training progress.
+                  You can start another training run by clicking "Play" or view the Flows of this run by continuing to the "Flow" tab.
+                </div>
+              {/if}
 
-                  </div>
-                </div>
-              </div>
             </div>
 
             <div class="pg-side">
@@ -3080,6 +3098,11 @@ The same principles introduced with trajectory balance apply to many other probl
                   <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_right</Icon>
                 </Fab>
               </div>
+              <div style="color: #848484; font-size: 12px; margin-left: 50px;">
+                Adjust the "Iteration" slider to see the flows during different training iterations.
+                Adjust the "Step" slider to see the flow for different steps of the agent.
+                You can find information about how to interpret this visualization in the "Flow" section above.
+              </div>
             </div>
             {#if display_trainhistory}
               <div class="pg-side">
@@ -3223,9 +3246,9 @@ The same principles introduced with trajectory balance apply to many other probl
     </div>
 
  <section class="section" bind:this={h_applied}>
-       <h2 class="section-title">Domain Application
+       <h2 class="section-title">Domain Applications</h2>
       <p class="section-text">
-        GFlowNets are applied in this domain because they can ensure a diverse sampling of candidate molecules. This is desirable when the reward is distributed among potentially many modes, where sampling in a too narrow region of the candidate space might miss out entire families of potentially interesting molecules (Nica et al. 2022).
+        We've already looked at molecule generation as an example of real world applications of GFlowNets. They are applied in this domain because they can ensure a diverse sampling of candidate molecules. This is desirable when the reward is distributed among potentially many modes, where sampling in a too narrow region of the candidate space might miss out entire families of potentially interesting molecules <a href="#Nica22" style="color: #21918c">(Nica et al. 2022)</a>.
       </p>
       <p class="section-text">
         The following are some other interesting examples of GFlowNets being applied to problems in which diverse samples are desirable:
@@ -3254,8 +3277,6 @@ The same principles introduced with trajectory balance apply to many other probl
       </ul>
       <p class="section-text">
         Additional examples of GFlowNet applications include vehicle routing <a href="#Zhang25" style="color: #21918c">(Zhang et al. 2025)</a>, the generation of realistic terrain datasets <a href="#Zhang23" style="color: #21918c">(C. Zhang and Yang, 2023)</a>, symbolic regression <a href="#Li23" style="color: #21918c">(Li, Marinescu, and Musslick, 2023)</a>, and causal discovery <a href="#Manta23" style="color: #21918c">(Manta, Hu, and Y. Bengio, 2023)</a>.
-        <br><br>
-        Next, we’ll take a closer look at how GFlowNets manage to create diverse candidate samples by learning to draw proportionally to the reward distribution.
       </p>
   </section>
 
@@ -3326,6 +3347,7 @@ The same principles introduced with trajectory balance apply to many other probl
     <section class="section">
       <h2 class="section-title">Acknowledgements</h2>
       <p class="section-text">
+        <br>This research was supported by the ETH AI Center through an ETH AI Center postdoctoral fellowship to Christina Humer.
         <br>Some implementations and ideas are based on great work of others:
         <span class="li">The
           <a href="https://github.com/GFNOrg/torchgfn/blob/master/tutorials/notebooks/intro_gfn_continuous_line_simple.ipynb" target="_blank">continuous line</a>

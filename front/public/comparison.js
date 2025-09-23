@@ -198,3 +198,248 @@ function initComparisonChartWhenReady() {
 }
 
 window.addEventListener('load', initComparisonChartWhenReady);
+
+
+
+
+
+
+
+
+
+
+
+
+function initComparisonChartMCMC() {
+  console.log('comparison.js: initComparisonChartMCMC running');
+  const container = d3.select("#comparisonChartMCMC");
+  const width = 300, height = 400;
+
+  // ─── Mock data ───
+  const leftData = {
+    nodes: [
+      { id: 'G', x:  40, y: 250 },
+      { id: 'H', x: 100, y: 250 },
+      { id: 'I', x: 160, y: 250 },
+      { id: 'J', x: 220, y: 250 }
+    ],
+    edges: [
+      { source: 'G', target: 'I' },
+      { source: 'I', target: 'H' }
+      // J is unconnected in Traditional
+    ]
+  };
+
+  const rightData = {
+    nodes: [
+      { id: 'A', x: 130, y: 50 },
+      { id: 'E', x:  70, y: 150 },
+      { id: 'F', x: 190, y: 150 },
+      { id: 'G', x:  40, y: 250 },
+      { id: 'H', x: 100, y: 250 },
+      { id: 'I', x: 160, y: 250 },
+      { id: 'J', x: 220, y: 250 }
+    ],
+    edges: [
+      { source: 'A', target: 'E' },
+      { source: 'A', target: 'F' },
+      { source: 'E', target: 'G' },
+      { source: 'E', target: 'H' },
+      { source: 'F', target: 'H' },
+      { source: 'F', target: 'I' },
+      { source: 'F', target: 'J' },
+      { source: 'E', target: 'I' }
+    ]
+  };
+
+  // ─── Center data ───
+  centerData(leftData, width, height);
+  centerData(rightData, width, height);
+
+  // ─── SVG containers ───
+  const svgLeft  = container.append("svg").attr("width", width).attr("height", height);
+  const svgRight = container.append("svg").attr("width", width).attr("height", height);
+
+  // ─── White background ───
+  [svgLeft, svgRight].forEach(svg => {
+    svg.append("rect")
+       .attr("x", 0).attr("y", 0)
+       .attr("width", width).attr("height", height)
+       .attr("fill", "#ffffff");
+  });
+
+  // ─── Two arrow‐markers pulled back to circle edge ───
+  [svgLeft, svgRight].forEach(svg => {
+    const defs = svg.append("defs");
+
+    defs.append("marker")
+      .attr("id", "arrow")
+      .attr("viewBox", "0 0 10 10")
+      .attr("markerUnits", "userSpaceOnUse")
+      .attr("refX", 0)
+      .attr("refY", 0)
+      .attr("markerWidth", 10)
+      .attr("markerHeight", 10)
+      .attr("orient", "auto")
+      .append("path")
+        .attr("d", "M0,0 L0,10 L10,5 z")
+        .attr("fill", "#000");
+
+    defs.append("marker")
+      .attr("id", "arrow-soft")
+      .attr("viewBox", "0 0 10 10")
+      .attr("markerUnits", "userSpaceOnUse")
+      .attr("refX", 1000)
+      .attr("refY", 1000)
+      .attr("markerWidth", 10)
+      .attr("markerHeight", 10)
+      .attr("orient", "auto")
+      .append("path")
+        .attr("d", "M0,0 L0,10 L10,5 z")
+        .attr("fill", "#444");
+  });
+
+  // ─── Draw DAGs ───
+  const edgesLeft  = drawDAG(svgLeft,  leftData,  "MCMC", true);
+  const edgesRight = drawDAG(svgRight, rightData, "GFlowNet",    false);
+
+  // ─── Animation ───
+  let step = 0;
+  d3.interval(() => {
+    step = (step + 1) % 6;
+
+    // Traditional highlights
+    edgesLeft.transition().duration(600)
+      .attr("stroke-width", d => {
+        const act = (step < 3 && d.source==='G'&&d.target==='I') ||
+                    (step>=3 && d.source==='I'&&d.target==='H');
+        return act ? 4 : 2;
+      })
+      .attr("stroke", d => {
+        const act = (step < 3 && d.source==='G'&&d.target==='I') ||
+                    (step>=3 && d.source==='I'&&d.target==='H');
+        return act ? "#ff9999" : "#000";
+      })
+      .attr("marker-end", d => {
+        const act = (step < 3 && d.source==='G'&&d.target==='I') ||
+                    (step>=3 && d.source==='I'&&d.target==='H');
+        return `url(#${act ? 'arrow-soft' : 'arrow'})`;
+      });
+
+    // GFlowNet highlights
+    edgesRight.transition().duration(600)
+      .attr("stroke-width", step>=3 ? 3 : 2)
+      .attr("stroke", step>=3 ? "#66c2ff" : "#000")
+      .attr("marker-end", step>=3 ? "url(#arrow-soft)" : "url(#arrow)");
+
+  }, 1800);
+
+  // ─── Helpers ───
+  function centerData(data, w, h) {
+    const xs = data.nodes.map(n=>n.x), ys = data.nodes.map(n=>n.y);
+    const minX = d3.min(xs), maxX = d3.max(xs);
+    const minY = d3.min(ys), maxY = d3.max(ys);
+    const dx = maxX - minX, dy = maxY - minY;
+    const offX = (w - dx)/2 - minX, offY = (h - dy)/2 - minY;
+    data.nodes.forEach(n=>{ n.x += offX; n.y += offY; });
+  }
+
+  function drawDAG(svg, data, title, curved) {
+    // title
+    svg.append("text")
+      .attr("x", width/2).attr("y", 24)
+      .attr("text-anchor", "middle")
+      .attr("fill", "#000")
+      .attr("font-size", 18).attr("font-weight", "bold")
+      .text(title);
+
+    let edges;
+    if (curved) {
+        // curved arrows for Traditional
+        edges = svg.selectAll(".edge")
+          .data(data.edges).enter().append("path")
+            .attr("class", "edge")
+            .attr("d", d => {
+              const s = data.nodes.find(n=>n.id===d.source);
+              const t = data.nodes.find(n=>n.id===d.target);
+              let mx = (s.x + t.x) / 2;
+              let my;
+
+              if (d.source === "G" && d.target === "I") {
+                // curve upwards
+                my = (s.y + t.y) / 2 - 80;
+                mx = mx-30;
+              } else if (d.source === "I" && d.target === "H") {
+                // curve downwards
+                my = (s.y + t.y) / 2 + 60;
+                mx = mx+30;
+              } else {
+                // default straight in case more edges are added
+                my = (s.y + t.y) / 2;
+              }
+
+              return `M${s.x},${s.y} Q${mx},${my} ${t.x},${t.y}`;
+            })
+            .attr("stroke", "#000")
+            .attr("stroke-width", 2)
+            .attr("fill", "none")
+            .attr("marker-end", "url(#arrow)");
+      } else {
+      // straight arrows for GFlowNet
+      edges = svg.selectAll(".edge")
+        .data(data.edges).enter().append("line")
+          .attr("class", "edge")
+          .attr("x1", d=>data.nodes.find(n=>n.id===d.source).x)
+          .attr("y1", d=>data.nodes.find(n=>n.id===d.source).y)
+          .attr("x2", d=>data.nodes.find(n=>n.id===d.target).x)
+          .attr("y2", d=>data.nodes.find(n=>n.id===d.target).y)
+          .attr("stroke", "#000")
+          .attr("stroke-width", 2)
+          .attr("marker-end", "url(#arrow)");
+    }
+
+    // nodes
+    svg.selectAll(".node")
+      .data(data.nodes).enter().append("circle")
+        .attr("class", "node")
+        .attr("r", 17)
+        .attr("cx", d=>d.x)
+        .attr("cy", d=>d.y)
+        .attr("fill", "#1f77b4")
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 2);
+
+    // labels
+    svg.selectAll(".label")
+      .data(data.nodes).enter().append("text")
+        .attr("class", "label")
+        .attr("x", d=>d.x)
+        .attr("y", d=>d.y+4)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#fff")
+        .attr("font-size", 12)
+        .attr("font-weight", "bold")
+        .text(d=>d.id);
+
+    return edges;
+  }
+}
+window.initComparisonChartMCMC = initComparisonChartMCMC;
+
+function initComparisonChartMCMCWhenReady() {
+  const el = document.getElementById('comparisonChartMCMC');
+  if (el) {
+    initComparisonChartMCMC();
+  } else {
+    const observer = new MutationObserver((_, obs) => {
+      const target = document.getElementById('comparisonChartMCMC');
+      if (target) {
+        obs.disconnect();
+        initComparisonChartMCMC();
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+}
+
+window.addEventListener('load', initComparisonChartMCMCWhenReady);
