@@ -32,7 +32,6 @@
   import { flow_velocity, flow_n_particles,flow_vectorfield, flow_vectors, flow_changed, A_molecule_prop} from './store.js';
 
 
-
   // default values for training
   let off_policy_value = 0;
   let n_iterations_value;
