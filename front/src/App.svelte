@@ -3346,7 +3346,7 @@ Finally, the one-piece-at-a-time decomposition is natural for Tetris; in this de
     <section class="section">
       <h2 class="section-title">Acknowledgements</h2>
       <p class="section-text">
-        <br>This research was supported by the ETH AI Center through an ETH AI Center postdoctoral fellowship to Christina Humer.
+        <br>This research was supported by the Austrian Science Fund under grant number FWF DFH 23–N and the ETH AI Center through an ETH AI Center postdoctoral fellowship to Christina Humer.
         <br>Some implementations and ideas are based on great work of others:
         <span class="li">The
           <a href="https://github.com/GFNOrg/torchgfn/blob/master/tutorials/notebooks/intro_gfn_continuous_line_simple.ipynb" target="_blank">continuous line</a>
