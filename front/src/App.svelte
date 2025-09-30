@@ -1324,12 +1324,10 @@
       </h2>
 
       <p class="section-text">
-        To better understand the core concepts used by GFlowNets, let’s consider a simplified version of the Tetris game. In Tetris, players control falling pieces, which are shaped like so-called “tetrominoes”. Players attempt to orient and stack these shapes such that they fill out entire lines in a grid-based playing field. In traditional Tetris, lines that are completely filled are removed, allowing the player to play on for as long as they can keep the playing field sufficiently empty. In our simplified version of Tetris, let’s disregard the clearing of filled lines. The new objective becomes to fill out the entire grid as completely as possible.
-        <br><br>
-        As stated in the tl;dr section above, GFlowNet sampling occurs iteratively, going from one state to the next using different available actions. The combination of all possible states and actions results in a directed acyclic graph (DAG) that describes all possible paths to any possible final state. Note that for most use cases it’s infeasible to show the complete DAG because action spaces are typically vast. To better illustrate these concepts, we use our simplified version of the game Tetris.
-        <br><br>
+        To better understand the core concepts used by GFlowNets, let’s consider a simplified version of the Tetris game. In Tetris, players control falling pieces, which are shaped like so-called “tetrominoes”. Players attempt to orient and stack these shapes such that they fill out entire lines in a grid-based playing field. In traditional Tetris, lines that are completely filled are removed, allowing the player to play on for as long as they can keep the playing field sufficiently empty. In our simplified version of Tetris, we disregard the clearing of filled lines. The new objective becomes to fill out the entire grid as completely as possible.        <br><br>
+        As stated in the tl;dr section above, GFlowNet sampling occurs sequentially, going from one state to the next using different available actions. The combination of all possible states and actions results in a directed acyclic graph (DAG) that describes all possible paths to any possible final state. Note that for most use cases it’s infeasible to show the complete DAG because state spaces are typically vast. To better illustrate these concepts, we use our simplified version of the game Tetris.        <br><br>
         <strong>State</strong>
-        A state is the full description of what our environment looks like at a given point in a sampled trajectory. In GFlowNets, every possible state is a node in a DAG. The state information describes the current position in the generative process and implicitly includes the options that remain. In our Tetris example, the state is simply the current board, including all tetrominoes that have already been placed. In general, intermediate states may be abstract, in the sense that they may not correspond to valid, final samples.
+        A state is the full description of any given point in a sampled trajectory. In GFlowNets, every possible state is a node in a DAG. The state information describes the current position in the generative process and for any state we can also determine the valid subsequent actions. In our Tetris example, the state is simply the current board, including all tetrominoes that have already been placed. In general, intermediate states may be abstract, in the sense that they may not correspond to valid, final samples.
       </p>
       <div class="image-container-small">
       <img
@@ -1343,8 +1341,7 @@
       </p>
       <p class="section-text">
         <strong>Action</strong>
-      An action is understood as the operation that maps one board state to the next board state. In the DAG, actions appear as edges between state nodes and specify how the object is assembled step by step. In Tetris, this can be modeled as piece-selection + placement, where a tetromino is first selected and then placed by choosing its rotation and landing column (gravity brings it to rest). Actions that would overlap existing blocks or exceed the board boundary are treated as invalid and are excluded, thereby enforcing hard constraints during generation. When a legal action is executed, the board is augmented with the new piece and the trajectory advances from board to board. Episodes are ended when no legal placement remains (or when an explicit Stop is taken, if present) and the terminal reward is computed on the final board.  </p>
-      <div class="image-container-small">
+        An action is understood as the operation that maps one board state to the next board state. In the DAG, actions appear as edges between state nodes and specify how the object is assembled step by step. In Tetris, an action describes a piece-selection + rotation + column. Given an action, a tetromino is first selected and then placed by choosing its rotation and landing column (gravity brings it to rest). Actions that would overlap existing blocks or exceed the board boundary are treated as invalid and are excluded, thereby enforcing hard constraints during generation. When a legal action is executed, the board is augmented with the new piece and the trajectory advances from board to board (state to state). Episodes are ended when no legal placement remains (or when an explicit Stop is taken, if present) and the terminal reward is computed on the final board      <div class="image-container-small">
         <img
           class="tetris-center-image tetris-smaller-image"
           src="/images/tetris-state-action.svg"
@@ -1352,11 +1349,11 @@
         />
       </div>
       <p class="mathexpl">
-        Fig. 4: Action in our Tetris game.
+        Fig. 4: Action in our Tetris game. Note that an action in our Tetris environment describes the piece choice, a rotation and the location (column) on the board.
       </p>
       <p class="section-text">
         <strong>Reward</strong>
-        In GFlowNets, the reward function defines how desirable a specific state is for the given task. For the simplified Tetris demo, we define the reward as the number of occupied cells at the end of the game. Once no more moves are possible or a specially defined “stop” action is performed, the final reward can be assigned to the end state. The path from the first state to the final state where the reward is collected is called a trajectory.
+        In GFlowNets, the reward function defines how desirable a specific state is for the given task. For the simplified Tetris demo, we define the reward as the number of occupied cells at the end of a trajectory. Once no more moves are possible or a specially defined “stop” action is performed, the final reward can be assigned to the end state. The path from the first state to the final state where the reward is collected is called a trajectory.
       </p>
       <div class="image-container-small">
         <img
@@ -1390,13 +1387,11 @@
         and choosing to terminate results in a final state with reward 28.
       </p>
       <p class="section-text">
-        For the interactive demonstration shown below, we trained a neural network policy under the GFlowNet framework and applied it to the simplified game of Tetris. 
-        In this simplified setup, at each step only the placement of the current tetromino is considered. Its rotation and landing column can be chosen while the next piece cannot be picked and is provided by the environment; an action is then sampled proportionally to the estimated future reward (i.e., the final number of filled cells)        
-        The sidebar lists the top three actions according to the policy prediction. In this game, the green move is executed automatically, but you may click any other action to override the choice. You can also pause the game at any time to examine how flow values are redistributed across subsequent moves.
+        For the interactive demonstration shown below, we trained a neural network policy under the GFlowNet framework and applied it to the simplified game of Tetris. At each step, the network evaluates every legal placement of the falling tetromino and selects an action proportionally to the future reward (i.e., the number of filled spaces in the grid). In order to better emulate the original game, the selection of the piece is random and the remaining choices for the action are the rotation and location to drop the piece. The sidebar lists only the top three actions according to the policy prediction. In this game, the green move is executed automatically, but you may click any other action to override the choice. You can also pause the game at any time to examine how flow values are redistributed across subsequent moves.
         <br><br>
         Conceptually, the GFlowNet constructs a DAG of the board states.
         All branches are drawn with uniform width, and each branch is labeled with its predicted flow value. This illustration demonstrates how the GFlowNet maintains multiple promising trajectories while still considering lower-probability options internally. 
-Finally, the one-piece-at-a-time decomposition is natural for Tetris; in this demo it is further simplified to placement-only (rotation + landing column) and excludes selecting the next piece, though in general one is free to define other state–action choices for a task.      </p>
+        Finally, the one-piece-at-a-time decomposition is natural for Tetris; in this demo it is further simplified to placement-only (rotation + landing column) and excludes selecting the next piece, though in general one is free to define other state–action choices for a task.      </p>
 
 
 
