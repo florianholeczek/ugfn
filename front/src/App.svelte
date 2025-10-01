@@ -1332,7 +1332,7 @@
       <div class="image-container-small">
       <img
         class="tetris-image tetris-image-small"
-        src="/images/tetris-state.svg"
+        src="/images/tetris-state-v2.svg"
         alt="Tetris board state illustration"
       />
       </div>
@@ -1344,7 +1344,7 @@
         An action is understood as the operation that maps one board state to the next board state. In the DAG, actions appear as edges between state nodes and specify how the object is assembled step by step. In Tetris, an action describes a piece-selection + rotation + column. Given an action, a tetromino is first selected and then placed by choosing its rotation and landing column (gravity brings it to rest). Actions that would overlap existing blocks or exceed the board boundary are treated as invalid and are excluded, thereby enforcing hard constraints during generation. When a legal action is executed, the board is augmented with the new piece and the trajectory advances from board to board (state to state). Episodes are ended when no legal placement remains (or when an explicit Stop is taken, if present) and the terminal reward is computed on the final board      <div class="image-container-small">
         <img
           class="tetris-center-image tetris-smaller-image"
-          src="/images/tetris-state-action.svg"
+          src="/images/tetris-action-v2.svg"
           alt="Tetris state to action transition"
         />
       </div>
@@ -1358,7 +1358,7 @@
       <div class="image-container-small">
         <img
           class="tetris-center-image"
-          src="/images/tetris-reward.svg"
+          src="/images/tetris-reward-v2.svg"
           alt="Tetris reward illustration"
         />
       </div>
@@ -1377,14 +1377,14 @@
       <div class="image-container-small">
         <img
           class="tetris-center-image"
-          src="/images/tetris-dag.svg"
+          src="/images/tetris-dag-v2.svg"
           alt="Tetris DAG illustration"
         />
       </div>
       <p class="mathexpl">
         Fig. 6: Extract of the DAG for our Tetris example.
         Two states (t-1) can result in the current state (t). Choosing different tetrominoes results in various next states (t+1)
-        and choosing to terminate results in a final state with reward 28.
+        and choosing to terminate results in a final state with reward 16.
       </p>
       <p class="section-text">
         For the interactive demonstration shown below, we trained a neural network policy under the GFlowNet framework and applied it to the simplified game of Tetris. At each step, the network evaluates every legal placement of the falling tetromino and selects an action proportionally to the future reward (i.e., the number of filled spaces in the grid). In order to better emulate the original game, the selection of the piece is random and the remaining choices for the action are the rotation and location to drop the piece. The sidebar lists only the top three actions according to the policy prediction. In this game, the green move is executed automatically, but you may click any other action to override the choice. You can also pause the game at any time to examine how flow values are redistributed across subsequent moves.
