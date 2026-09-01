@@ -2269,8 +2269,6 @@
               Training off-policy is even more helpful when it is scheduled. At the beginning of the training, we add a higher value to the variance. We then scale this value down during training until we reach on-policy training.
               Our new hyperparameter is the initial value for off-policy training; during each step, we gradually decrease it until we reach 0.
               <br>
-              Our new hyperparameter is the initial value for off-policy training; during each step, we gradually decrease it until we reach 0.
-              <br>
               <br>Important changes:
               <ul>
                 <li>
