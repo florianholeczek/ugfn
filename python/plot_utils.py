@@ -46,9 +46,7 @@ def plot_env_2d(
     """
 
     x_grid, y_grid, grid_points = grid(grid_size=grid_size)
-    print(grid_points)
     density = env.reward(grid_points)
-    print(density)
     density = density.reshape(grid_size, grid_size).numpy()
 
     fig, ax = plt.subplots(figsize=(8, 6))
