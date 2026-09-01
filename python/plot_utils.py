@@ -49,7 +49,7 @@ def plot_env_2d(
     density = env.reward(grid_points)
     density = density.reshape(grid_size, grid_size).numpy()
 
-    fig, ax = plt.subplots(figsize=(8, 6))
+    fig, ax = plt.subplots(figsize=(4, 4))
     contour = ax.contourf(x_grid.numpy(), y_grid.numpy(), density, levels=levels, cmap="viridis", alpha = alpha)
     fig.colorbar(contour, ax=ax, label="Density")
     ax.set_title(title)
@@ -204,7 +204,7 @@ def plot_states_2d(
     density_y = (6 / (grid_size - 1)) * np.sum(density_env, axis=1) / len(env.mus)
 
     # Plot ground truth
-    fig = plt.figure(layout='constrained', figsize=(8, 8))
+    fig = plt.figure(layout='constrained', figsize=(5, 5))
     ax = fig.add_gridspec(top=0.75, right=0.75).subplots()
     ax.set(aspect=1)
     if ground_truth == 'contour':
