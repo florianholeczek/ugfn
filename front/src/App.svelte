@@ -3283,6 +3283,14 @@
           <strong>Crystal structure generation.</strong>
           A crystal can be described by its unit cell, which is the most primitive three-dimensional structure that is repeated in the crystal lattice. To sample crystal structures with GFlowNets, unit cells are sequentially constructed by selecting its properties, such as the chemical composition, the symmetry properties and the shape. This approach enables the incorporation of physical and geometrical constraints and the generation of diverse samples of crystal structures with desirable properties, such as low formation energy <a href="#Mistal23" style="color: #21918c">(Mistal et al. 2023)</a>.
         </li>
+        <li>
+          <strong>Combinatorial optimization.</strong>
+          GFlowNets can be trained to tackle NP-hard combinatorial problems on graphs, such as maximum independent set, by framing the construction of a solution as a sequential decision process and sampling proportionally to a reward based on solution quality. This yields sets of diverse, high-quality candidate solutions rather than a single point estimate <a href="#Zhang23-2" style="color: #21918c">(Zhang et al. 2023)</a>.
+        </li>
+        <li>
+          <strong>Red-teaming language models.</strong>
+          GFlowNets have been used to generate diverse sets of adversarial prompts that elicit harmful behavior from large language models. Compared to standard RL-based red-teaming approaches, which tend to converge on a narrow set of high-reward attacks, this diversity surfaces a broader range of failure modes and supports more robust safety tuning <a href="#Lee25" style="color: #21918c">(Lee et al. 2025)</a>.
+        </li>
       </ul>
       <p class="section-text">
         Additional examples of GFlowNet applications include vehicle routing <a href="#Zhang25" style="color: #21918c">(Zhang et al. 2025)</a>, the generation of realistic terrain datasets <a href="#Zhang23" style="color: #21918c">(C. Zhang and Yang, 2023)</a>, symbolic regression <a href="#Li23" style="color: #21918c">(Li, Marinescu, and Musslick, 2023)</a>, and causal discovery <a href="#Manta23" style="color: #21918c">(Manta, Hu, and Y. Bengio, 2023)</a>.
@@ -3401,6 +3409,10 @@
         Lahlou, Salem, Tristan Deleu, Pablo Lemos, Dinghuai Zhang, Alexandra Volokhova, Alex Hernández-Garcıa, Léna Néhale Ezzine, Yoshua Bengio, and Nikolay Malkin (2023). “A theory of continuous generative flow networks”. In: International Conference on Machine Learning. PMLR, pp. 18269–18300.
         <a href="https://proceedings.mlr.press/v202/lahlou23a.html" style="color: #21918c">[URL]</a>
       </p>
+      <p class="section-text" id="Lee25">
+          Lee, Seanie, Minsu Kim, Lynn Cherif, David Dobre, Juho Lee, Sung Ju Hwang, Kenji Kawaguchi, Gauthier Gidel, Yoshua Bengio, Nikolay Malkin, et al. (2025). "Learning diverse attacks on large language models for robust red-teaming and safety tuning". In: International Conference on Learning Representations 2025, pp. 63141–63163.
+          <a href="https://proceedings.iclr.cc/paper_files/paper/2025/hash/9e128701ceca0ba03658a305faf39deb-Abstract-Conference.html" style="color: #21918c">[URL]</a>
+        </p>
       <p class="section-text" id="Li23">
         Li, Sida, Ioana Marinescu, and Sebastian Musslick (2023). GFN-SR: symbolic regression with generative flow networks. arXiv: 2312.00396 [cs.LG].
         <a href="https://arxiv.org/abs/2312.00396" style="color: #21918c">[URL]</a>
@@ -3434,6 +3446,10 @@
         Zhang, Chong and Lizhi Yang (2023). Generating a terrain-robustness benchmark for legged locomotion: A prototype via terrain authoring and active learning. arXiv: 2208.07681 [cs.RO].
         <a href="https://arxiv.org/abs/2208.07681" style="color: #21918c">[URL]</a>
       </p>
+      <p class="section-text" id="Zhang23-2">
+          Zhang, Dinghuai, Hanjun Dai, Nikolay Malkin, Aaron C Courville, Yoshua Bengio, and Ling Pan (2023). "Let the flows tell: Solving graph combinatorial problems with GFlowNets". In: Advances in Neural Information Processing Systems 36, pp. 11952–11969.
+          <a href="https://proceedings.neurips.cc/paper_files/paper/2023/hash/27571b74d6cd650b8eb6cf1837953ae8-Abstract-Conference.html" style="color: #21918c">[URL]</a>
+        </p>
       <p class="section-text" id="Zhang25">
         Zhang, Ni, Jingfeng Yang, Zhiguang Cao, and Xu Chi (2025). Adversarial generative flow network for solving vehicle routing problems. arXiv: 2503.01931 [cs.LG].
         <a href="https://arxiv.org/abs/2503.01931" style="color: #21918c">[URL]</a>
