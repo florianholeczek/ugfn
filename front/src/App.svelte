@@ -30,6 +30,7 @@
   import Fab from '@smui/fab';
   import Snackbar, { Actions } from '@smui/snackbar';
   import { flow_velocity, flow_n_particles,flow_vectorfield, flow_vectors, flow_changed, A_molecule_prop} from './store.js';
+  import AnchoredButton from './AnchoredButton.svelte';
 
 
   // default values for training
@@ -1240,6 +1241,9 @@
         With an estimated size of <Katex>{'10^{60}'}</Katex>, the space of possible molecular structures is vast, and promising candidates are potentially sparse and difficult to find. Traditional optimization methods might guide you to a single best guess, but what if this guess is toxic, has side effects, or fails in a later stage of testing? What if you need many diverse, high-quality candidates to test? This is where Generative Flow Networks (GFlowNets) come in. They are a class of generative models that don't just aim for a single optimal solution—they aim to diversely sample from a space of possibilities, with a preference for high-reward outcomes.
         <br><br>
         In this article, we introduce the core concepts behind GFlowNets, outline their theoretical foundations and common training pitfalls, and guide readers toward an intuitive understanding of how they work. We provide an interactive Playground, where the environment and hyperparameters can be adjusted on the fly to reveal a GFlowNet’s learning dynamics. A Tetris example brings these ideas to life, as the network uncovers stacking strategies in real time. By journey’s end, readers will have both a practical grasp of GFlowNet behavior and inspiration for applying them to their own challenges.
+        <br><br>
+        <AnchoredButton text="Accompanying notebook" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=u8GGMkdTgDnZ" />
+        While this article focuses on the concepts, there is also an accompanying notebook that handles the implementation of them. It follows the structure of this article, and the buttons on the right will link to notebook cells implementing the discussed concepts. The notebook should be treated as an addition, it is not necessary for understanding this article.
       </p>
     </section>
 
@@ -1436,6 +1440,7 @@
         We can now interpret this directed acyclic graph (DAG) as a <i>flow network</i>.
         <br><br>
         You can think of this flow network as water flowing from the source state through the intermediate states to the final states, following the edges of the DAG like pipes.
+        <AnchoredButton text="Notebook - Example environment" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=GbNMwFlNyT24" />
       </p>
 
       <svg width="800" height="350" style="display: block; margin: 20px auto;">
@@ -1570,72 +1575,74 @@
 
 
       <table style="width: 900px; border-collapse: collapse; margin: 20px auto; font-family: 'Georgia', serif; font-size: 16px;">
-        <tr>
-          <td style="width: 120px; height: 110px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid black;">Flow</td>
-          <td style="padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid black;">
-            {#if hoveredEdge}
-              <Katex>
-                {`F(\\textcolor{#d95f02}{s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]}}) = ${hoveredEdge.flow}`}
-              </Katex>
-            {:else if hoveredNode}
-              <Katex>
-                {`F_{in}(\\textcolor{#d95f02}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\textcolor{#1b9e77}{${previousStatesFormula(hoveredNode)}} = ${previousStatesValues(hoveredNode)}`}
-              </Katex>
-              <br>
-              <br>
-              {#if nodeById(hoveredNode).final}
-                <Katex>
-                  {`F_{out}(\\textcolor{#d95f02}{x_${hoveredNode[1]}}) = \\textcolor{#7570b3}{R(x_${hoveredNode[1]}) + 0} = ${nextStatesValues(hoveredNode)}`}
-                </Katex>
-              {:else}
-                <Katex>
-                  {`F_{out}(\\textcolor{#d95f02}{s_${hoveredNode[1]}}) = \\textcolor{#7570b3}{0 + ${nextStatesFormula(hoveredNode)}} = ${nextStatesValues(hoveredNode)}`}
-                </Katex>
-              {/if}
-            {:else}
-              <Katex>
-                F_{"{in}"}(s) = \sum_{"{s' \\in \\{children(s)\\}}"} F(s' \to s)
-              </Katex>
-              <br>
-              <br>
-              <Katex>
-                F_{"{out}"}(s) =R(s) + \sum_{"{s' \\in \\{parents(s)\\}}"} F(s \to s')
-              </Katex>
-            {/if}
-          </td>
-        </tr>
-        <tr>
-          <td style="width: 120px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Policy</td>
-          <td style="padding: 8px 0; border-bottom: 1px solid #aaa;">
-            {#if hoveredEdge}
-              <Katex>
-                {`P_F(\\textcolor{#d95f02}{${hoveredEdge.to[0]}_${hoveredEdge.to[1]}|s_${hoveredEdge.from[1]}}) = \\frac{\\textcolor{#d95f02}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})}}{\\textcolor{#d95f02}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})} \\textcolor{#1b9e77}{${policyFormula(hoveredEdge)}}} = ${policyValue(hoveredEdge)}`}
-              </Katex>
-            {:else if hoveredNode}
-              The policy is calculated for each action.
-            {:else}
-              <Katex>
-                {`P_F(s'|s) = \\frac{F(s \\to s')}{\\sum_{s' \\in \\{children(s)\\}} F(s \\to s')}`}
-              </Katex>
-            {/if}
-          </td>
-        </tr>
-        <tr>
-          <td style="width: 120px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Loss</td>
-          <td style="padding: 8px 0; border-bottom: 1px solid #aaa;">
-            {#if hoveredEdge}
-              The loss is calculated for each state.
-            {:else if hoveredNode}
-              <Katex>
-                {`\\mathcal{L}_{FM}(\\textcolor{#d95f02}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\left( \\log \\frac{\\textcolor{#1b9e77}{${previousStatesFormula(hoveredNode)}}}{\\textcolor{#7570b3}{${nextStatesFormula(hoveredNode)}}} \\right)^2 = ${lossValue(hoveredNode)}`}
-              </Katex>
-            {:else}
-              <Katex>
-                {`\\mathcal{L}_{FM}(s) = \\left( \\log \\frac{ \\sum_{s'\\in \\{children(s)\\}}F(s' \\to s)}{\\sum_{s' \\in \\{parents(s)\\}}F(s \\to s')} \\right)^2`}
-              </Katex>
-            {/if}
-          </td>
-        </tr>
+        <tbody>
+            <tr>
+              <td style="width: 120px; height: 110px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid black;">Flow</td>
+              <td style="padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid black;">
+                {#if hoveredEdge}
+                  <Katex>
+                    {`F(\\textcolor{#d95f02}{s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]}}) = ${hoveredEdge.flow}`}
+                  </Katex>
+                {:else if hoveredNode}
+                  <Katex>
+                    {`F_{in}(\\textcolor{#d95f02}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\textcolor{#1b9e77}{${previousStatesFormula(hoveredNode)}} = ${previousStatesValues(hoveredNode)}`}
+                  </Katex>
+                  <br>
+                  <br>
+                  {#if nodeById(hoveredNode).final}
+                    <Katex>
+                      {`F_{out}(\\textcolor{#d95f02}{x_${hoveredNode[1]}}) = \\textcolor{#7570b3}{R(x_${hoveredNode[1]}) + 0} = ${nextStatesValues(hoveredNode)}`}
+                    </Katex>
+                  {:else}
+                    <Katex>
+                      {`F_{out}(\\textcolor{#d95f02}{s_${hoveredNode[1]}}) = \\textcolor{#7570b3}{0 + ${nextStatesFormula(hoveredNode)}} = ${nextStatesValues(hoveredNode)}`}
+                    </Katex>
+                  {/if}
+                {:else}
+                  <Katex>
+                    F_{"{in}"}(s) = \sum_{"{s' \\in \\{children(s)\\}}"} F(s' \to s)
+                  </Katex>
+                  <br>
+                  <br>
+                  <Katex>
+                    F_{"{out}"}(s) =R(s) + \sum_{"{s' \\in \\{parents(s)\\}}"} F(s \to s')
+                  </Katex>
+                {/if}
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 120px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Policy</td>
+              <td style="padding: 8px 0; border-bottom: 1px solid #aaa;">
+                {#if hoveredEdge}
+                  <Katex>
+                    {`P_F(\\textcolor{#d95f02}{${hoveredEdge.to[0]}_${hoveredEdge.to[1]}|s_${hoveredEdge.from[1]}}) = \\frac{\\textcolor{#d95f02}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})}}{\\textcolor{#d95f02}{F(s_${hoveredEdge.from[1]} \\to ${hoveredEdge.to[0]}_${hoveredEdge.to[1]})} \\textcolor{#1b9e77}{${policyFormula(hoveredEdge)}}} = ${policyValue(hoveredEdge)}`}
+                  </Katex>
+                {:else if hoveredNode}
+                  The policy is calculated for each action.
+                {:else}
+                  <Katex>
+                    {`P_F(s'|s) = \\frac{F(s \\to s')}{\\sum_{s' \\in \\{children(s)\\}} F(s \\to s')}`}
+                  </Katex>
+                {/if}
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 120px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Loss</td>
+              <td style="padding: 8px 0; border-bottom: 1px solid #aaa;">
+                {#if hoveredEdge}
+                  The loss is calculated for each state.
+                {:else if hoveredNode}
+                  <Katex>
+                    {`\\mathcal{L}_{FM}(\\textcolor{#d95f02}{${hoveredNode[0]}_${hoveredNode[1]}}) = \\left( \\log \\frac{\\textcolor{#1b9e77}{${previousStatesFormula(hoveredNode)}}}{\\textcolor{#7570b3}{${nextStatesFormula(hoveredNode)}}} \\right)^2 = ${lossValue(hoveredNode)}`}
+                  </Katex>
+                {:else}
+                  <Katex>
+                    {`\\mathcal{L}_{FM}(s) = \\left( \\log \\frac{ \\sum_{s'\\in \\{children(s)\\}}F(s' \\to s)}{\\sum_{s' \\in \\{parents(s)\\}}F(s \\to s')} \\right)^2`}
+                  </Katex>
+                {/if}
+              </td>
+            </tr>
+        </tbody>
       </table>
 
 
@@ -1653,6 +1660,7 @@
         Over all children it sums to 1.
         The flows are learned by a neural network, and the agent can use them to sample the next action.
         As the flow determines the transition probabilities, it also determines the probabilities for sampling the final states <Katex>x</Katex>.
+        <AnchoredButton text="Notebook - Sampling" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=4ZJHOsR4e0cu" />
         <br>
         Hover over the states to see their incoming and outgoing flow.
         The example in Figure 8 shows a perfectly trained model, and you can see an important property of GFlowNets:
@@ -1664,6 +1672,7 @@
         In this case, the probability of sampling <Katex>x</Katex> is the reward of <Katex>x</Katex> divided by the sum of all rewards <Katex>Z</Katex>.
         This is the main theorem of GFlowNets and the reason for diversity in the sampled states.
         You can find more detail about it in the box below.
+        <AnchoredButton text="Notebook - Loss" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=JH2dLH7-hMXS" />
       </p>
 
       <Accordion class="image-container" style="width:1000px">
@@ -1735,6 +1744,7 @@
         In the first GFlowNet paper <a href="#Bengio21" style="color: #21918c">(E. Bengio et al. 2021)</a>, the authors used this simple loss;
         however, many improvements have been proposed since.
         In the Playground we use trajectory balance loss <a href="#Malkin22" style="color: #21918c">(Malkin et al. 2022)</a>; you can learn about it below.
+        <AnchoredButton text="Notebook - Trajectory balance" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=LHcSo1dIFERg" />
       </p>
 
       <div class="image-container" style="width:1000px">
@@ -1844,49 +1854,51 @@
                   Reset by selecting s0 or another orange state.
                 </p>
                 <table style="width: 900px; border-collapse: collapse; margin: 20px auto; font-family: 'Georgia', serif; font-size: 16px;">
-                  <tr>
-                    <td style="width: 130px; height: 110px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid white;">Forward- Policy</td>
-                    <td style="padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid white;">
-                      {#if TB_trajectory_complete}
-                        <Katex>
-                          {`\\prod_t P_F(s_{t+1}|s_t) = ${TB_calculate_PF()}`}
-                        </Katex>
-                      {:else}
-                        <Katex>
-                          {`P_F(s'|s) = \\frac{F(s \\to s')}{\\sum_{s' \\in \\{children(s)\\}} F(s \\to s')}`}
-                        </Katex>
-                      {/if}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="width: 130px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Backward- Policy</td>
-                    <td style="padding: 8px 0; border-bottom: 1px solid #aaa;">
-                      {#if TB_trajectory_complete}
-                        <Katex>
-                          {`\\prod_t P_B(s_{t}|s_{t+1}) = ${TB_calculate_PB()}`}
-                        </Katex>
-                      {:else}
-                        <Katex>
-                          {`P_B(s'|s) = \\frac{F(s \\to s')}{\\sum_{s' \\in \\{parents(s')\\}} F(s \\to s')}`}
-                        </Katex>
-                      {/if}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="width: 130px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Loss</td>
-                    <td style="padding: 8px 0; border-bottom: 1px solid #aaa;">
-                      {#if TB_trajectory_complete}
-                        <Katex>
-                          {"\\mathcal{L}_{TB}(\\tau) = \\left(\\log\\frac{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t)}"}{"{R(x)\\prod_t P_B(s_t|s_{t+1})}\\right)^2"}
-                          {`= \\left(\\log\\frac{${TB_current.z} \\cdot ${TB_current.pf}}{${edges.filter(e => e.to === TB_path.at(-1))[0].flow} \\cdot ${TB_current.pb}}\\right)^2 = 0`}
-                        </Katex>
-                      {:else}
-                        <Katex>
-                          {"\\mathcal{L}_{TB}(\\tau) = \\left(\\log\\frac{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t)}"}{"{R(x)\\prod_t P_B(s_t|s_{t+1})}"} \right)^2
-                        </Katex>
-                      {/if}
-                    </td>
-                  </tr>
+                  <tbody>
+                      <tr>
+                        <td style="width: 130px; height: 110px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid white;">Forward- Policy</td>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid white;">
+                          {#if TB_trajectory_complete}
+                            <Katex>
+                              {`\\prod_t P_F(s_{t+1}|s_t) = ${TB_calculate_PF()}`}
+                            </Katex>
+                          {:else}
+                            <Katex>
+                              {`P_F(s'|s) = \\frac{F(s \\to s')}{\\sum_{s' \\in \\{children(s)\\}} F(s \\to s')}`}
+                            </Katex>
+                          {/if}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="width: 130px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Backward- Policy</td>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #aaa;">
+                          {#if TB_trajectory_complete}
+                            <Katex>
+                              {`\\prod_t P_B(s_{t}|s_{t+1}) = ${TB_calculate_PB()}`}
+                            </Katex>
+                          {:else}
+                            <Katex>
+                              {`P_B(s'|s) = \\frac{F(s \\to s')}{\\sum_{s' \\in \\{parents(s')\\}} F(s \\to s')}`}
+                            </Katex>
+                          {/if}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="width: 130px; height: 100px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa;">Loss</td>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #aaa;">
+                          {#if TB_trajectory_complete}
+                            <Katex>
+                              {"\\mathcal{L}_{TB}(\\tau) = \\left(\\log\\frac{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t)}"}{"{R(x)\\prod_t P_B(s_t|s_{t+1})}\\right)^2"}
+                              {`= \\left(\\log\\frac{${TB_current.z} \\cdot ${TB_current.pf}}{${edges.filter(e => e.to === TB_path.at(-1))[0].flow} \\cdot ${TB_current.pb}}\\right)^2 = 0`}
+                            </Katex>
+                          {:else}
+                            <Katex>
+                              {"\\mathcal{L}_{TB}(\\tau) = \\left(\\log\\frac{Z_{\\theta}\\prod_t P_F(s_{t+1}|s_t)}"}{"{R(x)\\prod_t P_B(s_t|s_{t+1})}"} \right)^2
+                            </Katex>
+                          {/if}
+                        </td>
+                      </tr>
+                  </tbody>
                 </table>
                 Since we calculate the flow matching loss at the state level, we may encounter inefficiencies with longer trajectories.
                 A flow mismatch occurring at the final state is propagated backwards only one state per iteration.
@@ -2042,7 +2054,9 @@
     <section class="section" bind:this={h_continuous}>
       <h2 class="section-title">Towards Continuous GFlowNets</h2>
       <p class="section-text">
+        <AnchoredButton text="Notebook - Continuous plane environment" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=I2QchRi6AXbC" />
         So far, we've only looked at discrete environments; however, GFlowNets can also be applied to problems in continuous spaces. Browse through the description of continuous vs. discrete environments by using the button on the right. You will also learn about the specific continuous 2D environment we use in our Playground.
+        <AnchoredButton text="Notebook - Continuous GFlowNet" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=WEmTX2BnRDDT" />
       </p>
       <div class="DC-container">
         <!-- Left Button -->
@@ -2126,6 +2140,7 @@
       <h2 class="section-title">Training</h2>
       <p class="section-text">
         Using the environment above, we trained a GFlowNet with the trajectory balance loss. Below, you can see the model's progress during training. While it first samples randomly, it learns to match the reward distribution of our environment. Use the controls below to iterate through the training process. The button on the right lets you load the settings used for this run to the Playground. Hover over a sample to see its trajectory.
+        <AnchoredButton text="Notebook - Training" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=ODll4sREB4v5" />
       </p>
       <div id="runplot1" style="display: flex; justify-content: center;"></div>
       <div style="width: 700px; margin: auto; text-align:center;display:flex; margin-top: 10px">
@@ -2183,6 +2198,7 @@
       <div style="height:50px"></div>
       <p class="section-text">
         So far, our distribution match was very easy. Let's make it more challenging: If we lower the variance, we see the two modes are more separated. This makes the training of our GFlowNet more challenging.
+        <AnchoredButton text="Notebook - Mode collapse" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=qXiedTZCCBxn" />
       </p>
       <div id="runplot2" style="display: flex; justify-content: center;"></div>
       <div style="width: 700px; margin: auto; text-align:center;display:flex; margin-top: 10px">
@@ -2251,6 +2267,7 @@
           One option to train off-policy is to select a random action with a small probability.
           Another option is to add a fixed value to the variance of the sampling distribution provided by the forward policy.
           As this is a straightforward implementation, we will proceed with this one in our example.
+          <AnchoredButton text="Notebook - Off-policy training" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=SoabGArbHLaf" />
         </span>
         <span class="li">
           If adjusting the reward is an option,
@@ -3467,7 +3484,7 @@
   }
 
   span.li {
-    width: 100%;
+    width: 80%;
     display: list-item;
     list-style-type: disc;
     margin-left: 40px;
