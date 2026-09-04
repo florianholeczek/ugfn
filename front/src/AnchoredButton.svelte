@@ -1,66 +1,63 @@
 <script context="module">
   /**
-   * Shared layout watcher.
-   * Every AnchoredButton registers a callback that recomputes its vertical
-   * position. Instead of giving every instance its own ResizeObserver / resize
-   * listener (there may be many buttons), we keep a single shared set.
+   * Shared position ticker.
+   *
+   * Rather than recomputing each button's position only on discrete events
+   * (resize, timeouts, ResizeObserver) — which goes stale whenever a slow
+   * visualization reflows the page between those events — every mounted button
+   * re-measures its anchor once per animation frame from a single shared loop.
+   * The position is therefore always derived from the current layout.
    */
   const _subscribers = new Set();
+  let _rafId = null;
 
-  function _notify() {
-    _subscribers.forEach((cb) => cb());
+  function _tick() {
+    _subscribers.forEach((fn) => fn());
+    _rafId = _subscribers.size ? requestAnimationFrame(_tick) : null;
   }
 
-  let _initialized = false;
-  function _ensureWatcher() {
-    if (_initialized || typeof window === 'undefined') return;
-    _initialized = true;
-    window.addEventListener('resize', _notify);
-    // Content on this page (plots, images, fonts) loads asynchronously and
-    // shifts the layout. A ResizeObserver on <body> catches those reflows.
-    if (typeof ResizeObserver !== 'undefined') {
-      const ro = new ResizeObserver(_notify);
-      ro.observe(document.body);
+  function subscribe(fn) {
+    _subscribers.add(fn);
+    if (_rafId == null && typeof requestAnimationFrame !== 'undefined') {
+      _rafId = requestAnimationFrame(_tick);
     }
-  }
-
-  function registerWatcher(cb) {
-    _ensureWatcher();
-    _subscribers.add(cb);
-    return () => _subscribers.delete(cb);
+    return () => {
+      _subscribers.delete(fn);
+      if (_subscribers.size === 0 && _rafId != null) {
+        cancelAnimationFrame(_rafId);
+        _rafId = null;
+      }
+    };
   }
 </script>
 
 <script>
   import { onMount } from 'svelte';
-  import Button, { Label } from '@smui/button';
 
-  /** Text shown on the button. */
+  /** Text shown on the button (supports two lines / wrapping). */
   export let text = 'ExampleText';
   /** Where the button links to (opens in a new tab). */
   export let href = 'https://www.google.com';
+  /** Icon shown on the left. Any path under /public (png or svg). */
+  export let logo = '/images/colab.svg';
 
   let anchorEl;          // zero-size marker sitting inline in the text
-  let top = 0;           // document-Y position of the anchor, in px
+  let top = 0;           // viewport-Y of the anchor, in px (position: fixed)
   let visible = false;   // toggled by the IntersectionObserver
+  let lastTop = null;
 
-  function updatePosition() {
+  function measure() {
     if (!anchorEl) return;
-    const rect = anchorEl.getBoundingClientRect();
-    top = rect.top + window.scrollY;
-  }
-
-  function open() {
-    window.open(href, '_blank', 'noopener');
+    const t = anchorEl.getBoundingClientRect().top;
+    if (t !== lastTop) {
+      lastTop = t;
+      top = t;
+    }
   }
 
   onMount(() => {
-    updatePosition();
-
-    const unregister = registerWatcher(updatePosition);
-
-    // Catch late layout shifts from async-loaded content.
-    const timers = [150, 500, 1500, 4000].map((t) => setTimeout(updatePosition, t));
+    measure();
+    const unsubscribe = subscribe(measure);
 
     // The button fades in while its anchor sits in the central band of the
     // viewport, and fades back out once the anchor leaves that band (in either
@@ -69,25 +66,30 @@
       ([entry]) => {
         visible = entry.isIntersecting;
       },
-      { rootMargin: '-15% 0px -15% 0px', threshold: 0 }
+      { rootMargin: '-10% 0px -10% 0px', threshold: 0 }
     );
     io.observe(anchorEl);
 
     return () => {
-      unregister();
+      unsubscribe();
       io.disconnect();
-      timers.forEach(clearTimeout);
     };
   });
 </script>
 
 <span class="anchored-btn-anchor" bind:this={anchorEl}></span>
 
-<span class="anchored-btn" class:visible style="top: {top}px">
-  <Button variant="raised" color="secondary" on:click={open}>
-    <Label>{text}</Label>
-  </Button>
-</span>
+<a
+  class="anchored-btn"
+  class:visible
+  style="top: {top}px"
+  href={href}
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <img class="anchored-btn-logo" src={logo} alt="" aria-hidden="true" />
+  <span class="anchored-btn-text">{text}</span>
+</a>
 
 <style>
   .anchored-btn-anchor {
@@ -96,21 +98,64 @@
   }
 
   .anchored-btn {
-    position: absolute;
+    position: fixed;
     /* Right margin next to the 1000px-wide, centred text column. */
     left: calc(50% + 570px);
-    display: block;
+    z-index: 500;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 260px;
+    box-sizing: border-box;
+    padding: 10px 16px;
+
+    background: #f2f2f2;
+    border: 1px solid #d9d9d9;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.16);
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #444;
+    text-align: left;
+    text-decoration: none;
+
+    cursor: pointer;
     opacity: 0;
     transform: translateX(28px);
-    transition: opacity 0.35s ease, transform 0.35s ease;
+    transition: opacity 0.35s ease, transform 0.35s ease, background 0.15s ease;
     pointer-events: none;
-    z-index: 500;
-    white-space: nowrap;
   }
 
   .anchored-btn.visible {
     opacity: 1;
     transform: translateX(0);
     pointer-events: auto;
+  }
+
+  .anchored-btn:hover {
+    background: #e8e8e8;
+  }
+
+  .anchored-btn:active {
+    background: #e0e0e0;
+  }
+
+  .anchored-btn:focus-visible {
+    outline: 2px solid #e8710a;
+    outline-offset: 2px;
+  }
+
+  .anchored-btn-logo {
+    height: 2.5em;
+    width: auto;
+    flex-shrink: 0;
+  }
+
+  .anchored-btn-text {
+    white-space: normal;
   }
 </style>

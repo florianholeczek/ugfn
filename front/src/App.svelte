@@ -1440,7 +1440,7 @@
         We can now interpret this directed acyclic graph (DAG) as a <i>flow network</i>.
         <br><br>
         You can think of this flow network as water flowing from the source state through the intermediate states to the final states, following the edges of the DAG like pipes.
-        <AnchoredButton text="Notebook - Example environment" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=GbNMwFlNyT24" />
+        <AnchoredButton text="Example environment" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=GbNMwFlNyT24" />
       </p>
 
       <svg width="800" height="350" style="display: block; margin: 20px auto;">
@@ -1660,7 +1660,7 @@
         Over all children it sums to 1.
         The flows are learned by a neural network, and the agent can use them to sample the next action.
         As the flow determines the transition probabilities, it also determines the probabilities for sampling the final states <Katex>x</Katex>.
-        <AnchoredButton text="Notebook - Sampling" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=4ZJHOsR4e0cu" />
+        <AnchoredButton text="Sampling" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=4ZJHOsR4e0cu" />
         <br>
         Hover over the states to see their incoming and outgoing flow.
         The example in Figure 8 shows a perfectly trained model, and you can see an important property of GFlowNets:
@@ -1672,7 +1672,7 @@
         In this case, the probability of sampling <Katex>x</Katex> is the reward of <Katex>x</Katex> divided by the sum of all rewards <Katex>Z</Katex>.
         This is the main theorem of GFlowNets and the reason for diversity in the sampled states.
         You can find more detail about it in the box below.
-        <AnchoredButton text="Notebook - Loss" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=JH2dLH7-hMXS" />
+        <AnchoredButton text="Loss" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=JH2dLH7-hMXS" />
       </p>
 
       <Accordion class="image-container" style="width:1000px">
@@ -1744,7 +1744,7 @@
         In the first GFlowNet paper <a href="#Bengio21" style="color: #21918c">(E. Bengio et al. 2021)</a>, the authors used this simple loss;
         however, many improvements have been proposed since.
         In the Playground we use trajectory balance loss <a href="#Malkin22" style="color: #21918c">(Malkin et al. 2022)</a>; you can learn about it below.
-        <AnchoredButton text="Notebook - Trajectory balance" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=LHcSo1dIFERg" />
+        <AnchoredButton text="Trajectory balance" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=LHcSo1dIFERg" />
       </p>
 
       <div class="image-container" style="width:1000px">
@@ -2054,9 +2054,9 @@
     <section class="section" bind:this={h_continuous}>
       <h2 class="section-title">Towards Continuous GFlowNets</h2>
       <p class="section-text">
-        <AnchoredButton text="Notebook - Continuous plane environment" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=I2QchRi6AXbC" />
+        <AnchoredButton text="Continuous plane environment" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=I2QchRi6AXbC" />
         So far, we've only looked at discrete environments; however, GFlowNets can also be applied to problems in continuous spaces. Browse through the description of continuous vs. discrete environments by using the button on the right. You will also learn about the specific continuous 2D environment we use in our Playground.
-        <AnchoredButton text="Notebook - Continuous GFlowNet" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=WEmTX2BnRDDT" />
+        <AnchoredButton text="Continuous GFlowNet" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=WEmTX2BnRDDT" />
       </p>
       <div class="DC-container">
         <!-- Left Button -->
@@ -2140,7 +2140,7 @@
       <h2 class="section-title">Training</h2>
       <p class="section-text">
         Using the environment above, we trained a GFlowNet with the trajectory balance loss. Below, you can see the model's progress during training. While it first samples randomly, it learns to match the reward distribution of our environment. Use the controls below to iterate through the training process. The button on the right lets you load the settings used for this run to the Playground. Hover over a sample to see its trajectory.
-        <AnchoredButton text="Notebook - Training" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=ODll4sREB4v5" />
+        <AnchoredButton text="Training" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=ODll4sREB4v5" />
       </p>
       <div id="runplot1" style="display: flex; justify-content: center;"></div>
       <div style="width: 700px; margin: auto; text-align:center;display:flex; margin-top: 10px">
@@ -2198,7 +2198,7 @@
       <div style="height:50px"></div>
       <p class="section-text">
         So far, our distribution match was very easy. Let's make it more challenging: If we lower the variance, we see the two modes are more separated. This makes the training of our GFlowNet more challenging.
-        <AnchoredButton text="Notebook - Mode collapse" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=qXiedTZCCBxn" />
+        <AnchoredButton text="Mode collapse" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=qXiedTZCCBxn" />
       </p>
       <div id="runplot2" style="display: flex; justify-content: center;"></div>
       <div style="width: 700px; margin: auto; text-align:center;display:flex; margin-top: 10px">
@@ -2267,7 +2267,7 @@
           One option to train off-policy is to select a random action with a small probability.
           Another option is to add a fixed value to the variance of the sampling distribution provided by the forward policy.
           As this is a straightforward implementation, we will proceed with this one in our example.
-          <AnchoredButton text="Notebook - Off-policy training" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=SoabGArbHLaf" />
+          <AnchoredButton text="Off-policy training" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=SoabGArbHLaf" />
         </span>
         <span class="li">
           If adjusting the reward is an option,
