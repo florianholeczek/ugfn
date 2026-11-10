@@ -5,18 +5,19 @@ an interactive article to learn about [GFlowNets](https://dl.acm.org/doi/abs/10.
 
 Here you find the code for the webpage and the Python code to train models using the Playground environment.
 The code for the Tetris example can be found [here](https://github.com/Alexander070702/Alexander070702.github.io).
+The Playground also has an accompanying Notebook that can be found [here](https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=jkmJfeDf4u2U). The notebook builds understanding of the GFlowNet implementations in the playground incrementally and guides you through them. The final implementation of the continuous plane environment and training is basically the same as the one found here.
 
 Training in the playground environment happens on a continuous 2d plane where the reward is given proportional to the sum of n multivariate Gaussians.
 
 ![](https://github.com/florianholeczek/ugfn/blob/master/front/public/images/env1.png)
 
-When the training is successfull we can see that the GFN learned the true underlying distribution:
+When the training is successful, we can see that the GFN learned the true underlying distribution:
 
 ![](https://github.com/florianholeczek/ugfn/blob/master/front/public/images/run3.png)
 
 ## Python only
 If you want to use the Python code, all relevant files are in the "python" folder.
-To set up the environment you will need python version >3.8 and <3.11.
+To set up the environment, you will need python version >3.8 and <3.11.
 It is tested with version [3.10.11](https://www.python.org/downloads/release/python-31011/).
 Create a virtual environment using the requirements.txt file:
 
@@ -38,7 +39,7 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
-If you want to simply train models you can change the hyperparameters at the beginning of 
+If you want to simply train models, you can change the hyperparameters at the beginning of 
 the python/main.py file to change the model and the environment. 
 
 Then start training with:
@@ -51,12 +52,12 @@ python3 python/main.py
 ```
 
 ## Running the webpage locally
-If you want to run the webpage locally you can either use the docker image:
+If you want to run the webpage locally, you can either use the docker image:
 ```shell
 docker pull florianholeczek/ugfn:latest 
 docker run -p 8000:8000 florianholeczek/ugfn:latest
 ```
-Or you build it yourself:
+Or you can build it yourself:
 Clone the repository and create a venv like above.
 
 You will need [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and nodejs. 
@@ -78,7 +79,7 @@ nvm use 22.12.0
 # change to the front folder
 cd front
 
-# install dependecies
+# install dependencies
 npm install
 ```
 
