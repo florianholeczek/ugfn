@@ -1604,6 +1604,10 @@
           >
             {node.id}
           </text>
+          {#if node.final}
+            <!-- Reward of the final state -->
+            <text x="{node.x}" y="{node.y + 36}" text-anchor="middle" font-size="12" fill="black">R = {node.reward}</text>
+          {/if}
         </g>
       {/each}
 
@@ -1882,6 +1886,9 @@
                       >
                         {node.id}
                       </text>
+                      {#if node.final}
+                        <text x="{node.x}" y="{node.y + 36}" text-anchor="middle" font-size="12" fill="black">R = {node.reward}</text>
+                      {/if}
                     </g>
                   {/each}
                 </svg>

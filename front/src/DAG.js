@@ -9,10 +9,10 @@ export const nodes = [
     { id: 's7', x: 500, y: 150 },
     { id: 's8', x: 650, y: 50 },
     { id: 's9', x: 650, y: 150 },
-    { id: 'x5', x: 500, y: 300, final: true },
-    { id: 'x7', x: 600, y: 250, final: true },
-    { id: 'x8', x: 750, y: 100, final: true },
-    { id: 'x9', x: 750, y: 200, final: true },
+    { id: 'x5', x: 500, y: 300, final: true, reward: 3 },
+    { id: 'x7', x: 600, y: 250, final: true, reward: 1 },
+    { id: 'x8', x: 750, y: 100, final: true, reward: 1 },
+    { id: 'x9', x: 750, y: 200, final: true, reward: 5 },
   ];
 
 export const edges = [

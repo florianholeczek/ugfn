@@ -21,8 +21,7 @@
     const N = Object.fromEntries(nodes.map(n => [n.id, n]));
     const out = Object.fromEntries(nodes.map(n => [n.id, edges.filter(e => e.from === n.id)]));
     const terminals = nodes.filter(n => n.final).map(n => n.id);
-    // R(x) = inflow of the terminal state in the trained DAG
-    const R = Object.fromEntries(terminals.map(t => [t, edges.filter(e => e.to === t).reduce((s, e) => s + e.flow, 0)]));
+    const R = Object.fromEntries(terminals.map(t => [t, N[t].reward]));
     const Z = terminals.reduce((s, t) => s + R[t], 0);
 
     const trajs = [];

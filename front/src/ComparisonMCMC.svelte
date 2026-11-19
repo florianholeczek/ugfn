@@ -15,7 +15,7 @@
     const out = Object.fromEntries(nodes.map(n => [n.id, edges.filter(e => e.from === n.id)]));
     const par = id => edges.filter(e => e.to === id).map(e => e.from);
     const terminals = ['x5', 'x7', 'x9', 'x8'];
-    const R = Object.fromEntries(terminals.map(t => [t, edges.filter(e => e.to === t).reduce((s, e) => s + e.flow, 0)]));
+    const R = Object.fromEntries(terminals.map(t => [t, N[t].reward]));
     const Z = terminals.reduce((s, t) => s + R[t], 0);
     const COL = { x5: '#d95f02', x7: '#7570b3', x9: '#66a61e', x8: '#e7298a' };
 
