@@ -12,3 +12,7 @@ python/model_test.pth
 /front/public/Data/params.txt
 /dockercmds.txt
 Alex/
+/front/prototypes/mcmc_vs_gfn.html
+/front/prototypes/mcmc_vs_gfn_dag.html
+/front/prototypes/rl_vs_gfn.html
+/front/prototypes/rl_vs_gfn_dag.html
