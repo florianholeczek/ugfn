@@ -31,6 +31,7 @@
   import Snackbar, { Actions } from '@smui/snackbar';
   import { flow_velocity, flow_n_particles,flow_vectorfield, flow_vectors, flow_changed, A_molecule_prop} from './store.js';
   import AnchoredButton from './AnchoredButton.svelte';
+  import DesktopOnly from './DesktopOnly.svelte';
 
 
   // default values for training
@@ -186,7 +187,9 @@
 
   //other
   let session_id = null; // for handling multiple training sessions of multiple users
-  let isMobile = false; // to display mobile disclaimer
+  // Phone layout: heavy demos (Tetris/ONNX, molecules/RDKit, Playground) are replaced by a desktop-only notice.
+  // Decided once at load (see index.html), so desktop-only libraries are never fetched on phones.
+  const isMobile = typeof window !== 'undefined' && (window.__GFN_MOBILE__ ?? window.matchMedia('(max-width: 767px)').matches);
   const BACKEND_URL = ""//process.env.BACKEND_URL ?? ""; //"https://back:8000";
   const POLLING_INTERVAL = 100; //polling every n ms
 
@@ -734,6 +737,7 @@
 
   const startDragMean = (event, gaussian) => {
     if (isRunning) return;
+    event.preventDefault(); // keep touch drags from scrolling the page
     isDraggingMean = true;
     selectedGaussian = gaussian;
     initialMouse = { x: event.clientX, y: event.clientY };
@@ -741,6 +745,7 @@
 
   const startDragVariance = (event, gaussian) => {
     if (isRunning) return;
+    event.preventDefault();
     isDraggingVariance = true;
     selectedGaussian = gaussian;
     initialMouse = { x: event.clientX, y: event.clientY };
@@ -780,7 +785,7 @@
     selectedGaussian = null;
   };
   function plotEnv(){
-    if (view === "1. Environment"){
+    if (!isMobile && view === "1. Environment"){
       plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
       plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
     }
@@ -1016,8 +1021,6 @@
   // Mounting
   onMount(async () => {
     //visualize the environment
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
     await loadPlotly();
     plotlyready = true;
     plotEnv();
@@ -1029,18 +1032,36 @@
     run3_value = 4096;
     tutorial_env_image = await create_env_image(Plotly, run_data["run3_density"]);
     await loadp5();
-    await loadONNX();
-    if (typeof initMoleculeFlow === 'function') {
-      initMoleculeFlow('#chart');
-    } else {
-      console.error('initMoleculeFlow is not defined');
+    if (!isMobile) {
+      await loadONNX();
+      if (typeof initMoleculeFlow === 'function') {
+        initMoleculeFlow('#chart');
+      } else {
+        console.error('initMoleculeFlow is not defined');
+      }
     }
 
+    // add listeners for changing the Environment (pointer events cover mouse, touch and pen)
+    window.addEventListener('pointermove', handleMouseMove);
+    window.addEventListener('pointerup', stopDrag);
+    window.addEventListener('pointercancel', stopDrag);
 
-
-    // add listeners for changing the Environment
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', stopDrag);
+    // Re-fit the tutorial plots when the viewport width changes (e.g. phone rotation).
+    // Height-only changes (mobile URL bar showing/hiding) are ignored.
+    let lastWidth = window.innerWidth;
+    let resizeTimer;
+    const onResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (window.innerWidth === lastWidth) return;
+        lastWidth = window.innerWidth;
+        plot_run(1, run1_value);
+        plot_run(2, run2_value);
+        plot_run(3, run3_value);
+        DC_viewchange(DC_view);
+      }, 250);
+    };
+    window.addEventListener('resize', onResize);
     tutorial_flow_observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !isRunning) {
@@ -1085,8 +1106,10 @@
       tutorial_flow_observer.observe(tutorial_flowContainer);
     }
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', stopDrag);
+      window.removeEventListener('pointermove', handleMouseMove);
+      window.removeEventListener('pointerup', stopDrag);
+      window.removeEventListener('pointercancel', stopDrag);
+      window.removeEventListener('resize', onResize);
       tutorial_flow_observer.disconnect();
     };
   });
@@ -1194,15 +1217,6 @@
       </List>
     </Menu>
   </div>
-
-  {#if isMobile}
-    <div class="mobile-disclaimer">
-      <div class="disclaimer-box">
-        <h1>There is no mobile version for the GFlowNet Playground</h1>
-        <p>Please visit this website on a desktop device for the best experience.</p>
-      </div>
-    </div>
-  {:else}
 
 
     <header class="header-top">
@@ -1406,6 +1420,9 @@
     </section>
 
     <!--Tetris game-->
+    {#if isMobile}
+    <DesktopOnly what="The interactive Tetris GFlowNet (Fig. 7)" />
+    {:else}
     <div class="A_centerwrap">
       <div class="A_tetriscontainer">
         <div class="A_board-column">
@@ -1433,6 +1450,7 @@
     <p class="mathexpl">
       Fig. 7: Interactive GFlowNet Tetris game. In the candidate list, the top three moves can be selected. On the right, an extract of the DAG is presented.
     </p>
+    {/if}
 
 
 
@@ -1447,7 +1465,7 @@
         <AnchoredButton text="Example environment" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=GbNMwFlNyT24" />
       </p>
 
-      <svg width="800" height="350" style="display: block; margin: 20px auto;">
+      <svg class="dag-svg" width="800" height="350" viewBox="0 0 800 350" style="display: block; margin: 20px auto;">
         <!-- Marker for arrows -->
         <defs>
           <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
@@ -1578,7 +1596,7 @@
       </p>
 
 
-      <table style="width: 900px; border-collapse: collapse; margin: 20px auto; font-family: 'Georgia', serif; font-size: 16px;">
+      <table class="formula-table" style="width: 900px; border-collapse: collapse; margin: 20px auto; font-family: 'Georgia', serif; font-size: 16px;">
         <tbody>
             <tr>
               <td style="width: 120px; height: 110px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid black;">Flow</td>
@@ -1679,7 +1697,7 @@
         <AnchoredButton text="Loss" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=JH2dLH7-hMXS" />
       </p>
 
-      <Accordion class="image-container" style="width:1000px">
+      <Accordion class="image-container image-container-wide">
         <Panel color="secondary">
           <Header>Main Theorem</Header>
           <Content>
@@ -1749,12 +1767,12 @@
         <AnchoredButton text="Trajectory balance" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=LHcSo1dIFERg" />
       </p>
 
-      <div class="image-container" style="width:1000px">
+      <div class="image-container image-container-wide">
         <Accordion multiple>
             <Panel color="secondary">
               <Header>Trajectory Balance: Theory</Header>
               <Content>
-               <svg width="800" height="350" style="display: block; margin: 20px auto;">
+               <svg class="dag-svg" width="800" height="350" viewBox="0 0 800 350" style="display: block; margin: 20px auto;">
                   <defs>
                     <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
                       markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -1855,7 +1873,7 @@
                   To see the policy and loss calculations for a specific trajectory, choose a trajectory by selecting one of the purple states until you reach a final state.
                   Reset by selecting s0 or another orange state.
                 </p>
-                <table style="width: 900px; border-collapse: collapse; margin: 20px auto; font-family: 'Georgia', serif; font-size: 16px;">
+                <table class="formula-table" style="width: 900px; border-collapse: collapse; margin: 20px auto; font-family: 'Georgia', serif; font-size: 16px;">
                   <tbody>
                       <tr>
                         <td style="width: 130px; height: 110px; font-weight: bold; padding: 8px 0; border-bottom: 1px solid #aaa; border-top: 2px solid white;">Forward policy</td>
@@ -1978,6 +1996,9 @@
       <p class="section-text">
       A big part of training a GFlowNet is defining the reward function, since it ultimately determines which outcomes are sampled more often. We highlight this with a real-world use case of GFlowNets: molecule generation. Here, each node in the graph represents a partial molecule, each edge adds a fragment, and the process continues until a complete structure is formed and scored by a reward function. For example, if the goal is to find compounds with low polarity, the reward may down-weight the estimated polarity accordingly. Thanks to flow consistency, the total incoming flow at each intermediate molecule is redistributed among its possible extensions. Higher-reward molecules therefore attract more flow, while other molecules with non-zero reward retain non-zero probability and remain available for sampling. The interactive visualization below lets you adjust the reward with sliders. The reward of each molecule is a weighted sum of its normalized properties, with the weights set by the sliders. The visualization shows the flow and sampling percentages that a perfectly trained GFlowNet would produce for this reward; as the sliders move, these percentages update immediately. Clicking “Maximize Weight” sets the reward to favor heavy molecules; under this setting, the heaviest molecule is sampled about 49% of the time, whereas lighter molecules receive little or no flow.
       </p>
+      {#if isMobile}
+      <DesktopOnly what="The interactive molecule generation DAG (Fig. 10)" />
+      {:else}
       <div class="A_molecule-slider-container">
         <div class="A_molecule-slider">
           Weight: {$A_molecule_prop.mw.toFixed(2)}
@@ -2046,10 +2067,11 @@
                 Maximize Weight</Button>
         </div>
       </div>
-      <svg id="chart" style="width: 1000px; display:block; margin: 20px auto"></svg>
+      <svg id="chart" style="width: 1000px; max-width: 100%; display:block; margin: 20px auto"></svg>
       <p class="mathexpl">
         Fig. 10: Interactive molecule generation DAG. The flows show how a perfectly trained GFlowNet would sample molecules proportionally to the reward defined with the property sliders.
       </p>
+      {/if}
     </section>
 
 
@@ -2145,8 +2167,8 @@
         Using the environment above, we trained a GFlowNet with the trajectory balance loss. Below, you can see the model's progress during training. While it first samples randomly, it learns to sample proportionally to the reward function of our environment. Note that the training runs and observations in this and the following sections are specific to this 2D Gaussian environment and our implementation; they illustrate typical phenomena but are not general properties of GFlowNets. Use the controls below to iterate through the training process. The button on the right lets you load the settings used for this run to the Playground. Hover over a sample to see its trajectory.
         <AnchoredButton text="Training" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=ODll4sREB4v5" />
       </p>
-      <div id="runplot1" style="display: flex; justify-content: center;"></div>
-      <div style="width: 700px; margin: auto; text-align:center;display:flex; margin-top: 10px">
+      <div id="runplot1" class="runplot"></div>
+      <div class="run-controls">
         <div style="width:56px; margin-right:20px">
           <Wrapper rich>
             <Fab
@@ -2173,7 +2195,7 @@
           input$step="128"
 
         ></Textfield>
-        <div style="width: 500px; margin-top:10px">
+        <div class="run-slider">
           <Slider
             bind:value="{run1_value}"
             min={0}
@@ -2183,6 +2205,7 @@
             input$aria-label="Discrete slider"
           />
         </div>
+        {#if !isMobile}
         <Wrapper rich style="margin-top:10px">
           <Fab
             on:click={() =>load_pg_settings(1)} disabled={isRunning}
@@ -2193,6 +2216,7 @@
             Load the settings of this training run for the Playground
           </Tooltip>
         </Wrapper>
+        {/if}
       </div>
       <div class="mathexpl">
         Fig. 19: Example training run on a 2D plane with a reward given by two Gaussians. The model samples from both of the available modes. Hover over points to see the sampling trajectory.
@@ -2203,8 +2227,8 @@
         So far, matching the reward was easy. Let's make it harder: if we lower the variance, the two modes become narrower and the low-reward region between them becomes larger. This makes it harder for our GFlowNet to discover both modes.
         <AnchoredButton text="Mode collapse" href="https://colab.research.google.com/drive/14QtcbcS5mR9L_X5T_dI7jZEM1EPtVLGE#scrollTo=qXiedTZCCBxn" />
       </p>
-      <div id="runplot2" style="display: flex; justify-content: center;"></div>
-      <div style="width: 700px; margin: auto; text-align:center;display:flex; margin-top: 10px">
+      <div id="runplot2" class="runplot"></div>
+      <div class="run-controls">
         <div style="width:56px; margin-right:20px">
           <Wrapper rich>
             <Fab
@@ -2231,7 +2255,7 @@
           input$step="128"
 
         ></Textfield>
-        <div style="width: 500px; margin-top:10px">
+        <div class="run-slider">
           <Slider
             bind:value="{run2_value}"
             min={0}
@@ -2241,6 +2265,7 @@
             input$aria-label="Discrete slider"
           />
         </div>
+        {#if !isMobile}
         <Wrapper rich style="margin-top:10px">
           <Fab
             on:click={() =>load_pg_settings(2)} disabled={isRunning}
@@ -2251,6 +2276,7 @@
             Load the settings of this training run for the Playground
           </Tooltip>
         </Wrapper>
+        {/if}
       </div>
       <div class="mathexpl">
         Fig. 20: Example training run showing mode collapse. The model samples only from one of the available modes and does not improve.
@@ -2312,8 +2338,8 @@
           </Panel>
         </Accordion>
       </div>
-      <div id="runplot3" style="display: flex; justify-content: center;"></div>
-      <div style="width: 700px; margin: auto; text-align:center;display:flex; margin-top: 10px">
+      <div id="runplot3" class="runplot"></div>
+      <div class="run-controls">
         <div style="width:56px; margin-right:20px">
           <Wrapper rich>
             <Fab
@@ -2340,7 +2366,7 @@
           input$step="128"
 
         ></Textfield>
-        <div style="width: 500px; margin-top:10px">
+        <div class="run-slider">
           <Slider
             bind:value="{run3_value}"
             min={0}
@@ -2350,6 +2376,7 @@
             input$aria-label="Discrete slider"
           />
         </div>
+        {#if !isMobile}
         <Wrapper rich style="margin-top:10px">
           <Fab
             on:click={() =>load_pg_settings(3)} disabled={isRunning}
@@ -2360,6 +2387,7 @@
             Load the settings of this training run for the Playground
           </Tooltip>
         </Wrapper>
+        {/if}
       </div>
       <div class="mathexpl">
         Fig. 21: Example training run showing the effect of off-policy training.
@@ -2408,7 +2436,7 @@
       <div class="flow-container">
         <div bind:this={tutorial_flowContainer}></div>
       </div>
-      <div style="width: 750px; margin: auto; display: flex; align-items: flex-start;">
+      <div class="tflow-controls">
         <!-- Left: Select component centered vertically -->
         <div style="margin-right: 20px">
           <Select bind:value="{flow_vis_type}" label="Visualization" disabled="{isRunning}">
@@ -2424,7 +2452,7 @@
             <div style="text-align: left; margin-right: 10px;">
               Step <br> {t_flow_trajectory_step_value}
             </div>
-            <div style="width: 480px; margin-left: auto;">
+            <div class="tflow-slider">
               <Slider
                 bind:value="{t_flow_trajectory_step_value}"
                 min={1}
@@ -2440,7 +2468,7 @@
             <div style="text-align: left; margin-right: 10px;">
               Iteration <br> {t_flow_step_value}
             </div>
-            <div style="width: 480px; margin-left: auto;">
+            <div class="tflow-slider">
               <Slider
                 bind:value="{t_flow_step_value}"
                 min={0}
@@ -2505,6 +2533,9 @@
         If you encounter a mode collapse, try to fix it by adjusting the hyperparameters.
       </p>
     </section>
+    {#if isMobile}
+    <DesktopOnly what="The Playground" detail="Training runs live and the views are laid out for a wide screen." />
+    {:else}
     <div class="pg-background" id="Playground">
       <div class = "pg-top-background">
       </div>
@@ -2623,7 +2654,7 @@
                       left: {132 + 132/3 * g.mean.x}px;
                       top: {132 - 132/3 * g.mean.y}px;
                     "
-                    on:mousedown={(e) => startDragVariance(e, g)}
+                    on:pointerdown={(e) => startDragVariance(e, g)}
                     role="slider"
                     aria-valuenow="{g.variance}"
                     aria-valuemin="0.2"
@@ -2639,7 +2670,7 @@
                       left: {132 + 132/3 * g.mean.x}px;
                       top: {132 - 132/3 * g.mean.y}px;
                     "
-                    on:mousedown={(e) => startDragMean(e, g)}
+                    on:pointerdown={(e) => startDragMean(e, g)}
                     role="slider"
                     aria-valuenow="{g.mean.x}, {g.mean.y}"
                     aria-valuemin="-3"
@@ -3257,6 +3288,7 @@
       -->
 
     </div>
+    {/if}
 
  <section class="section" bind:this={h_applied}>
        <h2 class="section-title">Domain Applications</h2>
@@ -3325,7 +3357,7 @@
 
 
 
-      <div style="position:absolute; width:1000px; left: 50%;transform: translateX(-50%); margin-top:15px">
+      <div class="whatnext-buttons">
         <div class="whatnext_t" >
           <div class="whatnext_b">
             <Fab
@@ -3489,7 +3521,6 @@
         <a href="https://github.com/augustwester/gflownet" style="color: #21918c">[Code]</a>
       </p>
     </section>
-  {/if}
 </main>
 
 
@@ -3517,7 +3548,15 @@
     font-size: 0.8rem;
     color: grey;
     width: 600px;
+    max-width: calc(100% - 32px);
     margin: 5px auto 1rem;
+  }
+
+  @media (max-width: 767px) {
+    span.li {
+      width: auto;
+      margin-left: 20px;
+    }
   }
 
 

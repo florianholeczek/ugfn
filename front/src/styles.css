@@ -219,6 +219,7 @@ input[type="range"] {
     transform: translate(-50%, -50%);
     cursor: grab;
     pointer-events: auto;
+    touch-action: none;
   }
 
   .mean-circle.highlight {
@@ -232,6 +233,7 @@ input[type="range"] {
     transform: translate(-50%, -50%);
     cursor: grab;
     pointer-events: auto;
+    touch-action: none;
   }
 
   .variance-circle.highlight {
@@ -758,3 +760,288 @@ input[type="range"] {
 
 
 
+
+/* ------------------------------------------------------------------
+   Responsive layout
+   Fixed desktop widths stay as they are above; the max-width rules only
+   take effect once the viewport is narrower than the content column.
+   ------------------------------------------------------------------ */
+
+.section-title,
+.section-title3,
+.section-text,
+.annotations-header,
+.section-annotation,
+.whatnext_t,
+.tutorial-flow-controls,
+.A_centerwrap,
+.A_molecule-slider-container,
+.DC-container,
+.image-container,
+.image-container-small,
+.screenshot-container {
+  max-width: calc(100% - 32px);
+  box-sizing: border-box;
+}
+
+.image-container-wide {
+  width: 1000px;
+}
+
+.dag-svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.runplot {
+  display: flex;
+  justify-content: center;
+}
+
+.run-controls {
+  width: 700px;
+  max-width: calc(100% - 32px);
+  margin: 10px auto 0;
+  text-align: center;
+  display: flex;
+}
+
+.run-slider {
+  width: 500px;
+  margin-top: 10px;
+}
+
+.tflow-controls {
+  width: 750px;
+  max-width: calc(100% - 32px);
+  margin: auto;
+  display: flex;
+  align-items: flex-start;
+}
+
+.tflow-slider {
+  width: 480px;
+  margin-left: auto;
+}
+
+.whatnext-buttons {
+  position: absolute;
+  width: 1000px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 15px;
+}
+
+/* Tablets and small laptops: wide demos wrap or scroll inside their own box */
+@media (max-width: 1032px) {
+  .A_centerwrap {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .A_molecule-slider-container {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+
+  .A_molecule-slider {
+    width: auto;
+  }
+
+  .pg-background {
+    overflow-x: auto;
+  }
+
+  .image-container > * {
+    min-width: 0;
+    flex: 1 1 100%;
+  }
+
+  /* Formula tables: keep the label column narrow, scroll wide formulas */
+  .formula-table {
+    width: calc(100% - 32px) !important;
+    display: block;
+    overflow-x: auto;
+    font-size: 14px !important;
+  }
+
+  .formula-table td:first-child {
+    width: 80px !important;
+    padding-right: 8px !important;
+  }
+
+  /* Accordion content may contain long display formulas */
+  .smui-accordion__panel .smui-paper__content {
+    overflow-x: auto;
+  }
+
+  .whatnext-buttons {
+    width: 100%;
+  }
+
+  .DC-container {
+    height: auto;
+    align-items: stretch;
+  }
+
+  .DC-center-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    width: auto;
+    height: auto;
+    flex: 1;
+  }
+
+  .DC-plot {
+    min-height: 400px;
+  }
+
+  .DC-container .DC-side-button {
+    height: auto;
+  }
+
+  .tflow-controls > div {
+    min-width: 0;
+  }
+
+  .tflow-slider {
+    width: auto;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .flow-container {
+    width: 100%;
+    max-width: 750px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+
+  .flow-container > div,
+  .flow-container canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+}
+
+/* Phones */
+@media (max-width: 767px) {
+  .main-content {
+    overflow-x: hidden;
+  }
+
+  .header-top,
+  .header-pg {
+    padding: 2rem 16px;
+  }
+
+  .section {
+    padding: 1.5rem 0;
+  }
+
+  .authors-grid {
+    gap: 6px 16px;
+    padding: 0 16px;
+  }
+
+  .image-container-wide {
+    width: auto;
+  }
+
+
+  .image-container-small img,
+  .tetris-center-image {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Discrete vs. continuous carousel: one column, arrows below */
+  .DC-container {
+    width: auto;
+    height: auto;
+    flex-wrap: wrap;
+    margin: 10px 16px;
+  }
+
+  .DC-center-grid {
+    order: 0;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    width: 100%;
+    flex: 1 1 100%;
+    height: auto;
+  }
+
+  .DC-quadrant {
+    margin: 0;
+  }
+
+  .DC-plot {
+    min-height: 320px;
+  }
+
+  .DC-container .DC-side-button {
+    order: 1;
+    width: calc(50% - 8px);
+    height: 56px;
+    margin: 12px 4px 0;
+  }
+
+  .DC-container .DC-side-button .material-icons {
+    font-size: 36px !important;
+  }
+
+  /* Training-run controls: slider on its own row */
+  .run-controls {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+  }
+
+  .run-slider {
+    order: 3;
+    flex: 1 1 100%;
+    width: auto;
+    margin-top: 0;
+  }
+
+  /* Tutorial flow controls: stacked */
+  .tflow-controls {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .tflow-controls > div {
+    width: 100%;
+    margin-right: 0 !important;
+  }
+
+  .tflow-slider {
+    width: auto;
+    flex: 1;
+  }
+
+  /* What's next */
+  .whatnext_t {
+    padding: 10px 0;
+  }
+
+  .whatnext_b {
+    margin-left: 4px;
+    margin-right: 4px;
+    font-size: 0.85rem;
+  }
+
+  .whatnext-buttons {
+    position: static;
+    transform: none;
+    width: auto;
+    margin: 0 16px;
+  }
+
+  .menu-button {
+    top: 0.5rem;
+    left: 0.5rem;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+  }
+}

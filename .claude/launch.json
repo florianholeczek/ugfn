@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "front-static",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--prefix", "front", "sirv", "front/public", "--port", "5055", "--single", "--dev"],
+      "port": 5055
+    }
+  ]
+}

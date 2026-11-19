@@ -22,6 +22,31 @@ function grid(between = [-3, 3], gridSize = 100) {
     return [xGrid, yGrid, gridPoints];
 }
 
+// Square plot size that fits the plot's container (775px on desktop, smaller on phones).
+function fitPlotSize(element) {
+    const el = typeof element === 'string' ? document.getElementById(element) : element;
+    const parent = el && el.parentElement;
+    const avail = parent ? parent.clientWidth - 32 : 775;
+    return Math.max(280, Math.min(775, avail));
+}
+
+// Size-dependent layout parts; desktop (775px) keeps the original look.
+// On small screens the legend moves below the plot and the mode bar is hidden.
+function sizeLayout(size) {
+    if (size >= 775) return { width: 775, height: 775 };
+    return {
+        width: size,
+        height: size + 70,
+        font: { size: 9 },
+        margin: { l: 36, r: 8, t: 40, b: 100 },
+        legend: { orientation: 'h', x: 0, y: -0.12, xanchor: 'left', yanchor: 'top' },
+    };
+}
+
+function sizeConfig(layout) {
+    return layout.width < 775 ? { displayModeBar: false } : {};
+}
+
 export function plotStates(Plotly, states, losses, density, options = {}) {
     const {
         levels = 10,
@@ -160,8 +185,6 @@ export function plotStates(Plotly, states, losses, density, options = {}) {
             //orientation: 'h'
         },
         autosize: false,
-        width: 775,
-        height: 775,
         grid: { rows: 2, columns: 2, subplots: [['xy', 'x2y2'], ['x3y3', 'x4y4']] },
         xaxis: { domain: [0, 0.75], title: "x", range: [-3, 3] },
         yaxis: { domain: [0, 0.75], title: "y", range: [-3, 3] },
@@ -174,7 +197,8 @@ export function plotStates(Plotly, states, losses, density, options = {}) {
     };
 
     const allplots = [contourTrace, samplesTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot]
-    Plotly.react('trainplot', allplots, layout)
+    Object.assign(layout, sizeLayout(fitPlotSize('trainplot')));
+    Plotly.react('trainplot', allplots, layout, sizeConfig(layout))
 
 }
 
@@ -326,8 +350,6 @@ export function plotStatesHistory(
         title: `Iteration ${iter}/${losses['n_iterations']} `,
         showlegend: true,
         autosize: false,
-        width: 775,
-        height: 775,
         grid: { rows: 2, columns: 2, subplots: [['xy', 'x2y2'], ['x3y3', 'x4y4']] },
         legend: { x: 1, y: 1.2, xanchor: 'right', yanchor: 'top' },
         xaxis: { domain: [0, 0.75], title: "x", range: [-3, 3] },
@@ -341,8 +363,9 @@ export function plotStatesHistory(
         shapes: [{type: 'line', x0: iter, x1: iter, y0: -1, y1: 3, xref: 'x4', yref: 'y4', line: {color: 'black', width: 1, dash: 'solid'}}]
     };
 
+    Object.assign(layout, sizeLayout(fitPlotSize(element)));
     const baseTraces = [contourTrace, samplesTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot];
-    Plotly.react(element, baseTraces, layout);
+    Plotly.react(element, baseTraces, layout, sizeConfig(layout));
 
     const plotDiv = document.getElementById(element);
     plotDiv.removeAllListeners?.('plotly_hover');
@@ -409,7 +432,8 @@ export function plotStatesHistory(
             Plotly.react(
                 element,
                 [contourTrace, fadedSamples, trajPointsTrace, histX, histY, densY, densX, lossplot, logzplot, truelogzplot],
-                layoutWithArrows
+                layoutWithArrows,
+                sizeConfig(layout)
             );
         }, 100);
     });
@@ -418,7 +442,7 @@ export function plotStatesHistory(
     plotDiv.removeAllListeners?.('plotly_unhover');
     plotDiv.on('plotly_unhover', function () {
         clearTimeout(hoverTimeout);
-        Plotly.react(element, baseTraces, layout);
+        Plotly.react(element, baseTraces, layout, sizeConfig(layout));
     });
 }
 

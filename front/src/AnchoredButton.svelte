@@ -56,6 +56,8 @@
   }
 
   onMount(() => {
+    // Narrow screens show the button inline (see CSS), so no position tracking is needed.
+    if (window.matchMedia('(max-width: 1032px)').matches) return;
     measure();
     const unsubscribe = subscribe(measure);
 
@@ -157,5 +159,24 @@
 
   .anchored-btn-text {
     white-space: normal;
+  }
+
+  /* Tablets and phones: no side margin to float in, so the button sits inline in the text. */
+  @media (max-width: 1032px) {
+    .anchored-btn {
+      position: static;
+      display: flex;
+      width: fit-content;
+      margin: 10px 0;
+      padding: 6px 12px;
+      font-size: 13px;
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
+
+    .anchored-btn-logo {
+      height: 2em;
+    }
   }
 </style>
