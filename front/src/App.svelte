@@ -31,6 +31,8 @@
   import Snackbar, { Actions } from '@smui/snackbar';
   import { flow_velocity, flow_n_particles,flow_vectorfield, flow_vectors, flow_changed, A_molecule_prop} from './store.js';
   import AnchoredButton from './AnchoredButton.svelte';
+  import ComparisonRL from './ComparisonRL.svelte';
+  import ComparisonMCMC from './ComparisonMCMC.svelte';
   import DesktopOnly from './DesktopOnly.svelte';
 
 
@@ -1295,15 +1297,19 @@
               GFlowNets aim to learn a distribution over many high-reward outcomes. This property of proportional
               sampling is especially valuable in applications where multiple viable solutions are required, such as
               diverse move sequences in games or candidate molecules in drug discovery. Figure 1 contrasts the
-              behavior of a standard single-path reinforcement learner with that of a GFlowNet. In the traditional
-              RL approach (left), the policy concentrates probability mass along one “best” trajectory. In contrast,
-              the GFlowNet (right) spreads its flow across several promising paths. Each path in the diagram represents
-              an alternative construction strategy.
-              <div id="comparisonChart" style="margin:20px auto; max-width:600px;"></div>
+              behavior of a standard reinforcement learner with that of a GFlowNet. In traditional RL, the policy
+              concentrates probability mass along one “best” trajectory. In contrast, the GFlowNet spreads its flow
+              across several promising paths, each representing an alternative construction strategy.
+              Maximum-entropy RL also spreads probability over many outcomes, but it does so over trajectories rather than final objects:
+              an object that can be constructed in many ways is sampled more often than its reward warrants
+              (<a href="#Bengio21" style="color: black">Bengio et al., 2021</a>).
+              <ComparisonRL />
               <p class="mathexpl" style="color: white">
-                Fig. 1: Difference in path selection between reinforcement learning and GFlowNets.
-                In reinforcement learning, the objective is to maximize the expected reward.
-                GFlowNets, on the other hand, sample proportionally to the reward.
+                Fig. 1: Sampling in the example graph of Fig. 8, with rewards R(x₅)=3, R(x₇)=1, R(x₈)=1 and R(x₉)=5.
+                Edge width shows how much probability passes through an edge; bars compare the resulting sampling probability P(x) to the target R(x)/Z.
+                Reinforcement learning maximizes the expected reward and always follows one path to x₉.
+                The GFlowNet routes its flow so that P(x) = R(x)/Z.
+                Max-entropy RL weights each trajectory by its reward, so x₉ (reachable via three paths) is over-sampled and x₇ (one path) is under-sampled.
               </p>
             </Content>
           </Panel>
@@ -1329,11 +1335,13 @@
               as <a href="#Bengio21" style="color: black">Bengio et al. (2021) </a> have demonstrated.
               Note that distributions are represented rather differently in the two methods.
               MCMC uses a non-parametric representation based on samples, whereas GFlowNets represent the distribution implicitly via the flow along trajectories.
-              <div id="comparisonChartMCMC" style="margin:20px auto; max-width:600px;"></div>
+              <ComparisonMCMC />
               <p class="mathexpl" style="color: white">
-                Fig. 2: Difference in path selection between MCMC and GFlowNets.
-                MCMC builds a chain of samples, where each new sample is proposed from the current one and accepted or rejected based on its reward.
-                GFlowNets use the previous samples to guide future sampling, increasing the chance to cover all high-reward areas.
+                Fig. 2: MCMC and a trained GFlowNet sampling from the example graph of Fig. 8.
+                MCMC moves only between final objects: it proposes a neighboring object (dashed arcs) and accepts or rejects it based on the rewards.
+                Consecutive samples are correlated, visible as runs of the same color, especially since the chain must pass the low-reward x₇ to move between x₅ and x₉.
+                The GFlowNet constructs every sample from s₀ by following its learned flows, so consecutive samples are independent.
+                Both converge to P(x) = R(x)/Z; the cost of training the GFlowNet is not shown.
               </p>
             </Content>
           </Panel>
