@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>GFlowNet Playground</title>
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script src="vendor/katex/katex.min.js"></script>
+<style>
+  @page { size: 594mm 841mm; margin: 0; }
+  :root {
+    --purple: #443983;
+    --teal: #21918c;
+    --ink: #1d1d1f;
+    --muted: #55565c;
+    --tint: #f4f3f9;
+    --line: #d9d6e8;
+    --inflow: #1b9e77;
+    --outflow: #7570b3;
+    --gap: 6mm;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body {
+    width: 594mm; height: 841mm; overflow: hidden;
+    font-family: Verdana, Geneva, sans-serif; color: var(--ink);
+    font-size: 19pt; line-height: 1.36;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .poster {
+    width: 100%; height: 100%; padding: 13mm 15mm 9mm;
+    display: flex; flex-direction: column; gap: var(--gap);
+  }
+  .poster > * { flex: none; }
+  p { margin: 0 0 0.5em; }
+  p:last-child { margin-bottom: 0; }
+  b, strong { color: var(--purple); }
+  img { display: block; max-width: 100%; }
+  figure { margin: 0; }
+
+  /* ---------- header ---------- */
+  header { display: grid; grid-template-columns: 1fr auto; gap: 10mm; align-items: stretch; }
+  .title-block { display: flex; flex-direction: column; justify-content: space-between; }
+  h1 { margin: 0; font-size: 96pt; line-height: 1.0; letter-spacing: -0.025em; color: var(--purple); font-weight: 700; white-space: nowrap; }
+  .subtitle { margin: 2.5mm 0 0; font-size: 33pt; line-height: 1.15; color: var(--teal); }
+  .authors { margin-top: 5mm; font-size: 21pt; line-height: 1.42; }
+  .authors sup { font-size: 0.6em; color: var(--teal); }
+  .affil { font-size: 16pt; color: var(--muted); margin-top: 1mm; }
+  .affil sup { color: var(--teal); }
+  .logos { display: flex; align-items: center; gap: 12mm; margin-top: 5mm; }
+  .logos img { height: 15mm; width: auto; }
+  .logos img.jku { height: 8.5mm; }
+  .qr-card {
+    width: 96mm; background: var(--purple); color: #fff; border-radius: 6mm; padding: 5mm;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3mm; text-align: center;
+  }
+  .qr-card .qr { background: #fff; padding: 4.5mm; border-radius: 3mm; }
+  .qr-card .qr img { width: 68mm; height: 68mm; }
+  .qr-card .cta { font-size: 22pt; font-weight: 700; line-height: 1.15; }
+  .qr-card .url { font-size: 13pt; }
+
+  /* ---------- sections ---------- */
+  section { display: flex; flex-direction: column; gap: 4mm; }
+  h2 {
+    margin: 0; font-size: 34pt; line-height: 1.1; color: var(--purple);
+    padding-bottom: 2mm; border-bottom: 1.1mm solid var(--teal);
+  }
+  h3 { margin: 0 0 2mm; font-size: 23pt; line-height: 1.2; color: var(--teal); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; }
+  .card { background: var(--tint); border-radius: 4mm; padding: 4.5mm 6mm; }
+  .cap { font-size: 14pt; line-height: 1.3; color: var(--muted); margin-top: 1.5mm; }
+  .cap b { color: var(--ink); }
+
+  /* row 1 */
+  .intro { display: grid; grid-template-columns: 1.25fr auto 1fr; gap: 8mm; align-items: center; }
+  .keyprop { background: #fff; border-radius: 3mm; padding: 0 6mm 2mm; text-align: center; border: 0.5mm solid var(--line); }
+  .keyprop .tex { font-size: 25pt; }
+  .keyprop .lbl { margin-top: -2mm; font-size: 13pt; color: var(--muted); }
+  ul.ticks { margin: 0; padding: 0; list-style: none; }
+  ul.ticks li { position: relative; padding-left: 7mm; margin-bottom: 1.4mm; }
+  ul.ticks li:last-child { margin-bottom: 0; }
+  ul.ticks li::before { content: ""; position: absolute; left: 0; top: 0.45em; width: 3.4mm; height: 3.4mm; border-radius: 50%; background: var(--teal); }
+
+  /* learning path */
+  .path { display: grid; grid-template-columns: repeat(8, 1fr); }
+  .step { position: relative; padding: 0 2.5mm; text-align: center; }
+  .step .dot {
+    width: 13mm; height: 13mm; border-radius: 50%; margin: 0 auto 2mm; background: var(--purple); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 21pt; position: relative; z-index: 1;
+  }
+  .step.hl .dot { background: var(--teal); }
+  .step::before { content: ""; position: absolute; top: 6.5mm; left: -50%; width: 100%; height: 1mm; background: var(--line); }
+  .step:first-child::before { display: none; }
+  .step .t { font-weight: 700; font-size: 16pt; line-height: 1.2; }
+  .step .d { font-size: 12.5pt; line-height: 1.27; color: var(--muted); margin-top: 1mm; }
+
+  /* concepts */
+  .tetris { display: grid; grid-template-columns: 62mm 1fr; gap: 6mm; align-items: center; margin-top: 2mm; }
+  .tetris .pair { display: flex; flex-direction: column; gap: 4mm; }
+  .tetris .pair img { height: 40mm; width: auto; margin: 0 auto; }
+  .tetris .cap { text-align: center; }
+  .tetris .dagimg { height: 98mm; width: auto; margin: 0 auto; }
+  .formula { background: #fff; border-radius: 3mm; padding: 1mm 3mm; border: 0.5mm solid var(--line); text-align: center; margin: 2mm 0 3mm; }
+  .formula .tex { font-size: 17pt; }
+  .formula .katex-display { margin: 0.35em 0; }
+  .in { color: var(--inflow); font-weight: 700; }
+  .out { color: var(--outflow); font-weight: 700; }
+  .flowdag { width: 70%; margin: 0 auto; }
+  .cmp { display: grid; grid-template-columns: 92mm 1fr 1fr 1.43fr; gap: 6mm; align-items: start; }
+  .cmp .txt p { font-size: 15.5pt; line-height: 1.33; }
+  .cmp .head { font-weight: 700; font-size: 17pt; margin-bottom: 1mm; }
+  .cmp .head.rl { color: #5b4f9b; }
+  .cmp .head.gfn { color: var(--teal); }
+
+  /* playground */
+  .pg { display: grid; grid-template-columns: 182mm 1fr; gap: 8mm; align-items: start; }
+  .pg .shot { border: 0.5mm solid var(--line); border-radius: 3mm; overflow: hidden; }
+  .runs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; margin-top: 3mm; }
+  .runs img { border: 0.4mm solid var(--line); border-radius: 2mm; }
+  .tag { display: inline-block; font-size: 13pt; font-weight: 700; padding: 0.5mm 2.5mm; border-radius: 1.5mm; color: #fff; margin-bottom: 1.5mm; }
+  .tag.ok { background: var(--teal); } .tag.bad { background: #b0413e; } .tag.fix { background: var(--purple); }
+  .views { margin: 2.5mm 0 0; padding: 0; list-style: none; font-size: 14.5pt; line-height: 1.35; }
+  .views li { margin-bottom: 0.6mm; }
+
+  /* notebook / apps */
+  .nb { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: center; }
+  .nb .qr img { width: 33mm; height: 33mm; }
+  .nb .qr .u { font-size: 11pt; color: var(--muted); text-align: center; margin-top: 1mm; }
+  ol.nbsteps { margin: 1.5mm 0 0; padding-left: 7mm; font-size: 15pt; line-height: 1.32; }
+  .apps { display: grid; grid-template-columns: 1fr 1fr; gap: 1mm 6mm; font-size: 16pt; line-height: 1.3; }
+  .apps div::before { content: "▸ "; color: var(--teal); }
+
+  footer {
+    margin-top: auto; display: grid; grid-template-columns: auto 1fr; gap: 8mm; align-items: center;
+    border-top: 0.6mm solid var(--line); padding-top: 3mm; font-size: 11.5pt; line-height: 1.32; color: var(--muted);
+  }
+  footer .gh { display: flex; align-items: center; gap: 3.5mm; font-size: 14pt; color: var(--ink); }
+  footer .gh img { width: 20mm; height: 20mm; }
+  footer .refs p { margin: 0; }
+</style>
+</head>
+<body>
+<div class="poster" data-check="poster">
+
+  <!-- ===== Header ===== -->
+  <header>
+    <div class="title-block">
+      <div>
+        <h1>GFlowNet Playground</h1>
+        <p class="subtitle">Theory and Examples for an Intuitive Understanding</p>
+        <div class="authors">
+          Florian Holeczek<sup>1</sup>, Alexander Hillisch<sup>1</sup>, Andreas Hinterreiter<sup>1</sup>,
+          Alex Hernández-García<sup>2</sup>, Marc Streit<sup>1</sup>, Christina Humer<sup>3,1</sup>
+        </div>
+        <div class="affil">
+          <sup>1</sup>Johannes Kepler University Linz &nbsp;&nbsp; <sup>2</sup>Université de Montréal, Mila &nbsp;&nbsp; <sup>3</sup>ETH Zürich
+        </div>
+      </div>
+      <div class="logos">
+        <img class="jku" src="assets/jku.svg" alt="Johannes Kepler University Linz">
+        <img src="assets/mila.svg" alt="Mila">
+        <img src="assets/ivia.svg" alt="IVIA Lab, ETH Zürich">
+      </div>
+    </div>
+    <div class="qr-card">
+      <div class="cta">Try it yourself</div>
+      <div class="qr"><img src="assets/qr-playground.svg" alt="QR code to the GFlowNet Playground"></div>
+      <div class="url">gfn-playground.jku-vds-lab.at</div>
+    </div>
+  </header>
+
+  <!-- ===== Row 1: Why / About ===== -->
+  <div class="card intro">
+    <div>
+      <h3>Why GFlowNets?</h3>
+      <p>Drug discovery searches ~10<sup>60</sup> molecules, and a single best guess may fail later.
+        GFlowNets build objects step by step and learn to sample <b>many diverse, high-reward candidates</b>,
+        in proportion to their reward.</p>
+    </div>
+    <div class="keyprop"><div class="tex" data-tex="P(x) = \dfrac{R(x)}{Z}"></div><div class="lbl">sampling ∝ reward</div></div>
+    <div>
+      <h3>What the article offers</h3>
+      <ul class="ticks">
+        <li>Core concepts, foundations and common training pitfalls</li>
+        <li>A <b>Tetris example</b> and an interactive <b>Playground</b></li>
+        <li>An optional <b>notebook</b> implementing every concept</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== Learning path ===== -->
+  <section data-check="path">
+    <h2>Learning Path</h2>
+    <div class="path">
+      <div class="step"><div class="dot">1</div><div class="t">GFlowNets tl;dr</div><div class="d">Core idea; animated comparison to RL and MCMC</div></div>
+      <div class="step"><div class="dot">2</div><div class="t">Fundamentals with Tetris</div><div class="d">States, actions, rewards; play with a trained GFlowNet</div></div>
+      <div class="step"><div class="dot">3</div><div class="t">Flow, policies, objective</div><div class="d">Hover a DAG to see flow, policy and loss</div></div>
+      <div class="step"><div class="dot">4</div><div class="t">Reward functions</div><div class="d">Interactive molecule generation DAG</div></div>
+      <div class="step"><div class="dot">5</div><div class="t">Continuous GFlowNets</div><div class="d">From a grid to a continuous 2D plane</div></div>
+      <div class="step"><div class="dot">6</div><div class="t">Training &amp; flow</div><div class="d">Replay runs: mode collapse, off-policy training</div></div>
+      <div class="step hl"><div class="dot">7</div><div class="t">Playground</div><div class="d">Set reward and hyper&shy;parameters, train, inspect</div></div>
+      <div class="step"><div class="dot">8</div><div class="t">Domain applications</div><div class="d">Where diverse sampling matters</div></div>
+    </div>
+  </section>
+
+  <!-- ===== Row 2: Core concepts ===== -->
+  <section data-check="concepts">
+    <h2>Core Concepts, Illustrated</h2>
+    <div class="grid2">
+      <div class="card">
+        <h3>Building objects step by step: Tetris</h3>
+        <p>A <b>state</b> is the current board, an <b>action</b> places a tetromino (piece, rotation, column),
+          and the <b>reward</b> is the number of filled cells at the end of a trajectory.</p>
+        <div class="tetris">
+          <div class="pair">
+            <figure><img src="assets/tetris-state-v2.svg" alt=""><div class="cap"><b>State</b></div></figure>
+            <figure><img src="assets/tetris-action-v2.svg" alt=""><div class="cap"><b>Action</b></div></figure>
+          </div>
+          <figure><img class="dagimg" src="assets/tetris-dag-v2.svg" alt=""><div class="cap">States and actions form a directed acyclic graph (DAG); a state can be reached from several parents.</div></figure>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Flow through the DAG</h3>
+        <p>Like water through pipes, flow runs from the source <i>s</i><sub>0</sub> to the final objects.
+          Training matches <span class="in">inflow</span> and <span class="out">outflow</span> at every state:</p>
+        <div class="formula"><div class="tex" data-tex="\underbrace{\textcolor{#1b9e77}{\sum_{s' \in \mathrm{parents}(s)} F(s' \to s)}}_{\text{inflow}} = \underbrace{\textcolor{#7570b3}{R(s) + \sum_{s' \in \mathrm{children}(s)} F(s \to s')}}_{\text{outflow}}"></div></div>
+        <img class="flowdag" src="assets/dag.svg" alt="Example DAG with edge flows">
+        <div class="cap">A trained GFlowNet on a small example DAG; numbers are edge flows. The policy follows each edge in
+          proportion to its flow, so final objects <i>x</i> are sampled ∝ <i>R</i>(<i>x</i>).</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="cmp">
+        <div class="txt">
+          <h3>Compared to RL and MCMC</h3>
+          <p><b>RL</b> maximises reward and follows one path to <i>x</i><sub>9</sub>. The <b>GFlowNet</b> spreads flow so that <i>P</i>(<i>x</i>) = <i>R</i>(<i>x</i>)/<i>Z</i>.</p>
+          <p><b>MCMC</b> hops between neighbouring objects, so its samples are correlated; a GFlowNet builds each sample from <i>s</i><sub>0</sub>.</p>
+        </div>
+        <figure><div class="head rl">Reinforcement learning</div><img src="assets/cmp-rl.svg" alt=""></figure>
+        <figure><div class="head gfn">GFlowNet</div><img src="assets/cmp-gfn.svg" alt=""></figure>
+        <figure><div class="head">MCMC vs. GFlowNet</div><img src="assets/cmp-mcmc.svg" alt=""></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Row 3: Playground ===== -->
+  <section data-check="playground">
+    <h2>Learning by Doing: the Playground</h2>
+    <div class="pg">
+      <div>
+        <div class="shot"><img src="assets/playground-env.png" alt="Playground environment view"></div>
+        <ul class="views">
+          <li><b>1. Environment</b> &nbsp;drag Gaussians to shape the reward</li>
+          <li><b>2. Training</b> &nbsp;set hyperparameters, train, watch samples</li>
+          <li><b>3. Flow</b> &nbsp;see the learned flow as a vector field</li>
+        </ul>
+      </div>
+      <div>
+        <p>The reward is a mixture of Gaussians on a 2D plane; the policy outputs a Gaussian over steps.
+          Readers replay real training runs, then fix the failures themselves.</p>
+        <div class="runs">
+          <figure><span class="tag ok">Success</span><img src="assets/run-ok.png" alt="">
+            <div class="cap">Both modes, in proportion to reward</div></figure>
+          <figure><span class="tag bad">Mode collapse</span><img src="assets/run-collapse.png" alt="">
+            <div class="cap">Narrow modes: second one never found</div></figure>
+          <figure><span class="tag fix">Off-policy fix</span><img src="assets/run-offpolicy.png" alt="">
+            <div class="cap">Early exploration recovers both modes</div></figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Row 4: Notebook / Applications ===== -->
+  <div class="grid2">
+    <div class="card">
+      <h3>Accompanying notebook</h3>
+      <div class="nb">
+        <div>
+          <p style="font-size:15pt">Optional Colab notebook following the article’s structure; buttons in the article jump to the matching cells.</p>
+          <ol class="nbsteps">
+            <li>Example environment, flow matching and trajectory balance losses</li>
+            <li>Continuous plane environment and training loop</li>
+            <li>Mode collapse and off-policy training</li>
+          </ol>
+        </div>
+        <div class="qr"><img src="assets/qr-notebook.svg" alt="QR code to the notebook"><div class="u">Colab notebook</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Domain applications</h3>
+      <div class="apps">
+        <div>Molecule generation</div><div>Biological sequence design</div>
+        <div>Recommendation lists</div><div>Phylogenetic inference</div>
+        <div>Crystal structures</div><div>Combinatorial optimisation</div>
+        <div>Games (AFlowNets)</div><div>LLM red-teaming</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="gh"><img src="assets/qr-github.svg" alt="QR code to GitHub"><div>Code<br><span style="font-size:12pt;color:var(--muted)">github.com/florianholeczek/ugfn</span></div></div>
+    <div class="refs">
+      <p>Bengio, E., Jain, M., Korablyov, M., Precup, D., Bengio, Y. (2021). Flow network based generative models for non-iterative diverse candidate generation. <i>NeurIPS 34</i>.</p>
+      <p>Bengio, Y., Lahlou, S., Deleu, T., Hu, E. J., Tiwari, M., Bengio, E. (2023). GFlowNet Foundations. <i>JMLR 24</i>(210).</p>
+      <p>Malkin, N., Jain, M., Bengio, E., Sun, C., Bengio, Y. (2022). Trajectory balance: Improved credit assignment in GFlowNets. <i>NeurIPS 35</i>.</p>
+      <p>Lahlou, S., Deleu, T., Lemos, P., Zhang, D., Volokhova, A., Hernández-García, A., et al. (2023). A theory of continuous generative flow networks. <i>ICML</i>.</p>
+    </div>
+  </footer>
+</div>
+<script>
+  document.querySelectorAll('[data-tex]').forEach(el =>
+    katex.render(el.dataset.tex, el, { displayMode: true, throwOnError: false, trust: true, strict: false }));
+</script>
+</body>
+</html>
