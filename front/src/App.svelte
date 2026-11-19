@@ -1262,6 +1262,15 @@
     </section>
 
 
+    {#if isMobile}
+    <DesktopOnly>
+      <strong>You are viewing the mobile version.</strong>
+      The article and most figures work on phones, but the interactive Tetris game, the molecule generation DAG,
+      and the Playground need a larger screen and more computing power. They are only available on desktop;
+      open this page on a computer for the full experience.
+    </DesktopOnly>
+    {/if}
+
     <section class="section" id="Tutorial" bind:this={h_intro}>
       <h2 class="section-title">GFlowNets - tl;dr</h2>
       <p class="section-text">

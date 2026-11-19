@@ -8,10 +8,14 @@
 <div class="desktop-only" role="note">
   <span class="material-icons desktop-only-icon" aria-hidden="true">desktop_windows</span>
   <div>
-    <strong>{what} is only available on desktop.</strong>
-    It needs a larger screen and more computing power than most phones offer.
-    {#if detail}{detail}{/if}
-    Open this page on a computer to try it.
+    {#if $$slots.default}
+      <slot />
+    {:else}
+      <strong>{what} is only available on desktop.</strong>
+      It needs a larger screen and more computing power than most phones offer.
+      {#if detail}{detail}{/if}
+      Open this page on a computer to try it.
+    {/if}
   </div>
 </div>
 
