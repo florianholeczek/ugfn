@@ -1240,7 +1240,7 @@
         <div class="cell2">Johannes Kepler University Linz</div>
         <div class="cell1">Andreas Hinterreiter</div>
         <div class="cell2">Johannes Kepler University Linz</div>
-        <div class="cell1">Alex Hernandez-Garcia</div>
+        <div class="cell1">Alex Hernández-García</div>
         <div class="cell2">Université de Montréal, Mila</div>
         <div class="cell1">Marc Streit</div>
         <div class="cell2">Johannes Kepler University Linz</div>
