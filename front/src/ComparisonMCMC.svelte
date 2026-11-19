@@ -3,7 +3,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { nodes, edges } from './DAG.js';
 
-  let svg, card;
+  let svg, overlay, card;
   let running = true, speed = 1;
   let api = null;
 
@@ -52,7 +52,6 @@
         el('text', { x: n.x, y: n.y + 6, 'text-anchor': 'middle', 'font-size': 17, fill: 'white' }, gg).textContent = n.id;
         if (n.final) el('text', { x: n.x + 26, y: n.y + 34, 'font-size': 18, fill: '#666' }, gg).textContent = `R=${R[n.id]}`;
       }
-      p.particles = el('g', {}, g);
     }
     drawDag(P.mcmc, true); drawDag(P.gfn, false);
 
@@ -111,7 +110,8 @@
     function reset() {
       st = { mc: { x: 'x9', seq: [], counts: {}, n: 0, runs: 0, acc: 0 }, gf: { seq: [], counts: {}, n: 0, runs: 0 } };
       for (const s of [st.mc, st.gf]) terminals.forEach(t => s.counts[t] = 0);
-      P.gfn.particles.replaceChildren();
+      for (const d of live) d.remove();
+      live.clear();
       draw();
     }
     function record(s, x) {
@@ -130,25 +130,34 @@
       animate(gfnTraj(), Math.min(1300, 3 * T));
       draw();
     }
+    // Particles: HTML dots on an overlay, moved with Web Animations on `transform` only, so the browser
+    // runs them on the compositor without main-thread work, layout or SVG repaint per frame.
+    const live = new Set();
     function animate(path, dur) {
-      const p = P.gfn, segs = path.slice(1).map((s, j) => p.edge[path[j] + '>' + s]);
-      const lens = segs.map(s => s.getTotalLength()), total = lens.reduce((a, b) => a + b);
-      const dot = el('circle', { r: 7, fill: '#222', opacity: .75 }, p.particles), t0 = performance.now();
-      (function step(now) {
-        if (!dot.isConnected || destroyed) return;
-        const f = (now - t0) / dur;
-        if (f >= 1) { dot.remove(); record(st.gf, path.at(-1)); draw(); return; }
-        let d = f * total, k = 0; while (k < lens.length - 1 && d > lens[k]) d -= lens[k++];
-        const pt = segs[k].getPointAtLength(d); dot.setAttribute('cx', pt.x); dot.setAttribute('cy', pt.y);
-        requestAnimationFrame(step);
-      })(t0);
+      const k = overlay.clientWidth / 1000;                       // px per viewBox unit
+      const pts = path.map(id => [(P.gfn.x0 + SC * N[id].x) * k, (DY + SC * N[id].y) * k]);
+      const lens = pts.slice(1).map((b, i) => Math.hypot(b[0] - pts[i][0], b[1] - pts[i][1]));
+      const total = lens.reduce((a, b) => a + b);
+      let acc = 0;
+      const frames = pts.map(([x, y], i) => {
+        if (i) acc += lens[i - 1];
+        return { transform: `translate(${x}px, ${y}px)`, offset: acc / total };
+      });
+      const dot = document.createElement('div');
+      dot.className = 'cmp-dot';
+      overlay.appendChild(dot);
+      const anim = dot.animate(frames, { duration: dur, easing: 'linear', fill: 'forwards' });
+      live.add(dot);
+      anim.onfinish = () => { if (!live.delete(dot)) return; dot.remove(); record(st.gf, path.at(-1)); draw(); };
     }
+    // Sequence strips: fixed set of rects, only their fill changes
+    for (const k in P) P[k].cells = Array.from({ length: SN }, (_, i) =>
+      el('rect', { x: P[k].x0 + i * SW, y: SY, width: SW - 2, height: 22, rx: 2, fill: 'none' }, P[k].strip));
     function draw() {
       const X = N[st.mc.x]; ring.setAttribute('x', X.x - 28); ring.setAttribute('y', X.y - 28);
       for (const [k, s] of [['mcmc', st.mc], ['gfn', st.gf]]) {
-        const p = P[k];
-        p.strip.replaceChildren();
-        s.seq.forEach((x, i) => el('rect', { x: p.x0 + (SN - s.seq.length + i) * SW, y: SY, width: SW - 2, height: 22, rx: 2, fill: COL[x] }, p.strip));
+        const p = P[k], off = SN - s.seq.length;
+        p.cells.forEach((c, i) => c.setAttribute('fill', i < off ? 'none' : COL[s.seq[i - off]]));
         for (const t of terminals) {
           const f = s.n ? s.counts[t] / s.n : 0;
           p.bars[t].fill.setAttribute('width', f * BW); p.bars[t].pct.textContent = (f * 100).toFixed(0) + '%';
@@ -171,7 +180,10 @@
 </script>
 
 <div class="cmp-card" bind:this={card}>
-  <svg bind:this={svg} viewBox="0 0 1000 440" role="img" aria-label="MCMC chain over terminal objects vs. GFlowNet constructing samples in the example DAG"></svg>
+  <div class="cmp-stack">
+    <svg bind:this={svg} viewBox="0 0 1000 440" role="img" aria-label="MCMC chain over terminal objects vs. GFlowNet constructing samples in the example DAG"></svg>
+    <div bind:this={overlay} class="cmp-overlay" aria-hidden="true"></div>
+  </div>
   <div class="cmp-controls">
     <button on:click={togglePlay}>{running ? 'Pause' : 'Play'}</button>
     <span>speed</span>
@@ -188,6 +200,12 @@
     margin: 20px auto 8px; font-family: system-ui, sans-serif; box-sizing: border-box; width: 100%;
   }
   svg { width: 100%; height: auto; display: block; }
+  .cmp-stack { position: relative; }
+  .cmp-overlay { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .cmp-overlay :global(.cmp-dot) {
+    position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(34, 34, 34, .75); will-change: transform;
+  }
   .cmp-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13px; color: #888; margin-top: 4px; }
   .cmp-controls button { font: inherit; font-size: 13px; padding: 4px 10px; border-radius: 6px; border: 1px solid #bbb; background: #fafafa; color: #222; cursor: pointer; }
   .cmp-controls button.on { background: #222; color: #fff; border-color: #222; }
