@@ -1288,7 +1288,7 @@
         A more in-depth comparison between GFlowNets and related work can be found in <a href="#Bengio23" style="color: black">Bengio et al. (2023)</a>.
       </p>
 
-      <div class="image-container">
+      <div class="image-container image-container-wide">
         <Accordion multiple>
           <Panel color="secondary">
             <Header>Comparison to Reinforcement Learning</Header>
@@ -1305,11 +1305,11 @@
               (<a href="#Bengio21" style="color: black">Bengio et al., 2021</a>).
               <ComparisonRL />
               <p class="mathexpl" style="color: white">
-                Fig. 1: Sampling in the example graph of Fig. 8, with rewards R(x₅)=3, R(x₇)=1, R(x₈)=1 and R(x₉)=5.
-                Edge width shows how much probability passes through an edge; bars compare the resulting sampling probability P(x) to the target R(x)/Z.
-                Reinforcement learning maximizes the expected reward and always follows one path to x₉.
-                The GFlowNet routes its flow so that P(x) = R(x)/Z.
-                Max-entropy RL weights each trajectory by its reward, so x₉ (reachable via three paths) is over-sampled and x₇ (one path) is under-sampled.
+                Fig. 1: Sampling in the example graph of Fig. 8, with rewards <Katex>R(x_5)=3</Katex>, <Katex>R(x_7)=1</Katex>, <Katex>R(x_8)=1</Katex> and <Katex>R(x_9)=5</Katex>.
+                Edge width shows how much probability passes through an edge; bars compare the resulting sampling probability <Katex>P(x)</Katex> to the target <Katex>R(x)/Z</Katex>.
+                Reinforcement learning maximizes the expected reward and always follows one path to <Katex>x_9</Katex>.
+                The GFlowNet samples proportionally to reward.
+                Max-entropy RL weights each trajectory by its reward, so <Katex>x_9</Katex> (reachable via three paths) is over-sampled and <Katex>x_7</Katex> (one path) is under-sampled.
               </p>
             </Content>
           </Panel>
@@ -1339,9 +1339,9 @@
               <p class="mathexpl" style="color: white">
                 Fig. 2: MCMC and a trained GFlowNet sampling from the example graph of Fig. 8.
                 MCMC moves only between final objects: it proposes a neighboring object (dashed arcs) and accepts or rejects it based on the rewards.
-                Consecutive samples are correlated, visible as runs of the same color, especially since the chain must pass the low-reward x₇ to move between x₅ and x₉.
-                The GFlowNet constructs every sample from s₀ by following its learned flows, so consecutive samples are independent.
-                Both converge to P(x) = R(x)/Z; the cost of training the GFlowNet is not shown.
+                Consecutive samples are correlated, visible as runs of the same color, especially since the chain must pass the low-reward <Katex>x_7</Katex> to move between <Katex>x_5</Katex> and <Katex>x_9</Katex>.
+                The GFlowNet constructs every sample from <Katex>s_0</Katex> by following its learned flows, so consecutive samples are independent.
+                Both converge to <Katex>P(x) = R(x)/Z</Katex>; the cost of training the GFlowNet is not shown.
               </p>
             </Content>
           </Panel>
