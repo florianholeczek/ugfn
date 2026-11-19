@@ -785,7 +785,7 @@
     selectedGaussian = null;
   };
   function plotEnv(){
-    if (!isMobile && view === "1. Environment"){
+    if (view === "1. Environment"){
       plotEnvironment(Plotly, plotContainerEnv2d, $gaussians, {title: null});
       plotEnvironment(Plotly, plotContainerEnv3d, $gaussians, {title: null});
     }
@@ -1265,8 +1265,8 @@
     {#if isMobile}
     <DesktopOnly>
       <strong>You are viewing the mobile version.</strong>
-      The article and most figures work on phones, but the interactive Tetris game, the molecule generation DAG,
-      and the Playground need a larger screen and more computing power. They are only available on desktop;
+      The article, most figures, and the Playground work on phones, but the interactive Tetris game and
+      the molecule generation DAG need a larger screen and more computing power. They are only available on desktop;
       open this page on a computer for the full experience.
     </DesktopOnly>
     {/if}
@@ -2214,7 +2214,6 @@
             input$aria-label="Discrete slider"
           />
         </div>
-        {#if !isMobile}
         <Wrapper rich style="margin-top:10px">
           <Fab
             on:click={() =>load_pg_settings(1)} disabled={isRunning}
@@ -2225,7 +2224,6 @@
             Load the settings of this training run for the Playground
           </Tooltip>
         </Wrapper>
-        {/if}
       </div>
       <div class="mathexpl">
         Fig. 19: Example training run on a 2D plane with a reward given by two Gaussians. The model samples from both of the available modes. Hover over points to see the sampling trajectory.
@@ -2274,7 +2272,6 @@
             input$aria-label="Discrete slider"
           />
         </div>
-        {#if !isMobile}
         <Wrapper rich style="margin-top:10px">
           <Fab
             on:click={() =>load_pg_settings(2)} disabled={isRunning}
@@ -2285,7 +2282,6 @@
             Load the settings of this training run for the Playground
           </Tooltip>
         </Wrapper>
-        {/if}
       </div>
       <div class="mathexpl">
         Fig. 20: Example training run showing mode collapse. The model samples only from one of the available modes and does not improve.
@@ -2385,7 +2381,6 @@
             input$aria-label="Discrete slider"
           />
         </div>
-        {#if !isMobile}
         <Wrapper rich style="margin-top:10px">
           <Fab
             on:click={() =>load_pg_settings(3)} disabled={isRunning}
@@ -2396,7 +2391,6 @@
             Load the settings of this training run for the Playground
           </Tooltip>
         </Wrapper>
-        {/if}
       </div>
       <div class="mathexpl">
         Fig. 21: Example training run showing the effect of off-policy training.
@@ -2542,9 +2536,6 @@
         If you encounter a mode collapse, try to fix it by adjusting the hyperparameters.
       </p>
     </section>
-    {#if isMobile}
-    <DesktopOnly what="The Playground" detail="Training runs live and the views are laid out for a wide screen." />
-    {:else}
     <div class="pg-background" id="Playground">
       <div class = "pg-top-background">
       </div>
@@ -2600,8 +2591,8 @@
 
 
               </div>
-              <div style="color: #848484; font-size: 12px; margin-left: 50px;">
-                Adjust the reward function by dragging the grey circles in the left plot or by setting the parameters directly in the table.
+              <div class="pg-help">
+                Adjust the reward function by dragging the grey circles in the 2D plot or by setting the parameters directly in the table.
                 You can find more information by clicking on the info symbols next to the elements.
                 If you are done, continue to the "Training" tab.
               </div>
@@ -2616,7 +2607,7 @@
                 </Select>
               </div>
             </div>
-            <div style="top: 130px; left: 250px; position: absolute;">
+            <div class="pg-info pg-info-ngauss">
               <Wrapper rich>
                 <IconButton size="button">
                   <Icon class="material-icons">info</Icon>
@@ -2631,10 +2622,10 @@
               </Wrapper>
             </div>
 
-            <div style="top: 230px; left: 30px; position: absolute;">
+            <div class="pg-label pg-label-adjust">
               Adjust the parameters
             </div>
-            <div style="top: 220px; left: 250px; position: absolute;">
+            <div class="pg-info pg-info-adjust">
               <Wrapper rich>
                 <IconButton size="button">
                   <Icon class="material-icons">info</Icon>
@@ -2690,10 +2681,10 @@
               </div>
             </div>
 
-            <div style="top: 610px; left: 30px; position: absolute;">
+            <div class="pg-label pg-label-params">
               Parameters
             </div>
-            <div style="top: 600px; left: 250px; position: absolute;">
+            <div class="pg-info pg-info-params">
               <Wrapper rich>
                 <IconButton size="button">
                   <Icon class="material-icons">info</Icon>
@@ -2819,15 +2810,15 @@
                 </Wrapper>
               </div>
               {#if !display_trainhistory && !isRunning}
-                <div style="color: #848484; font-size: 12px; margin-left: 50px;">
+                <div class="pg-help">
                   Adjust the hyperparameters and press "Play" to start training the model.
                 </div>
               {:else if isRunning}
-                <div style="color: #848484; font-size: 12px; margin-left: 50px;">
+                <div class="pg-help">
                   Status: {training_status}
                 </div>
               {:else}
-                <div style="color: #848484; font-size: 12px; margin-left: 50px;">
+                <div class="pg-help">
                   Hover over a sample to see its trajectory.
                   By adjusting the "Iteration" slider you can see the training progress.
                   You can start another training run by clicking "Play" or view the flows of this run by continuing to the "Flow" tab.
@@ -3074,7 +3065,7 @@
               </div>
             </div>
             {#if !display_trainhistory && !isRunning}
-              <div class="pg-vis" style="text-align:center; padding:100px; color: #323232;">
+              <div class="pg-vis pg-placeholder">
                 Press Play to start training a GFlowNet
               </div>
             {:else if display_trainhistory && isRunning}
@@ -3151,7 +3142,7 @@
                   <Icon class="material-icons" style="font-size: 50px">keyboard_double_arrow_right</Icon>
                 </Fab>
               </div>
-              <div style="color: #848484; font-size: 12px; margin-left: 50px;">
+              <div class="pg-help">
                 Adjust the "Iteration" slider to see the flows during different training iterations.
                 Adjust the "Step" slider to see the flow for different steps of the agent.
                 You can find information about how to interpret this visualization in the "Flow" section above.
@@ -3249,7 +3240,7 @@
               </div>
 
               <div class="pg-vis">
-                <div bind:this={flowContainer}></div>
+                <div class="pg-flowvis" bind:this={flowContainer}></div>
               </div>
               <div class="pg-iter">
                 <Textfield
@@ -3273,7 +3264,7 @@
                 />
               </div>
             {:else}
-              <div class="pg-vis" style="text-align:center; padding:100px; color: #323232;">
+              <div class="pg-vis pg-placeholder">
                 Train a model first to visualize its Flow
               </div>
             {/if}
@@ -3297,7 +3288,6 @@
       -->
 
     </div>
-    {/if}
 
  <section class="section" bind:this={h_applied}>
        <h2 class="section-title">Domain Applications</h2>

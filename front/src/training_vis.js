@@ -26,7 +26,9 @@ function grid(between = [-3, 3], gridSize = 100) {
 function fitPlotSize(element) {
     const el = typeof element === 'string' ? document.getElementById(element) : element;
     const parent = el && el.parentElement;
-    const avail = parent ? parent.clientWidth - 32 : 775;
+    // Article plots keep a 16px gutter; the Playground container already has one.
+    const gutter = parent && parent.classList.contains('pg-container') ? 0 : 32;
+    const avail = parent ? parent.clientWidth - gutter : 775;
     return Math.max(280, Math.min(775, avail));
 }
 

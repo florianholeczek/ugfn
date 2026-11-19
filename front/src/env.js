@@ -82,9 +82,12 @@ export function plotEnvironment(Plotly, containerId, gaussians, options = {}) {
     margin: { t: 10, b: 25, l: 25, r: 10 },
   };
 
+  // 600px on desktop; fits the container on narrow screens.
+  const container3d = typeof document !== 'undefined' ? document.getElementById(containerId) : null;
+  const size3d = Math.max(260, Math.min(600, (container3d && container3d.clientWidth) || 600));
   const layout_3d = {
-    width: 600,
-    height: 600,
+    width: size3d,
+    height: size3d,
     showlegend: false,
     title: options.title || null,
     scene: {

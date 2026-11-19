@@ -449,6 +449,22 @@ input[type="range"] {
     height:775px;
   }
 
+  .pg-help {
+    color: #848484;
+    font-size: 12px;
+    margin-left: 50px;
+  }
+  .pg-info-ngauss { position: absolute; top: 130px; left: 250px; }
+  .pg-label-adjust { position: absolute; top: 230px; left: 30px; }
+  .pg-info-adjust { position: absolute; top: 220px; left: 250px; }
+  .pg-label-params { position: absolute; top: 610px; left: 30px; }
+  .pg-info-params { position: absolute; top: 600px; left: 250px; }
+  .pg-placeholder {
+    text-align: center;
+    padding: 100px;
+    color: #323232;
+  }
+
   .whatnext_t {
     width: 1000px;
     display: flex;
@@ -847,9 +863,6 @@ input[type="range"] {
     width: auto;
   }
 
-  .pg-background {
-    overflow-x: auto;
-  }
 
   .image-container > * {
     min-width: 0;
@@ -1043,5 +1056,168 @@ input[type="range"] {
     left: 0.5rem;
     background: rgba(255, 255, 255, 0.85);
     border-radius: 50%;
+  }
+}
+
+/* Playground on tablets and phones: the absolutely positioned desktop
+   layout becomes a single stacked column. */
+@media (max-width: 1032px) {
+  .pg-background,
+  .pg-views,
+  .pg-container {
+    width: auto;
+    height: auto;
+  }
+
+  .pg-background {
+    padding-bottom: 24px;
+  }
+
+  .pg-top-background {
+    display: none;
+  }
+
+  .pg-views {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+
+  .pg-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: 8px;
+    padding-top: 12px;
+  }
+
+  .pg-container > * {
+    position: static;
+    top: auto;
+    left: auto;
+  }
+
+  .pg-top {
+    flex: 1 1 100%;
+    width: auto;
+    height: auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px;
+    background-color: #F9F5FCFF;
+    border-radius: 8px;
+    box-sizing: border-box;
+  }
+
+  .pg-play {
+    margin-left: 0;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .pg-help {
+    margin-left: 0;
+  }
+
+  /* Environment view: [select][info] / [label][info] / 2D plot / [label][info] / table / 3D plot */
+  /* Each control or label shares a row only with its info button */
+  .pg-ngaussians {
+    width: auto;
+    height: auto;
+    flex: 0 0 calc(100% - 56px);
+  }
+
+  .pg-info {
+    flex: 0 0 46px;
+  }
+
+  .pg-label {
+    flex: 0 0 calc(100% - 56px);
+    margin-top: 12px;
+  }
+
+  .pg-container > .pg-2dplot {
+    position: relative;
+    flex: 0 0 300px;
+    height: 300px;
+    margin: 0 calc(50% - 150px);
+  }
+
+  .pg-gauss-table {
+    flex: 0 0 100%;
+    width: 100%;
+    height: auto;
+  }
+
+  .pg-3dplot {
+    flex: 0 0 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Training and Flow views */
+  .pg-side {
+    flex: 0 0 100%;
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  .pg-vis {
+    flex: 0 0 100%;
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .pg-placeholder {
+    padding: 40px 16px;
+    box-sizing: border-box;
+  }
+
+  .pg-iter {
+    flex: 0 0 90px;
+    width: 90px;
+    height: auto;
+  }
+
+  .pg-bottom-slider,
+  .pg-progress {
+    flex: 1 1 0;
+    width: auto;
+    height: auto;
+    margin-top: 0;
+    padding: 0 0 0 12px;
+  }
+
+  .pg-flowvis {
+    width: 100%;
+    max-width: 775px;
+  }
+
+  .pg-flowvis canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Fit the three Playground tabs without horizontal scrolling */
+  .pg-views .mdc-tab {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0 4px;
+  }
+
+  .pg-views .mdc-tab__text-label {
+    font-size: 12px;
+    letter-spacing: 0;
+    white-space: normal;
+    text-align: center;
   }
 }

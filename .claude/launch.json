@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["--prefix", "front", "sirv", "front/public", "--port", "5055", "--single", "--dev"],
       "port": 5055
+    },
+    {
+      "name": "backend",
+      "runtimeExecutable": ".venv/Scripts/python.exe",
+      "runtimeArgs": ["-m", "uvicorn", "back:app", "--port", "8000"],
+      "port": 8000
     }
   ]
 }
