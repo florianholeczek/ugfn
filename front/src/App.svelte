@@ -1299,10 +1299,9 @@
               diverse move sequences in games or candidate molecules in drug discovery. Figure 1 contrasts the
               behavior of a standard reinforcement learner with that of a GFlowNet. In traditional RL, the policy
               concentrates probability mass along one “best” trajectory. In contrast, the GFlowNet spreads its flow
-              across several promising paths, each representing an alternative construction strategy.
-              Maximum-entropy RL also spreads probability over many outcomes, but it does so over trajectories rather than final objects:
-              an object that can be constructed in many ways is sampled more often than its reward warrants
-              (<a href="#Bengio21" style="color: black">Bengio et al., 2021</a>).
+              across several promising paths, each representing an alternative construction strategy (<a href="#Bengio21" style="color: black">Bengio et al., 2021</a>).
+              Maximum-entropy RL tries to encourage exploration: It also spreads probability over many outcomes, but it does so over trajectories rather than final objects:
+              an object that can be constructed in many ways is sampled more often than its reward warrants.
               <ComparisonRL />
               <p class="mathexpl" style="color: white">
                 Fig. 1: Sampling in the example graph of Fig. 8, with rewards <Katex>R(x_5)=3</Katex>, <Katex>R(x_7)=1</Katex>, <Katex>R(x_8)=1</Katex> and <Katex>R(x_9)=5</Katex>.
