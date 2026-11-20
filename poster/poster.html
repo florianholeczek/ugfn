@@ -16,7 +16,7 @@
     --line: #d9d6e8;
     --inflow: #1b9e77;
     --outflow: #7570b3;
-    --gap: 6mm;
+    --gap: 5mm;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: #fff; }
@@ -48,13 +48,13 @@
   .affil sup { color: var(--teal); }
   .logos { display: flex; align-items: center; gap: 12mm; margin-top: 5mm; }
   .logos img { height: 15mm; width: auto; }
-  .logos img.jku { height: 8.5mm; }
+  .logos img.vds { height: 17mm; }
   .qr-card {
-    width: 96mm; background: var(--purple); color: #fff; border-radius: 6mm; padding: 5mm;
+    width: 88mm; background: var(--purple); color: #fff; border-radius: 6mm; padding: 5mm;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3mm; text-align: center;
   }
   .qr-card .qr { background: #fff; padding: 4.5mm; border-radius: 3mm; }
-  .qr-card .qr img { width: 68mm; height: 68mm; }
+  .qr-card .qr img { width: 62mm; height: 62mm; }
   .qr-card .cta { font-size: 22pt; font-weight: 700; line-height: 1.15; }
   .qr-card .url { font-size: 13pt; }
 
@@ -62,7 +62,7 @@
   section { display: flex; flex-direction: column; gap: 4mm; }
   h2 {
     margin: 0; font-size: 34pt; line-height: 1.1; color: var(--purple);
-    padding-bottom: 2mm; border-bottom: 1.1mm solid var(--teal);
+    padding-bottom: 2mm; border-bottom: 1.1mm solid var(--purple);
   }
   h3 { margin: 0 0 2mm; font-size: 23pt; line-height: 1.2; color: var(--teal); }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; }
@@ -74,7 +74,7 @@
   .intro { display: grid; grid-template-columns: 1.25fr auto 1fr; gap: 8mm; align-items: center; }
   .keyprop { background: #fff; border-radius: 3mm; padding: 0 6mm 2mm; text-align: center; border: 0.5mm solid var(--line); }
   .keyprop .tex { font-size: 25pt; }
-  .keyprop .lbl { margin-top: -2mm; font-size: 13pt; color: var(--muted); }
+  .keyprop .lbl { margin-top: -2mm; font-size: 13pt; line-height: 1.3; color: var(--muted); }
   ul.ticks { margin: 0; padding: 0; list-style: none; }
   ul.ticks li { position: relative; padding-left: 7mm; margin-bottom: 1.4mm; }
   ul.ticks li:last-child { margin-bottom: 0; }
@@ -96,15 +96,15 @@
   /* concepts */
   .tetris { display: grid; grid-template-columns: 62mm 1fr; gap: 6mm; align-items: center; margin-top: 2mm; }
   .tetris .pair { display: flex; flex-direction: column; gap: 4mm; }
-  .tetris .pair img { height: 40mm; width: auto; margin: 0 auto; }
+  .tetris .pair img { height: 36mm; width: auto; margin: 0 auto; }
   .tetris .cap { text-align: center; }
-  .tetris .dagimg { height: 98mm; width: auto; margin: 0 auto; }
+  .tetris .dagimg { height: 90mm; width: auto; margin: 0 auto; }
   .formula { background: #fff; border-radius: 3mm; padding: 1mm 3mm; border: 0.5mm solid var(--line); text-align: center; margin: 2mm 0 3mm; }
   .formula .tex { font-size: 17pt; }
   .formula .katex-display { margin: 0.35em 0; }
   .in { color: var(--inflow); font-weight: 700; }
   .out { color: var(--outflow); font-weight: 700; }
-  .flowdag { width: 70%; margin: 0 auto; }
+  .flowdag { width: 64%; margin: 0 auto; }
   .cmp { display: grid; grid-template-columns: 92mm 1fr 1fr 1.43fr; gap: 6mm; align-items: start; }
   .cmp .txt p { font-size: 15.5pt; line-height: 1.33; }
   .cmp .head { font-weight: 700; font-size: 17pt; margin-bottom: 1mm; }
@@ -112,14 +112,9 @@
   .cmp .head.gfn { color: var(--teal); }
 
   /* playground */
-  .pg { display: grid; grid-template-columns: 182mm 1fr; gap: 8mm; align-items: start; }
-  .pg .shot { border: 0.5mm solid var(--line); border-radius: 3mm; overflow: hidden; }
-  .runs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; margin-top: 3mm; }
-  .runs img { border: 0.4mm solid var(--line); border-radius: 2mm; }
-  .tag { display: inline-block; font-size: 13pt; font-weight: 700; padding: 0.5mm 2.5mm; border-radius: 1.5mm; color: #fff; margin-bottom: 1.5mm; }
-  .tag.ok { background: var(--teal); } .tag.bad { background: #b0413e; } .tag.fix { background: var(--purple); }
-  .views { margin: 2.5mm 0 0; padding: 0; list-style: none; font-size: 14.5pt; line-height: 1.35; }
-  .views li { margin-bottom: 0.6mm; }
+  .pgviews { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm; }
+  .pgviews .shot { border: 0.5mm solid var(--line); border-radius: 3mm; overflow: hidden; }
+  .tag { display: inline-block; font-size: 15pt; font-weight: 700; padding: 0.6mm 3mm; border-radius: 1.5mm; color: #fff; background: var(--purple); margin-bottom: 1.5mm; }
 
   /* notebook / apps */
   .nb { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: center; }
@@ -156,7 +151,7 @@
         </div>
       </div>
       <div class="logos">
-        <img class="jku" src="assets/jku.svg" alt="Johannes Kepler University Linz">
+        <img class="vds" src="assets/vds.svg" alt="JKU Visual Data Science Lab">
         <img src="assets/mila.svg" alt="Mila">
         <img src="assets/ivia.svg" alt="IVIA Lab, ETH Zürich">
       </div>
@@ -172,17 +167,16 @@
   <div class="card intro">
     <div>
       <h3>Why GFlowNets?</h3>
-      <p>Drug discovery searches ~10<sup>60</sup> molecules, and a single best guess may fail later.
-        GFlowNets build objects step by step and learn to sample <b>many diverse, high-reward candidates</b>,
-        in proportion to their reward.</p>
+      <p>Drug discovery searches ~10<sup>60</sup> molecules, and similar ones might fail later for similar reasons.
+        GFlowNets learn to sample <b>in proportion to the reward</b>, resulting in <b>many diverse, high-reward candidates</b>.</p>
     </div>
-    <div class="keyprop"><div class="tex" data-tex="P(x) = \dfrac{R(x)}{Z}"></div><div class="lbl">sampling ∝ reward</div></div>
+    <div class="keyprop"><div class="tex" data-tex="P(x) = \dfrac{R(x)}{Z}"></div><div class="lbl">sampling ∝ reward<br><i>Z</i> = sum of all rewards</div></div>
     <div>
       <h3>What the article offers</h3>
       <ul class="ticks">
         <li>Core concepts, foundations and common training pitfalls</li>
         <li>A <b>Tetris example</b> and an interactive <b>Playground</b></li>
-        <li>An optional <b>notebook</b> implementing every concept</li>
+        <li>An optional <b>notebook</b> treating the implementation side</li>
       </ul>
     </div>
   </div>
@@ -204,7 +198,7 @@
 
   <!-- ===== Row 2: Core concepts ===== -->
   <section data-check="concepts">
-    <h2>Core Concepts, Illustrated</h2>
+    <h2>Core Elements, Illustrated</h2>
     <div class="grid2">
       <div class="card">
         <h3>Building objects step by step: Tetris</h3>
@@ -220,7 +214,7 @@
       </div>
       <div class="card">
         <h3>Flow through the DAG</h3>
-        <p>Like water through pipes, flow runs from the source <i>s</i><sub>0</sub> to the final objects.
+        <p>Like water through pipes, flow runs from the source <i>s</i><sub>0</sub> to the final objects <i>x</i>.
           Training matches <span class="in">inflow</span> and <span class="out">outflow</span> at every state:</p>
         <div class="formula"><div class="tex" data-tex="\underbrace{\textcolor{#1b9e77}{\sum_{s' \in \mathrm{parents}(s)} F(s' \to s)}}_{\text{inflow}} = \underbrace{\textcolor{#7570b3}{R(s) + \sum_{s' \in \mathrm{children}(s)} F(s \to s')}}_{\text{outflow}}"></div></div>
         <img class="flowdag" src="assets/dag.svg" alt="Example DAG with edge flows">
@@ -245,27 +239,14 @@
   <!-- ===== Row 3: Playground ===== -->
   <section data-check="playground">
     <h2>Learning by Doing: the Playground</h2>
-    <div class="pg">
-      <div>
-        <div class="shot"><img src="assets/playground-env.png" alt="Playground environment view"></div>
-        <ul class="views">
-          <li><b>1. Environment</b> &nbsp;drag Gaussians to shape the reward</li>
-          <li><b>2. Training</b> &nbsp;set hyperparameters, train, watch samples</li>
-          <li><b>3. Flow</b> &nbsp;see the learned flow as a vector field</li>
-        </ul>
-      </div>
-      <div>
-        <p>The reward is a mixture of Gaussians on a 2D plane; the policy outputs a Gaussian over steps.
-          Readers replay real training runs, then fix the failures themselves.</p>
-        <div class="runs">
-          <figure><span class="tag ok">Success</span><img src="assets/run-ok.png" alt="">
-            <div class="cap">Both modes, in proportion to reward</div></figure>
-          <figure><span class="tag bad">Mode collapse</span><img src="assets/run-collapse.png" alt="">
-            <div class="cap">Narrow modes: second one never found</div></figure>
-          <figure><span class="tag fix">Off-policy fix</span><img src="assets/run-offpolicy.png" alt="">
-            <div class="cap">Early exploration recovers both modes</div></figure>
-        </div>
-      </div>
+    <p>A 2D plane with a reward made of Gaussians: shape the reward, train a GFlowNet live, and inspect what it learned.</p>
+    <div class="pgviews">
+      <figure><span class="tag">1. Environment</span><div class="shot"><img src="assets/pg-environment.png" alt="Playground environment view"></div>
+        <div class="cap">Drag Gaussians to shape the reward function.</div></figure>
+      <figure><span class="tag">2. Training</span><div class="shot"><img src="assets/pg-training.png" alt="Playground training view"></div>
+        <div class="cap">Set hyperparameters, train, and compare samples to the reward.</div></figure>
+      <figure><span class="tag">3. Flow</span><div class="shot"><img src="assets/pg-flow.png" alt="Playground flow view"></div>
+        <div class="cap">See the learned flow: particles move towards the modes.</div></figure>
     </div>
   </section>
 
