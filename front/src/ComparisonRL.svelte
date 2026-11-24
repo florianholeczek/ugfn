@@ -4,18 +4,19 @@
   import { nodes, edges } from './DAG.js';
 
   let svg;
-  let current = 'gfn';
+  export let current = 'gfn';   // can be set from outside (presentation steps)
   let status = '';
   let api = null;
 
-  const methodOrder = ['rl', 'gfn', 'me'];
+  export let methods = ['rl', 'gfn', 'me'];   // tabs to show (presentation hides max-entropy RL)
   const methodMeta = {
     rl:  { name: 'Reinforcement learning', color: 'var(--cmp-rl)' },
     gfn: { name: 'GFlowNet', color: 'var(--cmp-gfn)' },
     me:  { name: 'Max-entropy RL', color: 'var(--cmp-maxent)' },
   };
 
-  function select(k) { current = k; api?.select(k); }
+  function select(k) { current = k; }
+  $: api?.select(current);
 
   onMount(() => {
     const N = Object.fromEntries(nodes.map(n => [n.id, n]));
@@ -138,7 +139,7 @@
 
 <div class="cmp-card">
   <div class="cmp-tabs">
-    {#each methodOrder as k}
+    {#each methods as k}
       <button class:active={current === k} style="--c: {methodMeta[k].color}" on:click={() => select(k)}>{methodMeta[k].name}</button>
     {/each}
   </div>
