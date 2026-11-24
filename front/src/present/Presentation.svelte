@@ -1,7 +1,7 @@
 <script>
   // Talk version of the article (NeurIPS educational track, 15 min). Layout follows the JKU VDS Lab template
   // (Poppins, left-aligned titles, segmented color bar, logo top right), colors follow the article.
-  // Keys: → / Space / PageDown next step, ← / PageUp back, 0–7 jump to section, F fullscreen,
+  // Keys: → / Space / PageDown next step, ← / PageUp back, 0–8 jump to section, F fullscreen,
   // N open the speaker-notes window, Home / End first / last slide.
   // Mouse: left click next, right click back (not on interactive figures), side buttons back / forward.
   import { onMount } from 'svelte';
@@ -25,6 +25,7 @@
     { n: 5, t: 'Training' },
     { n: 6, t: 'Playground' },
     { n: 7, t: 'Applications' },
+    { n: 8, t: 'Notebook' },
   ];
 
   // steps = number of extra key presses on the slide before moving on
@@ -36,7 +37,7 @@
     { id: 'gfn', section: 1, title: 'What are GFlowNets?', steps: 3,
       notes: 'Generative probabilistic model. Builds objects sequentially (like Lego). Learns from a reward, no dataset. Key property: P(x) ∝ R(x).' },
     { id: 'why', section: 1, title: 'Why proportional sampling?', steps: 3,
-      notes: 'Domains where many high-reward candidates are wanted. Sampling from all modes, not just the biggest one. Drug discovery: ~10^60 molecules, expensive testing; candidates from the same region may fail for the same reasons → diversity is crucial.' },
+      notes: 'Sampling from all modes, not just the biggest one. Domains where many high-reward candidates are wanted. Drug discovery: ~10^60 molecules, expensive testing; candidates from the same region may fail for the same reasons → diversity is crucial.' },
     { id: 'rl', section: 1, title: 'GFlowNets and RL', steps: 1,
       notes: 'Reward maximization vs. proportional sampling. Starts on RL: one path to x9. Next → GFlowNet: proportional. Draw 50 samples.' },
     { id: 'mcmc', section: 1, title: 'GFlowNets and MCMC', steps: 3,
@@ -49,11 +50,20 @@
       notes: 'GFlowNets also work in continuous domains. Policy outputs parameters of a Gaussian (mean + variance) instead of flows per action; sample action from it. Playground environment: 2D plane, reward = mixture of n Gaussians, fixed number of steps.' },
     { id: 'training', section: 5, title: 'Training', steps: 2,
       notes: 'Recorded runs. (1) matches the distribution, (2) mode collapse: only one mode, (3) off-policy training (extra exploration variance, annealed to 0) finds the second mode.' },
-    { id: 'playground', section: 6, title: 'Playground', steps: 0,
-      notes: 'Adjust the reward function, set hyperparameters, start training, inspect how learned flows change during training.' },
+    { id: 'pg-env', section: 6, title: 'Playground: Environment', steps: 0, video: 'environment',
+      caption: 'Adjust the reward function: number, position and variance of the Gaussians',
+      notes: 'Adjust the reward function: drag the Gaussians in the 2D plot or edit the parameter table.' },
+    { id: 'pg-train', section: 6, title: 'Playground: Training', steps: 0, video: 'training',
+      caption: 'Set hyperparameters, train, and watch the samples approach the reward',
+      notes: 'Set hyperparameters, start training, watch samples, marginals and loss during training.' },
+    { id: 'pg-flow', section: 6, title: 'Playground: Flow', steps: 0, video: 'flow',
+      caption: 'Inspect the learned flow at each step and training iteration',
+      notes: 'Inspect how the learned flows change during training, per step and iteration.' },
     { id: 'apps', section: 7, title: 'Domain applications', steps: 0,
       notes: 'Where diverse sampling matters. Name 2–3 examples.' },
-    { id: 'end', section: 7, title: 'Thank you', steps: 0,
+    { id: 'notebook', section: 8, title: 'Accompanying notebook', steps: 0,
+      notes: 'Notebook follows the article. Build a GFlowNet for the toy environment (DAG of the flow section), train it, Test other loss functions, continuous GFlowNet on the 2D plane, recreate the recorded training runs.' },
+    { id: 'end', section: 8, title: 'Thank you', steps: 0,
       notes: 'Thank you. QR codes: Playground, notebook, code.' },
   ];
 
@@ -98,7 +108,7 @@
     else if (['ArrowLeft', 'PageUp', 'ArrowUp'].includes(k)) { e.preventDefault(); prev(); }
     else if (k === 'Home') go(0);
     else if (k === 'End') go(slides.length - 1);
-    else if (/^[0-7]$/.test(k)) jumpSection(+k);
+    else if (/^[0-8]$/.test(k)) jumpSection(+k);
     else if (k === 'f' || k === 'F') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
     else if ((k === 'n' || k === 'N') && !notesMode) window.open(location.pathname + '?notes', 'gfn-notes', 'width=900,height=700');
   }
@@ -271,8 +281,8 @@
 
           {:else if cur.id === 'why'}
             <ul class="ticks">
-              <li class="frag" class:in={step >= 0}>Domains where <b>many</b> high-reward candidates are wanted</li>
-              <li class="frag" class:in={step >= 1}>Proportional sampling covers <b>all modes</b>, not just the biggest one</li>
+              <li class="frag" class:in={step >= 0}>Proportional sampling covers all modes, not just the biggest one</li>
+              <li class="frag" class:in={step >= 1}>Domains where <b>diverse</b> high-reward candidates are wanted</li>
               <li class="frag" class:in={step >= 2}>Drug discovery: <Katex>{'\\sim 10^{60}'}</Katex> molecules, expensive testing</li>
               <li class="frag" class:in={step >= 3}>Similar candidates fail for similar reasons → <b>diversity is crucial</b></li>
             </ul>
@@ -333,11 +343,13 @@
               <figure class="frag" class:in={step >= 2}><img src="images/run3.png" alt="Run 3"><figcaption>Off-policy training</figcaption></figure>
             </div>
 
-          {:else if cur.id === 'playground'}
-            <figure class="pg">
-              <Media src="present/media/playground.webm" fallback="present/pg-training.png" label="Playground" active={cur.id === 'playground'} />
-              <figcaption>Adjust the reward, set hyperparameters, train, and inspect the learned flow</figcaption>
-            </figure>
+          {:else if cur.video}
+            {#key cur.id}
+              <figure class="pg">
+                <Media src="present/media/playground-{cur.video}.webm" label={cur.title} active />
+                <figcaption>{cur.caption}</figcaption>
+              </figure>
+            {/key}
 
           {:else if cur.id === 'apps'}
             <ul class="ticks apps">
@@ -350,6 +362,20 @@
               <li>Games (AFlowNets) <span class="cite">Jiralerspong et al. 2024</span></li>
               <li>LLM red-teaming <span class="cite">Lee et al. 2025</span></li>
             </ul>
+
+          {:else if cur.id === 'notebook'}
+            <div class="cols nb">
+              <ul class="ticks">
+                <li>Build a GFlowNet that samples from the <b>toy environment</b></li>
+                <li><b>Train</b> it</li>
+                <li>Implement other <b>loss functions</b></li>
+                <li>Train a <b>continuous</b> GFlowNet on the 2D plane</li>
+                <li>Recreate the <b>recorded training runs</b></li>
+              </ul>
+              <figure class="nb-fig">
+                <img src="present/notebook-env.png" alt="Notebook: example environment section">
+              </figure>
+            </div>
           {/if}
         </main>
 
@@ -496,12 +522,17 @@
   figure.pg :global(.media) { flex: 1; min-height: 0; }
 
   /* applications */
+  .cols.nb { gap: 60px; }
+  .cols.nb > ul { flex: 0 0 820px; }
+  .nb-fig { margin: 0; }
+  .nb-fig img { width: 100%; display: block; }
+  .nb-fig figcaption { font-size: 22px; color: var(--muted); margin-top: 12px; }
   .apps { columns: 2; column-gap: 80px; }
   .apps li { break-inside: avoid; }
   .cite { display: block; font-size: 24px; color: var(--muted); }
 
   /* section progress (template: segmented bar, current section colored, others light grey) */
-  .path { display: grid; grid-template-columns: repeat(8, 1fr); gap: 16px; padding: 0 var(--mx) 34px; }
+  .path { display: grid; grid-template-columns: repeat(9, 1fr); gap: 16px; padding: 0 var(--mx) 34px; }
   .path .seg { background: none; border: 0; padding: 0; font: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; text-align: left; }
   .path .line { display: block; width: 100%; height: 8px; background: var(--light); }
   .path .t { font-size: 18px; color: #bfbfbf; font-weight: 400; }
