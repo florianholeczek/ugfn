@@ -1291,10 +1291,10 @@
               MCMC uses a non-parametric representation based on samples, whereas GFlowNets represent the distribution implicitly via the flow along trajectories.
               <ComparisonMCMC />
               <p class="mathexpl" style="color: white">
-                Fig. 2: MCMC and a trained GFlowNet sampling from a reward function with four modes, the bottom-left one smaller.
+                Fig. 2: MCMC and a trained GFlowNet sampling from a reward function with four modes (A-D), the bottom-left one smaller.
                 MCMC performs a random walk (white): each step proposes a nearby point and accepts or rejects it based on the rewards.
-                Since the regions between the modes have almost no reward, the chain stays in the first mode it finds for a long time and reaches the small mode only rarely; use 10× to see it switch.
-                The GFlowNet constructs every sample from <Katex>s_0</Katex> in the center, so consecutive samples are independent and all modes are covered from the start.
+                Since the regions between the modes have almost no reward, the chain stays in the first mode it finds for a long time and reaches the small mode only rarely.
+                The trained GFlowNet constructs every sample from <Katex>s_0</Katex> in the center, so consecutive samples are independent and all modes are covered from the start.
                 Both use the same number of steps per second; the cost of training the GFlowNet is not shown.
               </p>
             </Content>
