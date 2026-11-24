@@ -31,8 +31,8 @@
   const slides = [
     { id: 'title', section: 0, title: 'GFlowNet Playground', steps: 0,
       notes: 'Title. Introduce yourself and co-authors.' },
-    { id: 'what', section: 0, title: 'What is the Playground?', steps: 3,
-      notes: 'Interactive article explaining GFlowNets. Train them in the browser. Accompanying notebook, linked at relevant sections, goes through implementations. This talk follows the outline of the article.' },
+    { id: 'what', section: 0, title: 'What is the Playground?', steps: 1,
+      notes: 'Interactive article explaining GFlowNets; train them in the browser. Next: accompanying notebook goes through the implementations; buttons in the article link to the matching notebook cell (here: the example DAG of the flow section).' },
     { id: 'gfn', section: 1, title: 'What are GFlowNets?', steps: 3,
       notes: 'Generative probabilistic model. Builds objects sequentially (like Lego). Learns from a reward, no dataset. Key property: P(x) ∝ R(x).' },
     { id: 'why', section: 1, title: 'Why proportional sampling?', steps: 3,
@@ -229,17 +229,31 @@
 
         <main class="content">
           {#if cur.id === 'what'}
-            <div class="cols">
-              <ul class="ticks">
-                <li class="frag" class:in={step >= 0}>Interactive article explaining GFlowNets</li>
-                <li class="frag" class:in={step >= 1}>Train GFlowNets in the browser</li>
-                <li class="frag" class:in={step >= 2}>Accompanying notebook, linked at the relevant sections</li>
-              </ul>
-              <div class="shots">
-                <img src="present/pg-environment.png" alt="Playground environment">
-                <img src="present/pg-training.png" alt="Playground training">
-                <img src="present/pg-flow.png" alt="Playground flow">
+            <div class="pair">
+              <figure class="shot-col">
+                <div class="shot-head"><b>Interactive article</b></div>
+                <div class="shot-desc">Concepts, interactive figures, train GFlowNets in the browser</div>
+                <div class="crop article">
+                  <img src="present/article.png" alt="Article: flow section with link to the notebook">
+                  <span class="ring frag" class:in={step >= 1}></span>
+                </div>
+              </figure>
+
+              <div class="link frag" class:in={step >= 1}>
+                <span class="link-label">linked at the relevant sections</span>
+                <svg viewBox="0 0 120 30" width="120" height="30" aria-hidden="true">
+                  <line x1="2" y1="15" x2="104" y2="15" stroke="#21918c" stroke-width="5" />
+                  <path d="M100 4 L118 15 L100 26 Z" fill="#21918c" />
+                </svg>
               </div>
+
+              <figure class="shot-col frag" class:in={step >= 1}>
+                <div class="shot-head"><b>Accompanying notebook</b></div>
+                <div class="shot-desc">Implementation of each concept, in Colab</div>
+                <div class="crop notebook">
+                  <img src="present/notebook.png" alt="Colab notebook: the same example DAG">
+                </div>
+              </figure>
             </div>
 
           {:else if cur.id === 'gfn'}
@@ -424,9 +438,23 @@
   .qrs figcaption { font-size: 26px; font-weight: 600; }
 
   /* ===== content slides ===== */
-  /* what */
-  .shots { display: flex; flex-direction: column; gap: 18px; flex: 0 0 720px !important; }
-  .shots img { width: 100%; max-height: 250px; object-fit: cover; object-position: top; }
+  /* what: article ↔ notebook */
+  .pair { display: grid; grid-template-columns: 1fr 190px 1fr; align-items: start; }
+  .shot-col { margin: 0; min-width: 0; }
+  .shot-head { font-size: 36px; }
+  .shot-desc { font-size: 24px; color: var(--muted); margin: 4px 0 18px; min-height: 2.8em; }
+  .crop { position: relative; overflow: hidden; outline: 2px solid #e4e4e4; }
+  .crop img { display: block; width: 100%; }
+  /* article.png is 3200×1800: drop the empty left 16.5 %, keep the top 76 % (heading, text, Colab button, DAG, caption) */
+  .crop.article { aspect-ratio: 2672 / 1368; }
+  .crop.article img { width: 119.76%; margin-left: -19.76%; }
+  /* notebook.png is 2800×1800: drop the promo banner (top 104 px) and the bottom bar */
+  .crop.notebook { aspect-ratio: 2800 / 1592; }
+  .crop.notebook img { margin-top: -3.72%; }
+  /* teal ring around the "Example environment" button (position measured on article.png) */
+  .ring { position: absolute; left: 81.6%; top: 30.6%; width: 18.4%; height: 12.4%; border: 5px solid var(--teal); border-radius: 12px; box-sizing: border-box; }
+  .link { align-self: center; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0 20px; margin-top: 60px; }
+  .link-label { font-size: 20px; color: var(--teal); text-align: center; line-height: 1.25; font-weight: 400; }
 
   /* gfn */
   .keyprop { flex: 0 0 600px !important; background: var(--light); padding: 30px 40px; text-align: center; font-size: 46px; }
