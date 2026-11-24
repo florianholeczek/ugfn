@@ -10,6 +10,7 @@
   import ComparisonRL from '../ComparisonRL.svelte';
   import ComparisonMCMC from '../ComparisonMCMC.svelte';
   import FlowDAG from '../FlowDAG.svelte';
+  import TBDAG from '../TBDAG.svelte';
   import { edgeById } from '../DAG.js';
   import Media from './Media.svelte';
 
@@ -46,6 +47,8 @@
       notes: 'State = board. Action = piece + rotation + column. Start with blank state, select action with policy, continue for fixed length or until stop action, collect reward. During training: update policy based on it.' },
     { id: 'dag', section: 3, title: 'Flow, policies and objective', steps: 3,
       notes: 'Policy predicts flow to each next state; transition probabilities = normalized flows. Flow matching: inflow = outflow. Steps: (1) edge s2→s4: policy, (2) state s4: inflow/outflow/loss, (3) free hover.' },
+    { id: 'tb', section: 3, title: 'Trajectory balance', steps: 0,
+      notes: 'Loss on the whole trajectory instead of per state: Z times the forward probabilities must equal R(x) times the backward probabilities. Selected: s0 → s2 → s4 → s7 (not finished, so the general formulas are shown). Click x7 or s9 to finish the trajectory.' },
     { id: 'continuous', section: 4, title: 'Continuous GFlowNets', steps: 2,
       notes: 'GFlowNets also work in continuous domains. Policy outputs parameters of a Gaussian (mean + variance) instead of flows per action; sample action from it. Playground environment: 2D plane, reward = mixture of n Gaussians, fixed number of steps.' },
     { id: 'training', section: 5, title: 'Training', steps: 2,
@@ -225,7 +228,7 @@
           <!-- where the template has its grey band -->
           <div class="end-band">
             <div class="qrs">
-              <figure><img src="present/qr-playground.svg" alt="QR Playground"><figcaption style="color:#443983">Playground</figcaption></figure>
+              <figure><img src="present/qr-playground.svg" alt="QR Playground"><figcaption style="color:#443983">Playground</figcaption><div class="qr-url">gfn-playground.jku-vds-lab.at</div></figure>
               <figure><img src="present/qr-notebook.svg" alt="QR notebook"><figcaption style="color:#21918c">Notebook</figcaption></figure>
               <figure><img src="present/qr-github.svg" alt="QR GitHub"><figcaption style="color:#55565c">Code</figcaption></figure>
             </div>
@@ -324,6 +327,11 @@
               <FlowDAG bind:hoveredNode={dagNode} bind:hoveredEdge={dagEdge} />
             </div>
 
+          {:else if cur.id === 'tb'}
+            <div class="dag-wrap tb-wrap">
+              <TBDAG path={['s0', 's2', 's4', 's7']} caption={false} />
+            </div>
+
           {:else if cur.id === 'continuous'}
             <div class="cols">
               <ul class="ticks narrow">
@@ -338,9 +346,9 @@
 
           {:else if cur.id === 'training'}
             <div class="runs">
-              <figure class="frag" class:in={step >= 0}><img src="images/run1.png" alt="Run 1"><figcaption>Matching the distribution</figcaption></figure>
-              <figure class="frag" class:in={step >= 1}><img src="images/run2.png" alt="Run 2"><figcaption>Mode collapse</figcaption></figure>
-              <figure class="frag" class:in={step >= 2}><img src="images/run3.png" alt="Run 3"><figcaption>Off-policy training</figcaption></figure>
+              <figure class="frag" class:in={step >= 0}><img src="present/run1-final.png" alt="Run 1 after training"><figcaption>Matching the distribution</figcaption></figure>
+              <figure class="frag" class:in={step >= 1}><img src="present/run2-final.png" alt="Run 2 after training"><figcaption>Mode collapse</figcaption></figure>
+              <figure class="frag" class:in={step >= 2}><img src="present/run3-final.png" alt="Run 3 after training"><figcaption>Off-policy training</figcaption></figure>
             </div>
 
           {:else if cur.video}
@@ -457,7 +465,7 @@
   .title-qr img { width: 280px; height: 280px; }
   .qr-url { font-size: 20px; color: var(--muted); }
 
-  .end-band { position: absolute; left: 0; right: 0; bottom: 0; height: 360px; padding: 0 var(--mx); display: flex; align-items: center; }
+  .end-band { position: absolute; left: 0; right: 0; bottom: 60px; height: 360px; padding: 0 var(--mx); display: flex; align-items: center; }
   .qrs { display: flex; gap: 70px; }
   .qrs figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
   .qrs img { width: 260px; height: 260px; }
@@ -508,9 +516,14 @@
   .dag-wrap { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100%; }
   .dag-wrap :global(.dag-svg) { width: 960px !important; height: auto; flex: none; margin: 0 auto !important; }
   .dag-wrap :global(.mathexpl) { display: none; }
+  .tb-wrap { justify-content: center; }
+  .tb-wrap :global(.dag-svg) { width: 900px !important; }
   .dag-wrap :global(.formula-table) { width: 1500px !important; font-size: 24px !important; margin: 0 auto !important; }
   .dag-wrap :global(.formula-table td) { height: auto !important; padding: 8px 0 !important; }
   .dag-wrap :global(.formula-table td:first-child) { width: 180px !important; font-family: 'Poppins', sans-serif; font-weight: 600; }
+  /* same table style as the flow slide (Fig. 8); after it so the wider label column wins */
+  .tb-wrap :global(.formula-table td) { border-top: 0 !important; }
+  .tb-wrap :global(.formula-table td:first-child) { width: 240px !important; }
 
   /* training */
   .runs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; align-items: start; }
