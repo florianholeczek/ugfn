@@ -470,6 +470,7 @@
   .widget :global(.cmp-controls) { font-size: 20px !important; }
 
   /* tetris */
+  .cols.tetris > .tetris-figs { flex: 0 0 620px; }
   .tetris-figs { display: grid; grid-template-columns: 1fr 1fr; gap: 30px 40px; align-items: end; }
   .tetris-figs figure { margin: 0; text-align: center; }
   .tetris-figs figure.wide { grid-column: span 2; }
